@@ -116,5 +116,5 @@ public double[] getGerryManderScores(Vector<District> districts) {
              q[j] += results[1][j];
         }
     }
-    return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(percet_dists,dist_pops))}; //exponentiate because each bit represents twice as many people disenfranched
+    return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops))}; //exponentiate because each bit represents twice as many people disenfranched
 }
