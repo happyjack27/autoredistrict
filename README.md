@@ -19,9 +19,7 @@
 
     interface iEvolvable {
         public int[] getGenome();
-        public int[] getClosestGenome(int[] reference);
-        public static Vector<int[]> getIdenticalGenomes(int[] genome);
-        public static int getGenomeHammingDistance(int[] genome1, int[] genome2);
+        public int[] getGenome(int[] baseline);
         public void setGenome(int[] genome);
         public double getFitnessScore();
     }
@@ -39,12 +37,12 @@
 
         //always find the most identical version before spawning new ones!
         //this dramatically reduces convergence time!
-        public int[] getClosestGenome(int[] reference) {
+        public int[] getGenome(int[] baseline) {
              Vector<int[]> versions =  getIdenticalGenomes(getGenome());
              int closest = 99999999999999999;
              int[] closest_version = null;
              for( int[] version : versions) {
-                int test = getGenomeHammingDistance(version,reference);
+                int test = getGenomeHammingDistance(version,baseline);
                 if( test < closest) {
                     closest = test;
                     closest_version = version;
