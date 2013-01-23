@@ -27,6 +27,7 @@
         public static double geometry_weight = 1;
         public static double disenfranchise_weight = 1;
         public static double population_balance_weight = 1;
+        public static double disconnected_population_weight = 0;
         
         Vector<Block> blocks;
         Vector<District> districts;
@@ -60,7 +61,12 @@
         }
         public double getFitnessScore() {
             double[] scores_to_minimize = getGerryManderScores(1000);
-            return -(scores_to_minimize[0]*geometry_weight + scores_to_minimize[1]*disenfranchise_weight + scores_to_minimize[2]*population_balance_weight);
+            return -(
+            scores_to_minimize[0]*geometry_weight + 
+            scores_to_minimize[1]*disenfranchise_weight + 
+            scores_to_minimize[2]*population_balance_weight +
+            scores_to_minimize[3]*disconnected_population_weight
+            );
         }
         
         //helper functions
@@ -150,7 +156,12 @@
                     q[j] += results[1][j];
                 }
             }
-            return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops))}; //exponentiate because each bit represents twice as many people disenfranched
+            disconnected_pops = 0;
+            if( disconnected_population_weight > 0) {
+                for(District district : districts)
+                    disconnected_pops += district.getPopulation() - district.geRegionPopulation(district.getTopPopulationRegion());
+            }
+            return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops}; //exponentiate because each bit represents twice as many people disenfranched
         }
     }
     
