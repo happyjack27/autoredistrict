@@ -184,7 +184,7 @@
                     continue;
                 Vector<Block> region = new Vector<Block>();
                 regions.add(region);
-                addAllConnected(blocks.get(i),region,region_hash);
+                addAllConnected(block,region,region_hash);
             }
             return regions;
         }
