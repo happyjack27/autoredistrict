@@ -15,7 +15,7 @@
     
     //language: Java
     
-    impor java.util.*;
+    import java.util.*;
 
     interface iEvolvable {
         public int[] getGenome();
