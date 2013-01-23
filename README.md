@@ -159,7 +159,7 @@
             double length = 0;
             for( Block block : blocks)
                 for( Edge edge : block.edges)
-                    if( block_districts[edge.block1.index] != block_districts[edge.block2.index])
+                    if( !edge.areBothSidesSameDistrict(block_districts))
                         length += edge.length;
             return length;
         }
@@ -168,6 +168,23 @@
             for( Block block : blocks)
                   pop += block.population;
             return pop;
+        }
+        
+        //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
+        //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
+        int getRegionCount() {
+            int regionCount = 0;
+            Vector<Edge> outerEdges = getOuterEdges();
+            //TODO: count regions by counting number of outer edge cycles.
+        }
+        
+        Vector<Edge> getOuterEdges() {
+            Vector<Edge> outerEdges = new Vector<Edge>();
+            for( Block block : blocks)
+                for( Edge edge : block.edges)
+                    if( !edge.areBothSidesSameDistrict(block_districts))
+                        outerEdges.add(edge);
+            return outerEdges;
         }
     }
     class Block {
@@ -183,6 +200,12 @@
     class Edge {
         Block block1;
         Block block2;
+        Vertex vertex1;
+        Vertex vertex2;
         double length;
+        boolean areBothSidesSameDistrict(int[] block_districts) {
+            return block_districts[block1.index] == block_districts[block2.index];
+        }
     }
-
+    class Vertex {
+    }
