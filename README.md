@@ -70,6 +70,13 @@ public double[][] getRandomResultSample(Vector<District> districts) {
 
 //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
 public double getKLDiv(double[] p, double[] q) {
+
+    //regularize (see "regularization" in statistics)
+    for( int i = 0; i < p.length; i++)
+        p[i]++;  
+    for( int i = 0; i < q.length; i++)
+        q[i]++;  
+
     //normalize
     double tot = 0;
     for( int i = 0; i < p.length; i++)
