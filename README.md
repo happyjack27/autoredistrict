@@ -8,7 +8,7 @@ block and length data can be taken from a standard dime file, which i presume an
 
 basic idea is you do it gestalt, without worrying about contiguity a prioiri.
 
-any standard heuristic optimization algorithm will do fine; generic algorithm and swarm intelligence are the two that come most readily to mine.
+any standard heuristic optimization algorithm will do fine; generic algorithm and swarm intelligence are the two that come most readily to mind.
 
 the gene of a genetic algorithm would just be a vector of which district each block belongs to, in order.  so one would have to add an ordering to the blocks.  (i.e. number them 1 through whatever).  
 
