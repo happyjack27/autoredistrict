@@ -105,7 +105,7 @@ public double getKLDiv(double[] p, double[] q) {
     //get kldiv
     double div = 0;
     for( int i = 0; i < q.length; i++)
-        div += -p[i]*Math.log(q[i]) + p[i]*Math.log(p[i]);
+        div += -p[i]*(Math.log(q[i]) - Math.log(p[i]));
     return div;
 }
 
