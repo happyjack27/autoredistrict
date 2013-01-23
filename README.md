@@ -12,8 +12,6 @@ any standard heuristic optimization algorithm will do fine; generic algorithm an
 
 the gene of a genetic algorithm would just be a vector of which district each block belongs to, in order.  so one would have to add an ordering to the blocks.  (i.e. number them 1 through whatever).  
 
-i also forgot to add constraint for population difference between districts.  that's trivial too.
-
 the two non trivial things: calculating geometric complexity and calculating democratic representativeness are what are shown.  the first, by minimizing border length, the second, by minimizing kullback-leibler divergence of the election results from the popular vote. 
 */
 
