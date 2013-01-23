@@ -14,6 +14,8 @@
     //for use in heuristic optimization (e.g. genetic algoritm / swarm ) for computer-automated redistricting.
     
     //language: Java
+    
+    impor java.util.*;
 
     interface iEvolvable {
         public int[] getGenome();
