@@ -174,6 +174,23 @@
         int getRegionCount() {
             int regionCount = 0;
             Vector<Edge> outerEdges = getOuterEdges();
+            
+            //create vertex-to-edge hashtable.
+            Hashtable<Vertex,Vector<Edge>> vertices = new Hashtable<Vertex,Vector<Edge>>();
+            for( Edge edge : outerEdges) {
+                Vector<Edge> ve1 = vertices.get(edge.vertex1);
+                if( ve1 == null) {
+                    ve1 = new Vector<Edge>();
+                    vertices.put(edge.vertex1,ve1);
+                }
+                ve1.add(edge);
+                Vector<Edge> ve2 = vertices.get(edge.vertex2);
+                if( ve2 == null) {
+                    ve2 = new Vector<Edge>();
+                    vertices.put(edge.vertex2,ve2);
+                }
+                ve2.add(edge);
+            }
             //TODO: count regions by counting number of outer edge cycles.
             
             return regionCount;
