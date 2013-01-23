@@ -201,11 +201,13 @@
                 Vertex startVertex = edge.vertex1;
                 Vertex nextVertex = edge.vertex2;
                 vertices.get(startVertex).remove(edge);
+                vertices.get(nextVertex).remove(edge);
                 outerEdges.remove(0);
                 while( nextVertex != startVertex) {
                      edge = vertices.get(nextVertex).remove(0);
-                     outerEdges.remove(edge);
                      nextVertex = edge.vertex1 == nextVertex ? edge.vertex2 : edge.vertex1;
+                     vertices.get(nextVertex).remove(edge);
+                     outerEdges.remove(edge);
                 }
             }
             
