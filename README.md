@@ -127,6 +127,7 @@ public double[] getGerryManderScores(Vector<District> districts) {
     for( int i = 0; i < perfect_dists.length; i++)
         perfect_dists[i] = exp_population;
 
+    //simulate 1000 elections and accumulate the results
     double[] p = new double[num_parties];
     double[] q = new double[num_parties];
     for( int i = 0; i < 1000; i++) {
