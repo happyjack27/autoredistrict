@@ -19,6 +19,9 @@
 
     interface iEvolvable {
         public int[] getGenome();
+        public int[] getClosestGenome(int[] reference);
+        public static Vector<int[]> getIdenticalGenomes(int[] genome);
+        public static int getGenomeHammingDistance(int[] genome1, int[] genome2);
         public void setGenome(int[] genome);
         public double getFitnessScore();
     }
@@ -33,7 +36,54 @@
         Vector<District> districts;
         int num_districts = 0;
         int[] block_districts;
-        
+
+        //always find the most identical version before spawning new ones!
+        //this dramatically reduces convergence time!
+        public int[] getClosestGenome(int[] reference) {
+             Vector<int[]> versions =  getIdenticalGenomes(getGenome());
+             int closest = 99999999999999999;
+             int[] closest_version = null;
+             for( int[] version : versions) {
+                int test = getGenomeHammingDistance(version,reference);
+                if( test < closest) {
+                    closest = test;
+                    closest_version = version;
+                }
+             }
+             return closest_version;
+        }
+
+        public static Vector<int[]> getIdenticalGenomes(int[] genome) {
+            Vector<int[]> identicals = new Vector<int[]>();
+            
+            int max = 0;
+            for( int i = 0; i < genome.length; i++) 
+                if( genome[i] > max)
+                    max = genome[i];
+            int[] rename = new int[max+1];
+            for( int i = 0; i < rename; i++)
+                rename[i] = i;
+                
+            //TODO ... cycle through all permutations... {
+                identicals.add(getRenamed(genome,rename));
+            // }
+            
+            return identicals;
+            
+        }
+        public int[] getRenamed(int[] source, int[] rename) {
+            int[] new_version = new int[source.length];
+            for( int i = 0; i < source.length; i++)
+                new_version[i] = rename[source[i]];
+            return new_version;
+        }
+        public static int getGenomeHammingDistance(int[] genome1, int[] genome2) {
+            int dist = 0;
+            for( int i = 0; i < genome1.length; i++)
+                dist += genome1[i] == genome2[i] ? 0 : 1;
+            return dist;
+        }
+
         //constructors
         public DistrictMap(Vector<Block> blocks, int num_districts, int[] genome) {
             this(blocks,num_districts);
