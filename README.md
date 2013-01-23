@@ -199,7 +199,7 @@
                 regionCount++;
                 Edge edge = outerEdges.get(0);
                 Vertex startVertex = edge.vertex1;
-                Vertext nextVertex = edge.vertex2;
+                Vertex nextVertex = edge.vertex2;
                 vertices.get(startVertex).remove(edge);
                 outerEdges.remove(0);
                 while( nextVertex != startVertex) {
