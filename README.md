@@ -161,6 +161,7 @@
                 for(District district : districts)
                     disconnected_pops += district.getPopulation() - district.geRegionPopulation(district.getTopPopulationRegion());
             }
+            disconnected_pops /= total_population;
             return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops}; //exponentiate because each bit represents twice as many people disenfranched
         }
     }
