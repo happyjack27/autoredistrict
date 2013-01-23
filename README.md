@@ -62,12 +62,32 @@
             for( int i = 0; i < rename; i++)
                 rename[i] = i;
                 
-            //TODO ... cycle through all permutations... {
-                identicals.add(getRenamed(genome,rename));
-            // }
+            //cycle through all permutations
+            Vector<int[]> permutations = new Vector<int[]>();
+            getPermutations(rename,0,permutations);
+            for( int[] permutation : permutations) 
+                identicals.add(getRenamed(genome,permutation));
             
             return identicals;
             
+        }
+        public void getPermutations(int[] a, int k, Vector<int[]> results) {
+            if(k==a.length) {
+                int[] result = new int[a.length];
+                for( int i = 0; i < a.length; i++)
+                    result[i] = a[i];
+                results.add(result);
+                return;
+            }
+            for (int i = k; i < a.length; i++) {
+                int temp = a[k];
+                a[k]=a[i];
+                a[i]=temp;
+                getPermutations(a,k+1,results);
+                temp=a[k];
+                a[k]=a[i];
+                a[i]=temp;
+            }
         }
         public int[] getRenamed(int[] source, int[] rename) {
             int[] new_version = new int[source.length];
