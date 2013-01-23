@@ -21,8 +21,8 @@ Programmatically makes a fair congressional district map (prevents gerrymanderin
     //language: Java
     
     class District {
-        Vector<Block> blocks;
-            double getEdgeLength() {
+        Vector<Block> blocks = new Vector<Block>();
+        double getEdgeLength() {
             double length = 0;
             for( Block block : blocks)
                 for( Edge edge : block.edges)
@@ -42,7 +42,7 @@ Programmatically makes a fair congressional district map (prevents gerrymanderin
         double population;
         double prob_turnout;
         double[] prob_vote = new double[num_parties];
-        Vector edges;
+        Vector<Edge> edges = new Vector<Edge>();
         double[] getVotes() {
             //TODO: get random variables of the vote distribution given the statistics for the block.
         }
