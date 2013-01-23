@@ -142,7 +142,7 @@
             double[] p = new double[num_parties];
             double[] q = new double[num_parties];
             for( int i = 0; i < trials; i++) {
-                double[][] results = getRandomResultSample(districts);
+                double[][] results = getRandomResultSample();
                 for( int j = 0; j < num_parties; j++) {
                     p[j] += results[0][j];
                     q[j] += results[1][j];
