@@ -174,45 +174,37 @@
         //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
         //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
         int getRegionCount() {
-            int regionCount = 0;
-            Vector<Edge> outerEdges = getOuterEdges();
-            
-            //create vertex-to-edge hashtable.
-            Hashtable<Vertex,Vector<Edge>> vertices = new Hashtable<Vertex,Vector<Edge>>();
-            for( Edge edge : outerEdges) {
-                Vector<Edge> ve1 = vertices.get(edge.vertex1);
-                if( ve1 == null) {
-                    ve1 = new Vector<Edge>();
-                    vertices.put(edge.vertex1,ve1);
-                }
-                ve1.add(edge);
-                Vector<Edge> ve2 = vertices.get(edge.vertex2);
-                if( ve2 == null) {
-                    ve2 = new Vector<Edge>();
-                    vertices.put(edge.vertex2,ve2);
-                }
-                ve2.add(edge);
-            }
-            
-            ///now count region cycles.
-            while( outerEdges.size() > 0) {
-                regionCount++;
-                Edge edge = outerEdges.get(0);
-                Vertex startVertex = edge.vertex1;
-                Vertex nextVertex = edge.vertex2;
-                vertices.get(startVertex).remove(edge);
-                vertices.get(nextVertex).remove(edge);
-                outerEdges.remove(0);
-                while( nextVertex != startVertex) {
-                     edge = vertices.get(nextVertex).remove(0);
-                     nextVertex = edge.vertex1 == nextVertex ? edge.vertex2 : edge.vertex1;
-                     vertices.get(nextVertex).remove(edge);
-                     outerEdges.remove(edge);
-                }
-            }
-            
-            return regionCount;
+            return getRegions().size();
         }
+        Vector<Vector<Block>> getRegions() {
+            Hashtable<Block,Vector<Block>> region_hash = new Hashtable<Block,Vector<Block>>();
+            Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
+            for( Block block : blocks) {
+                if( region_hash.get(block) != null)
+                    continue;
+                Vector<Block> region = new Vector<Block>();
+                regions.add(region);
+                addAllConnected(blocks.get(i),region,region_hash);
+            }
+            return regions;
+        }
+        //recursively insert connected blocks.
+        void addAllConnected( Block block, Vector<Block> region,  Hashtable<Block,Vector<Block>> region_hash) {
+            if( region_hash.get(block) != null)
+                return;
+            region.add(block);
+            region_hash.put(block,region);
+            for( Edge edge : block.edges)
+                if( edge.areBothSidesSameDistrict(block_districts))
+                    addAllConnected( edge.block1 == block ? edge.block2 : edge.block1, region, region_hash);
+        }
+        void getRegionPopulation(Vector<Block> region) {
+            double population = 0;
+            for( Block block : region)
+                population += region.population;
+            return population;
+        }
+
         
         Vector<Edge> getOuterEdges() {
             Vector<Edge> outerEdges = new Vector<Edge>();
