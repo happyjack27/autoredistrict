@@ -191,7 +191,21 @@
                 }
                 ve2.add(edge);
             }
-            //TODO: count regions by counting number of outer edge cycles.
+            
+            ///now count region cycles.
+            while( outerEdges.size() > 0) {
+                regionCount++;
+                Edge edge = outerEdges.get(0);
+                Vertex startVertex = edge.vertex1;
+                Vertext nextVertex = edge.vertex2;
+                vertices.get(startVertex).remove(edge);
+                outerEdges.remove(0);
+                while( nextVertex != startVertex) {
+                     edge = vertices.get(nextVertex).remove(0);
+                     outerEdges.remove(edge);
+                     nextVertex = edge.vertex1 == nextVertex ? edge.vertex2 : edge.vertex1;
+                }
+            }
             
             return regionCount;
         }
