@@ -1,8 +1,3 @@
-autoredistrict
-==============
-
-Programmatically makes a fair congressional district map (prevents gerrymandering)
-
     /*
     block and length data can be taken from a standard dime file, which i presume any municiplality has. the census data, well i'm sure they have it electronically, cause hey, they draw districts. so getting the geolocation dataset is not a problem. you still have to add in code to make sure the districts are contiguous, though.
     
@@ -19,14 +14,152 @@ Programmatically makes a fair congressional district map (prevents gerrymanderin
     //for use in heuristic optimization (e.g. genetic algoritm / swarm ) for computer-automated redistricting.
     
     //language: Java
+
+    interface iEvolvable {
+        public int[] getGenome();
+        public void setGenome(int[] genome);
+        public double getFitnessScore();
+    }
+
+    class DistrictMap implements iEvolvable {
+        public static double geometry_weight = 1;
+        public static double disenfranchise_weight = 1;
+        public static double population_balance_weight = 1;
+        
+        Vector<Block> blocks;
+        Vector<District> districts;
+        int num_districts = 0;
+        int[] block_districts;
+        
+        //constructors
+        public DistrictMap(Vector<Block> blocks, int num_districts, int[] genome) {
+            this(blocks,num_districts);
+            setGenome(genome);
+        }
+        public DistrictMap(Vector<Block> blocks, int num_districts) {
+            this.num_districts = num_districts;
+            this.blocks = blocks;
+            districts = new Vector<District>();
+            for( int i = 0; i < num_districts; i++)
+                districts.add(new District());
+        }
+        
+        //genetic evolution primary functions
+        public int[] getGenome() {
+            return block_districts;
+        }
+        public void setGenome(int[] genome) {
+            block_districts = genome;
+            districts = new Vector<District>();
+            for( int i = 0; i < num_districts; i++)
+                districts.add(new District());
+            for( int i = 0; i < genome.length; i++)
+                districts.get(genome[i]).add(blocks.get(i));
+        }
+        public double getFitnessScore() {
+            double[] scores_to_minimize = getGerryManderScores(1000);
+            return -(scores_to_minimize[0]*geometry_weight + scores_to_minimize[1]*disenfranchise_weight + scores_to_minimize[2]*population_balance_weight);
+        }
+        
+        //helper functions
+        public double[][] getRandomResultSample() {
+            double[] popular_vote = new double[num_parties]; //inited to 0
+            double[] elected_vote = new double[num_parties]; //inited to 0
+            for(District district : districts) {
+                double district_vote = new double[num_parties]; //inited to 0
+                for( Block block : district.blocks) {
+                    double[] block_vote = block.getVotes();
+                    for( int i = 0; i most_value) {
+                        most_index = i;
+                        most_value = district_vote[i];
+                    }
+                }
+                elected_vote[most_index]++;
+            }
+            return new double[][]{popular_vote,elected_vote};
+        }
     
+        //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
+        public double getKLDiv(double[] p, double[] q) {
+    
+            //get totals
+            double totp = 0;
+            for( int i = 0; i < p.length; i++)
+                totp += p[i];  
+            double totq = 0;
+            for( int i = 0; i < q.length; i++)
+                totq += q[i];  
+    
+            //make same ratio before regularizing.
+            double ratio = p[i] / q[i];
+            for( int i = 0; i < q.length; i++)
+                q[i] *= ratio;  
+        
+            //regularize (see "regularization" in statistics)
+            for( int i = 0; i < p.length; i++)
+                p[i]++;  
+            for( int i = 0; i < q.length; i++)
+                q[i]++;  
+        
+            //normalize
+            totp = 0;
+            for( int i = 0; i < p.length; i++)
+                totp += p[i];  
+            for( int i = 0; i < p.length; i++)
+                p[i] /= totp;
+            totq = 0;
+            for( int i = 0; i < q.length; i++)
+                totq += q[i];  
+            for( int i = 0; i < q.length; i++)
+                q[i] /= totq;
+        
+            //get kldiv
+            double div = 0;
+                for( int i = 0; i < q.length; i++)
+                    div += -p[i]*(Math.log(q[i]) - Math.log(p[i]));
+            return div;
+        }
+        
+        //returns total edge length, unfairness, population imbalance
+        //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
+        public double[] getGerryManderScores(int trials) {
+            double length = 0;
+            double total_population = 0;
+            double[] dist_pops = new double[districts.size()];
+            int h = 0;
+            for(District district : districts) {
+                length += district.getEdgeLength(block_districts);
+                dist_pops[h] = district.getPopulation();
+                total_population += dist_pops[h];
+                h++;
+            }
+            double exp_population = total_population/districts.size();
+            double[] perfect_dists = new double[districts.size()];
+            for( int i = 0; i < perfect_dists.length; i++)
+                perfect_dists[i] = exp_population;
+        
+            //simulate trials elections and accumulate the results
+            double[] p = new double[num_parties];
+            double[] q = new double[num_parties];
+            for( int i = 0; i < trials; i++) {
+                double[][] results = getRandomResultSample(districts);
+                for( int j = 0; j < num_parties; j++) {
+                    p[j] += results[0][j];
+                    q[j] += results[1][j];
+                }
+            }
+            return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops))}; //exponentiate because each bit represents twice as many people disenfranched
+        }
+    }
+    
+    //buisness objects
     class District {
         Vector<Block> blocks = new Vector<Block>();
-        double getEdgeLength() {
+        double getEdgeLength(int[] block_districts) {
             double length = 0;
             for( Block block : blocks)
                 for( Edge edge : block.edges)
-                    if( edge.block1.district != edge.block2.district)
+                    if( block_districts[edge.block1.index] != block_districts[edge.block2.index])
                         length += edge.length;
             return length;
         }
@@ -38,7 +171,7 @@ Programmatically makes a fair congressional district map (prevents gerrymanderin
         }
     }
     class Block {
-        int district;
+        int index;
         double population;
         double prob_turnout;
         double[] prob_vote = new double[num_parties];
@@ -52,91 +185,4 @@ Programmatically makes a fair congressional district map (prevents gerrymanderin
         Block block2;
         double length;
     }
-    public double[][] getRandomResultSample(Vector<District> districts) {
-        double[] popular_vote = new double[num_parties]; //inited to 0
-        double[] elected_vote = new double[num_parties]; //inited to 0
-        for(District district : districts) {
-            double district_vote = new double[num_parties]; //inited to 0
-            for( Block block : district.blocks) {
-                double[] block_vote = block.getVotes();
-                for( int i = 0; i most_value) {
-                    most_index = i;
-                    most_value = district_vote[i];
-                }
-            }
-            elected_vote[most_index]++;
-        }
-        return new double[][]{popular_vote,elected_vote};
-    }
-    
-    //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
-    public double getKLDiv(double[] p, double[] q) {
-    
-        //get totals
-        double totp = 0;
-        for( int i = 0; i < p.length; i++)
-            totp += p[i];  
-        double totq = 0;
-        for( int i = 0; i < q.length; i++)
-            totq += q[i];  
-    
-        //make same ratio before regularizing.
-        double ratio = p[i] / q[i];
-        for( int i = 0; i < q.length; i++)
-            q[i] *= ratio;  
-    
-        //regularize (see "regularization" in statistics)
-        for( int i = 0; i < p.length; i++)
-            p[i]++;  
-        for( int i = 0; i < q.length; i++)
-            q[i]++;  
-    
-        //normalize
-        totp = 0;
-        for( int i = 0; i < p.length; i++)
-            totp += p[i];  
-        for( int i = 0; i < p.length; i++)
-            p[i] /= totp;
-        totq = 0;
-        for( int i = 0; i < q.length; i++)
-            totq += q[i];  
-        for( int i = 0; i < q.length; i++)
-            q[i] /= totq;
-    
-        //get kldiv
-        double div = 0;
-            for( int i = 0; i < q.length; i++)
-            div += -p[i]*(Math.log(q[i]) - Math.log(p[i]));
-        return div;
-    }
-    
-    //returns total edge length, unfairness, population imbalance
-    //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
-    public double[] getGerryManderScores(Vector<District> districts) {
-        double length = 0;
-        double total_population = 0;
-        double[] dist_pops = new double[districts.size()];
-        int h = 0;
-        for(District district : districts) {
-            length += district.getEdgeLength();
-            dist_pops[h] = district.getPopulation();
-            total_population += dist_pops[h];
-            h++;
-        }
-        double exp_population = total_population/districts.size();
-        double[] perfect_dists = new double[districts.size()];
-        for( int i = 0; i < perfect_dists.length; i++)
-            perfect_dists[i] = exp_population;
-    
-        //simulate 1000 elections and accumulate the results
-        double[] p = new double[num_parties];
-        double[] q = new double[num_parties];
-        for( int i = 0; i < 1000; i++) {
-            double[][] results = getRandomResultSample(districts);
-            for( int j = 0; j < num_parties; j++) {
-                p[j] += results[0][j];
-                q[j] += results[1][j];
-            }
-        }
-        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops))}; //exponentiate because each bit represents twice as many people disenfranched
-    }
+
