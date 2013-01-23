@@ -176,6 +176,33 @@
         int getRegionCount() {
             return getRegions().size();
         }
+        
+        Vector<Block> getTopPopulationRegion() {
+            Vector<Vector<Block>> regions = getRegions();
+            Vector<Block> high;
+            double max_pop = 0;
+            for( Vector<Block> region : regions) {
+                pop = getRegionPopulation(region);
+                if( pop > max_pop) {
+                    max_pop = pop;
+                    high = region;
+                }
+            }
+            return high;
+        }
+        Vector<Block> getTopBlockCountRegion() {
+            Vector<Vector<Block>> regions = getRegions();
+            Vector<Block> high;
+            double max_pop = 0;
+            for( Vector<Block> region : regions) {
+                pop = region.size();
+                if( pop > max_pop) {
+                    max_pop = pop;
+                    high = region;
+                }
+            }
+            return high;
+        }
         Vector<Vector<Block>> getRegions() {
             Hashtable<Block,Vector<Block>> region_hash = new Hashtable<Block,Vector<Block>>();
             Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
