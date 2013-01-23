@@ -157,10 +157,9 @@
         Vector<Block> blocks = new Vector<Block>();
         double getEdgeLength(int[] block_districts) {
             double length = 0;
-            for( Block block : blocks)
-                for( Edge edge : block.edges)
-                    if( !edge.areBothSidesSameDistrict(block_districts))
-                        length += edge.length;
+            Vector<Edge> outerEdges = getOuterEdges();
+            for( Edge edge : outerEdges)
+                length += edge.length;
             return length;
         }
         double getPopulation() {
@@ -176,6 +175,8 @@
             int regionCount = 0;
             Vector<Edge> outerEdges = getOuterEdges();
             //TODO: count regions by counting number of outer edge cycles.
+            
+            return regionCount;
         }
         
         Vector<Edge> getOuterEdges() {
@@ -194,7 +195,10 @@
         double[] prob_vote = new double[num_parties];
         Vector<Edge> edges = new Vector<Edge>();
         double[] getVotes() {
+            double[] votes = new double[num_parties];
             //TODO: get random variables of the vote distribution given the statistics for the block.
+            
+            return votes;
         }
     }
     class Edge {
