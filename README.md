@@ -27,8 +27,8 @@
 	
 	class DistrictMap implements iEvolvable {
 		//static int num_parties = 0;
-		static int num_districts = 0;
-		static int[] block_districts = new int[]{};
+		int num_districts = 0;
+		int[] block_districts = new int[]{};
 	
 	    public static double geometry_weight = 1;
 	    public static double disenfranchise_weight = 1;
@@ -215,7 +215,7 @@
 	        double[] dist_pops = new double[districts.size()];
 	        int h = 0;
 	        for(District district : districts) {
-	            length += district.getEdgeLength();
+	            length += district.getEdgeLength(block_districts);
 	            dist_pops[h] = district.getPopulation();
 	            total_population += dist_pops[h];
 	            h++;
@@ -238,7 +238,7 @@
 	        double disconnected_pops = 0;
 	        if( disconnected_population_weight > 0) {
 	            for(District district : districts)
-	                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion());
+	                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
 	        }
 	        disconnected_pops /= total_population;
 	        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops}; //exponentiate because each bit represents twice as many people disenfranched
@@ -248,9 +248,9 @@
 	//buisness objects
 	class District {
 	    Vector<Block> blocks = new Vector<Block>();
-	    double getEdgeLength() {
+	    double getEdgeLength(int[] block_districts) {
 	        double length = 0;
-	        Vector<Edge> outerEdges = getOuterEdges();
+	        Vector<Edge> outerEdges = getOuterEdges(block_districts);
 	        for( Edge edge : outerEdges)
 	            length += edge.length;
 	        return length;
@@ -264,12 +264,12 @@
 	
 	    //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
 	    //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
-	    int getRegionCount() {
-	        return getRegions().size();
+	    int getRegionCount(int[] block_districts) {
+	        return getRegions(block_districts).size();
 	    }
 	
-	    Vector<Block> getTopPopulationRegion() {
-	        Vector<Vector<Block>> regions = getRegions();
+	    Vector<Block> getTopPopulationRegion(int[] block_districts) {
+	        Vector<Vector<Block>> regions = getRegions(block_districts);
 	        Vector<Block> high = null;
 	        double max_pop = 0;
 	        for( Vector<Block> region : regions) {
@@ -281,7 +281,7 @@
 	        }
 	        return high;
 	    }
-	    Vector<Vector<Block>> getRegions() {
+	    Vector<Vector<Block>> getRegions(int[] block_districts) {
 	        Hashtable<Block,Vector<Block>> region_hash = new Hashtable<Block,Vector<Block>>();
 	        Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
 	        for( Block block : blocks) {
@@ -289,19 +289,19 @@
 	                continue;
 	            Vector<Block> region = new Vector<Block>();
 	            regions.add(region);
-	            addAllConnected(block,region,region_hash);
+	            addAllConnected(block,region,region_hash,block_districts);
 	        }
 	        return regions;
 	    }
 	    //recursively insert connected blocks.
-	    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Block,Vector<Block>> region_hash) {
+	    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Block,Vector<Block>> region_hash, int[] block_districts) {
 	        if( region_hash.get(block) != null)
 	            return;
 	        region.add(block);
 	        region_hash.put(block,region);
 	        for( Edge edge : block.edges)
-	            if( edge.areBothSidesSameDistrict(DistrictMap.block_districts))
-	                addAllConnected( edge.block1 == block ? edge.block2 : edge.block1, region, region_hash);
+	            if( edge.areBothSidesSameDistrict(block_districts))
+	                addAllConnected( edge.block1 == block ? edge.block2 : edge.block1, region, region_hash, block_districts);
 	    }
 	    double getRegionPopulation(Vector<Block> region) {
 	        double population = 0;
@@ -311,11 +311,11 @@
 	    }
 	
 	
-	    Vector<Edge> getOuterEdges() {
+	    Vector<Edge> getOuterEdges(int[] block_districts) {
 	        Vector<Edge> outerEdges = new Vector<Edge>();
 	        for( Block block : blocks)
 	            for( Edge edge : block.edges)
-	                if( !edge.areBothSidesSameDistrict(DistrictMap.block_districts))
+	                if( !edge.areBothSidesSameDistrict(block_districts))
 	                    outerEdges.add(edge);
 	        return outerEdges;
 	    }
