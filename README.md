@@ -26,7 +26,7 @@
 	}
 	
 	class DistrictMap implements iEvolvable {
-		static int num_parties = 0;
+		//static int num_parties = 0;
 		static int num_districts = 0;
 		static int[] block_districts = new int[]{};
 	
@@ -37,7 +37,8 @@
 	
 	    Vector<Block> blocks;
 	    Vector<District> districts;
-	
+	    Vector<Candidate> candidates;
+	    
 	    //always find the most identical version before spawning new ones!
 	    //this dramatically reduces convergence time!
 	    public int[] getGenome(int[] baseline) {
@@ -142,10 +143,10 @@
 	
 	    //helper functions
 	    public double[][] getRandomResultSample() {
-	        double[] popular_vote = new double[num_parties]; //inited to 0
-	        double[] elected_vote = new double[num_parties]; //inited to 0
+	        double[] popular_vote = new double[candidates.size()]; //inited to 0
+	        double[] elected_vote = new double[candidates.size()]; //inited to 0
 	        for(District district : districts) {
-	            double[] district_vote = new double[num_parties]; //inited to 0
+	            double[] district_vote = new double[candidates.size()]; //inited to 0
 	            for( Block block : district.blocks) {
 	                double[] block_vote = block.getVotes();
 	                for( int i = 0; i < block_vote.length; i++) {//most_value) {
@@ -154,7 +155,7 @@
 	            }
 	            double most_value = 0;
 	            int most_index = 0;
-	            for( int i = 0; i < num_parties; i++) {
+	            for( int i = 0; i < candidates.size(); i++) {
 	            	if( district_vote[i] > most_value) {
 	            		most_index = i;
 	            		most_value = district_vote[i];//district_vote[i];
@@ -214,7 +215,7 @@
 	        double[] dist_pops = new double[districts.size()];
 	        int h = 0;
 	        for(District district : districts) {
-	            length += district.getEdgeLength(block_districts);
+	            length += district.getEdgeLength();
 	            dist_pops[h] = district.getPopulation();
 	            total_population += dist_pops[h];
 	            h++;
@@ -225,11 +226,11 @@
 	            perfect_dists[i] = exp_population;
 	
 	        //simulate trials elections and accumulate the results
-	        double[] p = new double[num_parties];
-	        double[] q = new double[num_parties];
+	        double[] p = new double[candidates.size()];
+	        double[] q = new double[candidates.size()];
 	        for( int i = 0; i < trials; i++) {
 	            double[][] results = getRandomResultSample();
-	            for( int j = 0; j < num_parties; j++) {
+	            for( int j = 0; j < candidates.size(); j++) {
 	                p[j] += results[0][j];
 	                q[j] += results[1][j];
 	            }
@@ -247,7 +248,7 @@
 	//buisness objects
 	class District {
 	    Vector<Block> blocks = new Vector<Block>();
-	    double getEdgeLength(int[] block_districts) {
+	    double getEdgeLength() {
 	        double length = 0;
 	        Vector<Edge> outerEdges = getOuterEdges();
 	        for( Edge edge : outerEdges)
@@ -323,11 +324,20 @@
 	    int index;
 	    double population;
 	    double prob_turnout;
-	    double[] prob_vote = new double[DistrictMap.num_parties];
+	    double[] prob_vote = null;//new double[DistrictMap.candidates.size()];
 	    Vector<Edge> edges = new Vector<Edge>();
 	    double[] getVotes() {
-	        double[] votes = new double[DistrictMap.num_parties];
-	        //TODO: get random variables of the vote distribution given the statistics for the block.
+	        double[] votes = new double[prob_vote.length];
+	        double turnout = population*prob_turnout;
+	        double sum = 0;
+	        for( int i = 0; i < votes.length; i++) {
+	        	votes[i]  = Math.random()*prob_vote[i];
+	        	sum += votes[i];
+	        }
+	        turnout /= sum;
+	        for( int i = 0; i < votes.length; i++) {
+	        	votes[i] *= turnout;
+	        }
 	
 	        return votes;
 	    }
@@ -344,3 +354,8 @@
 	}
 	class Vertex {
 	}
+    class Candidate {
+    	int index;
+    	String id;
+    }
+
