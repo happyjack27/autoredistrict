@@ -32,7 +32,10 @@
 		int num_districts = 0;
 		int[] block_districts = new int[]{};
 		
-		public static int fitness_polarity = 1;
+		public static int sorting_polarity = 1;
+		public static int fitness_polarity = -1;
+		public static int hamming_distance_polarity = 1;
+		
 		public static boolean mutate_to_neighbor_only = false;
 		public static double species_fraction = 0.25;
 	
@@ -97,7 +100,7 @@
 	    		DistrictMap map1 = available.get(g1);
 		    	for(DistrictMap m : available) {
 		    		m.makeLike(map1.getGenome());
-		    		m.fitness_score = -m.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+		    		m.fitness_score = m.getGenomeHammingDistance(m.getGenome(), map1.getGenome())*hamming_distance_polarity;
 		    	}
 		    	Collections.sort(available);
 	    		int g2 = (int)(Math.random()*(double)speciation_cutoff);
@@ -288,7 +291,7 @@
 	    }
 	    public double getFitnessScore(int trials) {
 	        double[] scores_to_minimize = getGerryManderScores(trials);
-	        fitness_score = -(
+	        fitness_score = fitness_polarity*(
 	        scores_to_minimize[0]*geometry_weight + 
 	        scores_to_minimize[1]*disenfranchise_weight + 
 	        scores_to_minimize[2]*population_balance_weight +
@@ -401,7 +404,7 @@
 	    }
 
 		public int compareTo(DistrictMap o) {
-			double d = (fitness_score-o.fitness_score)*fitness_polarity; 
+			double d = (fitness_score-o.fitness_score)*sorting_polarity; 
 			return  d > 0 ? 1 : d == 0 ? 0 : -1;
 		}
 	}
