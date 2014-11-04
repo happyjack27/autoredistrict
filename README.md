@@ -42,7 +42,7 @@
 	    public static double geometry_weight = 1;
 	    public static double disenfranchise_weight = 1;
 	    public static double population_balance_weight = 1;
-	    public static double disconnected_population_weight = 0;
+	    public static double disconnected_population_weight = 0; 
 	    
 	    public double fitness_score = 0;
 	
@@ -369,16 +369,17 @@
 	    //returns total edge length, unfairness, population imbalance
 	    //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
 	    public double[] getGerryManderScores(int trials) {
-	        double length = 0;
+	        double length = getEdgeLength();
 	        double total_population = 0;
 	        double[] dist_pops = new double[districts.size()];
 	        int h = 0;
-	        for(District district : districts) {
-	            length += district.getEdgeLength(block_districts);
+	        for(int i = 0; i < districts.size(); i++) {
+	        	District district = districts.get(i);
 	            dist_pops[h] = district.getPopulation();
 	            total_population += dist_pops[h];
 	            h++;
 	        }
+	        
 	        double exp_population = total_population/districts.size();
 	        double[] perfect_dists = new double[districts.size()];
 	        for( int i = 0; i < perfect_dists.length; i++)
@@ -407,18 +408,26 @@
 			double d = (fitness_score-o.fitness_score)*sorting_polarity; 
 			return  d > 0 ? 1 : d == 0 ? 0 : -1;
 		}
-	}
-	
-	//buisness objects
-	class District {
-	    Vector<Block> blocks = new Vector<Block>();
-	    double getEdgeLength(int[] block_districts) {
+	    double getEdgeLength() {
 	        double length = 0;
 	        Vector<Edge> outerEdges = getOuterEdges(block_districts);
 	        for( Edge edge : outerEdges)
 	            length += edge.length;
 	        return length;
 	    }
+	    Vector<Edge> getOuterEdges(int[] block_districts) {
+	        Vector<Edge> outerEdges = new Vector<Edge>();
+	        for( Block block : blocks)
+	            for( Edge edge : block.edges)
+	                if( !edge.areBothSidesSameDistrict(block_districts))
+	                    outerEdges.add(edge);
+	        return outerEdges;
+	    }
+    }
+	
+	//buisness objects
+	class District {
+	    Vector<Block> blocks = new Vector<Block>();
 	    double getPopulation() {
 	        double pop = 0;
 	        for( Block block : blocks)
@@ -475,14 +484,6 @@
 	    }
 	
 	
-	    Vector<Edge> getOuterEdges(int[] block_districts) {
-	        Vector<Edge> outerEdges = new Vector<Edge>();
-	        for( Block block : blocks)
-	            for( Edge edge : block.edges)
-	                if( !edge.areBothSidesSameDistrict(block_districts))
-	                    outerEdges.add(edge);
-	        return outerEdges;
-	    }
 	}
 	class Block {
 	    int index;
