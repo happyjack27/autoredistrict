@@ -62,6 +62,12 @@
 	    		population.add(new DistrictMap(blocks,districts.size()));
 	    	}
 	    }
+	    public void start_from_genome(int[] genome, double mutation_rate) {
+	    	for( DistrictMap map : population) {
+	    		map.setGenome(genome);
+	    		map.mutate(mutation_rate);
+	    	}
+	    }
 	    
 	    public void evolve(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
 	    	int cutoff = (int)((double)population.size()*replace_fraction);
