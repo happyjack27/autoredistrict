@@ -22,22 +22,69 @@
 	    public int[] getGenome();
 	    public int[] getGenome(int[] baseline);
 	    public void setGenome(int[] genome);
-	    public double getFitnessScore();
+	    public double getFitnessScore(int trials);
+	    public void crossover(int[] genome1,int[] genome2);
+	    public void mutate( double prob);
 	}
 	
-	class DistrictMap implements iEvolvable {
+	class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		//static int num_parties = 0;
 		int num_districts = 0;
 		int[] block_districts = new int[]{};
+		
+		public static int fitness_polarity = 1;
+		public static boolean mutate_to_neighbor_only = false;
 	
 	    public static double geometry_weight = 1;
 	    public static double disenfranchise_weight = 1;
 	    public static double population_balance_weight = 1;
 	    public static double disconnected_population_weight = 0;
+	    
+	    public double fitness_score = 0;
 	
 	    Vector<Block> blocks;
 	    Vector<District> districts;
 	    Vector<Candidate> candidates;
+	    
+	    Vector<DistrictMap> population;
+	    
+	    public void init(
+	    	    Vector<Block> blocks,
+	    	    Vector<District> districts,
+	    	    Vector<Candidate> candidates,
+	    	    int population_size
+	    		) {
+	    	this.blocks = blocks;
+	    	this.districts = districts;
+	    	this.candidates = candidates;
+	    	population =  new Vector<DistrictMap>();
+	    	for( int i = 0; i < population_size; i++) {
+	    		population.add(new DistrictMap(blocks,districts.size()));
+	    	}
+	    }
+	    
+	    public void evolve(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
+	    	int cutoff = (int)((double)population.size()*replace_fraction);
+	    	
+	    	if( score_all) {
+		    	for( DistrictMap map : population) {
+		    		map.getFitnessScore(trials);
+		    	}
+	    	} else {
+		    	for( int i = cutoff; i < population.size(); i++) {
+		    		population.get(i).getFitnessScore(trials);
+		    	}
+	    	}
+	    	
+	    	Collections.sort(population);
+	    	
+	    	for(int i = cutoff; i < population.size(); i++) {
+	    		int g1 = (int)(Math.random()*(double)cutoff);
+	    		int g2 = (int)(Math.random()*(double)cutoff);
+	    		population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome());
+	    		population.get(i).mutate(mutation_rate);
+	    	}
+	    }
 	    
 	    //always find the most identical version before spawning new ones!
 	    //this dramatically reduces convergence time!
@@ -53,6 +100,52 @@
 	            }
 	         }
 	         return closest_version;
+	    }
+	    public void mutate(double prob) {
+	    	double max = candidates.size();
+	    	boolean[] allow = null;
+			if( mutate_to_neighbor_only) {
+				allow = new boolean[districts.size()+1];
+			}
+	    	for( int i = 0; i < block_districts.length; i++) {
+	    		if( Math.random() < prob) {
+	    			if( mutate_to_neighbor_only) {
+    			    	for( int j = 0; j < allow.length; j++) {
+    			    		allow[j] = false;
+    			    	}
+    			    	allow[block_districts[i]] = true;
+	    				Block block = blocks.get(i);
+	    				for( Edge edge : block.edges) {
+	    					Block other_block = edge.block1 == block ? edge.block2 : edge.block1;
+	    					allow[block_districts[other_block.index]] = true;
+	    				}
+	    				double count = 0;
+    			    	for( int j = 0; j < allow.length; j++) {
+    			    		if( allow[j])
+    			    			count++;
+    			    	}
+    			    	int d = (int)(Math.random()*count); 
+    			    	for( int j = 0; j < allow.length; j++) {
+    			    		if( allow[j]) {
+    			    			if( count == 0) {
+    			    				block_districts[i] = j;
+    			    				break;
+    			    			}
+    			    			d--;
+    			    		}
+    			    	}
+	    			} else {
+	    				block_districts[i] = (int)(Math.floor(Math.random()*max)+1.0);
+	    			}
+	    		}
+	    	}
+	    }
+	    public void crossover(int[] genome1, int[] genome2) {
+	    	double max = candidates.size();
+	    	for( int i = 0; i < block_districts.length; i++) {
+	    		double r = Math.random();
+	    		block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+	    	}
 	    }
 	
 	    public static Vector<int[]> getIdenticalGenomes(int[] genome) {
@@ -117,6 +210,8 @@
 	        districts = new Vector<District>();
 	        for( int i = 0; i < num_districts; i++)
 	            districts.add(new District());
+	        block_districts = new int[blocks.size()];
+	        mutate(1);
 	    }
 	
 	    //genetic evolution primary functions
@@ -131,14 +226,15 @@
 	        for( int i = 0; i < genome.length; i++)
 	            districts.get(genome[i]).blocks.add(blocks.get(i));
 	    }
-	    public double getFitnessScore() {
-	        double[] scores_to_minimize = getGerryManderScores(1000);
-	        return -(
+	    public double getFitnessScore(int trials) {
+	        double[] scores_to_minimize = getGerryManderScores(trials);
+	        fitness_score = -(
 	        scores_to_minimize[0]*geometry_weight + 
 	        scores_to_minimize[1]*disenfranchise_weight + 
 	        scores_to_minimize[2]*population_balance_weight +
 	        scores_to_minimize[3]*disconnected_population_weight
 	        );
+	        return fitness_score;
 	    }
 	
 	    //helper functions
@@ -243,6 +339,11 @@
 	        disconnected_pops /= total_population;
 	        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops}; //exponentiate because each bit represents twice as many people disenfranched
 	    }
+
+		public int compareTo(DistrictMap o) {
+			double d = (fitness_score-o.fitness_score)*fitness_polarity; 
+			return  d > 0 ? 1 : d == 0 ? 0 : -1;
+		}
 	}
 	
 	//buisness objects
