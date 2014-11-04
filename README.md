@@ -34,6 +34,7 @@
 		
 		public static int fitness_polarity = 1;
 		public static boolean mutate_to_neighbor_only = false;
+		public static double species_fraction = 0.25;
 	
 	    public static double geometry_weight = 1;
 	    public static double disenfranchise_weight = 1;
@@ -69,8 +70,47 @@
 	    	}
 	    }
 	    
+	    //makeLike
+	    //sfads
+	    public void evolveWithSpeciation(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
+	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
+	    	int speciation_cutoff = (int)((double)cutoff*species_fraction);
+	    	
+	    	if( score_all) {
+		    	for( DistrictMap map : population) {
+		    		map.getFitnessScore(trials);
+		    	}
+	    	} else {
+		    	for( int i = cutoff; i < population.size(); i++) {
+		    		population.get(i).getFitnessScore(trials);
+		    	}
+	    	}
+	    	
+	    	Collections.sort(population);
+	    	Vector<DistrictMap> available = new Vector<DistrictMap>();
+	    	for(int i = cutoff; i < population.size(); i++) {
+	    		available.add(population.get(i));
+	    	}
+	    	
+	    	for(int i = cutoff; i < population.size(); i++) {
+	    		int g1 = (int)(Math.random()*(double)cutoff);
+	    		DistrictMap map1 = available.get(g1);
+		    	for(DistrictMap m : available) {
+		    		m.makeLike(map1.getGenome());
+		    		m.fitness_score = -m.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+		    	}
+		    	Collections.sort(available);
+	    		int g2 = (int)(Math.random()*(double)speciation_cutoff);
+	    		DistrictMap map2 = available.get(g2);
+	    		
+	    		population.get(i).crossover(map1.getGenome(), map2.getGenome());
+	    		population.get(i).mutate(mutation_rate);
+	    	}
+	    }
+	    
+	    
 	    public void evolve(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
-	    	int cutoff = (int)((double)population.size()*replace_fraction);
+	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 	    	
 	    	if( score_all) {
 		    	for( DistrictMap map : population) {
@@ -153,7 +193,21 @@
 	    		block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
 	    	}
 	    }
-	
+	    public void makeLike(int[] genome) {
+	        Vector<int[]> identicals = getIdenticalGenomes(getGenome());
+	        int lowest_score = 0;
+	        int best_match = -1;
+	        for( int i = 0; i < identicals.size(); i++) {
+	        	int new_score = getGenomeHammingDistance(genome,identicals.get(i));
+	        	if( best_match < 0 || new_score < lowest_score) {
+	        		lowest_score = new_score;
+	        		best_match = i;
+	        	}
+	        }
+	        setGenome(identicals.get(best_match));
+	    }
+
+	    
 	    public static Vector<int[]> getIdenticalGenomes(int[] genome) {
 	        Vector<int[]> identicals = new Vector<int[]>();
 	
