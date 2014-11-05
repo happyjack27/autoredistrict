@@ -14,6 +14,12 @@
 	//for use in heuristic optimization (e.g. genetic algoritm / swarm ) for computer-automated redistricting.
 	
 	//language: Java
+
+/*
+ * TODO: need to add a metric for how evenly distributed voting power is.  preferably in units of bits or nats.
+ * 
+ * TODO: add persistence to business objects, ala json from/to.
+ */
 	
 	import java.util.*;
 	
@@ -100,7 +106,7 @@
 	    		DistrictMap map1 = available.get(g1);
 		    	for(DistrictMap m : available) {
 		    		m.makeLike(map1.getGenome());
-		    		m.fitness_score = m.getGenomeHammingDistance(m.getGenome(), map1.getGenome())*hamming_distance_polarity;
+		    		m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome())*hamming_distance_polarity;
 		    	}
 		    	Collections.sort(available);
 	    		int g2 = (int)(Math.random()*(double)speciation_cutoff);
@@ -130,7 +136,7 @@
 	    	for(int i = cutoff; i < population.size(); i++) {
 	    		int g1 = (int)(Math.random()*(double)cutoff);
 	    		int g2 = (int)(Math.random()*(double)cutoff);
-	    		population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome());
+	    		population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
 	    		population.get(i).mutate(mutation_rate);
 	    	}
 	    }
@@ -176,7 +182,7 @@
     			    	int d = (int)(Math.random()*count); 
     			    	for( int j = 0; j < allow.length; j++) {
     			    		if( allow[j]) {
-    			    			if( count == 0) {
+    			    			if( d == 0) {
     			    				block_districts[i] = j;
     			    				break;
     			    			}
@@ -190,7 +196,6 @@
 	    	}
 	    }
 	    public void crossover(int[] genome1, int[] genome2) {
-	    	double max = candidates.size();
 	    	for( int i = 0; i < block_districts.length; i++) {
 	    		double r = Math.random();
 	    		block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
