@@ -19,6 +19,8 @@
 	 * TODO: need to add a metric for how evenly distributed voting power is.  preferably in units of bits or nats.
 	 * 
 	 * 	TODO: add persistence to business objects, ala json from/to.
+	 * 
+	 * measuring voting power as a posteri self-entropy of district?
  	*/
 	
 	import java.util.*;
@@ -310,16 +312,11 @@
 	        double[] popular_vote = new double[candidates.size()]; //inited to 0
 	        double[] elected_vote = new double[candidates.size()]; //inited to 0
 	        for(District district : districts) {
-	            double[] district_vote = new double[candidates.size()]; //inited to 0
-	            for( Block block : district.blocks) {
-	                double[] block_vote = block.getVotes();
-	                for( int i = 0; i < block_vote.length; i++) {//most_value) {
-	                	district_vote[i] += block_vote[i];
-	                }
-	            }
+	            double[] district_vote = district.getVotes();
 	            double most_value = 0;
 	            int most_index = 0;
 	            for( int i = 0; i < candidates.size(); i++) {
+	            	popular_vote[i] += district_vote[i];
 	            	if( district_vote[i] > most_value) {
 	            		most_index = i;
 	            		most_value = district_vote[i];//district_vote[i];
@@ -440,7 +437,21 @@
 	        return pop;
 	    }
 	
-	    //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
+	    public double[] getVotes() {
+	    	if( blocks.size() == 0) {
+	    		return null;
+	    	}
+            double[] district_vote = new double[blocks.get(0).prob_vote.length]; //inited to 0
+            for( Block block : blocks) {
+                double[] block_vote = block.getVotes();
+                for( int i = 0; i < block_vote.length; i++) {//most_value) {
+                	district_vote[i] += block_vote[i];
+                }
+            }
+            return district_vote;
+		}
+
+		//getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
 	    //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
 	    int getRegionCount(int[] block_districts) {
 	        return getRegions(block_districts).size();
