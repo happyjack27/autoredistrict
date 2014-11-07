@@ -51,6 +51,7 @@
 	    public static double disenfranchise_weight = 1;
 	    public static double population_balance_weight = 1;
 	    public static double disconnected_population_weight = 0; 
+	    public static double voting_power_balance_weight = 0; 
 	    
 	    public double fitness_score = 0;
 	
@@ -80,6 +81,7 @@
 	    		map.mutate(mutation_rate);
 	    	}
 	    }
+	    
 	    
 	    //makeLike
 	    //sfads
@@ -302,7 +304,8 @@
 	        scores_to_minimize[0]*geometry_weight + 
 	        scores_to_minimize[1]*disenfranchise_weight + 
 	        scores_to_minimize[2]*population_balance_weight +
-	        scores_to_minimize[3]*disconnected_population_weight
+	        scores_to_minimize[3]*disconnected_population_weight +
+	        scores_to_minimize[4]*voting_power_balance_weight
 	        );
 	        return fitness_score;
 	    }
@@ -313,16 +316,10 @@
 	        double[] elected_vote = new double[candidates.size()]; //inited to 0
 	        for(District district : districts) {
 	            double[] district_vote = district.getVotes();
-	            double most_value = 0;
-	            int most_index = 0;
-	            for( int i = 0; i < candidates.size(); i++) {
+	            for( int i = 0; i < district_vote.length; i++) {
 	            	popular_vote[i] += district_vote[i];
-	            	if( district_vote[i] > most_value) {
-	            		most_index = i;
-	            		most_value = district_vote[i];//district_vote[i];
-	            	}
 	            }
-	            elected_vote[most_index]++;
+	            elected_vote[district.last_winner]++;
 	        }
 	        return new double[][]{popular_vote,elected_vote};
 	    }
@@ -374,12 +371,16 @@
 	        double length = getEdgeLength();
 	        double total_population = 0;
 	        double[] dist_pops = new double[districts.size()];
-	        int h = 0;
+	        double[] dist_pop_frac = new double[districts.size()];
+	        
 	        for(int i = 0; i < districts.size(); i++) {
 	        	District district = districts.get(i);
-	            dist_pops[h] = district.getPopulation();
-	            total_population += dist_pops[h];
-	            h++;
+	        	district.resetWins();
+	            dist_pops[i] = district.getPopulation();
+	            total_population += dist_pops[i];
+	        }
+	        for(int i = 0; i < districts.size(); i++) {
+	            dist_pop_frac[i] = 	dist_pops[i] / total_population;
 	        }
 	        
 	        double exp_population = total_population/districts.size();
@@ -397,13 +398,31 @@
 	                q[j] += results[1][j];
 	            }
 	        }
+	        
+	        double[] voting_power = new double[districts.size()];
+	        double total_voting_power = 0;
+	        for(int i = 0; i < districts.size(); i++) {
+	        	District district = districts.get(i);
+	        	voting_power[i] = district.getSelfEntropy();
+	        	total_voting_power += voting_power[i];
+	        }
+	        
+	        for(int i = 0; i < districts.size(); i++) {
+	        	voting_power[i] /= total_voting_power;
+	        }
+	        
+	        double power_fairness = 0; //1 = perfect fairness
+	        for(int i = 0; i < districts.size(); i++) {
+	        	power_fairness += dist_pop_frac[i]*voting_power[i];
+	        }
+	        
 	        double disconnected_pops = 0;
 	        if( disconnected_population_weight > 0) {
 	            for(District district : districts)
 	                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
 	        }
 	        disconnected_pops /= total_population;
-	        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops}; //exponentiate because each bit represents twice as many people disenfranched
+	        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 	    }
 
 		public int compareTo(DistrictMap o) {
@@ -430,13 +449,48 @@
 	//buisness objects
 	class District {
 	    Vector<Block> blocks = new Vector<Block>();
+	    public double[] wins;
+	    public int last_winner = -1;
+	    
 	    double getPopulation() {
 	        double pop = 0;
 	        for( Block block : blocks)
 	              pop += block.population;
 	        return pop;
 	    }
-	
+	    
+	    public void resetWins() {
+	    	if( blocks.size() == 0) {
+	    		return;
+	    	}
+            wins = new double[blocks.get(0).prob_vote.length]; //inited to 0
+	    }
+	    public double getSelfEntropy() {
+	    	double total = 0;
+	    	for( int i = 0; i < wins.length; i++) {
+	    		total += wins[i];
+	    	}
+	    	
+	    	double H = 0;
+	    	for( int i = 0; i < wins.length; i++) {
+	    		double p = ((double)wins[i]) / total; 
+	    		H -= p*Math.log(p);
+	    	}
+	    	
+	    	return H;
+	    }
+	    public static int getHighestIndex(double[] dd) {
+            double most_value = 0;
+            int most_index = 0;
+            for( int i = 0; i < dd.length; i++) {
+            	if( dd[i] > most_value) {
+            		most_index = i;
+            		most_value = dd[i];//district_vote[i];
+            	}
+            }
+            return most_index;
+	    }
+
 	    public double[] getVotes() {
 	    	if( blocks.size() == 0) {
 	    		return null;
@@ -448,6 +502,9 @@
                 	district_vote[i] += block_vote[i];
                 }
             }
+            last_winner = getHighestIndex(district_vote);
+            wins[last_winner]++;
+
             return district_vote;
 		}
 
