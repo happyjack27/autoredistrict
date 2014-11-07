@@ -30,18 +30,18 @@
 	    public int[] getGenome();
 	    public int[] getGenome(int[] baseline);
 	    public void setGenome(int[] genome);
-	    public double getFitnessScore(int trials);
+	    public void calcFairnessScores(int trials);
 	    public void crossover(int[] genome1,int[] genome2);
 	    public void mutate( double prob);
 	}
 	
+    
 	class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		//static int num_parties = 0;
 		int num_districts = 0;
 		int[] block_districts = new int[]{};
 		
 		public static int sorting_polarity = 1;
-		public static int fitness_polarity = -1;
 		public static int hamming_distance_polarity = 1;
 		
 		public static boolean mutate_to_neighbor_only = false;
@@ -51,8 +51,9 @@
 	    public static double disenfranchise_weight = 1;
 	    public static double population_balance_weight = 1;
 	    public static double disconnected_population_weight = 0; 
-	    public static double voting_power_balance_weight = 0; 
+	    public static double voting_power_balance_weight = 1; 
 	    
+	    public double[] fairnessScores = new double[5];
 	    public double fitness_score = 0;
 	
 	    Vector<Block> blocks;
@@ -89,17 +90,36 @@
 	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 	    	int speciation_cutoff = (int)((double)cutoff*species_fraction);
 	    	
-	    	if( score_all) {
+	    	double mult = 1.0/population.size();
+	    	for( int i = 0; i < 5; i++) {
 		    	for( DistrictMap map : population) {
-		    		map.getFitnessScore(trials);
+		    		map.fitness_score = map.fairnessScores[i];
 		    	}
-	    	} else {
-		    	for( int i = cutoff; i < population.size(); i++) {
-		    		population.get(i).getFitnessScore(trials);
+		    	Collections.sort(population);
+		    	for( int j = 0; j < population.size(); j++) {
+		    		DistrictMap map = population.get(j);
+		    		map.fairnessScores[i] = ((double)j)*mult; 
+		    	}
+	    	}
+	    	
+	    	double[] weights = new double[]{
+	    	        geometry_weight, 
+	    	        disenfranchise_weight, 
+	    	        population_balance_weight,
+	    	        disconnected_population_weight,
+	    	        voting_power_balance_weight
+	    	};
+	    	
+	    	for( int j = 0; j < population.size(); j++) {
+	    		DistrictMap map = population.get(j);
+	    		map.fitness_score = 0;
+		    	for( int i = 0; i < 5; i++) {
+		    		map.fitness_score += map.fairnessScores[i]*weights[i];
 		    	}
 	    	}
 	    	
 	    	Collections.sort(population);
+	    	
 	    	Vector<DistrictMap> available = new Vector<DistrictMap>();
 	    	for(int i = cutoff; i < population.size(); i++) {
 	    		available.add(population.get(i));
@@ -127,15 +147,43 @@
 	    	
 	    	if( score_all) {
 		    	for( DistrictMap map : population) {
-		    		map.getFitnessScore(trials);
+		    		map.calcFairnessScores(trials);
 		    	}
 	    	} else {
 		    	for( int i = cutoff; i < population.size(); i++) {
-		    		population.get(i).getFitnessScore(trials);
+		    		population.get(i).calcFairnessScores(trials);
+		    	}
+	    	}
+	    	for( int i = 0; i < 5; i++) {
+		    	for( DistrictMap map : population) {
+		    		map.fitness_score = map.fairnessScores[i];
+		    	}
+		    	Collections.sort(population);
+		    	double mult = 1.0/population.size();
+		    	for( int j = 0; j < population.size(); j++) {
+		    		DistrictMap map = population.get(j);
+		    		map.fairnessScores[i] = ((double)j)*mult; 
 		    	}
 	    	}
 	    	
+	    	double[] weights = new double[]{
+	    	        geometry_weight, 
+	    	        disenfranchise_weight, 
+	    	        population_balance_weight,
+	    	        disconnected_population_weight,
+	    	        voting_power_balance_weight
+	    	};
+	    	
+	    	for( int j = 0; j < population.size(); j++) {
+	    		DistrictMap map = population.get(j);
+	    		map.fitness_score = 0;
+		    	for( int i = 0; i < 5; i++) {
+		    		map.fitness_score += map.fairnessScores[i]*weights[i];
+		    	}
+	    	}
+
 	    	Collections.sort(population);
+
 	    	
 	    	for(int i = cutoff; i < population.size(); i++) {
 	    		int g1 = (int)(Math.random()*(double)cutoff);
@@ -298,18 +346,7 @@
 	        for( int i = 0; i < genome.length; i++)
 	            districts.get(genome[i]).blocks.add(blocks.get(i));
 	    }
-	    public double getFitnessScore(int trials) {
-	        double[] scores_to_minimize = getGerryManderScores(trials);
-	        fitness_score = fitness_polarity*(
-	        scores_to_minimize[0]*geometry_weight + 
-	        scores_to_minimize[1]*disenfranchise_weight + 
-	        scores_to_minimize[2]*population_balance_weight +
-	        scores_to_minimize[3]*disconnected_population_weight +
-	        scores_to_minimize[4]*voting_power_balance_weight
-	        );
-	        return fitness_score;
-	    }
-	
+
 	    //helper functions
 	    public double[][] getRandomResultSample() {
 	        double[] popular_vote = new double[candidates.size()]; //inited to 0
@@ -367,7 +404,7 @@
 	
 	    //returns total edge length, unfairness, population imbalance
 	    //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
-	    public double[] getGerryManderScores(int trials) {
+	    public void calcFairnessScores(int trials) {
 	        double length = getEdgeLength();
 	        double total_population = 0;
 	        double[] dist_pops = new double[districts.size()];
@@ -422,7 +459,7 @@
 	                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
 	        }
 	        disconnected_pops /= total_population;
-	        return new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
+	        fairnessScores = new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 	    }
 
 		public int compareTo(DistrictMap o) {
