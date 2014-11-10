@@ -90,7 +90,7 @@
 	    
 	    //makeLike
 	    //sfads
-	    public void evolveWithSpeciation(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
+	    public void evolveWithSpeciation(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
 	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 	    	int speciation_cutoff = (int)((double)cutoff*species_fraction);
 	    	
@@ -151,11 +151,12 @@
 	    		
 	    		population.get(i).crossover(map1.getGenome(), map2.getGenome());
 	    		population.get(i).mutate(mutation_rate);
+	    		population.get(i).mutate_boundary(mutation_rate);
 	    	}
 	    }
 	    
 	    
-	    public void evolve(double replace_fraction, double mutation_rate, int trials, boolean score_all) {
+	    public void evolve(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
 	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 	    	
 	    	if( score_all) {
@@ -203,6 +204,7 @@
 	    		int g2 = (int)(Math.random()*(double)cutoff);
 	    		population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
 	    		population.get(i).mutate(mutation_rate);
+	    		population.get(i).mutate_boundary(mutation_rate);
 	    	}
 	    }
 	    
@@ -221,42 +223,44 @@
 	         }
 	         return closest_version;
 	    }
+	    
 	    public void mutate(double prob) {
 	    	double max = candidates.size();
-	    	boolean[] allow = null;
-			if( mutate_to_neighbor_only) {
-				allow = new boolean[districts.size()+1];
-			}
 	    	for( int i = 0; i < block_districts.length; i++) {
 	    		if( Math.random() < prob) {
-	    			if( mutate_to_neighbor_only) {
-    			    	for( int j = 0; j < allow.length; j++) {
-    			    		allow[j] = false;
-    			    	}
-    			    	allow[block_districts[i]] = true;
-	    				Block block = blocks.get(i);
-	    				for( Edge edge : block.edges) {
-	    					Block other_block = edge.block1 == block ? edge.block2 : edge.block1;
-	    					allow[block_districts[other_block.index]] = true;
-	    				}
-	    				double count = 0;
-    			    	for( int j = 0; j < allow.length; j++) {
-    			    		if( allow[j])
-    			    			count++;
-    			    	}
-    			    	int d = (int)(Math.random()*count); 
-    			    	for( int j = 0; j < allow.length; j++) {
-    			    		if( allow[j]) {
-    			    			if( d == 0) {
-    			    				block_districts[i] = j;
-    			    				break;
-    			    			}
-    			    			d--;
-    			    		}
-    			    	}
-	    			} else {
-	    				block_districts[i] = (int)(Math.floor(Math.random()*max)+1.0);
-	    			}
+    				block_districts[i] = (int)(Math.floor(Math.random()*max)+1.0);
+	    		}
+	    	}
+	    }
+	    
+	    public void mutate_boundary(double prob) {
+	    	boolean[] allow = new boolean[districts.size()+1];
+	    	for( int i = 0; i < block_districts.length; i++) {
+	    		if( Math.random() < prob) {
+			    	for( int j = 0; j < allow.length; j++) {
+			    		allow[j] = false;
+			    	}
+			    	allow[block_districts[i]] = true;
+    				Block block = blocks.get(i);
+    				for( Edge edge : block.edges) {
+    					Block other_block = edge.block1 == block ? edge.block2 : edge.block1;
+    					allow[block_districts[other_block.index]] = true;
+    				}
+    				double count = 0;
+			    	for( int j = 0; j < allow.length; j++) {
+			    		if( allow[j])
+			    			count++;
+			    	}
+			    	int d = (int)(Math.random()*count); 
+			    	for( int j = 0; j < allow.length; j++) {
+			    		if( allow[j]) {
+			    			if( d == 0) {
+			    				block_districts[i] = j;
+			    				break;
+			    			}
+			    			d--;
+			    		}
+			    	}
 	    		}
 	    	}
 	    }
