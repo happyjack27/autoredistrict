@@ -47,11 +47,15 @@
 		public static boolean mutate_to_neighbor_only = false;
 		public static double species_fraction = 0.25;
 	
-	    public static double geometry_weight = 1;
-	    public static double disenfranchise_weight = 1;
+	    //spatial metrics
+		public static double geometry_weight = 1;
 	    public static double population_balance_weight = 1;
 	    public static double disconnected_population_weight = 0; 
+
+	    //fairness metrics
+	    public static double disenfranchise_weight = 1;
 	    public static double voting_power_balance_weight = 1; 
+	    
 	    
 	    public double[] fairnessScores = new double[5];
 	    public double fitness_score = 0;
@@ -90,12 +94,21 @@
 	    	int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 	    	int speciation_cutoff = (int)((double)cutoff*species_fraction);
 	    	
-	    	double mult = 1.0/population.size();
+	    	if( score_all) {
+		    	for( DistrictMap map : population) {
+		    		map.calcFairnessScores(trials);
+		    	}
+	    	} else {
+		    	for( int i = cutoff; i < population.size(); i++) {
+		    		population.get(i).calcFairnessScores(trials);
+		    	}
+	    	}
 	    	for( int i = 0; i < 5; i++) {
 		    	for( DistrictMap map : population) {
 		    		map.fitness_score = map.fairnessScores[i];
 		    	}
 		    	Collections.sort(population);
+		    	double mult = 1.0/population.size();
 		    	for( int j = 0; j < population.size(); j++) {
 		    		DistrictMap map = population.get(j);
 		    		map.fairnessScores[i] = ((double)j)*mult; 
