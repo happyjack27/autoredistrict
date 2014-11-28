@@ -614,9 +614,9 @@
 	}
 	class Block {
 	    int index;
-	    double population;
-	    double prob_turnout;
-	    double[] prob_vote = null;//new double[DistrictMap.candidates.size()];
+	    double[] population;
+	    double[] prob_turnout;
+	    double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
 	    double[] vote_cache = null;
 	    static boolean use_vote_cache = true;
 	    static int cache_reuse_times = 20;
@@ -637,21 +637,23 @@
 	        for(int i = 0; i < votes; i++) {
 	        	votes[i] = 0;
 	        }
-	        for(int i = 0; i < population; i++) {
-	        	double p = Math.random();
-	        	if( p > prob_turnout) {
-	        		continue;
-	        	}
-	        	p = Math.random();
-	        	for( int j = 0; j < prob_vote.length; j++) {
-	        		p -= prob_vote[j];
-	        		if( p <= 0) {
-	        			votes[j]++;
-	        			break;
+	        for(int h = 0; h < population.length; h++) {
+		        for(int i = 0; i < population[h]; i++) {
+		        	double p = Math.random();
+	        		if( p > prob_turnout[h]) {
+	        			continue;
 	        		}
+		        	p = Math.random();
+		        	for( int j = 0; j < prob_vote[h].length; j++) {
+	        			p -= prob_vote[h][j];
+	        			if( p <= 0) {
+	        				votes[j]++;
+	        				break;
+		        		}
+		        	}
 	        	}
-	        }
-	        vote_cache = votes;
+	    	}
+		vote_cache = votes;
 	    }
 	}
 	class Edge {
