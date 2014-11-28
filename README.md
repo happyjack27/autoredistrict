@@ -618,13 +618,25 @@
 	    double[] prob_turnout;
 	    double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
 	    double[] vote_cache = null;
+	    double[][] vote_caches = null;
+	    static boolean use_vote_caches = true;
 	    static boolean use_vote_cache = true;
-	    static int cache_reuse_times = 20;
+	    static int cache_reuse_times = 16;
+	    static int vote_cache_size = 128;
 	    int cache_reused = 0;
 	    
 	    Vector<Edge> edges = new Vector<Edge>();
 	    double[] getVotes() {
-    		if( vote_cache == null || cache_reused >= cache_reuse_times) {
+	    	if( use_vote_caches) {
+	    		if( vote_caches == null) {
+	    			vote_caches = new double[vote_cache_size][];
+	    			for( int i = 0; i < vote_caches.length; i++) {
+	    				generateVotes();
+	    				vote_caches[i] = vote_cache;
+	    			}
+	    		}
+	    		return vote_caches[((int)Math.random()*(double)vote_caches.length)];
+	    	} else if( vote_cache == null || cache_reused >= cache_reuse_times) {
     			generateVotes();
     			cache_reuse_times = 0;
     		}
