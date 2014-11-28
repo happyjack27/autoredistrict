@@ -617,21 +617,41 @@
 	    double population;
 	    double prob_turnout;
 	    double[] prob_vote = null;//new double[DistrictMap.candidates.size()];
+	    double[] vote_cache = null;
+	    static boolean use_vote_cache = true;
+	    static int cache_reuse_times = 20;
+	    int cache_reused = 0;
+	    
 	    Vector<Edge> edges = new Vector<Edge>();
 	    double[] getVotes() {
+    		if( vote_cache == null || cache_reused >= cache_reuse_times) {
+    			generateVotes();
+    			cache_reuse_times = 0;
+    		}
+    		cache_reuse_times++;
+    		return vote_cache;
+	    }
+	    
+	    void generateVotes() {
 	        double[] votes = new double[prob_vote.length];
-	        double turnout = population*prob_turnout;
-	        double sum = 0;
-	        for( int i = 0; i < votes.length; i++) {
-	        	votes[i]  = Math.random()*prob_vote[i];
-	        	sum += votes[i];
+	        for(int i = 0; i < votes; i++) {
+	        	votes[i] = 0;
 	        }
-	        turnout /= sum;
-	        for( int i = 0; i < votes.length; i++) {
-	        	votes[i] *= turnout;
+	        for(int i = 0; i < population; i++) {
+	        	double p = Math.random();
+	        	if( p > prob_turnout) {
+	        		continue;
+	        	}
+	        	p = Math.random();
+	        	for( int j = 0; j < prob_vote.length; j++) {
+	        		p -= prob_vote[j];
+	        		if( p <= 0) {
+	        			votes[j]++;
+	        			break;
+	        		}
+	        	}
 	        }
-	
-	        return votes;
+	        vote_cache = votes;
 	    }
 	}
 	class Edge {
