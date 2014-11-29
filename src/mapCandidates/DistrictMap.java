@@ -10,9 +10,6 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static int sorting_polarity = 1;
     public static int hamming_distance_polarity = 1;
 
-
-
-
     public double[] fairnessScores = new double[5];
     public double fitness_score = 0;
 
