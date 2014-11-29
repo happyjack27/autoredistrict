@@ -1,7 +1,9 @@
 package mapCandidates;
 import java.util.*;
 
-public class Block {
+import serializable.JSONObject;
+
+public class Block extends JSONObject {
     public int index;
     double[] population;
     double[] prob_turnout;
@@ -56,4 +58,22 @@ public class Block {
         }
     vote_cache = votes;
     }
+
+	@Override
+	public void post_deserialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pre_serialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public JSONObject instantiateObject(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

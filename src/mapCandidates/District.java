@@ -1,7 +1,9 @@
 package mapCandidates;
 import java.util.*;
 
-class District {
+import serializable.JSONObject;
+
+class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
     public double[] wins;
     public int last_winner = -1;
@@ -113,6 +115,24 @@ class District {
         }
         return population;
     }
+
+	@Override
+	public void post_deserialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pre_serialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public JSONObject instantiateObject(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 }

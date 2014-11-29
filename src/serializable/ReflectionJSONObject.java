@@ -6,14 +6,14 @@ public class ReflectionJSONObject<T> extends JSONObject {
 
 	@Override
 	public void post_deserialize() {
-		System.out.println("post deserialize: ");
+		//System.out.println("post deserialize: ");
 
 		Class<T> t = (Class<T>) this.getClass();
 		Field[] fields = t.getFields();
 		for( int i = 0; i < fields.length; i++) {
 			Field f = fields[i];
 			String name = f.getName();
-			System.out.println("name: "+name);
+			//System.out.println("name: "+name);
 			if( name.indexOf("_json_") == 0 || !containsKey(name)) {
 				continue;
 			}
@@ -34,13 +34,10 @@ public class ReflectionJSONObject<T> extends JSONObject {
 			} catch (Exception ex) { }
 			
 		}
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void pre_serialize() {
-		// TODO Auto-generated method stub
 		Class<T> t = (Class<T>) this.getClass();
 		Field[] fields = t.getFields();
 		for( int i = 0; i < fields.length; i++) {
@@ -69,7 +66,6 @@ public class ReflectionJSONObject<T> extends JSONObject {
 
 	@Override
 	public JSONObject instantiateObject(String key) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
