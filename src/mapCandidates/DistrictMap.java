@@ -114,15 +114,15 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     public void evolve() {
     	boolean score_all = true;
-        int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
+        int cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
 
         if( score_all) {
             for( DistrictMap map : population) {
-                map.calcFairnessScores(trials);
+                map.calcFairnessScores(Settings.trials);
             }
         } else {
             for( int i = cutoff; i < population.size(); i++) {
-                population.get(i).calcFairnessScores(trials);
+                population.get(i).calcFairnessScores(Settings.trials);
             }
         }
         for( int i = 0; i < 5; i++) {
@@ -160,8 +160,8 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             int g1 = (int)(Math.random()*(double)cutoff);
             int g2 = (int)(Math.random()*(double)cutoff);
             population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
-            population.get(i).mutate(mutation_rate);
-            population.get(i).mutate_boundary(mutation_rate);
+            population.get(i).mutate(Settings.mutation_rate);
+            population.get(i).mutate_boundary(Settings.mutation_rate);
         }
     }
 

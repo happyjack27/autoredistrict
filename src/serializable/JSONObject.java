@@ -11,7 +11,7 @@ import java.util.*;
 public abstract class JSONObject extends HashMap<String,Object> implements iJSONObject {
 	static final String _json_tab = "  ";
 	static final String _json_quote = "\"";
-	static int _json_verbosity = 0;
+	static int _json_verbosity = 1;
 	static int _json_indents = 0;
 	
 	

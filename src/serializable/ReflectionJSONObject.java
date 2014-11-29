@@ -6,11 +6,14 @@ public class ReflectionJSONObject<T> extends JSONObject {
 
 	@Override
 	public void post_deserialize() {
+		System.out.println("post deserialize: ");
+
 		Class<T> t = (Class<T>) this.getClass();
 		Field[] fields = t.getFields();
 		for( int i = 0; i < fields.length; i++) {
 			Field f = fields[i];
 			String name = f.getName();
+			System.out.println("name: "+name);
 			if( name.indexOf("_json_") == 0 || !containsKey(name)) {
 				continue;
 			}

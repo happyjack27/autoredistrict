@@ -2,7 +2,7 @@ package mapCandidates;
 
 import serializable.JSONObject;
 
-public class Settings extends serializable.JSONObject {
+public class Settings extends serializable.ReflectionJSONObject<Settings> {
     public static boolean mutate_to_neighbor_only = false;
     public static double species_fraction = 0.25;
 
@@ -22,6 +22,7 @@ public class Settings extends serializable.JSONObject {
     public static int trials;
     public static int population;
     
+    /*
 	@Override
 	public void post_deserialize() {
 		species_fraction = this.getDouble("species_fraction");
@@ -57,6 +58,6 @@ public class Settings extends serializable.JSONObject {
 	@Override
 	public JSONObject instantiateObject(String key) {
 		return null;
-	} 
+	} */
 
 }
