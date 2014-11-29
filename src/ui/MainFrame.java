@@ -186,7 +186,7 @@ public class MainFrame extends JFrame {
 		panel.add(lblVotingPowerBalance);
 		slider_6.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.voting_power_balance_weight = slider_3.getValue()/100.0;
+				Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
 			}
 		});
 		
@@ -194,7 +194,7 @@ public class MainFrame extends JFrame {
 		panel.add(slider_6);
 		slider_7.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.disconnected_population_weight = slider_3.getValue()/100.0;
+				Settings.disconnected_population_weight = slider_7.getValue()/100.0;
 			}
 		});
 		
