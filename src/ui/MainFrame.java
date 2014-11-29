@@ -108,6 +108,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				 try {
 					 Settings.population = new Integer(textField.getText());
+					 ecology.resize_population();
 				 } catch (Exception ex) {
 					 
 				 }

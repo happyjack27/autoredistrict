@@ -69,24 +69,22 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
  
     Vector<DistrictMap> population;
-
-    public void init(
-            Vector<Block> blocks,
-            Vector<District> districts,
-            Vector<Candidate> candidates,
-            int population_size
-            ) {
-        this.blocks = blocks;
-        this.districts = districts;
-        this.candidates = candidates;
-        
+    
+    public void reset() {
         DistrictMap.candidates = candidates;
-        
-        population =  new Vector<DistrictMap>();
-        for( int i = 0; i < population_size; i++) {
+    	population =  new Vector<DistrictMap>();
+    }
+    public void resize_population() {    	
+    	population =  new Vector<DistrictMap>();
+        for( int i = population.size(); i < Settings.population; i++) {
             population.add(new DistrictMap(blocks,districts.size()));
         }
+        for( int i = Settings.population; i > population.size(); i++) {
+            population.remove(Settings.population);
+        }
+
     }
+
     public void evolveWithSpeciation(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
         int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
         int speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
