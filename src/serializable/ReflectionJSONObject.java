@@ -43,7 +43,7 @@ public class ReflectionJSONObject<T> extends JSONObject {
 		for( int i = 0; i < fields.length; i++) {
 			Field f = fields[i];
 			String name = f.getName();
-			if( name.indexOf("_json_") == 0 || !containsKey(name)) {
+			if( name.indexOf("_json_") == 0) {
 				continue;
 			}
 			Type type = f.getType();
