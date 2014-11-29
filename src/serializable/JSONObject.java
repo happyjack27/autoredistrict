@@ -9,10 +9,11 @@ import java.util.*;
 //check out the "jsonObjects" package for examples.
 //note: this is a single-pass in-place serializer / de-serializer!   that is, all work, including object instantiation and member initialization, is done in one pass!     
 public abstract class JSONObject extends HashMap<String,Object> implements iJSONObject {
-	static final String tab = "  ";
-	static final String quote = "\"";
-	static int verbosity = 0;
-	static int indents = 0;
+	static final String _json_tab = "  ";
+	static final String _json_quote = "\"";
+	static int _json_verbosity = 0;
+	static int _json_indents = 0;
+	
 	
 	   public String toJSON() {
 		   StringBuffer sb = new StringBuffer();
@@ -34,10 +35,10 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 			JSONObject o = null;
 			while( index < s.length()) {
 				char c = s.charAt(index);
-				if( verbosity > 0) System.out.print(c);
+				if( _json_verbosity > 0) System.out.print(c);
 				switch(c) {
 				case '{':
-					indents++;
+					_json_indents++;
 
 					o = instantiateObject(key);
 					index = o.deserialize(s, ++index);
@@ -48,23 +49,23 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 							array = 0;
 							mode = 0;
 							this.put(key, v);
-							if( verbosity > 0) System.out.println("|putting array "+key+" "+v+"| "+this.size());
+							if( _json_verbosity > 0) System.out.println("|putting array "+key+" "+v+"| "+this.size());
 							last_index = index+1;					
 						} else {
 							mode = 0;
 							if( o != null) {
 								this.put(key, o);
-								if( verbosity > 0) System.out.println("|putting "+key+" object| "+this.size());
+								if( _json_verbosity > 0) System.out.println("|putting "+key+" object| "+this.size());
 								o = null;
 							} else  {
 								String ss = s.substring(last_index,index).replaceAll("\"","").trim();
 								this.put(key, ss);
-								if( verbosity > 0) System.out.println("|putting "+key+" "+ss+"| "+this.size());
+								if( _json_verbosity > 0) System.out.println("|putting "+key+" "+ss+"| "+this.size());
 							}
 							last_index = index+1;					
 						}
 					}
-					indents--;
+					_json_indents--;
 					//System.out.println("returning1 "+size()+" "+mode+" "+array+" "+indents+" "+this);
 					post_deserialize();
 					return index;
@@ -93,19 +94,19 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 					} else if( array == 2) {
 						array = 0;
 						mode = 0;
-						if( verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
+						if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
 						this.put(key, v);
 						last_index = index+1;					
 					} else {
 						mode = 0;
 						if( o != null) {
 							this.put(key, o);
-							if( verbosity > 0) System.out.println("|putting1 "+key+" object| "+this.size());
+							if( _json_verbosity > 0) System.out.println("|putting1 "+key+" object| "+this.size());
 							o = null;
 						} else  {
 							String ss = s.substring(last_index,index).replaceAll("\"","").trim();
 							this.put(key, ss);
-							if( verbosity > 0) System.out.println("|putting2 "+key+" "+ss+"| "+this.size());
+							if( _json_verbosity > 0) System.out.println("|putting2 "+key+" "+ss+"| "+this.size());
 						}
 						last_index = index+1;
 					}
@@ -133,7 +134,7 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 					}				
 					mode = 0;
 					array = 2;
-					if( verbosity > 0) System.out.println("|putting array2 "+key+" "+v.size()+" "+v+"|");
+					if( _json_verbosity > 0) System.out.println("|putting array2 "+key+" "+v.size()+" "+v+"|");
 					this.put(key, v);
 					array = 0;
 					last_index = index+1;
@@ -156,19 +157,19 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 				} else if( array == 2) {
 					array = 0;
 					mode = 0;
-					if( verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
+					if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
 					this.put(key, v);
 					last_index = index+1;					
 				} else {
 					mode = 0;
 					if( o != null) {
 						this.put(key, o);
-						if( verbosity > 0) System.out.println("|putting1 "+key+" object| "+this.size());
+						if( _json_verbosity > 0) System.out.println("|putting1 "+key+" object| "+this.size());
 						o = null;
 					} else  {
 						String ss = s.substring(last_index,index).replaceAll("\"","").trim();
 						this.put(key, ss);
-						if( verbosity > 0) System.out.println("|putting2 "+key+" "+ss+"| "+this.size());
+						if( _json_verbosity > 0) System.out.println("|putting2 "+key+" "+ss+"| "+this.size());
 					}
 					last_index = index+1;
 				}
@@ -189,14 +190,14 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 		pre_serialize();
 		//sb.append(prepend+"{\n");
 		for( Map.Entry<String, Object> t: entrySet() ) {
-			writeObject(t.getKey(),t.getValue(),sb,prepend+tab);
+			writeObject(t.getKey(),t.getValue(),sb,prepend+_json_tab);
 			
 		}
 		//sb.append(prepend+"},\n");
 	}
 	private void writeObject(String name, Object obj, StringBuffer sb, String prepend) {
 		if( name != null) {
-			sb.append(prepend+quote+name+quote+":");
+			sb.append(prepend+_json_quote+name+_json_quote+":");
 		}
 		if(obj instanceof JSONObject) {
 			JSONObject o = (JSONObject)obj;
@@ -205,20 +206,20 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 				sb.append(prepend);
 			}
 			sb.append("{\n");
-			o.serialize(sb,prepend+tab);
+			o.serialize(sb,prepend+_json_tab);
 			sb.append(prepend+"},\n");
 		} else {
 		if(obj instanceof Collection) {
 			Collection<Object> v = (Collection<Object>)obj;
 			sb.append("[\n");
 			for( Object o : v) {
-				writeObject(null,o,sb,prepend+tab);
+				writeObject(null,o,sb,prepend+_json_tab);
 			}
 			sb.append(prepend+"],\n");	
 		} else
 		if(obj instanceof String) {
 			String o = (String)obj;
-			sb.append(quote+o+quote+",\n");
+			sb.append(_json_quote+o+_json_quote+",\n");
 		} else
 		if(obj instanceof Integer) {
 			Integer o = (Integer)obj;
@@ -241,5 +242,10 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 	}
 	public Vector getVector(String key) {
 		return (Vector)get(key);
+	}
+	public double getDouble(String key) {
+		if( !containsKey(key)) 
+			return 0;
+		return new Double((String)get(key));
 	}
 }

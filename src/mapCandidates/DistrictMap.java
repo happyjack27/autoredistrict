@@ -10,17 +10,7 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static int sorting_polarity = 1;
     public static int hamming_distance_polarity = 1;
 
-    public static boolean mutate_to_neighbor_only = false;
-    public static double species_fraction = 0.25;
 
-    //spatial metrics
-    public static double geometry_weight = 1;
-    public static double population_balance_weight = 1;
-    public static double disconnected_population_weight = 0; 
-
-    //fairness metrics
-    public static double disenfranchise_weight = 1;
-    public static double voting_power_balance_weight = 1; 
 
 
     public double[] fairnessScores = new double[5];
@@ -58,7 +48,7 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //sfads
     public void evolveWithSpeciation(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
         int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
-        int speciation_cutoff = (int)((double)cutoff*species_fraction);
+        int speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
 
         if( score_all) {
             for( DistrictMap map : population) {
@@ -82,11 +72,11 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
 
         double[] weights = new double[]{
-                geometry_weight, 
-                disenfranchise_weight, 
-                population_balance_weight,
-                disconnected_population_weight,
-                voting_power_balance_weight
+        		Settings.geometry_weight, 
+        		Settings.disenfranchise_weight, 
+        		Settings.population_balance_weight,
+                Settings.disconnected_population_weight,
+                Settings.voting_power_balance_weight
         };
 
         for( int j = 0; j < population.size(); j++) {
@@ -122,7 +112,8 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
 
-    public void evolve(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
+    public void evolve() {
+    	boolean score_all = true;
         int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
 
         if( score_all) {
@@ -147,11 +138,11 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
 
         double[] weights = new double[]{
-                geometry_weight, 
-                disenfranchise_weight, 
-                population_balance_weight,
-                disconnected_population_weight,
-                voting_power_balance_weight
+        		Settings.geometry_weight, 
+        		Settings.disenfranchise_weight, 
+        		Settings.population_balance_weight,
+        		Settings.disconnected_population_weight,
+        		Settings.voting_power_balance_weight
         };
 
         for( int j = 0; j < population.size(); j++) {
@@ -437,7 +428,7 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
 
         double disconnected_pops = 0;
-        if( disconnected_population_weight > 0) {
+        if( Settings.disconnected_population_weight > 0) {
             for(District district : districts)
                 disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
         }
