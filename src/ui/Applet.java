@@ -7,7 +7,7 @@ public class Applet extends JApplet {
 		new Applet();
 	}
     public Applet() {
-    	new MainFrame();
+    	new MainFrame().show();
     }
 
 
