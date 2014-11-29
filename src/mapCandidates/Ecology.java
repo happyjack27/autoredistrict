@@ -4,7 +4,7 @@ import java.util.*;
 
 import serializable.*;
 
-public class Ecology extends JSONObject {
+public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	Vector<District> districts = new Vector<District>();
 	Vector<DistrictMap> districtmaps = new Vector<DistrictMap>();
@@ -28,6 +28,11 @@ public class Ecology extends JSONObject {
 
 	@Override
 	public void pre_serialize() {
+		put("districts",districts);
+		put("candidates",candidates);
+		put("blocks",blocks);
+		put("edges",edges);
+		put("vertexes",vertexes);
 		// TODO Auto-generated method stub
 		
 	}

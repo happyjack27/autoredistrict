@@ -58,6 +58,8 @@ public class ReflectionJSONObject<T> extends JSONObject {
 					put(name,""+(String)f.get(this));
 				} else if( type.equals(boolean.class)) {
 					put(name,""+f.getBoolean(this));
+				} else {
+					put(name,f.get(this));
 				}
 			} catch (Exception ex) { }
 		}
