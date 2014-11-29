@@ -1,3 +1,4 @@
+package mapCandidates;
 
 
 public class Candidate {

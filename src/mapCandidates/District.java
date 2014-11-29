@@ -1,3 +1,4 @@
+package mapCandidates;
 import java.util.*;
 
 class District {

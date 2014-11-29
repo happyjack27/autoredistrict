@@ -1,3 +1,4 @@
+package mapCandidates;
 public class Edge {
     Block block1;
     Block block2;
