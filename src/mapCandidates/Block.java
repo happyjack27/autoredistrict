@@ -1,16 +1,17 @@
 package mapCandidates;
 import java.util.*;
 
-import serializable.JSONObject;
+import serializable.*;
 
-public class Block extends JSONObject {
-    public int index;
+public class Block extends ReflectionJSONObject<Block> {
+    public int id;
 
     public Vector<Edge> edges = new Vector<Edge>();
+    public Vector<Demographic> demographics = new Vector<Demographic>();
 
-    double[] population;
-    double[] prob_turnout;
-    double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
+    //double[] population;
+    //double[] prob_turnout;
+    //double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
     double[] vote_cache = null;
     double[][] vote_caches = null;
     
@@ -18,18 +19,21 @@ public class Block extends JSONObject {
     static boolean use_vote_cache = true;
     static int cache_reuse_times = 16;
     static int vote_cache_size = 128;
+    static Vector<Candidate> candidates = null;
     
     int cache_reused = 0;
 
     
 	@Override
 	public void post_deserialize() {
+		super.post_deserialize();
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void pre_serialize() {
+		super.pre_serialize();
 		// TODO Auto-generated method stub
 		
 	}
@@ -59,27 +63,28 @@ public class Block extends JSONObject {
     }
 
     void generateVotes() {
-        double[] votes = new double[prob_vote.length];
+        double[] votes = new double[candidates.size()];
         for(int i = 0; i < votes.length; i++) {
             votes[i] = 0;
         }
-        for(int h = 0; h < population.length; h++) {
-            for(int i = 0; i < population[h]; i++) {
+        for( Demographic d : demographics) {
+            for(int i = 0; i < d.population; i++) {
                 double p = Math.random();
-                if( p > prob_turnout[h]) {
+                if( p > d.turnout_probability) {
                     continue;
                 }
                 p = Math.random();
-                for( int j = 0; j < prob_vote[h].length; j++) {
-                    p -= prob_vote[h][j];
+                for( int j = 0; j < d.vote_prob.length; j++) {
+                    p -=  d.vote_prob[j];
                     if( p <= 0) {
                         votes[j]++;
                         break;
                     }
                 }
             }
+        	
         }
-    vote_cache = votes;
+        vote_cache = votes;
     }
 
 

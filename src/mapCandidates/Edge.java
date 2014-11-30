@@ -16,6 +16,6 @@ public class Edge extends ReflectionJSONObject<Edge> {
 	Vertex vertex2;
 	
     boolean areBothSidesSameDistrict(int[] block_districts) {
-        return block_districts[block1.index] == block_districts[block2.index];
+        return block_districts[block1.id] == block_districts[block2.id];
     }
 }

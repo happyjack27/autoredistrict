@@ -15,9 +15,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	Vector<Candidate> candidates = new Vector<Candidate>();
 
 	Vector<Block> blocks = new Vector<Block>();
-
 	Vector<Edge> edges = new Vector<Edge>();
 	Vector<Vertex> vertexes = new Vector<Vertex>();
+	
+	HashMap<Integer,Block> blocks_by_id = new HashMap<Integer,Block>();
+	HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
+	HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
 
 	Settings settings = new Settings();
 	
@@ -28,26 +31,53 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	@Override
 	public void post_deserialize() {
 		//geometry
-		if( containsKey("blocks")) { blocks = getVector("blocks"); }
-		if( containsKey("edges")) { edges = getVector("edges"); }
-		if( containsKey("vertexes")) { vertexes = getVector("vertexes"); }
+		if( containsKey("blocks")) {
+			blocks = getVector("blocks");
+			for( Block block: blocks) {
+				blocks_by_id.put(block.id,block);
+			}
+		}
+		if( containsKey("edges")) { 
+			edges = getVector("edges"); 
+			for( Edge edge: edges) {
+				edges_by_id.put(edge.id,edge);
+			}
+		}
+		if( containsKey("vertexes")) {
+			vertexes = getVector("vertexes");
+			for( Vertex vertex: vertexes) {
+				vertexes_by_id.put(vertex.id,vertex);
+			}
+		}
+		if( edges != null) {
+			for( Edge edge: edges) {
+				edge.block1 = blocks_by_id.get(edge.block1_id);
+				edge.block2 = blocks_by_id.get(edge.block2_id);
+				edge.vertex1 = vertexes_by_id.get(edge.vertex1_id);
+				edge.vertex2 = vertexes_by_id.get(edge.vertex2_id);
+				edge.block1.edges.add(edge);
+				edge.block2.edges.add(edge);
+			}
+		}
 
 		//stuff
-		if( containsKey("candidates")) { candidates = getVector("candidates"); }
+		if( containsKey("candidates")) {
+			candidates = getVector("candidates");
+			Block.candidates = candidates;
+			DistrictMap.candidates = candidates;
+			District.candidates = candidates;
+		}
 		
 		if( containsKey("settings")) { settings = (Settings)get("settings"); }
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public void pre_serialize() {
-		put("candidates",candidates);
+	public void pre_serialize() {		
 		put("blocks",blocks);
 		put("edges",edges);
 		put("vertexes",vertexes);
-		// TODO Auto-generated method stub
 		
+		put("candidates",candidates);
 	}
 
 	@Override
@@ -61,6 +91,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( key.equals("blocks")) {
 			return new Block();
 		}
+		
 		if( key.equals("candidates")) {
 			return new Candidate();
 		}

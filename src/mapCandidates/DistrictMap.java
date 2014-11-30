@@ -56,7 +56,7 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 Block block = blocks.get(i);
                 for( Edge edge : block.edges) {
                     Block other_block = edge.block1 == block ? edge.block2 : edge.block1;
-                    allow[block_districts[other_block.index]] = true;
+                    allow[block_districts[other_block.id]] = true;
                 }
                 double count = 0;
                 for( int j = 0; j < allow.length; j++) {

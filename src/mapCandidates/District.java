@@ -6,6 +6,8 @@ import serializable.JSONObject;
 class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
     
+    static Vector<Candidate> candidates = null;
+    
     double[] wins;
     
     int last_winner = -1;
@@ -13,8 +15,8 @@ class District extends JSONObject {
     double getPopulation() {
         double pop = 0;
         for( Block block : blocks) {
-        	for(double p : block.population)
-              pop += p;
+        	for(Demographic p : block.demographics)
+              pop += p.population;
         }
         return pop;
     }
@@ -23,7 +25,7 @@ class District extends JSONObject {
         if( blocks.size() == 0) {
             return;
         }
-        wins = new double[blocks.get(0).prob_vote.length]; //inited to 0
+        wins = new double[candidates.size()]; //inited to 0
     }
     public double getSelfEntropy() {
         double total = 0;
@@ -55,7 +57,7 @@ class District extends JSONObject {
         if( blocks.size() == 0) {
             return null;
         }
-        double[] district_vote = new double[blocks.get(0).prob_vote.length]; //inited to 0
+        double[] district_vote = new double[candidates.size()]; //inited to 0
         for( Block block : blocks) {
             double[] block_vote = block.getVotes();
             for( int i = 0; i < block_vote.length; i++) {//most_value) {
@@ -112,8 +114,8 @@ class District extends JSONObject {
     double getRegionPopulation(Vector<Block> region) {
         double population = 0;
         for( Block block : region) {
-        	for(double p : block.population)
-                population += p;
+        	for(Demographic p : block.demographics)
+                population += p.population;
         }
         return population;
     }
