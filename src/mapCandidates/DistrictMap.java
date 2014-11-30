@@ -6,15 +6,16 @@ class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
     public static int sorting_polarity = 1;
 
-    public int num_districts = 0;
+    public static int num_districts = 0;
+	public static Vector<Candidate> candidates = new Vector<Candidate>();
+	public Vector<Block> blocks = new Vector<Block>();
+	public Vector<District> districts = new Vector<District>();
+    
     public int[] block_districts = new int[]{};
     public double[] fairnessScores = new double[5];
     public double fitness_score = 0;
     
-	public Vector<Block> blocks = new Vector<Block>();
-	public Vector<District> districts = new Vector<District>();
 	
-	public static Vector<Candidate> candidates = new Vector<Candidate>();
 
     //makeLike
     //sfads

@@ -5,18 +5,41 @@ import serializable.JSONObject;
 
 public class Block extends JSONObject {
     public int index;
+
+    public Vector<Edge> edges = new Vector<Edge>();
+
     double[] population;
     double[] prob_turnout;
     double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
     double[] vote_cache = null;
     double[][] vote_caches = null;
+    
     static boolean use_vote_caches = true;
     static boolean use_vote_cache = true;
     static int cache_reuse_times = 16;
     static int vote_cache_size = 128;
+    
     int cache_reused = 0;
 
-    public Vector<Edge> edges = new Vector<Edge>();
+    
+	@Override
+	public void post_deserialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pre_serialize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public JSONObject instantiateObject(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
     double[] getVotes() {
         if( use_vote_caches) {
             if( vote_caches == null) {
@@ -59,21 +82,5 @@ public class Block extends JSONObject {
     vote_cache = votes;
     }
 
-	@Override
-	public void post_deserialize() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void pre_serialize() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public JSONObject instantiateObject(String key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -5,8 +5,10 @@ import serializable.JSONObject;
 
 class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
-    public double[] wins;
-    public int last_winner = -1;
+    
+    double[] wins;
+    
+    int last_winner = -1;
 
     double getPopulation() {
         double pop = 0;

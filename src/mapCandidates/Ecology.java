@@ -5,25 +5,36 @@ import java.util.*;
 import serializable.*;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
+	//geometry
+	//demographics
+	//settings
+	//map_population (folder)
+	//
+	int num_districts = 0;
 	
 	Vector<Candidate> candidates = new Vector<Candidate>();
 
 	Vector<Block> blocks = new Vector<Block>();
-	Vector<District> districts = new Vector<District>();
-	Vector<DistrictMap> districtmaps = new Vector<DistrictMap>();
 
 	Vector<Edge> edges = new Vector<Edge>();
 	Vector<Vertex> vertexes = new Vector<Vertex>();
 
 	Settings settings = new Settings();
+	
+    Vector<DistrictMap> population = new Vector<DistrictMap>();
+    
+
 
 	@Override
 	public void post_deserialize() {
-		if( containsKey("districts")) { districts = getVector("districts"); }
-		if( containsKey("candidates")) { candidates = getVector("candidates"); }
+		//geometry
 		if( containsKey("blocks")) { blocks = getVector("blocks"); }
 		if( containsKey("edges")) { edges = getVector("edges"); }
 		if( containsKey("vertexes")) { vertexes = getVector("vertexes"); }
+
+		//stuff
+		if( containsKey("candidates")) { candidates = getVector("candidates"); }
+		
 		if( containsKey("settings")) { settings = (Settings)get("settings"); }
 		// TODO Auto-generated method stub
 		
@@ -31,7 +42,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void pre_serialize() {
-		put("districts",districts);
 		put("candidates",candidates);
 		put("blocks",blocks);
 		put("edges",edges);
@@ -51,9 +61,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( key.equals("blocks")) {
 			return new Block();
 		}
-		if( key.equals("districts")) {
-			return new District();
-		}
 		if( key.equals("candidates")) {
 			return new Candidate();
 		}
@@ -68,8 +75,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public static int hamming_distance_polarity = 1;
 
  
-    Vector<DistrictMap> population;
-    
     public void reset() {
         DistrictMap.candidates = candidates;
     	population =  new Vector<DistrictMap>();
@@ -77,7 +82,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public void resize_population() {    	
     	population =  new Vector<DistrictMap>();
         for( int i = population.size(); i < Settings.population; i++) {
-            population.add(new DistrictMap(blocks,districts.size()));
+            population.add(new DistrictMap(blocks,num_districts));
         }
         for( int i = Settings.population; i > population.size(); i++) {
             population.remove(Settings.population);
