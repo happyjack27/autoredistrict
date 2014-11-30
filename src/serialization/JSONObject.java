@@ -1,4 +1,4 @@
-package serializable;
+package serialization;
 import java.util.*;
 
 //this class is for parsing a json string into an object, and formatting an object into a json string.

@@ -1,7 +1,7 @@
 package mapCandidates;
 import java.util.*;
 
-import serializable.JSONObject;
+import serialization.JSONObject;
 
 class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();

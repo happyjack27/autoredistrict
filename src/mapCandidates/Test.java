@@ -1,6 +1,6 @@
 package mapCandidates;
 
-import serializable.ReflectionJSONObject;
+import serialization.ReflectionJSONObject;
 import ui.Applet;
 
 public class Test extends ReflectionJSONObject<Test> {

@@ -1,4 +1,4 @@
-package serializable;
+package serialization;
 
 public interface iJSONObject {
 	public void post_deserialize();

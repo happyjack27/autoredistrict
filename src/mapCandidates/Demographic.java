@@ -1,6 +1,6 @@
 package mapCandidates;
 
-import serializable.ReflectionJSONObject;
+import serialization.ReflectionJSONObject;
 
 public class Demographic extends ReflectionJSONObject<Demographic> {
 	public int block_id;

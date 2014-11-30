@@ -1,8 +1,8 @@
 package mapCandidates;
 
-import serializable.JSONObject;
+import serialization.JSONObject;
 
-public class Settings extends serializable.ReflectionJSONObject<Settings> {
+public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static boolean mutate_to_neighbor_only = false;
     public static double species_fraction = 0.25;
 

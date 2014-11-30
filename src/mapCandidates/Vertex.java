@@ -1,6 +1,6 @@
 package mapCandidates;
 
-import serializable.ReflectionJSONObject;
+import serialization.ReflectionJSONObject;
 
 public class Vertex extends ReflectionJSONObject<Vertex> {
 	public int id;

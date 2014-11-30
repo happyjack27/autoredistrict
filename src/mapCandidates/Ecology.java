@@ -2,7 +2,7 @@ package mapCandidates;
 
 import java.util.*;
 
-import serializable.*;
+import serialization.*;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	//geometry

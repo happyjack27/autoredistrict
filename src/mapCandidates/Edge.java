@@ -1,6 +1,6 @@
 package mapCandidates;
 
-import serializable.ReflectionJSONObject;
+import serialization.ReflectionJSONObject;
 
 public class Edge extends ReflectionJSONObject<Edge> {
 	public int id;

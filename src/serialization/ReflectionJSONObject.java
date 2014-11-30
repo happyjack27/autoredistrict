@@ -1,4 +1,4 @@
-package serializable;
+package serialization;
 
 import java.lang.reflect.*;
 

@@ -1,7 +1,7 @@
 package mapCandidates;
 import java.util.*;
 
-import serializable.*;
+import serialization.*;
 
 public class Block extends ReflectionJSONObject<Block> {
     public int id;
