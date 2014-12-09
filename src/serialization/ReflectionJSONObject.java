@@ -1,6 +1,7 @@
 package serialization;
 
 import java.lang.reflect.*;
+import java.util.Vector;
 
 public class ReflectionJSONObject<T> extends JSONObject {
 
@@ -29,6 +30,13 @@ public class ReflectionJSONObject<T> extends JSONObject {
 					f.set(this, getString(name));
 				} else if( type.equals(boolean.class)) {
 					f.set(this, getString(name).equals("true"));
+				} else if( type.equals(double[].class)) {
+					Vector<String> vd = this.getVector(name);
+					double[] dd = new double[vd.size()];
+					for( int j = 0; j < vd.size(); j++) {
+						dd[j] = Double.parseDouble(vd.get(j));
+					}
+					f.set(this, dd);	
 					
 				}
 			} catch (Exception ex) { }
