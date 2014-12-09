@@ -11,7 +11,7 @@ import java.util.*;
 public abstract class JSONObject extends HashMap<String,Object> implements iJSONObject {
 	static final String _json_tab = "  ";
 	static final String _json_quote = "\"";
-	static int _json_verbosity = 1;
+	static int _json_verbosity = 0;
 	static int _json_indents = 0;
 	
 	
@@ -30,7 +30,10 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 			String key = null;
 			int mode = 0;
 			int last_index = index;
-			Vector v = null;
+
+			Stack<Vector> svo = new Stack<Vector>();
+			//Vector v = null;
+			
 			int array = 0;
 			JSONObject o = null;
 			while( index < s.length()) {
@@ -38,18 +41,24 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 				if( _json_verbosity > 0) System.out.print(c);
 				switch(c) {
 				case '{':
-					_json_indents++;
+					//ignore if no key encountered yet. 
+					if( key == null || key.length() == 0) {
+						index++;
+						last_index = index;
+					} else {
+						_json_indents++;
 
-					o = instantiateObject(key);
-					index = o.deserialize(s, ++index);
+						o = instantiateObject(key);
+						index = o.deserialize(s, ++index);
+					}
 					break;
 				case '}':
 					if( mode == 1) {
 						if( array == 2) {
 							array = 0;
 							mode = 0;
-							this.put(key, v);
-							if( _json_verbosity > 0) System.out.println("|putting array "+key+" "+v+"| "+this.size());
+							this.put(key, svo.pop());
+							if( _json_verbosity > 0) System.out.println("|putting array "+key+" "+"| "+this.size());
 							last_index = index+1;					
 						} else {
 							mode = 0;
@@ -85,17 +94,17 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 						break;
 					if( array == 1) {
 						if( o != null) {
-							v.add(o);
+							svo.peek().add(o);
 							o = null;
 						} else  {
-							v.add(s.substring(last_index,index).replaceAll("\"","").trim());
+							svo.peek().add(s.substring(last_index,index).replaceAll("\"","").trim());
 						}
 						last_index = index+1;
 					} else if( array == 2) {
 						array = 0;
 						mode = 0;
-						if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
-						this.put(key, v);
+						if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+"|");
+						this.put(key, svo.pop());
 						last_index = index+1;					
 					} else {
 						mode = 0;
@@ -117,26 +126,41 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 					last_index = index+1;
 					break;
 				case '[':
+					svo.push(new Vector());
+					last_index = index+1;
+					/*
+					if( v != null) {
+						svo.push(v);
+					}
 					v = new Vector();
+					*/
 					array = 1;
 					break;
 				case ']':
 					if( array == 1 && last_index+1 < index) {
 						if( o != null) {
-							v.add(o);
+							svo.peek().add(o);
 							o = null;
 						} else  {
 							String s2 = s.substring(last_index,index).replaceAll("\"","").trim();
 							if( s2.length() > 0) {
-								v.add(s2);
+								svo.peek().add(s2);
 							}
 						}
 					}				
-					mode = 0;
 					array = 2;
-					if( _json_verbosity > 0) System.out.println("|putting array2 "+key+" "+v.size()+" "+v+"|");
-					this.put(key, v);
-					array = 0;
+					if( _json_verbosity > 0) System.out.println("|putting array2 "+key+" "+svo.size() +" "+svo.peek().size()+ " \""+svo.peek()+"\"|");
+					Vector v = svo.pop();
+					if( svo.size() > 0) {
+						svo.peek().add(v);
+						//v = svo.pop();
+						array = 1;
+					} else {
+						this.put(key, v);
+						mode = 0;
+						array = 0;
+						v = null;
+					}
 					last_index = index+1;
 					break;
 				default:
@@ -146,19 +170,32 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 			
 			
 			if( mode != 0) {
-				if( array == 1) {
+				if( array == 1 && svo.size() > 0) {
 					if( o != null) {
-						v.add(o);
+						svo.peek().add(o);
 						o = null;
 					} else  {
-						v.add(s.substring(last_index,index).replaceAll("\"","").trim());
+						svo.peek().add(s.substring(last_index,index).replaceAll("\"","").trim());
 					}
+					Vector v = svo.pop();
+					while( svo.size() > 0) {
+						svo.peek().add(v);
+						v = svo.pop();
+					}
+					//this.put(key, v);
+					
 					last_index = index+1;
 				} else if( array == 2) {
 					array = 0;
 					mode = 0;
-					if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+v.size()+" "+v+"|");
+					if( _json_verbosity > 0) System.out.println("|putting array3 "+key+" "+svo.size()+" "+svo.peek().size()+" "+svo.peek()+"|");
+					Vector v = svo.pop();
+					while( svo.size() > 0) {
+						svo.peek().add(v);
+						v = svo.pop();
+					}
 					this.put(key, v);
+					
 					last_index = index+1;					
 				} else {
 					mode = 0;

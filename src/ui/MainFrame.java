@@ -1,5 +1,7 @@
 package ui;
 
+import geoJSON.FeatureCollection;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -80,6 +82,45 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnFile.add(mntmOpen);
+		
+		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON");
+		mntmOpenGeojson.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				StringBuffer sb = new StringBuffer();
+				try {
+					FileInputStream fis = new FileInputStream(f);
+					while( fis.available() > 0) {
+						byte[] bb = new byte[fis.available()];
+						fis.read(bb);
+						sb.append(new String(bb));
+						Thread.sleep(10);
+					}
+					
+					fis.close();
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+					return;
+				} 
+				
+				FeatureCollection featureCollection = new FeatureCollection();
+				try {
+					featureCollection.fromJSON(sb.toString());
+					
+					//System.out.println(featureCollection.type);
+					System.out.println(featureCollection.toJSON());
+					//System.out.println(featureCollection);
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+
+			}
+		});
+		mnFile.add(mntmOpenGeojson);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mnFile.add(mntmSave);

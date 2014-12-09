@@ -1,21 +1,19 @@
 package geoJSON;
 
+import java.util.Vector;
+
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
-public class Feature extends ReflectionJSONObject<Feature> {
+public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
-	public Properties properties;
-	public Geometry geometry;
+	public Vector<Feature> features;
 
 	@Override
 	public void post_deserialize() {
 		super.post_deserialize();
-		if( containsKey("properties")) {
-			properties = (Properties) getObject("properties");
-		}
-		if( containsKey("geometry")) {
-			geometry = (Geometry) getObject("geometry");
+		if( containsKey("features")) {
+			features = getVector("features");
 		}
 		// TODO Auto-generated method stub
 		
@@ -30,11 +28,11 @@ public class Feature extends ReflectionJSONObject<Feature> {
 
 	@Override
 	public JSONObject instantiateObject(String key) {
-		if( key.equals("geometry")) {
-			return new Geometry();
+		if( key == null) {
+			System.out. println("null key!");
 		}
-		if( key.equals("properties")) {
-			return new Properties();
+		if( key.equals("features")) {
+			return new Feature();
 		}
 		return super.instantiateObject(key);
 	}

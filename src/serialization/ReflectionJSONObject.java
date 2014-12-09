@@ -76,7 +76,7 @@ public class ReflectionJSONObject<T> extends JSONObject {
 
 	@Override
 	public JSONObject instantiateObject(String key) {
-		return null;
+		return  null;
 	}
 
 }
