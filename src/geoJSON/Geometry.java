@@ -25,7 +25,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				};
 				j++;
 				} catch (Exception ex) { 
-					System.out.println("ex "+vvo.get(i));
+					//System.out.println("ex "+vvo.get(i));
 				}
 			}
 			double[][] dd = new double[j][];

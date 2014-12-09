@@ -1,5 +1,6 @@
 package ui;
 
+import geoJSON.Feature;
 import geoJSON.FeatureCollection;
 
 import java.awt.*;
@@ -32,6 +33,8 @@ public class MainFrame extends JFrame {
 
 
 	public Ecology ecology = new Ecology();
+	public FeatureCollection featureCollection = new FeatureCollection();
+	
 	public MainFrame() {
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
@@ -81,6 +84,9 @@ public class MainFrame extends JFrame {
 
 			}
 		});
+		
+		JMenuItem mntmClear = new JMenuItem("Clear");
+		mnFile.add(mntmClear);
 		mnFile.add(mntmOpen);
 		
 		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON");
@@ -121,6 +127,63 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnFile.add(mntmOpenGeojson);
+		
+		JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
+		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				//jfc.sh
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( !fd.isDirectory()) {
+					return;
+				}
+				File[] ff = fd.listFiles();
+				
+				featureCollection = new FeatureCollection(); 
+				featureCollection.features = new Vector<Feature>();
+				
+				for( int i = 0; i < ff.length; i++) {
+					String s = ff[i].getName().toLowerCase();
+					if(s.indexOf(".json") < 0) {
+						continue;
+					}
+					System.out.println("Processing "+s+"...");
+					File f = ff[i];
+					StringBuffer sb = new StringBuffer();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						while( fis.available() > 0) {
+							byte[] bb = new byte[fis.available()];
+							fis.read(bb);
+							sb.append(new String(bb));
+							Thread.sleep(10);
+						}
+						
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						return;
+					} 
+					
+					FeatureCollection fc = new FeatureCollection();
+					try {
+						fc.fromJSON(sb.toString());
+					} catch (Exception ex) {
+						System.out.println("ex "+ex);
+						ex.printStackTrace();
+					}
+					for( Feature fe : fc.features) {
+						featureCollection.features.add(fe);
+					}
+					
+				}
+				System.out.println("Done.");
+			}
+		});
+		mnFile.add(mntmOpenGeojsonFolder);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mnFile.add(mntmSave);
