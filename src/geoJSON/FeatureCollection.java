@@ -13,6 +13,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
 	public Vector<Feature> features;
 	public Vector<Block> blocks;
+	public HashMap<String,Block> precinctHash;
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Vertex,HashMap<Vertex,Edge>> edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
@@ -46,10 +47,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public void initBlocks() {
 		blocks = new Vector<Block>();
+		precinctHash = new HashMap<String,Block>();
 		Block.id_enumerator = 0;
 		for( Feature f : features) {
 			f.block = new Block();
+			f.block.name = f.properties.DISTRICT;
 			blocks.add(f.block);
+			precinctHash.put(f.block.name,f.block);
 		}
 		collectVertexes();
 		collectEdges();
