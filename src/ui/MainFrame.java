@@ -348,7 +348,7 @@ public class MainFrame extends JFrame {
 						votes.put(district, dd);
 					}
 					for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
-						dd[j] = Double.parseDouble(ss[j+1]);
+						dd[j] += Double.parseDouble(ss[j+1]);
 					}
 				}
 				
