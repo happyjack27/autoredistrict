@@ -2,6 +2,8 @@ package geoJSON;
 
 import java.awt.Color;
 
+import mapCandidates.Block;
+
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
@@ -9,6 +11,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public String type;
 	public Properties properties;
 	public Geometry geometry;
+	public Block block = new Block();
 
 	@Override
 	public void post_deserialize() {

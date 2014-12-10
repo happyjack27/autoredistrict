@@ -5,6 +5,10 @@ import serialization.*;
 
 public class Block extends ReflectionJSONObject<Block> {
     public int id;
+	public static int id_enumerator = 0;
+	
+	public String name = "";
+
 
     public Vector<Edge> edges = new Vector<Edge>();
     public Vector<Demographic> demographics = new Vector<Demographic>();
@@ -15,13 +19,18 @@ public class Block extends ReflectionJSONObject<Block> {
     double[] vote_cache = null;
     double[][] vote_caches = null;
     
-    static boolean use_vote_caches = true;
+    static boolean use_vote_caches = true; 
     static boolean use_vote_cache = true;
     static int cache_reuse_times = 16;
     static int vote_cache_size = 128;
     static Vector<Candidate> candidates = null;
     
     int cache_reused = 0;
+    
+    public Block() {
+    	super();
+    	id = id_enumerator++;
+    }
 
     
 	@Override
