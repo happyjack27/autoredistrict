@@ -408,7 +408,7 @@ public class MainFrame extends JFrame {
 		slider_3.setBounds(6, 57, 190, 29);
 		panel_2.add(slider_3);
 		
-		JLabel lblContiguency = new JLabel("contiguency");
+		JLabel lblContiguency = new JLabel("contiguity");
 		lblContiguency.setBounds(6, 280, 172, 16);
 		panel_2.add(lblContiguency);
 		slider_7.setBounds(6, 301, 190, 29);
