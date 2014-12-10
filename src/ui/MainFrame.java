@@ -408,7 +408,7 @@ public class MainFrame extends JFrame {
 		slider_3.setBounds(6, 57, 190, 29);
 		panel_2.add(slider_3);
 		
-		JLabel lblContiguency = new JLabel("connectedness");
+		JLabel lblContiguency = new JLabel("proportional representation");
 		lblContiguency.setBounds(6, 280, 172, 16);
 		panel_2.add(lblContiguency);
 		slider_7.setBounds(6, 301, 190, 29);
@@ -418,13 +418,13 @@ public class MainFrame extends JFrame {
 		lblEvolutionaryPressure.setBounds(6, 8, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
-		JLabel lblPopulationBalance = new JLabel("population balance");
+		JLabel lblPopulationBalance = new JLabel("connectedness");
 		lblPopulationBalance.setBounds(6, 98, 172, 16);
 		panel_2.add(lblPopulationBalance);
 		slider_4.setBounds(6, 119, 190, 29);
 		panel_2.add(slider_4);
 		
-		JLabel lblProportionalRepresentation = new JLabel("proportional representation\n");
+		JLabel lblProportionalRepresentation = new JLabel("population balance");
 		lblProportionalRepresentation.setBounds(6, 161, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
 		slider_5.setBounds(6, 182, 190, 29);
@@ -464,7 +464,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		textField.setText("512");
+		textField.setText("256");
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");
@@ -488,7 +488,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		textField_1.setText("128");
+		textField_1.setText("8");
 		textField_1.setColumns(10);
 		
 		JLabel lblTrials = new JLabel("Trials");
@@ -525,12 +525,12 @@ public class MainFrame extends JFrame {
 		panel_3.add(slider_8);
 		slider_2.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_rate = slider.getValue()/100.0;
+				Settings.mutation_rate = slider_2.getValue()/100.0;
 			}
 		});
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = slider.getValue()/100.0;
+				Settings.mutation_boundary_rate = slider_1.getValue()/100.0;
 			}
 		});
 		
@@ -544,20 +544,20 @@ public class MainFrame extends JFrame {
 				Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
 			}
 		});
+		slider_7.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.disenfranchise_weight = slider_7.getValue()/100.0;
+
+			}
+		});
 		slider_5.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.disenfranchise_weight = slider_5.getValue()/100.0;
-
+				Settings.population_balance_weight = slider_5.getValue()/100.0;
 			}
 		});
 		slider_4.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.population_balance_weight = slider_3.getValue()/100.0;
-			}
-		});
-		slider_7.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.disconnected_population_weight = slider_7.getValue()/100.0;
+				Settings.disconnected_population_weight = slider_4.getValue()/100.0;
 			}
 		});
 		slider_3.addChangeListener(new ChangeListener() {
