@@ -3,6 +3,8 @@ package geoJSON;
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.util.*;
@@ -13,6 +15,8 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public int[] xpolys;
 	public int[] ypolys;
 	public Polygon[] polygons;
+	public Color c = Color.BLACK;
+	public boolean isDistrict = true;
 	
 	public static double shiftx,shifty,scalex,scaley;
 	public void makePolys() {
@@ -30,13 +34,18 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		}
 
 	}
-	public void draw(Graphics2D g) {
+	public void draw(Graphics g) {
 		if( polygons == null) {
 			makePolys();
 		}
+		g.setColor(c);
 		for( int i = 0; i < polygons.length; i++) {
 			//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
-			g.drawPolygon(polygons[i]);
+			if( isDistrict) {
+				g.fillPolygon(polygons[i]);
+			} else {
+				g.drawPolygon(polygons[i]);
+			}
 		}
 	}
 
@@ -52,10 +61,11 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				try {
 					Vector<Vector<Object>> vvo = vvvo.get(i);
 					coordinates[i2] = new double[vvo.size()][];
-					int k2 = 0;
+					int k2;
+					k2 = 0;
 					for( int k = 0; k < vvo.size(); k++) {
 						try {
-							Vector<Object> vo = vvo.get(i);
+							Vector<Object> vo = vvo.get(k);
 
 							coordinates[i2][k2] = new double[]{
 									Double.parseDouble((String)vo.get(0)),	
@@ -63,17 +73,18 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 							};
 						k2++;
 						} catch (Exception ex) { 
-							//System.out.println("ex "+vvo.get(i));
+							//System.out.println("ex1 "+vvo.get(k));
 						}
 					}
 					double[][] dd = new double[k2][];
-					for( int k = 0; i < dd.length; k++) {
+					for( int k = 0; k < dd.length; k++) {
 						dd[k] = coordinates[i2][k];
 					}
 					coordinates[i2] = dd;
 					i2++;
 				} catch (Exception ex) { 
-					//System.out.println("ex "+vvo.get(i));
+					//System.out.println("ex "+vvvo.get(i));
+					//ex.printStackTrace();
 				}
 			}
 			double[][][] dd = new double[i2][][];
@@ -81,6 +92,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				dd[i] = coordinates[i];
 			}
 			coordinates = dd;
+			this.remove("coordinates");
 			
 		}
 		

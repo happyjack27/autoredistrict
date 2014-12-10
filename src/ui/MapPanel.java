@@ -1,6 +1,7 @@
 package ui;
 
 import geoJSON.Feature;
+import geoJSON.Geometry;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,8 +25,15 @@ public class MapPanel extends JPanel {
         Dimension d = this.getSize();
         double scalex = ((double)d.getWidth())/(maxx-minx);
         double scaley = ((double)d.getHeight())/(maxy-miny);
+        Geometry.shiftx = minx;
+        Geometry.shifty = miny;
+        Geometry.scalex = scalex;
+        Geometry.scaley = scaley;
         if( features != null) {
             for( Feature f : features) {
+            	f.geometry.makePolys();
+            	f.geometry.draw(g);
+            	/*
             	double[][] coordinates = f.geometry.coordinates;
             	for( int i = 0; i < coordinates.length; i++) {
             		double[] first = coordinates[i];
@@ -36,6 +44,7 @@ public class MapPanel extends JPanel {
                 			(int)((secon[0]-minx)*scalex),(int)((secon[1]-miny)*scaley) 
                 			);
             	}
+            	*/
             }
         }
     }

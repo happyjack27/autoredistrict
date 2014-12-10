@@ -1,5 +1,7 @@
 package geoJSON;
 
+import java.awt.Color;
+
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
@@ -16,6 +18,10 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		}
 		if( containsKey("geometry")) {
 			geometry = (Geometry) getObject("geometry");
+		}
+		if( properties.DISTRICT == null || properties.DISTRICT.toLowerCase().equals("null")) {
+			geometry.c = Color.BLUE;
+			geometry.isDistrict = false;
 		}
 		// TODO Auto-generated method stub
 		
