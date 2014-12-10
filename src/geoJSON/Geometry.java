@@ -2,11 +2,43 @@ package geoJSON;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+
+import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.util.*;
 
 public class Geometry extends ReflectionJSONObject<Geometry> {
 	public String type;
 	public double[][][] coordinates;
+	public int[] xpolys;
+	public int[] ypolys;
+	public Polygon[] polygons;
+	
+	public static double shiftx,shifty,scalex,scaley;
+	public void makePolys() {
+		polygons = new Polygon[coordinates.length];
+		for( int i = 0; i < coordinates.length; i++) {
+			xpolys = new int[coordinates[i].length];
+			ypolys = new int[coordinates[i].length];
+			for( int j = 0; j < coordinates[i].length; j++) {
+				xpolys[j] = (int)((coordinates[i][j][0]-shiftx)*scalex);
+			}
+			for( int j = 0; j < coordinates[i].length; j++) {
+				ypolys[j] = (int)((coordinates[i][j][1]-shifty)*scaley);
+			}
+			polygons[i] = new Polygon(xpolys[i],ypolys[i],xpolys.length);
+		}
+
+	}
+	public void draw(Graphics2D g) {
+		if( polygons == null) {
+			makePolys();
+		}
+		for( int i = 0; i < polygons.length; i++) {
+			//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
+			g.drawPolygon(polygons[i]);
+		}
+	}
 
 	@Override
 	public void post_deserialize() {
@@ -49,6 +81,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				dd[i] = coordinates[i];
 			}
 			coordinates = dd;
+			
 		}
 		
 		// TODO Auto-generated method stub
