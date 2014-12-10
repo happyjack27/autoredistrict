@@ -41,8 +41,11 @@ public class MainFrame extends JFrame {
 
 	public Ecology ecology = new Ecology();
 	public FeatureCollection featureCollection = new FeatureCollection();
+	private JTextField textField_2;
 	
 	public MainFrame() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
 		this.setSize(d);
@@ -57,152 +60,30 @@ public class MainFrame extends JFrame {
 			}
 		});
 		menuBar.add(mnFile);
+		mnFile.add(new JSeparator());
 		
-		JMenuItem mntmOpen = new JMenuItem("Open");
-		mntmOpen.addActionListener(new ActionListener() {
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				StringBuffer sb = new StringBuffer();
-				try {
-					FileInputStream fis = new FileInputStream(f);
-					while( fis.available() > 0) {
-						byte[] bb = new byte[fis.available()];
-						fis.read(bb);
-						sb.append(new String(bb));
-						Thread.sleep(10);
-					}
-					
-					fis.close();
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-					return;
-				} 
-				
-				ecology = new Ecology();
-				try {
-					ecology.fromJSON(sb.toString());
-				} catch (Exception ex) {
-					System.out.println("ex "+ex);
-					ex.printStackTrace();
-				}
-
+				System.exit(0);
 			}
 		});
+		mnFile.add(mntmExit);
 		
-		JMenuItem mntmClear = new JMenuItem("Clear");
-		mnFile.add(mntmClear);
-		mnFile.add(mntmOpen);
+		JMenu mnGeography = new JMenu("Geography");
+		menuBar.add(mnGeography);
 		
 		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
-		mntmOpenGeojson.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				//jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				//jfc.sh
-				jfc.showOpenDialog(null);
-				File fd = jfc.getSelectedFile();
-				/*if( !fd.isDirectory()) {
-					return;
-				}*/
-				File[] ff = new File[]{fd};//fd.listFiles();
-				
-				featureCollection = new FeatureCollection(); 
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-				
-				for( int i = 0; i < ff.length; i++) {
-					String s = ff[i].getName().toLowerCase();
-					if(s.indexOf(".json") < 0) {
-						continue;
-					}
-					System.out.println("Processing "+s+"...");
-					File f = ff[i];
-					StringBuffer sb = new StringBuffer();
-					try {
-						FileInputStream fis = new FileInputStream(f);
-						while( fis.available() > 0) {
-							byte[] bb = new byte[fis.available()];
-							fis.read(bb);
-							sb.append(new String(bb));
-							Thread.sleep(10);
-						}
-						
-						fis.close();
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						return;
-					} 
-					
-					FeatureCollection fc = new FeatureCollection();
-					try {
-						fc.fromJSON(sb.toString());
-					} catch (Exception ex) {
-						System.out.println("ex "+ex);
-						ex.printStackTrace();
-					}
-					for( Feature fe : fc.features) {
-						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
-						if( suppress_duplicates) {
-							hmFeatures.put(fe.properties.DISTRICT, fe);
-						} else {
-							featureCollection.features.add(fe);
-						}
-						//}
-					}
-					
-				}
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				Vector<Feature> features = featureCollection.features;
-				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing blocks...");
-				featureCollection.initBlocks();
-				minx = features.get(0).geometry.coordinates[0][0][0];
-				maxx = features.get(0).geometry.coordinates[0][0][0];
-				miny = features.get(0).geometry.coordinates[0][0][1];
-				maxy = features.get(0).geometry.coordinates[0][0][1];
-				HashSet<String> types = new HashSet<String>();
-				for( Feature f : features) {
-					double[][][] coordinates2 = f.geometry.coordinates;
-					for( int j = 0; j < coordinates2.length; j++) {
-						double[][] coordinates = coordinates2[j];
-						for( int i = 0; i < coordinates.length; i++) {
-							if( coordinates[i][0] < minx) {
-								minx = coordinates[i][0];
-							}
-							if( coordinates[i][0] > maxx) {
-								maxx = coordinates[i][0];
-							}
-							if( coordinates[i][1] < miny) {
-								miny = coordinates[i][1];
-							}
-							if( coordinates[i][1] > maxy) {
-								maxy = coordinates[i][1];
-							}
-						}
-					}					
-				}
-				System.out.println(""+minx+","+miny);
-				System.out.println(""+maxx+","+maxy);
-				
-				mapPanel.minx = minx;
-				mapPanel.miny = miny;
-				mapPanel.maxx = maxx;
-				mapPanel.maxy = maxy;
-				mapPanel.features = features;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				System.out.println("Ready.");
-			}
-		});
-		mnFile.add(mntmOpenGeojson);
+		mnGeography.add(mntmOpenGeojson);
 		
 		JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
+		mnGeography.add(mntmOpenGeojsonFolder);
+		
+		JSeparator separator_1 = new JSeparator();
+		mnGeography.add(separator_1);
+		
+		JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
+		mnGeography.add(chckbxmntmLatitudeLongitude);
 		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
@@ -308,9 +189,115 @@ public class MainFrame extends JFrame {
 
 			}
 		});
-		mnFile.add(mntmOpenGeojsonFolder);
+		mntmOpenGeojson.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				//jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				//jfc.sh
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				/*if( !fd.isDirectory()) {
+					return;
+				}*/
+				File[] ff = new File[]{fd};//fd.listFiles();
+				
+				featureCollection = new FeatureCollection(); 
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				
+				for( int i = 0; i < ff.length; i++) {
+					String s = ff[i].getName().toLowerCase();
+					if(s.indexOf(".json") < 0) {
+						continue;
+					}
+					System.out.println("Processing "+s+"...");
+					File f = ff[i];
+					StringBuffer sb = new StringBuffer();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						while( fis.available() > 0) {
+							byte[] bb = new byte[fis.available()];
+							fis.read(bb);
+							sb.append(new String(bb));
+							Thread.sleep(10);
+						}
+						
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						return;
+					} 
+					
+					FeatureCollection fc = new FeatureCollection();
+					try {
+						fc.fromJSON(sb.toString());
+					} catch (Exception ex) {
+						System.out.println("ex "+ex);
+						ex.printStackTrace();
+					}
+					for( Feature fe : fc.features) {
+						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
+						if( suppress_duplicates) {
+							hmFeatures.put(fe.properties.DISTRICT, fe);
+						} else {
+							featureCollection.features.add(fe);
+						}
+						//}
+					}
+					
+				}
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
+				minx = features.get(0).geometry.coordinates[0][0][0];
+				maxx = features.get(0).geometry.coordinates[0][0][0];
+				miny = features.get(0).geometry.coordinates[0][0][1];
+				maxy = features.get(0).geometry.coordinates[0][0][1];
+				HashSet<String> types = new HashSet<String>();
+				for( Feature f : features) {
+					double[][][] coordinates2 = f.geometry.coordinates;
+					for( int j = 0; j < coordinates2.length; j++) {
+						double[][] coordinates = coordinates2[j];
+						for( int i = 0; i < coordinates.length; i++) {
+							if( coordinates[i][0] < minx) {
+								minx = coordinates[i][0];
+							}
+							if( coordinates[i][0] > maxx) {
+								maxx = coordinates[i][0];
+							}
+							if( coordinates[i][1] < miny) {
+								miny = coordinates[i][1];
+							}
+							if( coordinates[i][1] > maxy) {
+								maxy = coordinates[i][1];
+							}
+						}
+					}					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				
+				mapPanel.minx = minx;
+				mapPanel.miny = miny;
+				mapPanel.maxx = maxx;
+				mapPanel.maxy = maxy;
+				mapPanel.features = features;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				System.out.println("Ready.");
+			}
+		});
+		
+		JMenu mnDemographics = new JMenu("Demographics");
+		menuBar.add(mnDemographics);
 		
 		JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
+		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
@@ -371,19 +358,30 @@ public class MainFrame extends JFrame {
 				
 			}
 		});
-		mnFile.add(mntmOpenElectionResults);
 		
-		JMenuItem mntmSave = new JMenuItem("Save");
-		mnFile.add(mntmSave);
-		mnFile.add(new JSeparator());
+		JMenu mnEvolution = new JMenu("Evolution");
+		menuBar.add(mnEvolution);
 		
-		JMenuItem mntmExit = new JMenuItem("Exit");
-		mntmExit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-		mnFile.add(mntmExit);
+		JMenuItem mntmInitialize = new JMenuItem("Initialize");
+		mnEvolution.add(mntmInitialize);
+		
+		JSeparator separator = new JSeparator();
+		mnEvolution.add(separator);
+		
+		JMenuItem mntmStart = new JMenuItem("Start");
+		mnEvolution.add(mntmStart);
+		
+		JMenuItem mntmPause = new JMenuItem("Pause");
+		mnEvolution.add(mntmPause);
+		
+		JMenu mnView = new JMenu("View");
+		menuBar.add(mnView);
+		
+		JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+		mnView.add(chckbxmntmFlipVertical);
+		
+		JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+		mnView.add(chckbxmntmFlipHorizontal);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -415,6 +413,7 @@ public class MainFrame extends JFrame {
 		panel_2.add(slider_7);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
+		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEvolutionaryPressure.setBounds(6, 8, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
@@ -438,7 +437,7 @@ public class MainFrame extends JFrame {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 0, 200, 358);
+		panel_3.setBounds(0, 55, 200, 358);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -468,6 +467,7 @@ public class MainFrame extends JFrame {
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
 		textField_1.setBounds(105, 68, 91, 28);
@@ -523,6 +523,15 @@ public class MainFrame extends JFrame {
 		});
 		slider_8.setBounds(6, 315, 190, 29);
 		panel_3.add(slider_8);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		textField_2.setBounds(112, 11, 78, 28);
+		panel.add(textField_2);
+		
+		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
+		lblNumOfDistricts.setBounds(10, 17, 94, 16);
+		panel.add(lblNumOfDistricts);
 		slider_2.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_rate = slider_2.getValue()/100.0;
