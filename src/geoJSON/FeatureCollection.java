@@ -2,6 +2,7 @@ package geoJSON;
 
 import java.util.*;
 
+import mapCandidates.Block;
 import mapCandidates.Edge;
 import mapCandidates.Vertex;
 
@@ -11,6 +12,7 @@ import serialization.ReflectionJSONObject;
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
 	public Vector<Feature> features;
+	public Vector<Block> blocks;
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Vertex,HashMap<Vertex,Edge>> edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
@@ -42,7 +44,18 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		return super.instantiateObject(key);
 	}
-	public void collectEdges() {
+	public void initBlocks() {
+		blocks = new Vector<Block>();
+		Block.id_enumerator = 0;
+		for( Feature f : features) {
+			f.block = new Block();
+			blocks.add(f.block);
+		}
+		collectVertexes();
+		collectEdges();
+	}
+	
+	void collectEdges() {
 		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 		for( Feature f : features) {
 			f.block.edges = new Vector<Edge>();
@@ -70,6 +83,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						e.vertex2 = v2;
 						e.block1_id = f.block.id;
 						e.block1 = f.block;
+						e.setLength();
 						ve.put(v2,e);
 					} else {
 						e.block2_id = f.block.id;
@@ -82,7 +96,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 	}
 	
-	public void collectVertexes() {
+	void collectVertexes() {
 		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		int id = 0;
 		for( Feature f : features) {

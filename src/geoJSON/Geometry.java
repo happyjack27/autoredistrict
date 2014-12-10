@@ -36,6 +36,14 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		}
 
 	}
+	public Geometry() {
+		super();
+		int r = (int)Math.floor(Math.random()*256.0);
+		int g = (int)Math.floor(Math.random()*256.0);
+		int b = (int)Math.floor(Math.random()*256.0);
+		c = new Color(r,g,b);
+	}
+	
 	public void draw(Graphics g) {
 		if( polygons == null) {
 			makePolys();
@@ -49,27 +57,6 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				g.drawPolygon(polygons[i]);
 			}
 		}
-	}
-	public double getDistance(double[] c1, double[] c2) {
-		if( isLatLon) {
-			//this is the haversine formula.
-			double lat1 = c1[0];
-			double lat2 = c2[0];
-			double lon1 = c1[1];
-			double lon2 = c2[2];
-			double dlon = lon2 - lon1; 
-			double dlat = lat2 - lat1; 
-			double a = Math.sin(dlat/2)*Math.sin(dlat/2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlon/2)*Math.sin(dlon/2); 
-			double c = 2 * Math.atan2( Math.sqrt(a), Math.sqrt(1-a) );
-			double R = 1;
-			double d = R * c;
-			return d;
-		} else {
-			double dx = c1[0]-c2[0];
-			double dy = c1[1]-c2[1];
-			return Math.sqrt(dx*dx+dy*dy);
-		}
-		
 	}
 
 	@Override

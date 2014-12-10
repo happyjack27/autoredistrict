@@ -159,6 +159,8 @@ public class MainFrame extends JFrame {
 				}
 				Vector<Feature> features = featureCollection.features;
 				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
 				minx = features.get(0).geometry.coordinates[0][0][0];
 				maxx = features.get(0).geometry.coordinates[0][0][0];
 				miny = features.get(0).geometry.coordinates[0][0][1];
@@ -194,6 +196,7 @@ public class MainFrame extends JFrame {
 				mapPanel.features = features;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				System.out.println("Ready.");
 			}
 		});
 		mnFile.add(mntmOpenGeojson);
@@ -262,6 +265,9 @@ public class MainFrame extends JFrame {
 				}
 				Vector<Feature> features = featureCollection.features;
 				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
+
 				minx = features.get(0).geometry.coordinates[0][0][0];
 				maxx = features.get(0).geometry.coordinates[0][0][0];
 				miny = features.get(0).geometry.coordinates[0][0][1];
@@ -297,6 +303,8 @@ public class MainFrame extends JFrame {
 				mapPanel.features = features;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				System.out.println("Ready.");
+
 			}
 		});
 		mnFile.add(mntmOpenGeojsonFolder);

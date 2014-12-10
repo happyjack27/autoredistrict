@@ -11,7 +11,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public String type;
 	public Properties properties;
 	public Geometry geometry;
-	public Block block = new Block();
+	public Block block = null;
 
 	@Override
 	public void post_deserialize() {
