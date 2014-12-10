@@ -19,6 +19,8 @@ import javax.swing.border.*;
 
 
 public class MainFrame extends JFrame {
+	boolean suppress_duplicates = false;
+	
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	JSlider slider = new JSlider();
@@ -93,41 +95,105 @@ public class MainFrame extends JFrame {
 		mnFile.add(mntmClear);
 		mnFile.add(mntmOpen);
 		
-		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON");
+		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
 		mntmOpenGeojson.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
+				//jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				//jfc.sh
 				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				StringBuffer sb = new StringBuffer();
-				try {
-					FileInputStream fis = new FileInputStream(f);
-					while( fis.available() > 0) {
-						byte[] bb = new byte[fis.available()];
-						fis.read(bb);
-						sb.append(new String(bb));
-						Thread.sleep(10);
+				File fd = jfc.getSelectedFile();
+				/*if( !fd.isDirectory()) {
+					return;
+				}*/
+				File[] ff = new File[]{fd};//fd.listFiles();
+				
+				featureCollection = new FeatureCollection(); 
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				
+				for( int i = 0; i < ff.length; i++) {
+					String s = ff[i].getName().toLowerCase();
+					if(s.indexOf(".json") < 0) {
+						continue;
+					}
+					System.out.println("Processing "+s+"...");
+					File f = ff[i];
+					StringBuffer sb = new StringBuffer();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						while( fis.available() > 0) {
+							byte[] bb = new byte[fis.available()];
+							fis.read(bb);
+							sb.append(new String(bb));
+							Thread.sleep(10);
+						}
+						
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						return;
+					} 
+					
+					FeatureCollection fc = new FeatureCollection();
+					try {
+						fc.fromJSON(sb.toString());
+					} catch (Exception ex) {
+						System.out.println("ex "+ex);
+						ex.printStackTrace();
+					}
+					for( Feature fe : fc.features) {
+						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
+						if( suppress_duplicates) {
+							hmFeatures.put(fe.properties.DISTRICT, fe);
+						} else {
+							featureCollection.features.add(fe);
+						}
+						//}
 					}
 					
-					fis.close();
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-					return;
-				} 
-				
-				FeatureCollection featureCollection = new FeatureCollection();
-				try {
-					featureCollection.fromJSON(sb.toString());
-					
-					//System.out.println(featureCollection.type);
-					System.out.println(featureCollection.toJSON());
-					//System.out.println(featureCollection);
-				} catch (Exception ex) {
-					System.out.println("ex "+ex);
-					ex.printStackTrace();
 				}
-
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				minx = features.get(0).geometry.coordinates[0][0][0];
+				maxx = features.get(0).geometry.coordinates[0][0][0];
+				miny = features.get(0).geometry.coordinates[0][0][1];
+				maxy = features.get(0).geometry.coordinates[0][0][1];
+				HashSet<String> types = new HashSet<String>();
+				for( Feature f : features) {
+					double[][][] coordinates2 = f.geometry.coordinates;
+					for( int j = 0; j < coordinates2.length; j++) {
+						double[][] coordinates = coordinates2[j];
+						for( int i = 0; i < coordinates.length; i++) {
+							if( coordinates[i][0] < minx) {
+								minx = coordinates[i][0];
+							}
+							if( coordinates[i][0] > maxx) {
+								maxx = coordinates[i][0];
+							}
+							if( coordinates[i][1] < miny) {
+								miny = coordinates[i][1];
+							}
+							if( coordinates[i][1] > maxy) {
+								maxy = coordinates[i][1];
+							}
+						}
+					}					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				
+				mapPanel.minx = minx;
+				mapPanel.miny = miny;
+				mapPanel.maxx = maxx;
+				mapPanel.maxy = maxy;
+				mapPanel.features = features;
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		mnFile.add(mntmOpenGeojson);
@@ -182,7 +248,11 @@ public class MainFrame extends JFrame {
 					}
 					for( Feature fe : fc.features) {
 						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
+						if( suppress_duplicates) {
 							hmFeatures.put(fe.properties.DISTRICT, fe);
+						} else {
+							featureCollection.features.add(fe);
+						}
 						//}
 					}
 					
