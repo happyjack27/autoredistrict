@@ -26,7 +26,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 			for( int j = 0; j < coordinates[i].length; j++) {
 				ypolys[j] = (int)((coordinates[i][j][1]-shifty)*scaley);
 			}
-			polygons[i] = new Polygon(xpolys[i],ypolys[i],xpolys.length);
+			polygons[i] = new Polygon(xpolys, ypolys, xpolys.length);
 		}
 
 	}
