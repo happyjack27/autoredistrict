@@ -30,6 +30,10 @@ public class MainFrame extends JFrame {
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
 	JSlider slider_8 = new JSlider();
+	
+	double minx,maxx,miny,maxy;
+	
+	MapPanel mapPanel = new MapPanel(); 
 
 
 	public Ecology ecology = new Ecology();
@@ -180,7 +184,39 @@ public class MainFrame extends JFrame {
 					}
 					
 				}
-				System.out.println("Done.");
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				minx = features.get(0).geometry.coordinates[0][0];
+				maxx = features.get(0).geometry.coordinates[0][0];
+				miny = features.get(0).geometry.coordinates[0][1];
+				maxy = features.get(0).geometry.coordinates[0][1];
+				for( Feature f : features) {
+					double[][] coordinates = f.geometry.coordinates;
+					for( int i = 0; i < coordinates.length; i++) {
+						if( coordinates[i][0] < minx) {
+							minx = coordinates[i][0];
+						}
+						if( coordinates[i][0] > maxx) {
+							maxx = coordinates[i][0];
+						}
+						if( coordinates[i][1] < miny) {
+							miny = coordinates[i][1];
+						}
+						if( coordinates[i][1] > maxy) {
+							maxy = coordinates[i][1];
+						}
+					}
+					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				mapPanel.minx = minx;
+				mapPanel.miny = miny;
+				mapPanel.maxx = maxx;
+				mapPanel.maxy = maxy;
+				mapPanel.features = features;
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		mnFile.add(mntmOpenGeojsonFolder);
@@ -378,6 +414,6 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		splitPane.setRightComponent(panel_1);
+		splitPane.setRightComponent(mapPanel);
 	}
 }
