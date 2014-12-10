@@ -4,6 +4,7 @@ import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
@@ -42,21 +43,6 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		int g = (int)Math.floor(Math.random()*256.0);
 		int b = (int)Math.floor(Math.random()*256.0);
 		c = new Color(r,g,b);
-	}
-	
-	public void draw(Graphics g) {
-		if( polygons == null) {
-			makePolys();
-		}
-		g.setColor(c);
-		for( int i = 0; i < polygons.length; i++) {
-			//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
-			if( isDistrict && false) {
-				g.fillPolygon(polygons[i]);
-			} else {
-				g.drawPolygon(polygons[i]);
-			}
-		}
 	}
 
 	@Override
@@ -108,6 +94,38 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		
 		// TODO Auto-generated method stub
 		
+	}
+	public double[] compute2DPolygonCentroid(Polygon p) {
+		return compute2DPolygonCentroid(p.xpoints,p.ypoints);
+	
+	}
+	public double[] compute2DPolygonCentroid(int[] xs, int[] ys) {
+			    double signedArea = 0.0;
+			    double x0 = 0.0; // Current vertex X
+			    double y0 = 0.0; // Current vertex Y
+			    double x1 = 0.0; // Next vertex X
+			    double y1 = 0.0; // Next vertex Y
+			    double a = 0.0;  // Partial signed area
+
+			    double retx = 0;
+			    double rety = 0;
+			    for(int i=0; i < xs.length; i++)
+			    {
+			        x0 = xs[i];
+			        y0 = ys[i];
+			        x1 = xs[i+1 == xs.length ? 0 : i+1];
+			        y1 = ys[i+1 == xs.length ? 0 : i+1];
+			        a = x0*y1 - x1*y0;
+			        signedArea += a;
+			        retx += (x0 + x1)*a;
+			        rety += (y0 + y1)*a;
+			    }
+
+			    signedArea *= 0.5;
+			    retx /= (6.0*signedArea);
+			    rety /= (6.0*signedArea);
+
+			    return new double[]{retx,rety};
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class MapPanel extends JPanel {
         if( features != null) {
             for( Feature f : features) {
             	f.geometry.makePolys();
-            	f.geometry.draw(g);
+            	f.draw(g);
             	/*
             	double[][] coordinates = f.geometry.coordinates;
             	for( int i = 0; i < coordinates.length; i++) {

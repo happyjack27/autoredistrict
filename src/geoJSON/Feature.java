@@ -1,6 +1,8 @@
 package geoJSON;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 
 import mapCandidates.Block;
 
@@ -47,4 +49,28 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		}
 		return super.instantiateObject(key);
 	}
+	
+	
+	public void draw(Graphics g) {
+		if( geometry.polygons == null) {
+			geometry.makePolys();
+		}
+		g.setColor(geometry.c);
+		for( int i = 0; i < geometry.polygons.length; i++) {
+			//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
+			if( geometry.isDistrict && false) {
+				g.fillPolygon(geometry.polygons[i]);
+			} else {
+				g.drawPolygon(geometry.polygons[i]);
+			}
+			
+			double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
+			FontMetrics fm = g.getFontMetrics();
+			String name = this.properties.DISTRICT;
+			centroid[0] -= fm.stringWidth(name)/2.0;
+			centroid[1] += fm.getHeight()/2.0;
+			g.drawString(name, (int)centroid[0],(int)centroid[1]);
+		}
+	}
+	
 }

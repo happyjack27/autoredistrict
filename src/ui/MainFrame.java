@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.io.*;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import javax.swing.*;
 
@@ -308,6 +309,69 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnFile.add(mntmOpenGeojsonFolder);
+		
+		JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
+		mntmOpenElectionResults.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				StringBuffer sb = new StringBuffer();
+				try {
+					FileInputStream fis = new FileInputStream(f);
+					while( fis.available() > 0) {
+						byte[] bb = new byte[fis.available()];
+						fis.read(bb);
+						sb.append(new String(bb));
+						Thread.sleep(10);
+					}
+					
+					fis.close();
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+					return;
+				}
+				String s = sb.toString();
+				String[] lines = s.split("\n");
+				int num_candidates = lines[0].split("\t").length - 1;
+				HashMap<String,double[]> votes = new HashMap<String,double[]>();
+				for( int i = 0; i < lines.length; i++) {
+					String[] ss = lines[i].split("\t");
+					String district = ss[0].trim();
+					double[] dd = votes.get(district);
+					if( dd == null) {
+						dd = new double[num_candidates];
+						for( int j = 0; j < num_candidates; j++) {
+							dd[j] = 0;
+						}
+						votes.put(district, dd);
+					}
+					for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
+						dd[j] = Double.parseDouble(ss[j+1]);
+					}
+				}
+				
+				for( Entry<String, double[]> es : votes.entrySet()) {
+					Block b = featureCollection.precinctHash.get(es.getKey());
+					double[] dd = es.getValue();
+					for( int j = 0; j < num_candidates; j++) {
+						Demographic d = new Demographic();
+						d.block_id = b.id;
+						d.turnout_probability = 1;
+						d.population = (int) dd[j];
+						d.vote_prob = new double[num_candidates];
+						for( int i = 0; i < d.vote_prob.length; i++) {
+							d.vote_prob[i] = 0;
+						}
+						d.vote_prob[j] = 1;
+						b.demographics.add(d);
+					}
+				}
+				
+			}
+		});
+		mnFile.add(mntmOpenElectionResults);
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
 		mnFile.add(mntmSave);

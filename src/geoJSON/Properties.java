@@ -8,4 +8,13 @@ public class Properties extends ReflectionJSONObject<Properties> {
 	public String DISTRICT;
 	public String NAME;
 	public int POPULATION;
+	
+	public void post_deserialize() {
+		super.post_deserialize();
+		if( !containsKey("DISTRICT")) {
+			if( containsKey("PCT")) {
+				DISTRICT = getString("PCT");
+			}
+		}
+	}
 }

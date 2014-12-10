@@ -8,7 +8,7 @@ public class Demographic extends ReflectionJSONObject<Demographic> {
 	public int block_id;
 	public int population;
 	public double turnout_probability;
-	double[] vote_prob;
+	public double[] vote_prob;
 	
 	public void post_deserialize() {
 		super.post_deserialize();
