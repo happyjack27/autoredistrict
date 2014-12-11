@@ -107,9 +107,17 @@ class District extends JSONObject {
             return;
         region.add(block);
         region_hash.put(block,region);
+        for( Block other_block : block.neighbors) {
+        	if( block_districts[other_block.id] == block_districts[block.id]) {
+        		addAllConnected( other_block, region, region_hash, block_districts);
+        	}
+        }
+
+        /*
         for( Edge edge : block.edges)
             if( edge.areBothSidesSameDistrict(block_districts))
                 addAllConnected( edge.block1 == block ? edge.block2 : edge.block1, region, region_hash, block_districts);
+                */
     }
     double getRegionPopulation(Vector<Block> region) {
         double population = 0;

@@ -45,6 +45,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		return super.instantiateObject(key);
 	}
+	
 	public void initBlocks() {
 		blocks = new Vector<Block>();
 		precinctHash = new HashMap<String,Block>();
@@ -57,6 +58,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		collectVertexes();
 		collectEdges();
+		for( Feature f : features) {
+			f.block.collectNeighbors();
+		}
+		/*
+		for( Feature f : features) {
+			f.block.edges = new Vector<Edge>();
+		}
+		*/
+		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
+		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
 	
 	void collectEdges() {

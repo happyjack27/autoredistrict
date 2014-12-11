@@ -59,6 +59,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 				edge.block2.edges.add(edge);
 			}
 		}
+		for( Block b : blocks) {
+			b.collectNeighbors();
+		}
 
 		//stuff
 		if( containsKey("candidates")) {

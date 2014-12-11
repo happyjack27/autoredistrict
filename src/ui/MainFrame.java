@@ -43,7 +43,7 @@ public class MainFrame extends JFrame {
 	public FeatureCollection featureCollection = new FeatureCollection();
 	private JTextField textField_2;
 	
-	public MainFrame() {
+	public MainFrame() { 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);

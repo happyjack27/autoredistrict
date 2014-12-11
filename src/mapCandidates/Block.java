@@ -11,6 +11,7 @@ public class Block extends ReflectionJSONObject<Block> {
 
 
     public Vector<Edge> edges = new Vector<Edge>();
+    public Vector<Block> neighbors = new Vector<Block>();
     public Vector<Demographic> demographics = new Vector<Demographic>();
 
     //double[] population;
@@ -30,6 +31,17 @@ public class Block extends ReflectionJSONObject<Block> {
     public Block() {
     	super();
     	id = id_enumerator++;
+    }
+    
+    public void collectNeighbors() {
+		HashSet<Block> hashBlocks = new HashSet<Block>(); 
+		neighbors = new Vector<Block>();
+		for( Edge e : edges) {
+			hashBlocks.add(e.block1 == this ? e.block2 : e.block1); 
+		}
+		for( Block b : hashBlocks) {
+			neighbors.add(b);
+		}
     }
 
     
