@@ -69,7 +69,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
-	
+	public void recalcEdgeLengths() {
+		for( Feature f : features) {
+			f.block = new Block();
+			for( Edge e : f.block.edges) {
+				e.setLength();
+			}
+		}		
+	}
 	void collectEdges() {
 		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 		for( Feature f : features) {

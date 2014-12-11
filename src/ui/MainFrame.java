@@ -22,6 +22,10 @@ import javax.swing.border.*;
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
 	
+	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
+	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	JSlider slider = new JSlider();
@@ -82,7 +86,12 @@ public class MainFrame extends JFrame {
 		JSeparator separator_1 = new JSeparator();
 		mnGeography.add(separator_1);
 		
-		JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
+		chckbxmntmLatitudeLongitude.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Edge.isLatLon = chckbxmntmLatitudeLongitude.isSelected();
+				featureCollection.recalcEdgeLengths();
+			}
+		});
 		mnGeography.add(chckbxmntmLatitudeLongitude);
 		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -178,10 +187,12 @@ public class MainFrame extends JFrame {
 				System.out.println(""+minx+","+miny);
 				System.out.println(""+maxx+","+maxy);
 				
-				mapPanel.minx = minx;
-				mapPanel.miny = miny;
-				mapPanel.maxx = maxx;
-				mapPanel.maxy = maxy;
+				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
+				boolean flipy = chckbxmntmFlipVertical.isSelected();
+				mapPanel.minx = flipx ? maxx : minx;
+				mapPanel.maxx = flipx ? minx : maxx;
+				mapPanel.miny = flipy ? maxy : miny;
+				mapPanel.maxy = flipy ? miny : maxy;
 				mapPanel.features = features;
 				mapPanel.invalidate();
 				mapPanel.repaint();
@@ -376,12 +387,42 @@ public class MainFrame extends JFrame {
 		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
-		
-		JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+		chckbxmntmFlipVertical.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
+				boolean flipy = chckbxmntmFlipVertical.isSelected();
+				mapPanel.minx = flipx ? maxx : minx;
+				mapPanel.maxx = flipx ? minx : maxx;
+				mapPanel.miny = flipy ? maxy : miny;
+				mapPanel.maxy = flipy ? miny : maxy;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
 		mnView.add(chckbxmntmFlipVertical);
 		
-		JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+		chckbxmntmFlipHorizontal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
+				boolean flipy = chckbxmntmFlipVertical.isSelected();
+				mapPanel.minx = flipx ? maxx : minx;
+				mapPanel.maxx = flipx ? minx : maxx;
+				mapPanel.miny = flipy ? maxy : miny;
+				mapPanel.maxy = flipy ? miny : maxy;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
 		mnView.add(chckbxmntmFlipHorizontal);
+		
+		chckbxmntmShowPrecinctLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Feature.showPrecinctLabels = chckbxmntmShowPrecinctLabels.isSelected();
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(chckbxmntmShowPrecinctLabels);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);

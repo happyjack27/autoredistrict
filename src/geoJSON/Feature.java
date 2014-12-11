@@ -14,6 +14,8 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public Properties properties;
 	public Geometry geometry;
 	public Block block = null;
+	
+	public static boolean showPrecinctLabels = false;
 
 	@Override
 	public void post_deserialize() {
@@ -65,11 +67,13 @@ public class Feature extends ReflectionJSONObject<Feature> {
 			}
 			
 			double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
-			FontMetrics fm = g.getFontMetrics();
-			String name = this.properties.DISTRICT;
-			centroid[0] -= fm.stringWidth(name)/2.0;
-			centroid[1] += fm.getHeight()/2.0;
-			g.drawString(name, (int)centroid[0],(int)centroid[1]);
+			if( showPrecinctLabels) {
+				FontMetrics fm = g.getFontMetrics();
+				String name = this.properties.DISTRICT;
+				centroid[0] -= fm.stringWidth(name)/2.0;
+				centroid[1] += fm.getHeight()/2.0;
+				g.drawString(name, (int)centroid[0],(int)centroid[1]);
+			}
 		}
 	}
 	
