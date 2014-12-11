@@ -10,6 +10,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	//settings
 	//map_population (folder)
 	//
+	static boolean evolve_paused = false;
 	int num_districts = 0;
 	
 	Vector<Candidate> candidates = new Vector<Candidate>();
@@ -25,6 +26,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	Settings settings = new Settings();
 	
     Vector<DistrictMap> population = new Vector<DistrictMap>();
+    
+    class EvolveThread extends Thread {
+    	public void run() {
+    		while( !evolve_paused) {
+    			evolve(); 
+    		}
+    		
+    	}
+    }
     
 
 
