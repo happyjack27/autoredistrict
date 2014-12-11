@@ -1,3 +1,17 @@
+TODO:
+1. after loading, fill in ecology data structures.
+2. also initalize candidates in ecology on loading of election results.
+3. write parts to adjust population, number of districts on evolve function
+4. write parts to start and stop election
+5. write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
+6. add inverters for score components - in drop down menu.
+7. multithread testing, but reusable threads.
+8. add exporting of results ( simple tab deliminted: precinct - district)
+*. add listener to num of districts to adjust, should be a target and work together with evolve. 
+
+
+
+
 	/*
 	block and length data can be taken from a standard dime file, which i presume any municiplality has. the census data, well i'm sure they have it electronically, cause hey, they draw districts. so getting the geolocation dataset is not a problem. you still have to add in code to make sure the districts are contiguous, though.
 	
