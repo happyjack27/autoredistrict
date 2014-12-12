@@ -33,14 +33,16 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public void run() {
     		while( !evolve_paused) {
     			if( last_num_districts != Settings.num_districts) {
+    				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
     				resize_districts();
     			}
-    			if( last_population != Settings.population) {
+    			if( population.size() != Settings.population) {
+    				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
         			resize_population();
     			}
     			evolve(); 
+    			System.out.print(".");
     		}
-    		
     	}
     }
     
@@ -51,7 +53,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( evolveThread != null) {
 			try {
 				evolveThread.stop();
-				evolveThread.destroy();
+				//evolveThread.destroy();
 				evolveThread = null;
 			} catch (Exception ex) { }
 		}

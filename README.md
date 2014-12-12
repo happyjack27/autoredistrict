@@ -1,13 +1,15 @@
-TODO:
+DONE:
 1. after loading, fill in ecology data structures.
 2. also initalize candidates in ecology on loading of election results. 
 3. write parts to adjust population, number of districts on evolve function
-4. write parts to start and stop election
+4. write parts to start and stop evolution
+8. add exporting of results ( simple tab deliminted: precinct - district)
+*. add listener to num of districts to adjust, should be a target and work together with evolve. 
+
+TODO:
 5. write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
 6. add inverters for score components - in drop down menu.
 7. multithread testing, but reusable threads.
-8. add exporting of results ( simple tab deliminted: precinct - district)
-*. add listener to num of districts to adjust, should be a target and work together with evolve. 
 
 
 
