@@ -196,6 +196,7 @@ public class MainFrame extends JFrame {
 				mapPanel.features = features;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				featureCollection.initEcology(ecology);
 				System.out.println("Ready.");
 
 			}
@@ -300,6 +301,8 @@ public class MainFrame extends JFrame {
 				mapPanel.features = features;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				featureCollection.initEcology(ecology);
+
 				System.out.println("Ready.");
 			}
 		});
@@ -367,6 +370,13 @@ public class MainFrame extends JFrame {
 					}
 				}
 				
+				for( int i = 0; i < num_candidates; i++) {
+					Candidate c = new Candidate();
+					c.index = i;
+					c.id = ""+i;
+					ecology.candidates.add(c);
+				}
+				ecology.reset();
 			}
 		});
 		
@@ -380,9 +390,19 @@ public class MainFrame extends JFrame {
 		mnEvolution.add(separator);
 		
 		JMenuItem mntmStart = new JMenuItem("Start");
+		mntmStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ecology.startEvolving();
+			}
+		});
 		mnEvolution.add(mntmStart);
 		
 		JMenuItem mntmPause = new JMenuItem("Pause");
+		mntmPause.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ecology.stopEvolving();
+			}
+		});
 		mnEvolution.add(mntmPause);
 		
 		JMenu mnView = new JMenu("View");
@@ -423,6 +443,42 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnView.add(chckbxmntmShowPrecinctLabels);
+		
+		JMenu mnResults = new JMenu("Results");
+		menuBar.add(mnResults);
+		
+		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
+		mntmExportcsv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if( ecology.population == null || ecology.population.size() == 0) {
+					JOptionPane.showMessageDialog(null,"No results");
+				}
+				JFileChooser jfc = new JFileChooser();
+				jfc.showSaveDialog(null);
+				File f = jfc.getSelectedFile();
+				StringBuffer sb = new StringBuffer();
+				try {
+					FileOutputStream fis = new FileOutputStream(f);
+					
+					DistrictMap dm = ecology.population.get(0);
+					int[] blocks = dm.block_districts;
+					for( int i = 0; i < blocks.length; i++) {
+						Block b = ecology.blocks_by_id.get(i);
+						sb.append(b.name+", "+blocks[i]+"\n");
+					}
+					
+					fis.write(sb.toString().getBytes());
+					fis.flush();
+					fis.close();
+					JOptionPane.showMessageDialog(null,"File saved.");
+				} catch (Exception ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+					return;
+				}
+			}
+		});
+		mnResults.add(mntmExportcsv);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);

@@ -2,7 +2,7 @@ package mapCandidates;
 
 import java.util.*;
 
-class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
+public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
     public static int sorting_polarity = 1;
 

@@ -10,22 +10,24 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	//settings
 	//map_population (folder)
 	//
-	static boolean evolve_paused = false;
+	static public boolean evolve_paused = true;
+	int target_num_districts = 0;
 	int num_districts = 0;
 	
-	Vector<Candidate> candidates = new Vector<Candidate>();
-
-	Vector<Block> blocks = new Vector<Block>();
-	Vector<Edge> edges = new Vector<Edge>();
-	Vector<Vertex> vertexes = new Vector<Vertex>();
+	public HashMap<Integer,Block> blocks_by_id;
 	
-	HashMap<Integer,Block> blocks_by_id = new HashMap<Integer,Block>();
-	HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
-	HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
+	public Vector<Candidate> candidates = new Vector<Candidate>();
+
+	public Vector<Block> blocks = new Vector<Block>();
+	public Vector<Edge> edges = new Vector<Edge>();
+	public Vector<Vertex> vertexes = new Vector<Vertex>();
+	
 
 	Settings settings = new Settings();
 	
-    Vector<DistrictMap> population = new Vector<DistrictMap>();
+    public Vector<DistrictMap> population = new Vector<DistrictMap>();
+    
+    public EvolveThread evolveThread; 
     
     class EvolveThread extends Thread {
     	public void run() {
@@ -36,10 +38,35 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	}
     }
     
+	public void startEvolving() {
+		if( !evolve_paused) {
+			return;
+		}
+		if( evolveThread != null) {
+			try {
+				evolveThread.stop();
+				evolveThread.destroy();
+				evolveThread = null;
+			} catch (Exception ex) { }
+		}
+		evolve_paused= false;
+		evolveThread = new EvolveThread();
+		evolveThread.start();
+	}
+    
+	
+	public void stopEvolving() {
+		evolve_paused= true;
+	}
+
 
 
 	@Override
 	public void post_deserialize() {
+		blocks_by_id = new HashMap<Integer,Block>();
+		HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
+		HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
+		
 		//geometry
 		if( containsKey("blocks")) {
 			blocks = getVector("blocks");

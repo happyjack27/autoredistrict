@@ -3,6 +3,7 @@ package geoJSON;
 import java.util.*;
 
 import mapCandidates.Block;
+import mapCandidates.Ecology;
 import mapCandidates.Edge;
 import mapCandidates.Vertex;
 
@@ -66,9 +67,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			f.block.edges = new Vector<Edge>();
 		}
 		*/
-		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
-		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
+		//vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
+		//edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
+	
+	public void initEcology(Ecology ecology) {
+		ecology.blocks = blocks;
+		//ecology.edges = edgeHash.values();
+		//ecology.vertexes = vertexes;
+	}
+	
 	public void recalcEdgeLengths() {
 		for( Feature f : features) {
 			f.block = new Block();
