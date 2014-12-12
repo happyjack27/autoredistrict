@@ -11,8 +11,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	//map_population (folder)
 	//
 	static public boolean evolve_paused = true;
-	int target_num_districts = 0;
-	int num_districts = 0;
+	int last_population = 0;
+	int last_num_districts = 0;
 	
 	public HashMap<Integer,Block> blocks_by_id;
 	
@@ -32,6 +32,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     class EvolveThread extends Thread {
     	public void run() {
     		while( !evolve_paused) {
+    			if( last_num_districts != Settings.num_districts) {
+    				resize_districts();
+    			}
+    			if( last_population != Settings.population) {
+        			resize_population();
+    			}
     			evolve(); 
     		}
     		
@@ -150,15 +156,22 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         DistrictMap.candidates = candidates;
     	population =  new Vector<DistrictMap>();
     }
-    public void resize_population() {    	
+    public void resize_population() {
     	population =  new Vector<DistrictMap>();
         for( int i = population.size(); i < Settings.population; i++) {
-            population.add(new DistrictMap(blocks,num_districts));
+            population.add(new DistrictMap(blocks,Settings.num_districts));
         }
         for( int i = Settings.population; i > population.size(); i++) {
             population.remove(Settings.population);
         }
-
+        last_population = Settings.population;
+    }
+    public void resize_districts() {
+    	population =  new Vector<DistrictMap>();
+        for( int i = 0; i < population.size(); i++) {
+            population.get(i).resize_districts(Settings.num_districts);
+        }
+        last_num_districts = Settings.num_districts;
     }
 
     public void evolveWithSpeciation(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {

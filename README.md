@@ -1,6 +1,6 @@
 TODO:
 1. after loading, fill in ecology data structures.
-2. also initalize candidates in ecology on loading of election results.
+2. also initalize candidates in ecology on loading of election results. 
 3. write parts to adjust population, number of districts on evolve function
 4. write parts to start and stop election
 5. write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)

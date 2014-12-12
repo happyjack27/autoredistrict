@@ -161,6 +161,32 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         block_districts = new int[blocks.size()];
         mutate(1);
     }
+    public void resize_districts(int target) {
+    	if( num_districts == target) {
+    		return;
+    	}
+		while( districts.size() > target) {
+			districts.remove(target);
+		}
+		while( districts.size() < target) {
+			districts.add(new District());
+		}
+		
+    	if( num_districts > target) {
+    		double d = target;
+    		for( int i = 0; i < block_districts.length; i++) {
+    			if( block_districts[i] >= target) {
+    				int x = (int)Math.floor(Math.random() * d);
+    				block_districts[i] = x;
+    				districts.get(x).blocks.add(blocks.get(i));
+    			}
+    		}
+    	}
+    	if( num_districts < target) {
+    	}
+    	num_districts = target;
+    }
+
 
     //genetic evolution primary functions
     public int[] getGenome() {

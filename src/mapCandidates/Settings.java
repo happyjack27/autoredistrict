@@ -21,6 +21,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double mutation_boundary_rate;
     public static int trials;
     public static int population;
+    public static int num_districts;
     
     /*
 	@Override

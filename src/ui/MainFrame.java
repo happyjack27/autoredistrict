@@ -553,7 +553,6 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				 try {
 					 Settings.population = new Integer(textField.getText());
-					 ecology.resize_population();
 				 } catch (Exception ex) {
 					 
 				 }
@@ -622,6 +621,13 @@ public class MainFrame extends JFrame {
 		panel_3.add(slider_8);
 		
 		textField_2 = new JTextField();
+		textField_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Settings.num_districts = Integer.parseInt(textField_2.getText());
+				} catch (Exception ex) { }
+			}
+		});
 		textField_2.setColumns(10);
 		textField_2.setBounds(112, 11, 78, 28);
 		panel.add(textField_2);
