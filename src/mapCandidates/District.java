@@ -66,8 +66,10 @@ class District extends JSONObject {
         }
         for( Block block : blocks) {
             double[] block_vote = block.getVotes();
-            for( int i = 0; i < block_vote.length; i++) {//most_value) {
-                district_vote[i] += block_vote[i];
+            if( block_vote != null) {
+                for( int i = 0; i < block_vote.length; i++) {//most_value) {
+                    district_vote[i] += block_vote[i];
+                }
             }
         }
         last_winner = getHighestIndex(district_vote);

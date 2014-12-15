@@ -132,16 +132,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
 					Vertex v1 = vertexHash.get(c[j][0]).get(c[j][1]);
-					System.out.println("v1 "+v1.id);
+					//System.out.println("v1 "+v1.id);
 					Vertex v2 = vertexHash.get(c[j+1 == c.length ? 0 : j+1][0]).get(c[j+1 == c.length ? 0 : j+1][1]);
-					System.out.println("v2 "+v2.id);
+					//System.out.println("v2 "+v2.id);
 					if( v1.id > v2.id) {
 						Vertex t = v1;
 						v1 = v2;
 						v2 = t;
 					}
 					HashMap<Integer,Edge> ve = edgeHash.get(v1.id);
-					System.out.println("ve "+ve);
+					//System.out.println("ve "+ve);
 					if( ve == null) {
 						ve = new HashMap<Integer,Edge>();
 						edgeHash.put(v1.id, ve);
