@@ -36,10 +36,15 @@ public class Block extends ReflectionJSONObject<Block> {
 		HashSet<Block> hashBlocks = new HashSet<Block>(); 
 		neighbors = new Vector<Block>();
 		for( Edge e : edges) {
-			hashBlocks.add(e.block1 == this ? e.block2 : e.block1); 
+			Block b = e.block1 == this ? e.block2 : e.block1;
+			if( b != null) {
+				hashBlocks.add(b);
+			}
 		}
 		for( Block b : hashBlocks) {
-			neighbors.add(b);
+			if( b != null) {
+				neighbors.add(b);
+			}
 		}
     }
 

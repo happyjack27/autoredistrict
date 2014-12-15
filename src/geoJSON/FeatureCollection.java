@@ -146,7 +146,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						ve = new HashMap<Integer,Edge>();
 						edgeHash.put(v1.id, ve);
 					}
-					Edge e = ve.get(v2);
+					Edge e = ve.get(v2.id);
 					if( e == null) {
 						e = new Edge();
 						e.vertex1_id = v1.id;
@@ -177,17 +177,45 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		System.out.println("paired edges: "+paired_edges);
 		System.out.println("unpaired edges: "+unpaired_edges);
+		System.out.println("paired edges: "+paired_edges);
 	}
 	
 	void collectVertexes() {
+		double minx = 0;
+		double maxx = 0;
+		double miny = 0;
+		double maxy = 0;
+		boolean point_added = false;
+		for( Feature f : features) {
+			for( int i = 0; i < f.geometry.coordinates.length; i++) {
+				double[][] c = f.geometry.coordinates[i];
+				for( int j = 0; j < c.length; j++) {
+					if( !point_added) {
+						minx = maxx = c[0][0];
+						miny = maxy = c[0][1];
+						point_added = true;
+					} else {
+						 minx = minx > c[0][0] ? c[0][0] : minx;
+						 maxx = maxx < c[0][0] ? c[0][0] : maxx;
+						 miny = miny > c[0][1] ? c[0][1] : miny;
+						 maxy = maxy < c[0][1] ? c[0][1] : maxy;
+					}
+				}
+			}
+		}
+		double area = (maxx-minx)*(maxy-miny);
+		double increment = Math.sqrt(area)/1000.0; 
+		double r_increment = 1.0/increment; 
+		
 		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		int id = 0;
 		for( Feature f : features) {
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
+					c[j][0] = Math.round(c[j][0]*r_increment)*increment;
+					c[j][1] = Math.round(c[j][1]*r_increment)*increment;
 					HashMap<Double,Vertex> hm = vertexHash.get(c[j][0]);
 					if( hm == null) {
 						hm = new HashMap<Double,Vertex>();

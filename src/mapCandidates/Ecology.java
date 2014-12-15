@@ -39,16 +39,16 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     				//System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
     				//System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);
         			if( last_num_districts != Settings.num_districts) {
-        				if( JOptionPane.showConfirmDialog(null, "resize districts?") == JOptionPane.YES_OPTION) {
+        				//if( JOptionPane.showConfirmDialog(null, "resize districts?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
             				resize_districts();
-        				}
+        				//}
         			}
         			if( population.size() != Settings.population) {
-        				if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
+        				//if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
                 			resize_population();
-        				}
+        				//}
         			}
         			evolveWithSpeciation(); 
         			System.out.print(".");

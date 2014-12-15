@@ -649,13 +649,6 @@ public class MainFrame extends JFrame {
 		lblSpeciation.setBounds(6, 294, 172, 16);
 		panel_3.add(lblSpeciation);
 		
-		slider_8.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
-			}
-		});
-		slider_8.setBounds(6, 315, 190, 29);
-		panel_3.add(slider_8);
 		
 		textField_2.addFocusListener(new FocusAdapter() {
 			@Override
@@ -719,7 +712,25 @@ public class MainFrame extends JFrame {
 				Settings.geometry_weight = slider_3.getValue()/100.0;
 			}
 		});
+		slider_8.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
+			}
+		});
+		slider_8.setBounds(6, 315, 190, 29);
+		panel_3.add(slider_8);
+
 		
+		Settings.mutation_rate = slider_2.getValue()/100.0;
+		Settings.mutation_boundary_rate = slider_1.getValue()/100.0;
+		Settings.replace_fraction = slider.getValue()/100.0;
+		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
+		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
+		Settings.population_balance_weight = slider_5.getValue()/100.0;
+		Settings.disconnected_population_weight = slider_4.getValue()/100.0;
+		Settings.geometry_weight = slider_3.getValue()/100.0;
+		Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
+
 		splitPane.setRightComponent(mapPanel);
 	}
 }
