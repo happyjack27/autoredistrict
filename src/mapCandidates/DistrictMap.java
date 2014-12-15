@@ -54,7 +54,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 allow[block_districts[i]] = true;
                 Block block = blocks.get(i);
                 for( Block other_block : block.neighbors) {
-                    allow[block_districts[other_block.id]] = true;
+                	if( block_districts[other_block.id] < allow.length) {
+                        allow[block_districts[other_block.id]] = true;
+                	}
                 }
                 double count = 0;
                 for( int j = 0; j < allow.length; j++) {
@@ -271,6 +273,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //returns total edge length, unfairness, population imbalance
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
+    //all measures should be minimized.
     public void calcFairnessScores(int trials) {
     	
     	//===fairness score: compactness

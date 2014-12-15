@@ -15,13 +15,13 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double disenfranchise_weight = 1;
     public static double voting_power_balance_weight = 1;
     
-    public static double speciation_fraction;
-    public static double replace_fraction;
-    public static double mutation_rate;
-    public static double mutation_boundary_rate;
-    public static int trials;
+    public static double speciation_fraction = 0.5;
+    public static double replace_fraction = 0.5;
+    public static double mutation_rate = 0.5;
+    public static double mutation_boundary_rate = 0.5;
+    public static int trials = 1;
     public static int population;
-    public static int num_districts;
+    public static int num_districts = 3;
     
     /*
 	@Override

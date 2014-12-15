@@ -22,7 +22,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Ecology ecology = new Ecology();
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
-	HashMap<Vertex,HashMap<Vertex,Edge>> edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
+	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 	
 	public void draw(Graphics g) {
 		if( features == null) {
@@ -42,7 +42,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				for( int i = 0; i < features.size(); i++) {
 					Block b = features.get(i).block;
 					Geometry geo = features.get(i).geometry;
-					geo.fillColor = c[dm.block_districts[b.id]];
+					try {
+						int color = dm.block_districts[b.id];
+						if( color < c.length) {
+							geo.fillColor = c[color];
+						}
+					} catch (Exception ex) {}
 					
 				}
 			}
@@ -120,23 +125,26 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}		
 	}
 	void collectEdges() {
-		edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
+		edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 		for( Feature f : features) {
 			f.block.edges = new Vector<Edge>();
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
 					Vertex v1 = vertexHash.get(c[j][0]).get(c[j][1]);
+					System.out.println("v1 "+v1.id);
 					Vertex v2 = vertexHash.get(c[j+1 == c.length ? 0 : j+1][0]).get(c[j+1 == c.length ? 0 : j+1][1]);
+					System.out.println("v2 "+v2.id);
 					if( v1.id > v2.id) {
 						Vertex t = v1;
 						v1 = v2;
 						v2 = t;
 					}
-					HashMap<Vertex,Edge> ve = edgeHash.get(v1);
+					HashMap<Integer,Edge> ve = edgeHash.get(v1.id);
+					System.out.println("ve "+ve);
 					if( ve == null) {
-						ve = new HashMap<Vertex,Edge>();
-						edgeHash.put(v1, ve);
+						ve = new HashMap<Integer,Edge>();
+						edgeHash.put(v1.id, ve);
 					}
 					Edge e = ve.get(v2);
 					if( e == null) {
@@ -148,7 +156,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						e.block1_id = f.block.id;
 						e.block1 = f.block;
 						e.setLength();
-						ve.put(v2,e);
+						ve.put(v2.id,e);
 					} else {
 						e.block2_id = f.block.id;
 						e.block2 = f.block;
@@ -158,6 +166,19 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		int paired_edges = 0;
+		int unpaired_edges = 0;
+		for( HashMap<Integer,Edge> ev : edgeHash.values()) {
+			for( Edge e : ev.values()) {
+				if( e.block2 == null) {
+					unpaired_edges++;
+				} else {
+					paired_edges++;
+				}
+			}
+		}
+		System.out.println("paired edges: "+paired_edges);
+		System.out.println("unpaired edges: "+unpaired_edges);
 	}
 	
 	void collectVertexes() {
@@ -183,5 +204,15 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		int vertex_x = 0;
+		int vertex_all = 0;
+		for( HashMap<Double,Vertex> ev : vertexHash.values()) {
+			vertex_x++;
+			for( Vertex e : ev.values()) {
+				vertex_all++;
+			}
+		}
+		System.out.println("vertex_xs: "+vertex_x);
+		System.out.println("vertex_all: "+vertex_all);
 	}
 }

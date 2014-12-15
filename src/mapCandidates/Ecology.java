@@ -14,6 +14,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	//map_population (folder)
 	//
 	static public boolean evolve_paused = true;
+	public static double invert = 1;
 	int last_population = 0;
 	int last_num_districts = 0;
 	
@@ -35,8 +36,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public void run() {
     		while( !evolve_paused) {
     			try {
-    				System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
-    				System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);
+    				//System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
+    				//System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);
         			if( last_num_districts != Settings.num_districts) {
         				if( JOptionPane.showConfirmDialog(null, "resize districts?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
@@ -49,7 +50,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 			resize_population();
         				}
         			}
-        			evolve(); 
+        			evolveWithSpeciation(); 
         			System.out.print(".");
         			
         			if( mapPanel != null) {
@@ -167,8 +168,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	
     //static int num_parties = 0;
 
-    public static int hamming_distance_polarity = 1;
-
  
     public void reset() {
     	population =  new Vector<DistrictMap>();
@@ -195,25 +194,19 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         last_num_districts = Settings.num_districts;
     }
 
-    public void evolveWithSpeciation(double replace_fraction, double mutation_rate, double mutation_boundary_rate, int trials, boolean score_all) {
-        int cutoff = population.size()-(int)((double)population.size()*replace_fraction);
+    public void evolveWithSpeciation() {
+        int cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
         int speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
 
-        if( score_all) {
-            for( DistrictMap map : population) {
-                map.calcFairnessScores(trials);
-            }
-        } else {
-            for( int i = cutoff; i < population.size(); i++) {
-                population.get(i).calcFairnessScores(trials);
-            }
+        for( DistrictMap map : population) {
+            map.calcFairnessScores(Settings.trials);
         }
         for( int i = 0; i < 5; i++) {
             for( DistrictMap map : population) {
                 map.fitness_score = map.fairnessScores[i];
             }
             Collections.sort(population);
-            double mult = 1.0/population.size();
+            double mult = 1.0/(double)population.size();
             for( int j = 0; j < population.size(); j++) {
                 DistrictMap map = population.get(j);
                 map.fairnessScores[i] = ((double)j)*mult; 
@@ -232,31 +225,38 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             DistrictMap map = population.get(j);
             map.fitness_score = 0;
             for( int i = 0; i < 5; i++) {
-                map.fitness_score += map.fairnessScores[i]*weights[i];
+            	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
+            		map.fairnessScores[i] = 0;
+            	}
+                map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
             }
         }
 
         Collections.sort(population);
 
-        Vector<DistrictMap> available = new Vector<DistrictMap>();
-        for(int i = cutoff; i < population.size(); i++) {
-            available.add(population.get(i));
+        Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
+        for(int i = 0; i < cutoff; i++) {
+            available_mate.add(population.get(i));
         }
 
         for(int i = cutoff; i < population.size(); i++) {
             int g1 = (int)(Math.random()*(double)cutoff);
-            DistrictMap map1 = available.get(g1);
-            for(DistrictMap m : available) {
+            DistrictMap map1 = available_mate.get(g1);
+            for(DistrictMap m : available_mate) {
                 m.makeLike(map1.getGenome());
-                m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome())*hamming_distance_polarity;
+                m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
             }
-            Collections.sort(available);
+            Collections.sort(available_mate);
             int g2 = (int)(Math.random()*(double)speciation_cutoff);
-            DistrictMap map2 = available.get(g2);
+            DistrictMap map2 = available_mate.get(g2);
 
             population.get(i).crossover(map1.getGenome(), map2.getGenome());
-            population.get(i).mutate(mutation_rate);
-            population.get(i).mutate_boundary(mutation_rate);
+        }
+        for(int i = 0; i < population.size(); i++) {
+            DistrictMap dm = population.get(i); 
+            dm.mutate(Settings.mutation_rate);
+            dm.mutate_boundary(Settings.mutation_rate);
+            dm.fillDistrictBlocks();
         }
     }
 
@@ -264,6 +264,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public void evolve() {
     	boolean score_all = true;
         int cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
+        System.out.println("replace fraction "+Settings.replace_fraction+" cutoff "+cutoff+" population "+population.size());
 
         if( score_all) {
             for( DistrictMap map : population) {
@@ -274,12 +275,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 population.get(i).calcFairnessScores(Settings.trials);
             }
         }
+        
+        double mult = 1.0/(double)population.size();
         for( int i = 0; i < 5; i++) {
             for( DistrictMap map : population) {
                 map.fitness_score = map.fairnessScores[i];
             }
             Collections.sort(population);
-            double mult = 1.0/population.size();
             for( int j = 0; j < population.size(); j++) {
                 DistrictMap map = population.get(j);
                 map.fairnessScores[i] = ((double)j)*mult; 
@@ -298,19 +300,32 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             DistrictMap map = population.get(j);
             map.fitness_score = 0;
             for( int i = 0; i < 5; i++) {
-                map.fitness_score += map.fairnessScores[i]*weights[i];
+            	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
+            		map.fairnessScores[i] = 0;
+            	}
+                map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
             }
         }
 
         Collections.sort(population);
+        System.out.println("best: "+population.get(0).fitness_score);
+        System.out.println("worst: "+population.get(population.size()-1).fitness_score);
 
 
         for(int i = cutoff; i < population.size(); i++) {
             int g1 = (int)(Math.random()*(double)cutoff);
             int g2 = (int)(Math.random()*(double)cutoff);
-            population.get(i).crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
-            population.get(i).mutate(Settings.mutation_rate);
-            population.get(i).mutate_boundary(Settings.mutation_rate);
+            DistrictMap dm = population.get(i); 
+            dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
+            //dm.mutate(Settings.mutation_rate);
+            //dm.mutate_boundary(Settings.mutation_rate);
+            //dm.fillDistrictBlocks();
+        }
+        for(int i = 0; i < population.size(); i++) {
+            DistrictMap dm = population.get(i); 
+            dm.mutate(Settings.mutation_rate);
+            dm.mutate_boundary(Settings.mutation_rate);
+            dm.fillDistrictBlocks();
         }
     }
     public void start_from_genome(int[] genome, double mutation_rate) {

@@ -23,6 +23,7 @@ public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
 	boolean use_sample = true;
 	
+	JCheckBoxMenuItem chckbxmntmInvert = new JCheckBoxMenuItem("Invert");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
@@ -410,8 +411,12 @@ public class MainFrame extends JFrame {
 		JMenu mnEvolution = new JMenu("Evolution");
 		menuBar.add(mnEvolution);
 		
-		JMenuItem mntmInitialize = new JMenuItem("Initialize");
-		mnEvolution.add(mntmInitialize);
+		chckbxmntmInvert.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Ecology.invert = chckbxmntmInvert.isSelected() ? -1.0 : 1.0;
+			}
+		});
+		mnEvolution.add(chckbxmntmInvert);
 		
 		JSeparator separator = new JSeparator();
 		mnEvolution.add(separator);
