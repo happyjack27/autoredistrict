@@ -21,11 +21,13 @@ import javax.swing.border.*;
 
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
+	boolean use_sample = true;
 	
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+	JTextField textField_2 = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	JSlider slider = new JSlider();
@@ -45,7 +47,6 @@ public class MainFrame extends JFrame {
 
 	//public Ecology ecology = new Ecology();
 	public FeatureCollection featureCollection = new FeatureCollection();
-	private JTextField textField_2;
 	
 	public MainFrame() { 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,11 +96,20 @@ public class MainFrame extends JFrame {
 		mnGeography.add(chckbxmntmLatitudeLongitude);
 		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				//jfc.sh
-				jfc.showOpenDialog(null);
-				File fd = jfc.getSelectedFile();
+				File fd;
+				if( use_sample) {
+					fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
+				} else {
+					JFileChooser jfc = new JFileChooser();
+					jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					//jfc.sh
+					jfc.showOpenDialog(null);
+					fd = jfc.getSelectedFile();
+				}
+				if( fd == null) {
+					return;
+				}
+
 				if( !fd.isDirectory()) {
 					return;
 				}
@@ -318,9 +328,17 @@ public class MainFrame extends JFrame {
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					File f;
+					if( use_sample) {
+						f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
+					} else {
 					JFileChooser jfc = new JFileChooser();
 					jfc.showOpenDialog(null);
-					File f = jfc.getSelectedFile();
+					f = jfc.getSelectedFile();
+					}
+					if( f == null) {
+						return;
+					}
 					StringBuffer sb = new StringBuffer();
 					try {
 						FileInputStream fis = new FileInputStream(f);
@@ -401,6 +419,8 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				Settings.population = Integer.parseInt(textField.getText());
+				Settings.num_districts = Integer.parseInt(textField_2.getText());
 				featureCollection.ecology.startEvolving();
 			}
 		});
@@ -465,6 +485,9 @@ public class MainFrame extends JFrame {
 				JFileChooser jfc = new JFileChooser();
 				jfc.showSaveDialog(null);
 				File f = jfc.getSelectedFile();
+				if( f == null) {
+					return;
+				}
 				StringBuffer sb = new StringBuffer();
 				try {
 					FileOutputStream fis = new FileOutputStream(f);
@@ -629,7 +652,12 @@ public class MainFrame extends JFrame {
 		slider_8.setBounds(6, 315, 190, 29);
 		panel_3.add(slider_8);
 		
-		textField_2 = new JTextField();
+		textField_2.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				textField_2.postActionEvent();
+			}
+		});
 		textField_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {

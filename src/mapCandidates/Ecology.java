@@ -2,6 +2,8 @@ package mapCandidates;
 
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
 import serialization.*;
 import ui.MapPanel;
 
@@ -33,13 +35,19 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public void run() {
     		while( !evolve_paused) {
     			try {
+    				System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
+    				System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);
         			if( last_num_districts != Settings.num_districts) {
-        				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
-        				resize_districts();
+        				if( JOptionPane.showConfirmDialog(null, "resize districts?") == JOptionPane.YES_OPTION) {
+            				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
+            				resize_districts();
+        				}
         			}
         			if( population.size() != Settings.population) {
-        				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
-            			resize_population();
+        				if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
+            				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
+                			resize_population();
+        				}
         			}
         			evolve(); 
         			System.out.print(".");
@@ -166,17 +174,21 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	population =  new Vector<DistrictMap>();
     }
     public void resize_population() {
-    	population =  new Vector<DistrictMap>();
-        for( int i = population.size(); i < Settings.population; i++) {
+    	if( population == null) {
+    		population =  new Vector<DistrictMap>();
+    	}
+        while( population.size() < Settings.population) {
             population.add(new DistrictMap(blocks,Settings.num_districts));
         }
-        for( int i = Settings.population; i > population.size(); i++) {
+        while( population.size() > Settings.population) {
             population.remove(Settings.population);
         }
         last_population = Settings.population;
     }
     public void resize_districts() {
-    	population =  new Vector<DistrictMap>();
+    	if( population == null) {
+    		population = new Vector<DistrictMap>();
+    	}
         for( int i = 0; i < population.size(); i++) {
             population.get(i).resize_districts(Settings.num_districts);
         }

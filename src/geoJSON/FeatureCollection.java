@@ -30,12 +30,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		if( ecology.population != null && ecology.population.size() > 0) {
 			DistrictMap dm  = ecology.population.get(0);
+			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.block_districts.length);
 			if( dm.block_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
 				float hue_inc = (float)(1.0/(double)Settings.num_districts);
 				float hue = 0;
 				for( int i = 0; i < c.length; i++) {
-					c[i] = Color.getHSBColor(hue, (float)1.0, (float)0.66);
+					c[i] = Color.getHSBColor(hue, (float)1.0, (float)0.75);
 					hue += hue_inc;
 				}
 				for( int i = 0; i < features.size(); i++) {

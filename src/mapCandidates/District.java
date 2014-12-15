@@ -57,7 +57,8 @@ class District extends JSONObject {
     public double[] getVotes() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
         if( blocks.size() == 0) {
-        	System.out.println("blocks is null! district");
+        	System.out.println("blocks is empty! district");
+        	System.exit(0);
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
             }

@@ -45,7 +45,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate_boundary(double prob) {
-        boolean[] allow = new boolean[districts.size()+1];
+        boolean[] allow = new boolean[districts.size()];
         for( int i = 0; i < block_districts.length; i++) {
             if( Math.random() < prob) {
                 for( int j = 0; j < allow.length; j++) {
@@ -151,6 +151,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         this(blocks,num_districts);
         setGenome(genome);
     }
+    
+    public void fillDistrictBlocks() {
+    	for( District d : districts) {
+    		d.blocks = new Vector<Block>();
+    	}
+    	for( int i = 0; i < block_districts.length; i++) {
+    		districts.get(block_districts[i]).blocks.add(blocks.get(i));
+    	}
+    }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
         this.num_districts = num_districts;
         this.blocks = blocks;
@@ -159,6 +168,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             districts.add(new District());
         block_districts = new int[blocks.size()];
         mutate(1);
+        fillDistrictBlocks();
     }
     public void resize_districts(int target) {
     	if( num_districts == target) {
@@ -168,7 +178,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			districts.remove(target);
 		}
 		while( districts.size() < target) {
-			districts.add(new District());
+			District d = new District();
+			districts.add(d);
 		}
 		
     	if( num_districts > target) {
@@ -181,6 +192,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     		}
     	}
+        fillDistrictBlocks();
     	if( num_districts < target) {
     	}
     	num_districts = target;
@@ -209,7 +221,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < district_vote.length; i++) {
                 popular_vote[i] += district_vote[i];
             }
-            elected_vote[district.last_winner]++;
+            if( district.last_winner >= 0) {
+            	elected_vote[district.last_winner]++;
+            }
         }
         return new double[][]{popular_vote,elected_vote};
     }
@@ -258,7 +272,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //returns total edge length, unfairness, population imbalance
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
     public void calcFairnessScores(int trials) {
+    	
+    	//===fairness score: compactness
         double length = getEdgeLength();
+        
+    	//===fairness score: population balance
         double total_population = 0;
         double[] dist_pops = new double[districts.size()];
         double[] dist_pop_frac = new double[districts.size()];
@@ -278,7 +296,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < perfect_dists.length; i++)
             perfect_dists[i] = exp_population;
 
-        //simulate trials elections and accumulate the results
+    	//===fairness score: proportional representation
         double[] p = new double[Candidate.candidates.size()];
         double[] q = new double[Candidate.candidates.size()];
         for( int i = 0; i < trials; i++) {
@@ -289,6 +307,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
 
+    	//===fairness score: power fairness
         double[] voting_power = new double[districts.size()];
         double total_voting_power = 0;
         for(int i = 0; i < districts.size(); i++) {
@@ -306,12 +325,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             power_fairness += dist_pop_frac[i]*voting_power[i];
         }
 
+    	//===fairness score: connectedness
         double disconnected_pops = 0;
         if( Settings.disconnected_population_weight > 0) {
             for(District district : districts)
                 disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
         }
         disconnected_pops /= total_population;
+        
         fairnessScores = new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
     }
 
