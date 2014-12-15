@@ -1,10 +1,14 @@
 package geoJSON;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.*;
 
 import mapCandidates.Block;
+import mapCandidates.DistrictMap;
 import mapCandidates.Ecology;
 import mapCandidates.Edge;
+import mapCandidates.Settings;
 import mapCandidates.Vertex;
 
 import serialization.JSONObject;
@@ -15,9 +19,38 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Feature> features;
 	public Vector<Block> blocks;
 	public HashMap<String,Block> precinctHash;
+	public Ecology ecology = new Ecology();
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Vertex,HashMap<Vertex,Edge>> edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
+	
+	public void draw(Graphics g) {
+		if( features == null) {
+			return;
+		}
+		if( ecology.population != null && ecology.population.size() > 0) {
+			DistrictMap dm  = ecology.population.get(0);
+			if( dm.block_districts != null) {
+				Color[] c = new Color[Settings.num_districts];
+				float hue_inc = (float)(1.0/(double)Settings.num_districts);
+				float hue = 0;
+				for( int i = 0; i < c.length; i++) {
+					c[i] = Color.getHSBColor(hue, (float)1.0, (float)0.66);
+					hue += hue_inc;
+				}
+				for( int i = 0; i < features.size(); i++) {
+					Block b = features.get(i).block;
+					Geometry geo = features.get(i).geometry;
+					geo.fillColor = c[dm.block_districts[b.id]];
+					
+				}
+			}
+		}
+        for( Feature f : features) {
+        	f.geometry.makePolys();
+        	f.draw(g);
+        }		
+	}
 
 	@Override
 	public void post_deserialize() {
@@ -71,7 +104,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		//edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
 	
-	public void initEcology(Ecology ecology) {
+	public void initEcology() {
 		ecology.blocks = blocks;
 		//ecology.edges = edgeHash.values();
 		//ecology.vertexes = vertexes;

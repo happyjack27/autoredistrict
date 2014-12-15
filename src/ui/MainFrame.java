@@ -43,7 +43,7 @@ public class MainFrame extends JFrame {
 	MapPanel mapPanel = new MapPanel(); 
 
 
-	public Ecology ecology = new Ecology();
+	//public Ecology ecology = new Ecology();
 	public FeatureCollection featureCollection = new FeatureCollection();
 	private JTextField textField_2;
 	
@@ -193,10 +193,11 @@ public class MainFrame extends JFrame {
 				mapPanel.maxx = flipx ? minx : maxx;
 				mapPanel.miny = flipy ? maxy : miny;
 				mapPanel.maxy = flipy ? miny : maxy;
-				mapPanel.features = features;
+				mapPanel.featureCollection = featureCollection;
 				mapPanel.invalidate();
 				mapPanel.repaint();
-				featureCollection.initEcology(ecology);
+				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.initEcology();
 				System.out.println("Ready.");
 
 			}
@@ -298,10 +299,12 @@ public class MainFrame extends JFrame {
 				mapPanel.miny = miny;
 				mapPanel.maxx = maxx;
 				mapPanel.maxy = maxy;
-				mapPanel.features = features;
+				mapPanel.featureCollection = featureCollection;
 				mapPanel.invalidate();
 				mapPanel.repaint();
-				featureCollection.initEcology(ecology);
+				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.initEcology();
+				
 
 				System.out.println("Ready.");
 			}
@@ -314,69 +317,75 @@ public class MainFrame extends JFrame {
 		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				StringBuffer sb = new StringBuffer();
 				try {
-					FileInputStream fis = new FileInputStream(f);
-					while( fis.available() > 0) {
-						byte[] bb = new byte[fis.available()];
-						fis.read(bb);
-						sb.append(new String(bb));
-						Thread.sleep(10);
+					JFileChooser jfc = new JFileChooser();
+					jfc.showOpenDialog(null);
+					File f = jfc.getSelectedFile();
+					StringBuffer sb = new StringBuffer();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						while( fis.available() > 0) {
+							byte[] bb = new byte[fis.available()];
+							fis.read(bb);
+							sb.append(new String(bb));
+							Thread.sleep(10);
+						}
+						
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						return;
+					}
+					String s = sb.toString();
+					String[] lines = s.split("\n");
+					int num_candidates = lines[0].split("\t").length - 1;
+					HashMap<String,double[]> votes = new HashMap<String,double[]>();
+					for( int i = 0; i < lines.length; i++) {
+						String[] ss = lines[i].split("\t");
+						String district = ss[0].trim();
+						double[] dd = votes.get(district);
+						if( dd == null) {
+							dd = new double[num_candidates];
+							for( int j = 0; j < num_candidates; j++) {
+								dd[j] = 0;
+							}
+							votes.put(district, dd);
+						}
+						for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
+							dd[j] += Double.parseDouble(ss[j+1]);
+						}
 					}
 					
-					fis.close();
-				} catch (Exception ex) {
-					// TODO Auto-generated catch block
-					ex.printStackTrace();
-					return;
-				}
-				String s = sb.toString();
-				String[] lines = s.split("\n");
-				int num_candidates = lines[0].split("\t").length - 1;
-				HashMap<String,double[]> votes = new HashMap<String,double[]>();
-				for( int i = 0; i < lines.length; i++) {
-					String[] ss = lines[i].split("\t");
-					String district = ss[0].trim();
-					double[] dd = votes.get(district);
-					if( dd == null) {
-						dd = new double[num_candidates];
+					for( Entry<String, double[]> es : votes.entrySet()) {
+						Block b = featureCollection.precinctHash.get(es.getKey());
+						double[] dd = es.getValue();
 						for( int j = 0; j < num_candidates; j++) {
-							dd[j] = 0;
+							Demographic d = new Demographic();
+							d.block_id = b.id;
+							d.turnout_probability = 1;
+							d.population = (int) dd[j];
+							d.vote_prob = new double[num_candidates];
+							for( int i = 0; i < d.vote_prob.length; i++) {
+								d.vote_prob[i] = 0;
+							}
+							d.vote_prob[j] = 1;
+							b.demographics.add(d);
 						}
-						votes.put(district, dd);
 					}
-					for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
-						dd[j] += Double.parseDouble(ss[j+1]);
+					
+					Candidate.candidates = new Vector<Candidate>();
+					for( int i = 0; i < num_candidates; i++) {
+						Candidate c = new Candidate();
+						c.index = i;
+						c.id = ""+i;
+						Candidate.candidates.add(c);
 					}
+					featureCollection.ecology.reset();
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
 				}
-				
-				for( Entry<String, double[]> es : votes.entrySet()) {
-					Block b = featureCollection.precinctHash.get(es.getKey());
-					double[] dd = es.getValue();
-					for( int j = 0; j < num_candidates; j++) {
-						Demographic d = new Demographic();
-						d.block_id = b.id;
-						d.turnout_probability = 1;
-						d.population = (int) dd[j];
-						d.vote_prob = new double[num_candidates];
-						for( int i = 0; i < d.vote_prob.length; i++) {
-							d.vote_prob[i] = 0;
-						}
-						d.vote_prob[j] = 1;
-						b.demographics.add(d);
-					}
-				}
-				
-				for( int i = 0; i < num_candidates; i++) {
-					Candidate c = new Candidate();
-					c.index = i;
-					c.id = ""+i;
-					ecology.candidates.add(c);
-				}
-				ecology.reset();
 			}
 		});
 		
@@ -392,7 +401,7 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ecology.startEvolving();
+				featureCollection.ecology.startEvolving();
 			}
 		});
 		mnEvolution.add(mntmStart);
@@ -400,7 +409,7 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmPause = new JMenuItem("Pause");
 		mntmPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ecology.stopEvolving();
+				featureCollection.ecology.stopEvolving();
 			}
 		});
 		mnEvolution.add(mntmPause);
@@ -450,7 +459,7 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
 		mntmExportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if( ecology.population == null || ecology.population.size() == 0) {
+				if( featureCollection.ecology.population == null || featureCollection.ecology.population.size() == 0) {
 					JOptionPane.showMessageDialog(null,"No results");
 				}
 				JFileChooser jfc = new JFileChooser();
@@ -460,10 +469,10 @@ public class MainFrame extends JFrame {
 				try {
 					FileOutputStream fis = new FileOutputStream(f);
 					
-					DistrictMap dm = ecology.population.get(0);
+					DistrictMap dm = featureCollection.ecology.population.get(0);
 					int[] blocks = dm.block_districts;
 					for( int i = 0; i < blocks.length; i++) {
-						Block b = ecology.blocks_by_id.get(i);
+						Block b = featureCollection.ecology.blocks_by_id.get(i);
 						sb.append(b.name+", "+blocks[i]+"\n");
 					}
 					

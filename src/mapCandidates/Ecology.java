@@ -3,6 +3,7 @@ package mapCandidates;
 import java.util.*;
 
 import serialization.*;
+import ui.MapPanel;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	//geometry
@@ -16,11 +17,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	public HashMap<Integer,Block> blocks_by_id;
 	
-	public Vector<Candidate> candidates = new Vector<Candidate>();
-
 	public Vector<Block> blocks = new Vector<Block>();
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
+	public MapPanel mapPanel;
 	
 
 	Settings settings = new Settings();
@@ -32,16 +32,27 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     class EvolveThread extends Thread {
     	public void run() {
     		while( !evolve_paused) {
-    			if( last_num_districts != Settings.num_districts) {
-    				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
-    				resize_districts();
+    			try {
+        			if( last_num_districts != Settings.num_districts) {
+        				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
+        				resize_districts();
+        			}
+        			if( population.size() != Settings.population) {
+        				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
+            			resize_population();
+        			}
+        			evolve(); 
+        			System.out.print(".");
+        			
+        			if( mapPanel != null) {
+        				mapPanel.invalidate();
+        				mapPanel.repaint();
+        			}
+        			
+    			} catch (Exception ex) {
+    				System.out.println("ex "+ex);
+    				ex.printStackTrace();
     			}
-    			if( population.size() != Settings.population) {
-    				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
-        			resize_population();
-    			}
-    			evolve(); 
-    			System.out.print(".");
     		}
     	}
     }
@@ -110,10 +121,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 		//stuff
 		if( containsKey("candidates")) {
-			candidates = getVector("candidates");
-			Block.candidates = candidates;
-			DistrictMap.candidates = candidates;
-			District.candidates = candidates;
+			Candidate.candidates = getVector("candidates");
 		}
 		
 		if( containsKey("settings")) { settings = (Settings)get("settings"); }
@@ -125,7 +133,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		put("edges",edges);
 		put("vertexes",vertexes);
 		
-		put("candidates",candidates);
+		put("candidates",Candidate.candidates);
 	}
 
 	@Override
@@ -155,7 +163,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
  
     public void reset() {
-        DistrictMap.candidates = candidates;
     	population =  new Vector<DistrictMap>();
     }
     public void resize_population() {

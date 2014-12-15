@@ -24,7 +24,6 @@ public class Block extends ReflectionJSONObject<Block> {
     static boolean use_vote_cache = true;
     static int cache_reuse_times = 16;
     static int vote_cache_size = 128;
-    static Vector<Candidate> candidates = null;
     
     int cache_reused = 0;
     
@@ -84,7 +83,7 @@ public class Block extends ReflectionJSONObject<Block> {
     }
 
     void generateVotes() {
-        double[] votes = new double[candidates.size()];
+        double[] votes = new double[Candidate.candidates.size()];
         for(int i = 0; i < votes.length; i++) {
             votes[i] = 0;
         }

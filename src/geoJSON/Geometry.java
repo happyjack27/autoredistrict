@@ -16,7 +16,8 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public int[] xpolys;
 	public int[] ypolys;
 	public Polygon[] polygons;
-	public Color c = Color.BLACK;
+	public Color outlineColor = Color.BLACK;
+	public Color fillColor = null;
 	public boolean isDistrict = true;
 	
 	public static boolean isLatLon = false; 
@@ -39,10 +40,10 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	}
 	public Geometry() {
 		super();
-		int r = (int)Math.floor(Math.random()*256.0);
-		int g = (int)Math.floor(Math.random()*256.0);
-		int b = (int)Math.floor(Math.random()*256.0);
-		c = new Color(r,g,b);
+		//int r = (int)Math.floor(Math.random()*256.0);
+		//int g = (int)Math.floor(Math.random()*256.0);
+		//int b = (int)Math.floor(Math.random()*256.0);
+		//outlineColor = new Color(r,g,b);
 	}
 
 	@Override
