@@ -7,7 +7,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static int sorting_polarity = 1;
 
     public static int num_districts = 0;
-	public static Vector<Candidate> candidates = new Vector<Candidate>();
 	public Vector<Block> blocks = new Vector<Block>();
 	public Vector<District> districts = new Vector<District>();
     
@@ -37,10 +36,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate(double prob) {
-        double max = candidates.size();
+        double max = Settings.num_districts;
         for( int i = 0; i < block_districts.length; i++) {
             if( Math.random() < prob) {
-                block_districts[i] = (int)(Math.floor(Math.random()*max)+1.0);
+                block_districts[i] = (int)(Math.floor(Math.random()*max));
             }
         }
     }
@@ -62,7 +61,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     if( allow[j])
                         count++;
                 }
-                int d = (int)(Math.random()*count); 
+                int d = (int)Math.floor(Math.random()*count); 
                 for( int j = 0; j < allow.length; j++) {
                     if( allow[j]) {
                         if( d == 0) {
@@ -203,8 +202,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //helper functions
     public double[][] getRandomResultSample() {
-        double[] popular_vote = new double[candidates.size()]; //inited to 0
-        double[] elected_vote = new double[candidates.size()]; //inited to 0
+        double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
         for(District district : districts) {
             double[] district_vote = district.getVotes();
             for( int i = 0; i < district_vote.length; i++) {
@@ -280,11 +279,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             perfect_dists[i] = exp_population;
 
         //simulate trials elections and accumulate the results
-        double[] p = new double[candidates.size()];
-        double[] q = new double[candidates.size()];
+        double[] p = new double[Candidate.candidates.size()];
+        double[] q = new double[Candidate.candidates.size()];
         for( int i = 0; i < trials; i++) {
             double[][] results = getRandomResultSample();
-            for( int j = 0; j < candidates.size(); j++) {
+            for( int j = 0; j < Candidate.candidates.size(); j++) {
                 p[j] += results[0][j];
                 q[j] += results[1][j];
             }

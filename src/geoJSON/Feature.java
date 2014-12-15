@@ -27,7 +27,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 			geometry = (Geometry) getObject("geometry");
 		}
 		if( properties.DISTRICT == null || properties.DISTRICT.toLowerCase().equals("null")) {
-			geometry.c = Color.BLUE;
+			geometry.outlineColor = Color.BLUE;
 			geometry.isDistrict = false;
 		}
 		// TODO Auto-generated method stub
@@ -57,17 +57,35 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		g.setColor(geometry.c);
-		for( int i = 0; i < geometry.polygons.length; i++) {
-			//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
-			if( geometry.isDistrict && false) {
+		if( geometry.fillColor != null) {
+			g.setColor(geometry.fillColor);
+			for( int i = 0; i < geometry.polygons.length; i++) {
 				g.fillPolygon(geometry.polygons[i]);
-			} else {
-				g.drawPolygon(geometry.polygons[i]);
 			}
-			
-			double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
-			if( showPrecinctLabels) {
+		}
+		if( geometry.outlineColor != null) {
+			g.setColor(geometry.outlineColor);
+			for( int i = 0; i < geometry.polygons.length; i++) {
+				//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
+				if( geometry.isDistrict && false) {
+					g.fillPolygon(geometry.polygons[i]);
+				} else {
+					g.drawPolygon(geometry.polygons[i]);
+				}
+				
+				double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
+				if( showPrecinctLabels) {
+					FontMetrics fm = g.getFontMetrics();
+					String name = this.properties.DISTRICT;
+					centroid[0] -= fm.stringWidth(name)/2.0;
+					centroid[1] += fm.getHeight()/2.0;
+					g.drawString(name, (int)centroid[0],(int)centroid[1]);
+				}
+			}
+		}
+		if( showPrecinctLabels) {
+			for( int i = 0; i < geometry.polygons.length; i++) {
+				double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
 				FontMetrics fm = g.getFontMetrics();
 				String name = this.properties.DISTRICT;
 				centroid[0] -= fm.stringWidth(name)/2.0;
@@ -76,5 +94,4 @@ public class Feature extends ReflectionJSONObject<Feature> {
 			}
 		}
 	}
-	
 }
