@@ -14,8 +14,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double[] fairnessScores = new double[5];
     public double fitness_score = 0;
     
-    public static double[] metrics = new double[6];
+    public static double[] metrics = new double[10];
     
+    double[] dist_pops;
+    double[] dist_pop_frac;
+    double[] perfect_dists;
 	
 
     //makeLike
@@ -162,22 +165,29 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	}
     	for( int i = 0; i < block_districts.length; i++) {
     		int district = block_districts[i];
-    		if( district >= districts.size());
-    		districts.add(new District());
+    		if( district >= districts.size()) {
+    			districts.add(new District());
+    		}
     		districts.get(district).blocks.add(blocks.get(i));
     	}
     }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
         this.num_districts = num_districts;
         this.blocks = blocks;
+        //System.out.println(" districtmap constructor numdists "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
         block_districts = new int[blocks.size()];
         mutate(1);
         fillDistrictBlocks();
+        //System.out.println(" districtmap constructor dist size "+districts.size());
     }
     public void resize_districts(int target) {
+        dist_pops = new double[districts.size()];
+        dist_pop_frac = new double[districts.size()];
+        perfect_dists = new double[districts.size()];
+    	
     	if( num_districts == target) {
     		return;
     	}
@@ -203,6 +213,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( num_districts < target) {
     	}
     	num_districts = target;
+        dist_pops = new double[districts.size()];
+        dist_pop_frac = new double[districts.size()];
+        perfect_dists = new double[districts.size()];
+    	//System.out.println( "resize_districts target "+target+" districts.size() "+districts.size()); 
     }
 
 
@@ -212,6 +226,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     public void setGenome(int[] genome) {
         block_districts = genome;
+        System.out.println("setgenome districts "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
@@ -288,18 +303,32 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time1 = System.currentTimeMillis();
     	//===fairness score: population balance
         double total_population = 0;
-        double[] dist_pops = new double[districts.size()];
-        double[] dist_pop_frac = new double[districts.size()];
-        double[] perfect_dists = new double[districts.size()];
+        //System.out.println("districts size " +districts.size());
+        if( dist_pops == null) {
+            dist_pops = new double[districts.size()];
+            dist_pop_frac = new double[districts.size()];
+            perfect_dists = new double[districts.size()];
+        }
+        for( int i = 0; i < dist_pops.length; i++) {
+        	dist_pop_frac[i] = 0;
+        }
+        for( int i = 0; i < dist_pops.length; i++) {
+        	dist_pop_frac[i] = 0;
+        }
+        for( int i = 0; i < dist_pops.length; i++) {
+        	perfect_dists[i] = 0;
+        }
+
         if( Settings.population_balance_weight > 0) {
             for(int i = 0; i < districts.size(); i++) {
                 District district = districts.get(i);
-                district.resetWins();
+                //district.resetWins();
                 dist_pops[i] = district.getPopulation();
                 total_population += dist_pops[i];
             }
+        	double rtotpop = 1.0/ total_population;
             for(int i = 0; i < districts.size(); i++) {
-                dist_pop_frac[i] =  dist_pops[i] / total_population;
+                dist_pop_frac[i] =  dist_pops[i] * rtotpop;
             }
 
             double exp_population = total_population/districts.size();
@@ -308,6 +337,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
 
     	long time2 = System.currentTimeMillis();
+    	
         double[] p = new double[Candidate.candidates.size()];
         double[] q = new double[Candidate.candidates.size()];
     	if( Settings.disenfranchise_weight > 0) {
@@ -362,6 +392,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	metrics[3] += time4-time3;
     	metrics[4] += time5-time4;
     	metrics[5] += time6-time5;
+
+    	metrics[6] += 0;//time10-time1;
+    	metrics[7] += 0;//time11-time10; //
+    	metrics[8] += 0;//time12-time11;
+    	metrics[9] += 0;//time2-time12;
     }
 
     public int compareTo(DistrictMap o) {
