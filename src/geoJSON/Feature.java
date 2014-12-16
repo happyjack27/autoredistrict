@@ -16,6 +16,38 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public Block block = null;
 	
 	public static boolean showPrecinctLabels = false;
+	
+	public void toggleClicked() {
+		try {
+
+		if( block.state == 0) {
+			block.state = 2;
+			for( Block b : block.neighbors) {
+				
+				if( b == null) {
+					continue;
+				}
+				if( b.state == 0) {
+					b.state = 1;
+				}
+			}
+		} else if( block.state == 2) { 
+			block.state = 0;
+			for( Block b : block.neighbors) {
+				
+				if( b == null) {
+					continue;
+				}
+				if( b.state == 1) {
+					b.state = 0;
+				}
+			}
+		}
+		} catch (Exception ex) {
+			System.out.println(" ex "+ex);
+			ex.printStackTrace();
+		}
+	}
 
 	@Override
 	public void post_deserialize() {
@@ -57,8 +89,14 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null) {
+		if( geometry.fillColor != null || block.state != 0) {
 			g.setColor(geometry.fillColor);
+			if( block.state == 1) {
+				g.setColor(Color.blue);
+			}
+			if( block.state == 2) {
+				g.setColor(Color.white);
+			}
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				g.fillPolygon(geometry.polygons[i]);
 			}

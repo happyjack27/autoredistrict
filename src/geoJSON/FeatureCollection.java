@@ -21,6 +21,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public HashMap<String,Block> precinctHash;
 	public Ecology ecology = new Ecology();
 	
+	double snap_to_grid_resolution = 10000.0;
+	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 	
@@ -101,6 +103,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.block.collectNeighbors();
 		}
+		for( Feature f : features) {
+			f.block.syncNeighbors();
+		}
 		/*
 		for( Feature f : features) {
 			f.block.edges = new Vector<Edge>();
@@ -157,11 +162,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						e.block1 = f.block;
 						e.setLength();
 						ve.put(v2.id,e);
+						f.block.edges.add(e);
 					} else {
-						e.block2_id = f.block.id;
-						e.block2 = f.block;
+						if( e.block1 != f.block) {
+							e.block2_id = f.block.id;
+							e.block2 = f.block;
+							f.block.edges.add(e);
+						}
 					}
-					f.block.edges.add(e);
 					
 				}
 			}
@@ -205,7 +213,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 		}
 		double area = (maxx-minx)*(maxy-miny);
-		double increment = Math.sqrt(area)/1000.0; 
+		double increment = Math.sqrt(area)/snap_to_grid_resolution; 
 		double r_increment = 1.0/increment; 
 		
 		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();

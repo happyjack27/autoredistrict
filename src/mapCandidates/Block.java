@@ -6,6 +6,7 @@ import serialization.*;
 public class Block extends ReflectionJSONObject<Block> {
     public int id;
 	public static int id_enumerator = 0;
+	public int state = 0;
 	
 	public String name = "";
 
@@ -31,21 +32,47 @@ public class Block extends ReflectionJSONObject<Block> {
     	super();
     	id = id_enumerator++;
     }
+    public boolean equals(Block b) {
+    	return b != null && b.id == this.id;
+    }
+    public void syncNeighbors() {
+		for(Block b : neighbors) {
+			boolean is_in = false;
+			for(Block b2 : b.neighbors) {
+				if( b2.id == this.id){
+					is_in = true;
+					break;
+				}
+			}
+			if( !is_in) {
+				b.neighbors.add(this);
+			}
+		}
+    	
+    }
     
     public void collectNeighbors() {
-		HashSet<Block> hashBlocks = new HashSet<Block>(); 
+		//HashSet<Block> hashBlocks = new HashSet<Block>(); 
 		neighbors = new Vector<Block>();
+		System.out.println("edges: "+edges.size());
+		System.out.print("block "+id+" neighbors: ");
 		for( Edge e : edges) {
-			Block b = e.block1 == this ? e.block2 : e.block1;
-			if( b != null) {
-				hashBlocks.add(b);
+			Block b = e.block1.id == this.id ? e.block2 : e.block1;
+			if( b != null && b.id != this.id) {
+				boolean is_in = false;
+				for(Block b2 : neighbors) {
+					if( b2.id == b.id){
+						is_in = true;
+						break;
+					}
+				}
+				if( !is_in) {
+					neighbors.add(b);
+					System.out.print(""+b.id+", ");
+				}
 			}
 		}
-		for( Block b : hashBlocks) {
-			if( b != null) {
-				neighbors.add(b);
-			}
-		}
+		System.out.println();
     }
 
     

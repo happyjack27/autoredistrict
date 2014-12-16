@@ -21,7 +21,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public ExecutorService iterateThreadPool;
 	public CountDownLatch iterateLatch;
 
-	static int num_threads = 8;
+	static int num_threads = 4;
 	
 	static public boolean evolve_paused = true;
 	public static double invert = 1;
