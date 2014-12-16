@@ -13,6 +13,7 @@ public class Block extends ReflectionJSONObject<Block> {
 
     public Vector<Edge> edges = new Vector<Edge>();
     public Vector<Block> neighbors = new Vector<Block>();
+    public double[] neighbor_lengths;
     public Vector<Demographic> demographics = new Vector<Demographic>();
 
     //double[] population;
@@ -47,6 +48,21 @@ public class Block extends ReflectionJSONObject<Block> {
 			if( !is_in) {
 				b.neighbors.add(this);
 			}
+		}
+    	
+    }
+    public void collectNeighborLengths() {
+    	neighbor_lengths = new double[neighbors.size()];
+    	for( int i = 0; i < neighbor_lengths.length; i++) {
+    		neighbor_lengths[i] = 0;
+    	}
+		for(Edge e : edges) {
+	    	for( int i = 0; i < neighbor_lengths.length; i++) {
+	    		Block b = neighbors.get(i);
+	    		if( e.block1_id == b.id || e.block2_id == b.id){
+	    			neighbor_lengths[i] += e.length;	
+	    		}
+	    	}
 		}
     	
     }

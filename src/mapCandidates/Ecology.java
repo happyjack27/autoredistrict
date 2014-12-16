@@ -16,13 +16,24 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	//settings
 	//map_population (folder)
 	//
+	static boolean multiThreadScoring = true;
+	static boolean multiThreadMating = true;
+	static boolean multiThreadMutatting = true;
+	static boolean mutate_all = false;
 	
-	public IterationThread[] iterationThreads;
-	public ExecutorService iterateThreadPool;
-	public CountDownLatch iterateLatch;
+	public ScoringThread[] scoringThreads;
+	public ExecutorService scoringThreadPool;
+	public CountDownLatch scoringLatch;
+
+	public MatingThread[] matingThreads;
+	public ExecutorService matingThreadPool;
+	public CountDownLatch matingLatch;
 
 	static int num_threads = 4;
-	
+
+    int cutoff;
+    int speciation_cutoff;
+
 	static public boolean evolve_paused = true;
 	public static double invert = 1;
 	int last_population = 0;
@@ -44,16 +55,26 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     
     class EvolveThread extends Thread {
     	public void run() {
-    		iterateThreadPool = Executors.newFixedThreadPool(num_threads);
-    		iterationThreads = new IterationThread[num_threads];
-    		for( int i = 0; i < iterationThreads.length; i++) {
-    			iterationThreads[i] = new IterationThread();
-    			iterationThreads[i].population = new Vector<DistrictMap>();
+    		for( int i = 0; i < DistrictMap.metrics.length; i++) {
+    			DistrictMap.metrics[i] = 0;
+    		}
+    		scoringThreadPool = Executors.newFixedThreadPool(num_threads);
+    		scoringThreads = new ScoringThread[num_threads];
+    		matingThreadPool = Executors.newFixedThreadPool(num_threads);
+    		matingThreads = new MatingThread[num_threads];
+    		for( int i = 0; i < matingThreads.length; i++) {
+    			matingThreads[i] = new MatingThread();
+    			matingThreads[i].id = i;
+    		}
+    		
+    		for( int i = 0; i < scoringThreads.length; i++) {
+    			scoringThreads[i] = new ScoringThread();
+    			scoringThreads[i].population = new Vector<DistrictMap>();
     		}
     		{
         		int i = 0;
         		for( DistrictMap d : population) {
-        			iterationThreads[i].population.add(d);
+        			scoringThreads[i].population.add(d);
         			i++;
         			i %= num_threads;
         		}
@@ -68,13 +89,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
             				resize_districts();
         				//}
-            	    		for( int i = 0; i < iterationThreads.length; i++) {
-            	    			iterationThreads[i] = new IterationThread();
-            	    			iterationThreads[i].population = new Vector<DistrictMap>();
+            	    		for( int i = 0; i < scoringThreads.length; i++) {
+            	    			scoringThreads[i] = new ScoringThread();
+            	    			scoringThreads[i].population = new Vector<DistrictMap>();
             	    		}
             	    		int i = 0;
             	    		for( DistrictMap d : population) {
-            	    			iterationThreads[i].population.add(d);
+            	    			scoringThreads[i].population.add(d);
             	    			i++;
             	    			i %= num_threads;
             	    		}
@@ -83,20 +104,24 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				//if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
                 			resize_population();
-            	    		for( int i = 0; i < iterationThreads.length; i++) {
-            	    			iterationThreads[i] = new IterationThread();
-            	    			iterationThreads[i].population = new Vector<DistrictMap>();
+            	    		for( int i = 0; i < scoringThreads.length; i++) {
+            	    			scoringThreads[i] = new ScoringThread();
+            	    			scoringThreads[i].population = new Vector<DistrictMap>();
             	    		}
             	    		int i = 0;
             	    		for( DistrictMap d : population) {
-            	    			iterationThreads[i].population.add(d);
+            	    			scoringThreads[i].population.add(d);
             	    			i++;
             	    			i %= num_threads;
             	    		}
         				//}
         			}
         			evolveWithSpeciation(); 
-        			System.out.print(".");
+        			System.out.print("time metrics: ");
+        			for( int i = 0; i < DistrictMap.metrics.length; i++) {
+        				System.out.print(DistrictMap.metrics[i]+", ");
+        			}
+        			System.out.println();
         			
         			if( mapPanel != null) {
         				mapPanel.invalidate();
@@ -238,7 +263,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         }
         last_num_districts = Settings.num_districts;
     }
-    class IterationThread implements Runnable {
+    
+    class ScoringThread implements Runnable {
     	Vector<DistrictMap> population = new Vector<DistrictMap>();
     	public void run() {
             for( DistrictMap map : population) {
@@ -246,32 +272,31 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 map.calcFairnessScores(Settings.trials);
             }
             System.out.print("o");
-    		iterateLatch.countDown();
+    		scoringLatch.countDown();
     		
     	}
     }
-
     public void evolveWithSpeciation() {
-        int cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
-        int speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
+        cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
+        speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
         System.out.println("evolving {");
 
         
         System.out.print("  calculating fairness");
-        if( false) {
-        for( DistrictMap map : population) {
-        	System.out.print(".");
-            map.calcFairnessScores(Settings.trials);
-        }
+        if( !multiThreadScoring) { //single threaded
+            for( DistrictMap map : population) {
+            	System.out.print(".");
+                map.calcFairnessScores(Settings.trials);
+            }
         } else {
 		//System.out.print(""+step);
-    		iterateLatch = new CountDownLatch(num_threads);
-    		for( int j = 0; j < iterationThreads.length; j++) {
-    			iterateThreadPool.execute(iterationThreads[j]);
+    		scoringLatch = new CountDownLatch(num_threads);
+    		for( int j = 0; j < scoringThreads.length; j++) {
+    			scoringThreadPool.execute(scoringThreads[j]);
     			//iterationThreads[j].start();
     		}
     		try {
-    			iterateLatch.await();
+    			scoringLatch.await();
     		} catch (InterruptedException e) {
     			System.out.println("ex");
     			// TODO Auto-generated catch block
@@ -318,6 +343,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         System.out.println("  sorting population...");
 
         Collections.sort(population);
+        System.out.print("  top score:");
+        DistrictMap top = population.get(0);
+		for( int i = 0; i < top.fairnessScores.length; i++) {
+			System.out.print(top.fairnessScores[i]+", ");
+		}
+		System.out.println();
+
 
         Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
         for(int i = 0; i < cutoff; i++) {
@@ -325,22 +357,46 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         }
 
         System.out.println("  selecting mates... (cutoff: "+cutoff+"  spec_cutoff: "+speciation_cutoff+")");
-        for(int i = cutoff; i < population.size(); i++) {
-            int g1 = (int)(Math.random()*(double)cutoff);
-            DistrictMap map1 = available_mate.get(g1);
-            for(DistrictMap m : available_mate) {
-                m.makeLike(map1.getGenome());
-                m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
-            }
-            Collections.sort(available_mate);
-            int g2 = (int)(Math.random()*(double)speciation_cutoff);
-            DistrictMap map2 = available_mate.get(g2);
+        if( !multiThreadMating) {
+            for(int i = cutoff; i < population.size(); i++) {
+                int g1 = (int)(Math.random()*(double)cutoff);
+                DistrictMap map1 = available_mate.get(g1);
+                if( speciation_cutoff != cutoff) {
+                    for(DistrictMap m : available_mate) {
+                        m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                    }
+                    Collections.sort(available_mate);
+                }
+                int g2 = (int)(Math.random()*(double)speciation_cutoff);
+                DistrictMap map2 = available_mate.get(g2);
 
-            population.get(i).crossover(map1.getGenome(), map2.getGenome());
+                population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+            }
+        } else {
+		//System.out.print(""+step);
+    		for( int j = 0; j < matingThreads.length; j++) {
+    			matingThreads[j].available_mate.clear();
+    	        for(int i = 0; i < cutoff; i++) {
+    	        	matingThreads[j].available_mate.add(population.get(i));
+    	        }
+    		}
+    		matingLatch = new CountDownLatch(num_threads);
+    		for( int i = 0; i < matingThreads.length; i++) {
+    			matingThreadPool.execute(matingThreads[i]);
+    			//iterationThreads[j].start();
+    		}
+    		try {
+    			matingLatch.await();
+    		} catch (InterruptedException e) {
+    			System.out.println("ex");
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        	
         }
 
         System.out.println("  applying mutation...");
-        for(int i = 0; i < population.size(); i++) {
+        for(int i = mutate_all ? 0 : cutoff; i < population.size(); i++) {
             DistrictMap dm = population.get(i); 
             dm.mutate(Settings.mutation_rate);
             dm.mutate_boundary(Settings.mutation_rate);
@@ -348,6 +404,38 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         }
         System.out.println("}");
     }
+    
+    class MatingThread implements Runnable {
+    	public int id = 0;
+    	public Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
+    	public void run() {
+            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
+                int g1 = (int)(Math.random()*(double)cutoff);
+                DistrictMap map1 = available_mate.get(g1);
+                if( speciation_cutoff != cutoff) {
+                    for(DistrictMap m : available_mate) {
+                        //m.makeLike(map1.getGenome());
+                        m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                    }
+                    try {
+                    	Collections.sort(available_mate);
+                    } catch (Exception ex) {
+                    	ex.printStackTrace();
+                    }
+                }
+                int g2 = (int)(Math.random()*(double)speciation_cutoff);
+                DistrictMap map2 = available_mate.get(g2);
+
+                population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+            }
+
+            //System.out.print("o");
+    		matingLatch.countDown();
+    		
+    	}
+    }
+
+
 
 
     public void evolve() {

@@ -106,6 +106,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.block.syncNeighbors();
 		}
+		for( Feature f : features) {
+			f.block.collectNeighborLengths();
+		}
+		
 		/*
 		for( Feature f : features) {
 			f.block.edges = new Vector<Edge>();
@@ -127,7 +131,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			for( Edge e : f.block.edges) {
 				e.setLength();
 			}
-		}		
+		}
+		for( Feature f : features) {
+			f.block.collectNeighborLengths();
+		}
+
 	}
 	void collectEdges() {
 		edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();

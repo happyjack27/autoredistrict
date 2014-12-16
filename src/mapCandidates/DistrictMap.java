@@ -14,6 +14,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double[] fairnessScores = new double[5];
     public double fitness_score = 0;
     
+    public static double[] metrics = new double[6];
+    
 	
 
     //makeLike
@@ -159,7 +161,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		d.blocks = new Vector<Block>();
     	}
     	for( int i = 0; i < block_districts.length; i++) {
-    		districts.get(block_districts[i]).blocks.add(blocks.get(i));
+    		int district = block_districts[i];
+    		if( district >= districts.size());
+    		districts.add(new District());
+    		districts.get(district).blocks.add(blocks.get(i));
     	}
     }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
@@ -276,58 +281,68 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //all measures should be minimized.
     public void calcFairnessScores(int trials) {
     	
+    	long time0 = System.currentTimeMillis();    	
     	//===fairness score: compactness
         double length = getEdgeLength();
         
+    	long time1 = System.currentTimeMillis();
     	//===fairness score: population balance
         double total_population = 0;
         double[] dist_pops = new double[districts.size()];
         double[] dist_pop_frac = new double[districts.size()];
-
-        for(int i = 0; i < districts.size(); i++) {
-            District district = districts.get(i);
-            district.resetWins();
-            dist_pops[i] = district.getPopulation();
-            total_population += dist_pops[i];
-        }
-        for(int i = 0; i < districts.size(); i++) {
-            dist_pop_frac[i] =  dist_pops[i] / total_population;
-        }
-
-        double exp_population = total_population/districts.size();
         double[] perfect_dists = new double[districts.size()];
-        for( int i = 0; i < perfect_dists.length; i++)
-            perfect_dists[i] = exp_population;
+        if( Settings.population_balance_weight > 0) {
+            for(int i = 0; i < districts.size(); i++) {
+                District district = districts.get(i);
+                district.resetWins();
+                dist_pops[i] = district.getPopulation();
+                total_population += dist_pops[i];
+            }
+            for(int i = 0; i < districts.size(); i++) {
+                dist_pop_frac[i] =  dist_pops[i] / total_population;
+            }
 
-    	//===fairness score: proportional representation
+            double exp_population = total_population/districts.size();
+            for( int i = 0; i < perfect_dists.length; i++)
+                perfect_dists[i] = exp_population;
+        }
+
+    	long time2 = System.currentTimeMillis();
         double[] p = new double[Candidate.candidates.size()];
         double[] q = new double[Candidate.candidates.size()];
-        for( int i = 0; i < trials; i++) {
-            double[][] results = getRandomResultSample();
-            for( int j = 0; j < Candidate.candidates.size(); j++) {
-                p[j] += results[0][j];
-                q[j] += results[1][j];
+    	if( Settings.disenfranchise_weight > 0) {
+        	//===fairness score: proportional representation
+            for( int i = 0; i < trials; i++) {
+                double[][] results = getRandomResultSample();
+                for( int j = 0; j < Candidate.candidates.size(); j++) {
+                    p[j] += results[0][j];
+                    q[j] += results[1][j];
+                }
             }
-        }
+    	}
 
+    	long time3 = System.currentTimeMillis();
     	//===fairness score: power fairness
         double[] voting_power = new double[districts.size()];
         double total_voting_power = 0;
-        for(int i = 0; i < districts.size(); i++) {
-            District district = districts.get(i);
-            voting_power[i] = district.getSelfEntropy();
-            total_voting_power += voting_power[i];
-        }
-
-        for(int i = 0; i < districts.size(); i++) {
-            voting_power[i] /= total_voting_power;
-        }
-
         double power_fairness = 0; //1 = perfect fairness
-        for(int i = 0; i < districts.size(); i++) {
-            power_fairness += dist_pop_frac[i]*voting_power[i];
+        if( Settings.voting_power_balance_weight > 0) {
+            for(int i = 0; i < districts.size(); i++) {
+                District district = districts.get(i);
+                voting_power[i] = district.getSelfEntropy();
+                total_voting_power += voting_power[i];
+            }
+
+            for(int i = 0; i < districts.size(); i++) {
+                voting_power[i] /= total_voting_power;
+            }
+
+            for(int i = 0; i < districts.size(); i++) {
+                power_fairness += dist_pop_frac[i]*voting_power[i];
+            }
         }
 
+    	long time4 = System.currentTimeMillis();
     	//===fairness score: connectedness
         double disconnected_pops = 0;
         if( Settings.disconnected_population_weight > 0) {
@@ -336,7 +351,17 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         disconnected_pops /= total_population;
         
+    	long time5 = System.currentTimeMillis();
+
+        
         fairnessScores = new double[]{length,Math.exp(getKLDiv(p,q)),Math.exp(getKLDiv(perfect_dists,dist_pops)),disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
+    	long time6 = System.currentTimeMillis();
+    	metrics[0] += time1-time0;
+    	metrics[1] += time2-time1;
+    	metrics[2] += time3-time2;
+    	metrics[3] += time4-time3;
+    	metrics[4] += time5-time4;
+    	metrics[5] += time6-time5;
     }
 
     public int compareTo(DistrictMap o) {
@@ -345,9 +370,23 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     double getEdgeLength() {
         double length = 0;
+        for( Block b : blocks) {
+        	int d1 = block_districts[b.id];
+        	for( int i = 0; i < b.neighbor_lengths.length; i++) {
+        		int b2id = b.neighbors.get(i).id;
+            	int d2 = block_districts[b2id];
+            	if( d1 != d2) {
+            		length += b.neighbor_lengths[i];
+            	}
+        	}
+        	
+        	
+        }
+        /*
         Vector<Edge> outerEdges = getOuterEdges(block_districts);
         for( Edge edge : outerEdges)
             length += edge.length;
+        */
         return length;
     }
     Vector<Edge> getOuterEdges(int[] block_districts) {
