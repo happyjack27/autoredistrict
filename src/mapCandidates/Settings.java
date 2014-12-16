@@ -3,6 +3,11 @@ package mapCandidates;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
+	public static boolean multiThreadScoring = true;
+	public static boolean multiThreadMating = true;
+	public static boolean multiThreadMutatting = true;
+	public static boolean mutate_all = false;
+
     public static boolean mutate_to_neighbor_only = false;
     public static double species_fraction = 0.25;
 
@@ -22,6 +27,11 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static int trials = 1;
     public static int population;
     public static int num_districts = 3;
+	//geometry
+	//demographics
+	//settings
+	//map_population (folder)
+	//
     
     /*
 	@Override

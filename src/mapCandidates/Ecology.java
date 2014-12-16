@@ -11,15 +11,8 @@ import serialization.*;
 import ui.MapPanel;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
-	//geometry
-	//demographics
-	//settings
-	//map_population (folder)
-	//
-	static boolean multiThreadScoring = true;
-	static boolean multiThreadMating = true;
-	static boolean multiThreadMutatting = true;
-	static boolean mutate_all = false;
+	
+	static int verbosity = 1;
 	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
@@ -268,24 +261,34 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	Vector<DistrictMap> population = new Vector<DistrictMap>();
     	public void run() {
             for( DistrictMap map : population) {
-            	System.out.print(".");
+            	//System.out.print(".");
                 map.calcFairnessScores(Settings.trials);
             }
-            System.out.print("o");
+            //System.out.print(".");
     		scoringLatch.countDown();
     		
     	}
     }
+    int step = 0;
     public void evolveWithSpeciation() {
         cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
         speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
-        System.out.println("evolving {");
+        if( verbosity > 1) {
+        	System.out.println("evolving {");
+        } else if (verbosity == 1) {
+        	System.out.print(".");
+        	step++;
+        	if( step % 100 == 0) {
+        		System.out.println();
+        	}
+        }
 
         
-        System.out.print("  calculating fairness");
-        if( !multiThreadScoring) { //single threaded
+        if( verbosity > 1)
+        	System.out.print("  calculating fairness");
+        if( !Settings.multiThreadScoring) { //single threaded
             for( DistrictMap map : population) {
-            	System.out.print(".");
+            	//System.out.print(".");
                 map.calcFairnessScores(Settings.trials);
             }
         } else {
@@ -304,9 +307,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		}
         }
         
-    	System.out.println("");
+        if( verbosity > 1)
+        	System.out.println("");
     	
-        System.out.println("  renormalizing fairness...");
+        if( verbosity > 1)
+        	System.out.println("  renormalizing fairness...");
         for( int i = 0; i < 5; i++) {
             for( DistrictMap map : population) {
                 map.fitness_score = map.fairnessScores[i];
@@ -319,7 +324,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             }
         }
 
-        System.out.println("  weighing fairness...");
+        if( verbosity > 1)
+        	System.out.println("  weighing fairness...");
 
         double[] weights = new double[]{
         		Settings.geometry_weight, 
@@ -340,7 +346,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             }
         }
 
-        System.out.println("  sorting population...");
+        if( verbosity > 1)
+        	System.out.println("  sorting population...");
 
         Collections.sort(population);
         System.out.print("  top score:");
@@ -356,8 +363,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             available_mate.add(population.get(i));
         }
 
-        System.out.println("  selecting mates... (cutoff: "+cutoff+"  spec_cutoff: "+speciation_cutoff+")");
-        if( !multiThreadMating) {
+        if( verbosity > 1)
+        	System.out.println("  selecting mates... (cutoff: "+cutoff+"  spec_cutoff: "+speciation_cutoff+")");
+        if( !Settings.multiThreadMating || cutoff != speciation_cutoff) {
             for(int i = cutoff; i < population.size(); i++) {
                 int g1 = (int)(Math.random()*(double)cutoff);
                 DistrictMap map1 = available_mate.get(g1);
@@ -395,14 +403,16 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	
         }
 
-        System.out.println("  applying mutation...");
-        for(int i = mutate_all ? 0 : cutoff; i < population.size(); i++) {
+        if( verbosity > 1)
+        	System.out.println("  applying mutation...");
+        for(int i = Settings.mutate_all ? 0 : cutoff; i < population.size(); i++) {
             DistrictMap dm = population.get(i); 
             dm.mutate(Settings.mutation_rate);
             dm.mutate_boundary(Settings.mutation_rate);
             dm.fillDistrictBlocks();
         }
-        System.out.println("}");
+        if( verbosity > 1)
+        	System.out.println("}");
     }
     
     class MatingThread implements Runnable {

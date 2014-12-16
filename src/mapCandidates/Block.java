@@ -70,8 +70,8 @@ public class Block extends ReflectionJSONObject<Block> {
     public void collectNeighbors() {
 		//HashSet<Block> hashBlocks = new HashSet<Block>(); 
 		neighbors = new Vector<Block>();
-		System.out.println("edges: "+edges.size());
-		System.out.print("block "+id+" neighbors: ");
+		//System.out.println("edges: "+edges.size());
+		//System.out.print("block "+id+" neighbors: ");
 		for( Edge e : edges) {
 			Block b = e.block1.id == this.id ? e.block2 : e.block1;
 			if( b != null && b.id != this.id) {
@@ -84,11 +84,11 @@ public class Block extends ReflectionJSONObject<Block> {
 				}
 				if( !is_in) {
 					neighbors.add(b);
-					System.out.print(""+b.id+", ");
+					//System.out.print(""+b.id+", ");
 				}
 			}
 		}
-		System.out.println();
+		//System.out.println();
     }
 
     

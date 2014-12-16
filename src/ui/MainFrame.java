@@ -23,6 +23,10 @@ public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
 	boolean use_sample = true;
 	
+	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
+	JCheckBoxMenuItem chckbxmntmSingleThreadScoring = new JCheckBoxMenuItem("Single thread scoring");
+	JCheckBoxMenuItem chckbxmntmSingleThreadMating = new JCheckBoxMenuItem("Single thread mating");
+
 	JCheckBoxMenuItem chckbxmntmInvert = new JCheckBoxMenuItem("Invert");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
@@ -417,6 +421,27 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnEvolution.add(chckbxmntmInvert);
+		
+		chckbxmntmMutateAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_all = chckbxmntmMutateAll.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateAll);
+		
+		chckbxmntmSingleThreadScoring.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.multiThreadScoring = !chckbxmntmSingleThreadScoring.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmSingleThreadScoring);
+		
+		chckbxmntmSingleThreadMating.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.multiThreadMating = !chckbxmntmSingleThreadMating.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmSingleThreadMating);
 		
 		JSeparator separator = new JSeparator();
 		mnEvolution.add(separator);
