@@ -622,7 +622,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		textField.setText("256");
+		textField.setText("64");
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");
@@ -647,7 +647,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		textField_1.setText("8");
+		textField_1.setText("1");
 		textField_1.setColumns(10);
 		
 		JLabel lblTrials = new JLabel("Trials");
@@ -756,6 +756,9 @@ public class MainFrame extends JFrame {
 		Settings.disconnected_population_weight = slider_4.getValue()/100.0;
 		Settings.geometry_weight = slider_3.getValue()/100.0;
 		Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
+		
+		chckbxmntmMutateAll.setSelected(true);
+		Settings.mutate_all = true;
 
 		splitPane.setRightComponent(mapPanel);
 	}

@@ -308,7 +308,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//===fairness score: population balance
         double total_population = 0;
         //System.out.println("districts size " +districts.size());
-        if( dist_pops == null) {
+        if( dist_pops == null || dist_pops.length != districts.size()) {
             dist_pops = new double[districts.size()];
             dist_pop_frac = new double[districts.size()];
             perfect_dists = new double[districts.size()];
