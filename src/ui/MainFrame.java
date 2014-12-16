@@ -22,6 +22,7 @@ import javax.swing.border.*;
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
 	boolean use_sample = true;
+	double mutation_rate_multiplier = 0.1;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmSingleThreadScoring = new JCheckBoxMenuItem("Single thread scoring");
@@ -697,12 +698,12 @@ public class MainFrame extends JFrame {
 		panel.add(lblNumOfDistricts);
 		slider_2.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_rate = slider_2.getValue()/100.0;
+				Settings.mutation_rate = mutation_rate_multiplier*slider_2.getValue()/100.0;
 			}
 		});
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = slider_1.getValue()/100.0;
+				Settings.mutation_boundary_rate = mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
 		
@@ -746,8 +747,8 @@ public class MainFrame extends JFrame {
 		panel_3.add(slider_8);
 
 		
-		Settings.mutation_rate = slider_2.getValue()/100.0;
-		Settings.mutation_boundary_rate = slider_1.getValue()/100.0;
+		Settings.mutation_rate = mutation_rate_multiplier*slider_2.getValue()/100.0;
+		Settings.mutation_boundary_rate = mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.replace_fraction = slider.getValue()/100.0;
 		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
 		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
