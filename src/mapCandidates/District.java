@@ -104,10 +104,10 @@ class District extends JSONObject {
         return high;
     }
     Vector<Vector<Block>> getRegions(int[] block_districts) {
-        Hashtable<Block,Vector<Block>> region_hash = new Hashtable<Block,Vector<Block>>();
+        Hashtable<Integer,Vector<Block>> region_hash = new Hashtable<Integer,Vector<Block>>();
         Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
         for( Block block : blocks) {
-            if( region_hash.get(block) != null)
+            if( region_hash.get(block.id) != null)
                 continue;
             Vector<Block> region = new Vector<Block>();
             regions.add(region);
@@ -116,11 +116,11 @@ class District extends JSONObject {
         return regions;
     }
     //recursively insert connected blocks.
-    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Block,Vector<Block>> region_hash, int[] block_districts) {
-        if( region_hash.get(block) != null)
+    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Integer,Vector<Block>> region_hash, int[] block_districts) {
+        if( region_hash.get(block.id) != null)
             return;
         region.add(block);
-        region_hash.put(block,region);
+        region_hash.put(block.id,region);
         for( Block other_block : block.neighbors) {
         	if( block_districts[other_block.id] == block_districts[block.id]) {
         		addAllConnected( other_block, region, region_hash, block_districts);

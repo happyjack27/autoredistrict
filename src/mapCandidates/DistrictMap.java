@@ -376,8 +376,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//===fairness score: connectedness
         double disconnected_pops = 0;
         if( Settings.disconnected_population_weight > 0) {
-            for(District district : districts)
-                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
+            for(District district : districts) {
+            	int count = district.getRegionCount(block_districts);
+            	//System.out.println("region count: "+count);
+            	disconnected_pops += count;
+                //disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
+            }
         }
         disconnected_pops /= total_population;
         

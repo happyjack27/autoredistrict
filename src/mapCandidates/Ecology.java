@@ -406,9 +406,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("  applying mutation...");
         for(int i = Settings.mutate_all ? 0 : cutoff; i < population.size(); i++) {
-            DistrictMap dm = population.get(i); 
-            dm.mutate(Settings.mutation_rate);
-            dm.mutate_boundary(Settings.mutation_rate);
+            DistrictMap dm = population.get(i);
+            if(Settings.mutation_rate > 0)
+            	dm.mutate(Settings.mutation_rate);
+            if(Settings.mutation_boundary_rate > 0)
+            	dm.mutate_boundary(Settings.mutation_boundary_rate);
             dm.fillDistrictBlocks();
         }
         if( verbosity > 1)
