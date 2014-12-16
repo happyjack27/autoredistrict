@@ -75,6 +75,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
     		while( !evolve_paused) {
     			try {
+<<<<<<< HEAD
     				//System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
     				//System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);
         			if( last_num_districts != Settings.num_districts) {
@@ -117,6 +118,18 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             			}
             			System.out.println();
         			}
+=======
+        			if( last_num_districts != Settings.num_districts) {
+        				System.out.println("Adjusting district count from "+last_num_districts+" to "+Settings.num_districts+"...");
+        				resize_districts();
+        			}
+        			if( population.size() != Settings.population) {
+        				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
+            			resize_population();
+        			}
+        			evolve(); 
+        			System.out.print(".");
+>>>>>>> refs/remotes/origin/master
         			
         			if( mapPanel != null) {
         				mapPanel.invalidate();

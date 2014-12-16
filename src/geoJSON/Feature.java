@@ -89,17 +89,27 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
+<<<<<<< HEAD
 		if( geometry.fillColor != null || block.state != 0) {
 			g.setColor(geometry.fillColor);
 			if( block.state == 1) {
 				g.setColor(Color.blue);
+=======
+		if( geometry.fillColor != null) {
+			g.setColor(geometry.fillColor);
+			for( int i = 0; i < geometry.polygons.length; i++) {
+				g.fillPolygon(geometry.polygons[i]);
+>>>>>>> refs/remotes/origin/master
 			}
+<<<<<<< HEAD
 			if( block.state == 2) {
 				g.setColor(Color.white);
 			}
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				g.fillPolygon(geometry.polygons[i]);
 			}
+=======
+>>>>>>> refs/remotes/origin/master
 		}
 		if( geometry.outlineColor != null) {
 			g.setColor(geometry.outlineColor);
