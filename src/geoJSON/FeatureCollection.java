@@ -20,14 +20,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Block> blocks;
 	public HashMap<String,Block> precinctHash;
 	public Ecology ecology = new Ecology();
-<<<<<<< HEAD
-	
 	double snap_to_grid_resolution = 10000.0;
-=======
->>>>>>> refs/remotes/origin/master
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
-<<<<<<< HEAD
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 	
 	public void draw(Graphics g) {
@@ -54,28 +49,6 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 							geo.fillColor = c[color];
 						}
 					} catch (Exception ex) {}
-=======
-	HashMap<Vertex,HashMap<Vertex,Edge>> edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
-	
-	public void draw(Graphics g) {
-		if( features == null) {
-			return;
-		}
-		if( ecology.population != null && ecology.population.size() > 0) {
-			DistrictMap dm  = ecology.population.get(0);
-			if( dm.block_districts != null) {
-				Color[] c = new Color[Settings.num_districts];
-				float hue_inc = (float)(1.0/(double)Settings.num_districts);
-				float hue = 0;
-				for( int i = 0; i < c.length; i++) {
-					c[i] = Color.getHSBColor(hue, (float)1.0, (float)0.66);
-					hue += hue_inc;
-				}
-				for( int i = 0; i < features.size(); i++) {
-					Block b = features.get(i).block;
-					Geometry geo = features.get(i).geometry;
-					geo.fillColor = c[dm.block_districts[b.id]];
->>>>>>> refs/remotes/origin/master
 					
 				}
 			}

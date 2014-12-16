@@ -53,33 +53,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         boolean[] allow = new boolean[districts.size()];
         for( int i = 0; i < block_districts.length; i++) {
             if( Math.random() < prob) {
-<<<<<<< HEAD
             	try {
                     for( int j = 0; j < allow.length; j++) {
                         allow[j] = false;
-=======
-                for( int j = 0; j < allow.length; j++) {
-                    allow[j] = false;
-                }
-                allow[block_districts[i]] = true;
-                Block block = blocks.get(i);
-                for( Block other_block : block.neighbors) {
-                    allow[block_districts[other_block.id]] = true;
-                }
-                double count = 0;
-                for( int j = 0; j < allow.length; j++) {
-                    if( allow[j])
-                        count++;
-                }
-                int d = (int)Math.floor(Math.random()*count); 
-                for( int j = 0; j < allow.length; j++) {
-                    if( allow[j]) {
-                        if( d == 0) {
-                            block_districts[i] = j;
-                            break;
-                        }
-                        d--;
->>>>>>> refs/remotes/origin/master
                     }
                     allow[block_districts[i]] = true;
                     Block block = blocks.get(i);
@@ -359,7 +335,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 dist_pop_frac[i] =  dist_pops[i] * rtotpop;
             }
 
-<<<<<<< HEAD
             double exp_population = total_population/districts.size();
             for( int i = 0; i < perfect_dists.length; i++)
                 perfect_dists[i] = exp_population;
@@ -398,16 +373,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
             for(int i = 0; i < districts.size(); i++) {
                 power_fairness += dist_pop_frac[i]*voting_power[i];
-=======
-        //simulate trials elections and accumulate the results
-        double[] p = new double[Candidate.candidates.size()];
-        double[] q = new double[Candidate.candidates.size()];
-        for( int i = 0; i < trials; i++) {
-            double[][] results = getRandomResultSample();
-            for( int j = 0; j < Candidate.candidates.size(); j++) {
-                p[j] += results[0][j];
-                q[j] += results[1][j];
->>>>>>> refs/remotes/origin/master
             }
         }
 

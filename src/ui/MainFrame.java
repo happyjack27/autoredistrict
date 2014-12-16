@@ -334,7 +334,6 @@ public class MainFrame extends JFrame {
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-<<<<<<< HEAD
 					File f;
 					if( use_sample) {
 						f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
@@ -346,11 +345,6 @@ public class MainFrame extends JFrame {
 					if( f == null) {
 						return;
 					}
-=======
-					JFileChooser jfc = new JFileChooser();
-					jfc.showOpenDialog(null);
-					File f = jfc.getSelectedFile();
->>>>>>> refs/remotes/origin/master
 					StringBuffer sb = new StringBuffer();
 					try {
 						FileInputStream fis = new FileInputStream(f);
@@ -456,11 +450,8 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-<<<<<<< HEAD
 				Settings.population = Integer.parseInt(textField.getText());
 				Settings.num_districts = Integer.parseInt(textField_2.getText());
-=======
->>>>>>> refs/remotes/origin/master
 				featureCollection.ecology.startEvolving();
 			}
 		});

@@ -38,7 +38,6 @@ public class MapPanel extends JPanel implements MouseListener {
         	featureCollection.draw(g);
         }
     }
-<<<<<<< HEAD
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
@@ -111,6 +110,4 @@ public class MapPanel extends JPanel implements MouseListener {
 		// TODO Auto-generated method stub
 		
 	}
-=======
->>>>>>> refs/remotes/origin/master
 }
