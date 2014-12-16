@@ -53,31 +53,35 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         boolean[] allow = new boolean[districts.size()];
         for( int i = 0; i < block_districts.length; i++) {
             if( Math.random() < prob) {
-                for( int j = 0; j < allow.length; j++) {
-                    allow[j] = false;
-                }
-                allow[block_districts[i]] = true;
-                Block block = blocks.get(i);
-                for( Block other_block : block.neighbors) {
-                	if( block_districts[other_block.id] < allow.length) {
-                        allow[block_districts[other_block.id]] = true;
-                	}
-                }
-                double count = 0;
-                for( int j = 0; j < allow.length; j++) {
-                    if( allow[j])
-                        count++;
-                }
-                int d = (int)Math.floor(Math.random()*count); 
-                for( int j = 0; j < allow.length; j++) {
-                    if( allow[j]) {
-                        if( d == 0) {
-                            block_districts[i] = j;
-                            break;
-                        }
-                        d--;
+            	try {
+                    for( int j = 0; j < allow.length; j++) {
+                        allow[j] = false;
                     }
-                }
+                    allow[block_districts[i]] = true;
+                    Block block = blocks.get(i);
+                    for( Block other_block : block.neighbors) {
+                    	if( block_districts[other_block.id] < allow.length) {
+                            allow[block_districts[other_block.id]] = true;
+                    	}
+                    }
+                    double count = 0;
+                    for( int j = 0; j < allow.length; j++) {
+                        if( allow[j])
+                            count++;
+                    }
+                    int d = (int)Math.floor(Math.random()*count); 
+                    for( int j = 0; j < allow.length; j++) {
+                        if( allow[j]) {
+                            if( d == 0) {
+                                block_districts[i] = j;
+                                break;
+                            }
+                            d--;
+                        }
+                    }
+            	} catch (Exception ex) {
+            		ex.printStackTrace();
+            	}
             }
         }
     }

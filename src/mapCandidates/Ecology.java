@@ -12,7 +12,7 @@ import ui.MapPanel;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
-	static int verbosity = 1;
+	static int verbosity = 0;
 	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
@@ -110,11 +110,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				//}
         			}
         			evolveWithSpeciation(); 
-        			System.out.print("time metrics: ");
-        			for( int i = 0; i < DistrictMap.metrics.length; i++) {
-        				System.out.print(DistrictMap.metrics[i]+", ");
+        			if( verbosity > 0) {
+            			System.out.print("time metrics: ");
+            			for( int i = 0; i < DistrictMap.metrics.length; i++) {
+            				System.out.print(DistrictMap.metrics[i]+", ");
+            			}
+            			System.out.println();
         			}
-        			System.out.println();
         			
         			if( mapPanel != null) {
         				mapPanel.invalidate();
@@ -350,12 +352,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	System.out.println("  sorting population...");
 
         Collections.sort(population);
-        System.out.print("  top score:");
-        DistrictMap top = population.get(0);
-		for( int i = 0; i < top.fairnessScores.length; i++) {
-			System.out.print(top.fairnessScores[i]+", ");
+
+        if( verbosity > 0) {
+	        System.out.print("  top score:");
+	        DistrictMap top = population.get(0);
+			for( int i = 0; i < top.fairnessScores.length; i++) {
+				System.out.print(top.fairnessScores[i]+", ");
+			}
+			System.out.println();
 		}
-		System.out.println();
 
 
         Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
