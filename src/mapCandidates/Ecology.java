@@ -13,6 +13,7 @@ import ui.MapPanel;
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	static int verbosity = 0;
+	static boolean mate_merge = false;
 	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
@@ -377,14 +378,23 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 DistrictMap map1 = available_mate.get(g1);
                 if( speciation_cutoff != cutoff) {
                     for(DistrictMap m : available_mate) {
-                        m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                        if( mate_merge) {
+                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                        } else {
+                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+                        }
+                    	
                     }
                     Collections.sort(available_mate);
                 }
                 int g2 = (int)(Math.random()*(double)speciation_cutoff);
                 DistrictMap map2 = available_mate.get(g2);
 
-                population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+                if( mate_merge) {
+                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+                } else {
+                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
+                }
             }
         } else {
 		//System.out.print(""+step);
@@ -433,7 +443,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 if( speciation_cutoff != cutoff) {
                     for(DistrictMap m : available_mate) {
                         //m.makeLike(map1.getGenome());
-                        m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                        if( mate_merge) {
+                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+                        } else {
+                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+                        }
                     }
                     try {
                     	Collections.sort(available_mate);
@@ -444,7 +458,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 int g2 = (int)(Math.random()*(double)speciation_cutoff);
                 DistrictMap map2 = available_mate.get(g2);
 
-                population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+                if( mate_merge) {
+                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+                } else {
+                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
+                }
             }
 
             //System.out.print("o");
@@ -511,7 +529,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             int g1 = (int)(Math.random()*(double)cutoff);
             int g2 = (int)(Math.random()*(double)cutoff);
             DistrictMap dm = population.get(i); 
-            dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
+            if( mate_merge) {
+            	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
+            } else {
+            	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome());
+            }
             //dm.mutate(Settings.mutation_rate);
             //dm.mutate_boundary(Settings.mutation_rate);
             //dm.fillDistrictBlocks();
