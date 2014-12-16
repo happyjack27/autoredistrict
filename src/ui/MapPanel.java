@@ -51,7 +51,6 @@ public class MapPanel extends JPanel implements MouseListener {
 		// TODO Auto-generated method stub
 		
 	}
-
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
