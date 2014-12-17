@@ -15,20 +15,11 @@ public class Block extends ReflectionJSONObject<Block> {
     public Vector<Block> neighbors = new Vector<Block>();
     public double[] neighbor_lengths;
     public Vector<Demographic> demographics = new Vector<Demographic>();
+    
+    
+	public static int num_outcomes = 128; 
+    double[][] outcomes;
 
-    //double[] population;
-    //double[] prob_turnout;
-    //double[][] prob_vote = null;//new double[DistrictMap.candidates.size()];
-    double[] vote_cache = null;
-    double[][] vote_caches = null;
-    
-    static boolean use_vote_caches = true; 
-    static boolean use_vote_cache = true;
-    static int cache_reuse_times = 16;
-    static int vote_cache_size = 128;
-    
-    int cache_reused = 0;
-    
     public Block() {
     	super();
     	id = id_enumerator++;
@@ -113,29 +104,54 @@ public class Block extends ReflectionJSONObject<Block> {
 	}
 	
     double[] getVotes() {
-    	generateVotes();
-    	return vote_cache;
+    	return generateVotes();
+    }
+    double[] getOutcome() {
+    	if( outcomes == null) {
+    		generateOutComes();
+    	}
+    	int i = (int)Math.floor(Math.random()*(double)outcomes.length);
+    	return outcomes[i];
+    }
+    
+    public void generateOutComes() {
+    	outcomes = new double[num_outcomes][];
     	
-    	/*
-        if( use_vote_caches) {
-            if( vote_caches == null) {
-                vote_caches = new double[vote_cache_size][];
-                for( int i = 0; i < vote_caches.length; i++) {
-                    generateVotes();
-                    vote_caches[i] = vote_cache;
-                }
-            }
-            return vote_caches[(int)(Math.random()*(double)vote_caches.length)];
-        } else if( vote_cache == null || cache_reused >= cache_reuse_times) {
-            generateVotes();
-            cache_reuse_times = 0;
+        //aggregate and normalize voting probs
+    	double[] probs = new double[Candidate.candidates.size()];
+        for(int i = 0; i < probs.length; i++) {
+        	probs[i] = 0;
         }
-        cache_reuse_times++;
-        return vote_cache;
-        */
+        for( Demographic d : demographics) {
+            for( int j = 0; j < d.vote_prob.length; j++) {
+            	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
+            }
+        }
+        double total_population = 0;
+        for(int i = 0; i < probs.length; i++) {
+        	total_population += probs[i];
+        }
+        double r_tot_prob  = 1.0/total_population;
+        for(int i = 0; i < probs.length; i++) {
+        	probs[i] *= r_tot_prob;
+        }
+
+    	for( int i = 0; i < outcomes.length; i++) {
+    		outcomes[i] = new double[probs.length];
+            for(int j = 0; j < total_population; j++) {
+                double p = Math.random();
+                for( int k = 0; k < probs.length; k++) {
+                    p -=  probs[k];
+                    if( p <= 0) {
+                    	outcomes[i][k]++;
+                        break;
+                    }
+                }
+    		}
+    	}
     }
 
-    void generateVotes() {
+    double[] generateVotes() {
         double[] votes = new double[Candidate.candidates.size()];
         for(int i = 0; i < votes.length; i++) {
             votes[i] = 0;
@@ -183,7 +199,7 @@ public class Block extends ReflectionJSONObject<Block> {
         	}
         	
         }
-        vote_cache = votes;
+        return votes;
     }
 
 

@@ -5,10 +5,6 @@ import serialization.JSONObject;
 
 class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
-    
-    double[] wins;
-    
-    int last_winner = -1;
 
     double getPopulation() {
         double pop = 0;
@@ -22,16 +18,23 @@ class District extends JSONObject {
         return pop;
     }
 
-    public void resetWins() {
-        if( blocks.size() == 0) {
-            return;
-        }
-        wins = new double[Candidate.candidates.size()]; //inited to 0
-    }
     public double getSelfEntropy() {
         double total = 0;
-        if( wins == null) {
-        	return 0;
+        double[] wins  = new double[Candidate.candidates.size()];
+        for( int i = 0; i < wins.length; i++) {
+        	wins[i] = 0;
+        }
+        for( int i = 0; i < Block.num_outcomes; i++) {
+        	double[] outcome = getAnOutcome();
+        	int best = -1;
+        	double best_value = -1;
+            for( int j = 0; j < outcome.length; j++) {
+            	if( outcome[j] > best_value) {
+            		best = j;
+            		best_value = outcome[j];
+            	}
+            }
+            wins[best]++;
         }
         for( int i = 0; i < wins.length; i++) {
             total += wins[i];
@@ -45,23 +48,30 @@ class District extends JSONObject {
 
         return H;
     }
-    public static int getHighestIndex(double[] dd) {
-        double most_value = 0;
-        int most_index = 0;
-        for( int i = 0; i < dd.length; i++) {
-            if( dd[i] > most_value) {
-                most_index = i;
-                most_value = dd[i];//district_vote[i];
+    
+    public double[] getAnOutcome() {
+        double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        if( blocks.size() == 0) {
+            for( int i = 0; i < district_vote.length; i++) {//most_value) {
+                district_vote[i] = 0;
+            }
+            return district_vote;
+        }
+        for( Block block : blocks) {
+            double[] block_vote = block.getOutcome();
+            if( block_vote != null) {
+                for( int i = 0; i < block_vote.length; i++) {//most_value) {
+                    district_vote[i] += block_vote[i];
+                }
             }
         }
-        return most_index;
+        return district_vote;
     }
+
 
     public double[] getVotes() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
         if( blocks.size() == 0) {
-        	//System.out.println("blocks is empty! district");
-        	//System.exit(0);
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
             }
@@ -75,17 +85,6 @@ class District extends JSONObject {
                 }
             }
         }
-        /*
-        last_winner = getHighestIndex(district_vote);
-        if( wins == null || wins.length < Candidate.candidates.size() || wins.length == 0) {
-        	wins = new double[Candidate.candidates.size() > 0 ? Candidate.candidates.size() : 1];
-        	for( int i = 0; i < wins.length; i++) {
-        		wins[i] = 0;
-        	}
-        }
-        wins[last_winner]++;
-        */
-
         return district_vote;
     }
 

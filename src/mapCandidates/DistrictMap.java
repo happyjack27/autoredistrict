@@ -279,7 +279,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     //helper functions
-    public double[][] getRandomResultSample() {
+    public double[][] getStandardResult() {
     	//System.out.println("num dists "+districts.size());
     	
         double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
@@ -302,8 +302,32 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         return new double[][]{popular_vote,elected_vote};
     }
 
+    
+    public double[][] getRandomResultSample() {
+    	//System.out.println("num dists "+districts.size());
+    	
+        double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+        for(District district : districts) {
+            double[] district_vote = district.getAnOutcome();
+            int winner_num = -1;
+            double winner_vote_count = -1;
+            for( int i = 0; i < district_vote.length; i++) {
+            	if( district_vote[i] > winner_vote_count) {
+            		winner_vote_count = district_vote[i];
+            		winner_num = i;
+            	}
+                popular_vote[i] += district_vote[i];
+            }
+            if( winner_num >= 0) {
+            	elected_vote[winner_num]++;
+            }
+        }
+        return new double[][]{popular_vote,elected_vote};
+    }
+
     //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
-    public double getKLDiv(double[] p, double[] q) {
+    public double getKLDiv(double[] p, double[] q, double regularization_factor) {
 
         //get totals
         double totp = 0;
@@ -320,9 +344,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
         //regularize (see "regularization" in statistics)
         for( int i = 0; i < p.length; i++)
-            p[i]++;  
+            p[i]+=regularization_factor;  
         for( int i = 0; i < q.length; i++)
-            q[i]++;  
+            q[i]+=regularization_factor;  
 
         //normalize
         totp = 0;
@@ -396,7 +420,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < perfect_dists.length; i++) {
                 perfect_dists[i] = exp_population;
             }
-            population_imbalance = getKLDiv(perfect_dists,dist_pops);
+            population_imbalance = getKLDiv(perfect_dists,dist_pops,0.01);
         }
 
     	long time2 = System.currentTimeMillis();
@@ -409,36 +433,40 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
     		
-            //for( int i = 0; i < trials; i++) {
+            for( int i = 0; i < trials; i++) {
                 double[][] results = getRandomResultSample();
                 for( int j = 0; j < Candidate.candidates.size(); j++) {
                     p[j] += results[0][j];
                     q[j] += results[1][j];
                 }
-            //}
+            }
             time20 = System.currentTimeMillis();
-            disproportional_representation = getKLDiv(p,q);
+            disproportional_representation = getKLDiv(p,q,0.01);
     	}
 
     	long time3 = System.currentTimeMillis();
     	//===fairness score: power fairness
-        double[] voting_power = new double[districts.size()];
+        double[] voting_power = new double[dist_pops.length];
         double total_voting_power = 0;
         double power_fairness = 0; //1 = perfect fairness
         if( Settings.voting_power_balance_weight > 0) {
-            for(int i = 0; i < districts.size(); i++) {
+        	while( districts.size() < dist_pops.length) {
+        		districts.add(new District());
+        	}
+            for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
                 voting_power[i] = district.getSelfEntropy();
                 total_voting_power += voting_power[i];
             }
 
-            for(int i = 0; i < districts.size(); i++) {
+            for(int i = 0; i < dist_pops.length; i++) {
                 voting_power[i] /= total_voting_power;
             }
-
+            power_fairness = getKLDiv(dist_pop_frac,voting_power,0.01);
+/*
             for(int i = 0; i < districts.size(); i++) {
                 power_fairness += dist_pop_frac[i]*voting_power[i];
-            }
+            }*/
         }
 
     	long time4 = System.currentTimeMillis();
