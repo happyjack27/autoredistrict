@@ -189,7 +189,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	}
     	for( int i = 0; i < block_districts.length; i++) {
     		int district = block_districts[i];
-    		if( district >= districts.size()) {
+    		while( district >= districts.size()) {
     			districts.add(new District());
     		}
     		districts.get(district).blocks.add(blocks.get(i));

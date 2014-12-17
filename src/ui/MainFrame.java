@@ -21,7 +21,7 @@ import javax.swing.border.*;
 
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
-	boolean use_sample = true;
+	boolean use_sample = false;
 	double mutation_rate_multiplier = 0.1;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
@@ -45,6 +45,8 @@ public class MainFrame extends JFrame {
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
 	JSlider slider_8 = new JSlider();
+	
+	
 	
 	double minx,maxx,miny,maxy;
 	
@@ -334,13 +336,17 @@ public class MainFrame extends JFrame {
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					File f;
+					File f = null;
+					
 					if( use_sample) {
-						f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
+						String os_name = System.getProperty("os.name").toLowerCase();
+						if( os_name.indexOf("windows") < 0) {
+							f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
+						}
 					} else {
-					JFileChooser jfc = new JFileChooser();
-					jfc.showOpenDialog(null);
-					f = jfc.getSelectedFile();
+						JFileChooser jfc = new JFileChooser();
+						jfc.showOpenDialog(null);
+						f = jfc.getSelectedFile();
 					}
 					if( f == null) {
 						return;
