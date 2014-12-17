@@ -113,6 +113,10 @@ public class Block extends ReflectionJSONObject<Block> {
 	}
 	
     double[] getVotes() {
+    	generateVotes();
+    	return vote_cache;
+    	
+    	/*
         if( use_vote_caches) {
             if( vote_caches == null) {
                 vote_caches = new double[vote_cache_size][];
@@ -128,6 +132,7 @@ public class Block extends ReflectionJSONObject<Block> {
         }
         cache_reuse_times++;
         return vote_cache;
+        */
     }
 
     void generateVotes() {
@@ -136,20 +141,46 @@ public class Block extends ReflectionJSONObject<Block> {
             votes[i] = 0;
         }
         for( Demographic d : demographics) {
-            for(int i = 0; i < d.population; i++) {
-                double p = Math.random();
-                if( p > d.turnout_probability) {
-                    continue;
-                }
-                p = Math.random();
-                for( int j = 0; j < d.vote_prob.length; j++) {
-                    p -=  d.vote_prob[j];
-                    if( p <= 0) {
-                        votes[j]++;
-                        break;
-                    }
+            int single_voting = -1;
+            for( int j = 0; j < d.vote_prob.length; j++) {
+            	if( d.vote_prob[j] == 1) {
+            		single_voting = j;
+                    break;
                 }
             }
+        	if( d.turnout_probability == 1) {
+        		if( single_voting >= 0) {
+        			votes[single_voting] = d.population;
+        		} else {
+                    double p = Math.random();
+                    for( int j = 0; j < d.vote_prob.length; j++) {
+                        p -=  d.vote_prob[j];
+                        if( p <= 0) {
+                            votes[j]++;
+                            break;
+                        }
+                    }
+        		}
+        	} else {
+                for(int i = 0; i < d.population; i++) {
+                    double p = Math.random();
+                    if( p > d.turnout_probability) {
+                        continue;
+                    }
+            		if( single_voting >= 0) {
+            			votes[single_voting]++;
+            		} else {
+                        p = Math.random();
+                        for( int j = 0; j < d.vote_prob.length; j++) {
+                            p -=  d.vote_prob[j];
+                            if( p <= 0) {
+                                votes[j]++;
+                                break;
+                            }
+                        }
+            		}
+                }
+        	}
         	
         }
         vote_cache = votes;

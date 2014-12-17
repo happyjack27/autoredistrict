@@ -21,8 +21,9 @@ import javax.swing.border.*;
 
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
-	boolean use_sample = false;
+	boolean use_sample = true;
 	double mutation_rate_multiplier = 0.1;
+	double boundary_mutation_rate_multiplier = 0.4;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmSingleThreadScoring = new JCheckBoxMenuItem("Single thread scoring");
@@ -40,11 +41,9 @@ public class MainFrame extends JFrame {
 	JSlider slider_1 = new JSlider();
 	JSlider slider_2 = new JSlider();
 	JSlider slider_3 = new JSlider();
-	JSlider slider_4 = new JSlider();
 	JSlider slider_5 = new JSlider();
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
-	JSlider slider_8 = new JSlider();
 	
 	
 	
@@ -340,7 +339,7 @@ public class MainFrame extends JFrame {
 					
 					if( use_sample) {
 						String os_name = System.getProperty("os.name").toLowerCase();
-						if( os_name.indexOf("windows") < 0) {
+						if( os_name.indexOf("windows") >= 0) {
 							f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
 						}
 					} else {
@@ -401,6 +400,7 @@ public class MainFrame extends JFrame {
 							}
 							d.vote_prob[j] = 1;
 							b.demographics.add(d);
+							System.out.println("block "+b.id+" added demo "+d.population+" "+j);
 						}
 					}
 					
@@ -583,12 +583,6 @@ public class MainFrame extends JFrame {
 		lblEvolutionaryPressure.setBounds(6, 8, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
-		JLabel lblPopulationBalance = new JLabel("connectedness");
-		lblPopulationBalance.setBounds(6, 98, 172, 16);
-		panel_2.add(lblPopulationBalance);
-		slider_4.setBounds(6, 119, 190, 29);
-		panel_2.add(slider_4);
-		
 		JLabel lblProportionalRepresentation = new JLabel("population balance");
 		lblProportionalRepresentation.setBounds(6, 161, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
@@ -677,10 +671,6 @@ public class MainFrame extends JFrame {
 		slider_2.setBounds(6, 253, 190, 29);
 		panel_3.add(slider_2);
 		
-		JLabel lblSpeciation = new JLabel("% speciation");
-		lblSpeciation.setBounds(6, 294, 172, 16);
-		panel_3.add(lblSpeciation);
-		
 		
 		textField_2.addFocusListener(new FocusAdapter() {
 			@Override
@@ -709,7 +699,7 @@ public class MainFrame extends JFrame {
 		});
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = mutation_rate_multiplier*slider_1.getValue()/100.0;
+				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
 		
@@ -734,37 +724,25 @@ public class MainFrame extends JFrame {
 				Settings.population_balance_weight = slider_5.getValue()/100.0;
 			}
 		});
-		slider_4.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.disconnected_population_weight = slider_4.getValue()/100.0;
-			}
-		});
 		slider_3.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.geometry_weight = slider_3.getValue()/100.0;
 			}
 		});
-		slider_8.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
-			}
-		});
-		slider_8.setBounds(6, 315, 190, 29);
-		panel_3.add(slider_8);
 
 		
 		Settings.mutation_rate = mutation_rate_multiplier*slider_2.getValue()/100.0;
-		Settings.mutation_boundary_rate = mutation_rate_multiplier*slider_1.getValue()/100.0;
+		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.replace_fraction = slider.getValue()/100.0;
 		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
 		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
 		Settings.population_balance_weight = slider_5.getValue()/100.0;
-		Settings.disconnected_population_weight = slider_4.getValue()/100.0;
 		Settings.geometry_weight = slider_3.getValue()/100.0;
-		Settings.species_fraction = 1.0 - (slider_8.getValue()/100.0);
 		
 		chckbxmntmMutateAll.setSelected(true);
 		Settings.mutate_all = true;
+		Settings.speciation_fraction = 1.0;
+		Settings.disconnected_population_weight = 0.0;
 
 		splitPane.setRightComponent(mapPanel);
 	}

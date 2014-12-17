@@ -13,6 +13,9 @@ class District extends JSONObject {
     double getPopulation() {
         double pop = 0;
         for( Block block : blocks) {
+        	if( block.demographics == null || block.demographics.size() == 0) {
+        		System.out.println("no demographics!");
+        	}
         	for(Demographic p : block.demographics)
               pop += p.population;
         }
@@ -72,6 +75,7 @@ class District extends JSONObject {
                 }
             }
         }
+        /*
         last_winner = getHighestIndex(district_vote);
         if( wins == null || wins.length < Candidate.candidates.size() || wins.length == 0) {
         	wins = new double[Candidate.candidates.size() > 0 ? Candidate.candidates.size() : 1];
@@ -80,6 +84,7 @@ class District extends JSONObject {
         	}
         }
         wins[last_winner]++;
+        */
 
         return district_vote;
     }
