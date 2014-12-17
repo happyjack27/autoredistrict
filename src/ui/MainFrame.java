@@ -640,7 +640,7 @@ public class MainFrame extends JFrame {
 		textField_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 try {
-					 Settings.trials = new Integer(textField.getText());
+					 Settings.trials = new Integer(textField_1.getText());
 				 } catch (Exception ex) {
 					 
 				 }

@@ -202,7 +202,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for( int i = 0; i < districts.size(); i++) {
     		District d = districts.get(i);
     		if( d.blocks.size() == 0) {
-    			int num_to_get = blocks.size() / (districts.size()*3);
+    			int num_to_get = blocks.size() / (districts.size());
     			if( num_to_get < 1) {
     				num_to_get = 1;
     			}
@@ -280,7 +280,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //helper functions
     public double[][] getRandomResultSample() {
-    	System.out.println("num dists "+districts.size());
+    	//System.out.println("num dists "+districts.size());
     	
         double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
         double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
@@ -406,7 +406,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double[] q = new double[Candidate.candidates.size()];
         double disproportional_representation = 0;
     	if( Settings.disenfranchise_weight > 0) {
-    		System.out.println("num c "+Candidate.candidates.size()+"  num t "+trials);
+    		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
     		
             //for( int i = 0; i < trials; i++) {
