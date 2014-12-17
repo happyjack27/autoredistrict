@@ -24,7 +24,7 @@ class District extends JSONObject {
         for( int i = 0; i < wins.length; i++) {
         	wins[i] = 0;
         }
-        for( int i = 0; i < Block.num_outcomes; i++) {
+        for( int i = 0; i < Settings.num_district_outcomes; i++) {
         	double[] outcome = getAnOutcome();
         	int best = -1;
         	double best_value = -1;

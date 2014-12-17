@@ -17,8 +17,7 @@ public class Block extends ReflectionJSONObject<Block> {
     public Vector<Demographic> demographics = new Vector<Demographic>();
     
     
-	public static int num_outcomes = 128; 
-    double[][] outcomes;
+	double[][] outcomes;
 
     public Block() {
     	super();
@@ -115,7 +114,7 @@ public class Block extends ReflectionJSONObject<Block> {
     }
     
     public void generateOutComes() {
-    	outcomes = new double[num_outcomes][];
+    	outcomes = new double[Settings.num_precinct_outcomes][];
     	
         //aggregate and normalize voting probs
     	double[] probs = new double[Candidate.candidates.size()];

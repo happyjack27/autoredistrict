@@ -32,6 +32,8 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//settings
 	//map_population (folder)
 	//
+	public static int num_precinct_outcomes = 256;
+	public static int num_district_outcomes = 64;
     
     /*
 	@Override
