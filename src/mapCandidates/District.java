@@ -12,6 +12,9 @@ class District extends JSONObject {
     double[][] pop_balanced_outcomes;
     
     private double population = -1;
+    void resetPopulation() {
+    	population = -1;
+    }
 
     double getPopulation() {
     	if( population >= 0) {

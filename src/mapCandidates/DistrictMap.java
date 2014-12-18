@@ -215,7 +215,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		}
     	}
     	for( int i = 0; i < districts.size(); i++) {
-    		districts.get(i).getPopulation();
+    		districts.get(i).resetPopulation();
     	}
     }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
