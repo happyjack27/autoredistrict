@@ -16,6 +16,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public Block block = null;
 	
 	public static boolean showPrecinctLabels = false;
+	public static int display_mode = 0;
 	
 	public void toggleClicked() {
 		try {
@@ -89,13 +90,19 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null || block.state != 0) {
+		if( geometry.fillColor != null || block.state != 0 || display_mode != 0) {
 			g.setColor(geometry.fillColor);
-			if( block.state == 1) {
-				g.setColor(Color.blue);
-			}
-			if( block.state == 2) {
-				g.setColor(Color.white);
+			if( display_mode == 1) {
+				g.setColor(block.demographics != null && block.demographics.size() > 0 ? Color.white :  Color.black);
+			} else if( display_mode == 2) {
+				g.setColor(block.has_census_results ? Color.white :  Color.black);
+			} else {
+				if( block.state == 1) {
+					g.setColor(Color.blue);
+				}
+				if( block.state == 2) {
+					g.setColor(Color.white);
+				}
 			}
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				g.fillPolygon(geometry.polygons[i]);

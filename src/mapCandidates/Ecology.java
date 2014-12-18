@@ -266,7 +266,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public void run() {
             for( DistrictMap map : population) {
             	//System.out.print(".");
-                map.calcFairnessScores(Settings.trials);
+                map.calcFairnessScores(Settings.num_elections_simulated);
             }
             //System.out.print(".");
     		scoringLatch.countDown();
@@ -293,7 +293,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( !Settings.multiThreadScoring) { //single threaded
             for( DistrictMap map : population) {
             	//System.out.print(".");
-                map.calcFairnessScores(Settings.trials);
+                map.calcFairnessScores(Settings.num_elections_simulated);
             }
         } else {
 		//System.out.print(""+step);
@@ -481,11 +481,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
         if( score_all) {
             for( DistrictMap map : population) {
-                map.calcFairnessScores(Settings.trials);
+                map.calcFairnessScores(Settings.num_elections_simulated);
             }
         } else {
             for( int i = cutoff; i < population.size(); i++) {
-                population.get(i).calcFairnessScores(Settings.trials);
+                population.get(i).calcFairnessScores(Settings.num_elections_simulated);
             }
         }
         

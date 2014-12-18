@@ -214,6 +214,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     		}
     	}
+    	for( int i = 0; i < districts.size(); i++) {
+    		districts.get(i).getPopulation();
+    	}
     }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
         this.num_districts = num_districts;
@@ -420,7 +423,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < perfect_dists.length; i++) {
                 perfect_dists[i] = exp_population;
             }
-            population_imbalance = getKLDiv(perfect_dists,dist_pops,0.01);
+            population_imbalance = getKLDiv(perfect_dists,dist_pops,1);
         }
 
     	long time2 = System.currentTimeMillis();
@@ -429,19 +432,49 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double[] p = new double[Candidate.candidates.size()];
         double[] q = new double[Candidate.candidates.size()];
         double disproportional_representation = 0;
+    	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0) {
+    		for(District d : districts) {
+    			d.generateOutcomes(Settings.num_elections_simulated);
+    		}
+    		
+    	}
     	if( Settings.disenfranchise_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
     		
-            for( int i = 0; i < trials; i++) {
-                double[][] results = getRandomResultSample();
+            for( int i = 0; i < Settings.num_elections_simulated; i++) {
+                double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
+                double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+                for(District district : districts) {
+                	try {
+                		int n = (int)Math.floor(Math.random()*(double)district.outcomes.length);
+                        double[] district_vote = district.outcomes[n];
+                        double[] pop_district_vote = district.pop_balanced_outcomes[n];
+                        int winner_num = -1;
+                        double winner_vote_count = -1;
+                        for( int j = 0; j < district_vote.length; j++) {
+                            popular_vote[j] += pop_district_vote[j];
+                        	if( district_vote[j] > winner_vote_count) {
+                        		winner_vote_count = district_vote[j];
+                        		winner_num = j;
+                        	}
+                        }
+                        if( winner_num >= 0) {
+                        	elected_vote[winner_num]++;
+                        }
+                	} catch (Exception ex) {
+                		break;
+                	}
+                }
+                //double[][] results = new double[][]{popular_vote,elected_vote};
+            	
                 for( int j = 0; j < Candidate.candidates.size(); j++) {
-                    p[j] += results[0][j];
-                    q[j] += results[1][j];
+                    p[j] += popular_vote[j];
+                    q[j] += elected_vote[j];
                 }
             }
             time20 = System.currentTimeMillis();
-            disproportional_representation = getKLDiv(p,q,0.01);
+            disproportional_representation = getKLDiv(p,q,1);
     	}
 
     	long time3 = System.currentTimeMillis();
@@ -455,7 +488,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
             for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
-                voting_power[i] = district.getSelfEntropy();
+                voting_power[i] = district.getSelfEntropy(district.outcomes);
                 total_voting_power += voting_power[i];
             }
 

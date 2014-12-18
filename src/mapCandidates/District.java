@@ -5,27 +5,44 @@ import serialization.JSONObject;
 
 class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
+    
+    public static boolean adjust_vote_to_population = true;
+
+    double[][] outcomes;
+    double[][] pop_balanced_outcomes;
+    
+    private double population = -1;
 
     double getPopulation() {
+    	if( population >= 0) {
+    		return population;
+    	}
         double pop = 0;
         for( Block block : blocks) {
         	if( block.demographics == null || block.demographics.size() == 0) {
         		System.out.println("no demographics!");
         	}
-        	for(Demographic p : block.demographics)
-              pop += p.population;
+        	if( block.has_census_results) {
+        		pop += block.population;
+        	} else {
+            	for(Demographic p : block.demographics) {
+                    pop += p.population;
+            	}
+        	}
         }
+        population = pop;
         return pop;
     }
 
-    public double getSelfEntropy() {
+    public double getSelfEntropy(double[][] outcomes) {
+
         double total = 0;
         double[] wins  = new double[Candidate.candidates.size()];
         for( int i = 0; i < wins.length; i++) {
-        	wins[i] = 0;
+        	wins[i] = 1;
         }
-        for( int i = 0; i < Settings.num_district_outcomes; i++) {
-        	double[] outcome = getAnOutcome();
+        for( int i = 0; i < outcomes.length; i++) {
+        	double[] outcome = outcomes[i];
         	int best = -1;
         	double best_value = -1;
             for( int j = 0; j < outcome.length; j++) {
@@ -48,6 +65,25 @@ class District extends JSONObject {
 
         return H;
     }
+    public double[][] generateOutcomes(int num) {
+    	if( adjust_vote_to_population) {
+        	outcomes = new double[num][];
+        	pop_balanced_outcomes = new double[num][];
+        	for( int i = 0; i < num; i++) {
+        		double[][] dd = getAnOutcomePair(); 
+        		outcomes[i] = dd[0];
+        		pop_balanced_outcomes[i] = dd[1];
+        	}
+        	return outcomes;
+    	} else {
+        	outcomes = new double[num][];
+        	for( int i = 0; i < num; i++) {
+        		outcomes[i] = getAnOutcome();
+        	}
+        	pop_balanced_outcomes = outcomes;
+        	return outcomes;
+    	}
+    }
     
     public double[] getAnOutcome() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
@@ -67,6 +103,32 @@ class District extends JSONObject {
         }
         return district_vote;
     }
+    public double[][] getAnOutcomePair() {
+        double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] pop_district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        if( blocks.size() == 0) {
+            for( int i = 0; i < district_vote.length; i++) {
+                district_vote[i] = 0;
+            }
+            return new double[][]{district_vote,district_vote};
+        }
+        for( Block block : blocks) {
+            double[] block_vote = block.getOutcome();
+            if( block_vote != null) {
+            	double tot = 0;
+                for( int i = 0; i < block_vote.length; i++) {
+                	tot += block_vote[i];
+                    district_vote[i] += block_vote[i];
+                }
+                tot = block.population/tot;
+                for( int i = 0; i < block_vote.length; i++) {
+                    pop_district_vote[i] += block_vote[i]*tot;
+                }
+            }
+        }
+        return new double[][]{district_vote,pop_district_vote};
+    }
+
 
 
     public double[] getVotes() {
@@ -143,8 +205,13 @@ class District extends JSONObject {
         	return 0;
         }
         for( Block block : region) {
-        	for(Demographic p : block.demographics)
-                population += p.population;
+        	if( block.has_census_results) {
+        		population += block.population;
+        	} else {
+            	for(Demographic p : block.demographics) {
+            		population += p.population;
+            	}
+        	}
         }
         return population;
     }

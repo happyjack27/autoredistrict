@@ -16,6 +16,9 @@ public class Block extends ReflectionJSONObject<Block> {
     public double[] neighbor_lengths;
     public Vector<Demographic> demographics = new Vector<Demographic>();
     
+    public boolean has_census_results = false;
+    public double population=1;
+    
     
 	double[][] outcomes;
 

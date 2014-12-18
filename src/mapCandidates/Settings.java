@@ -24,7 +24,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double replace_fraction = 0.5;
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
-    public static int trials = 1;
+    public static int num_elections_simulated = 64;
     public static int population;
     public static int num_districts = 3;
 	//geometry
@@ -33,7 +33,6 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//map_population (folder)
 	//
 	public static int num_precinct_outcomes = 256;
-	public static int num_district_outcomes = 64;
     
     /*
 	@Override

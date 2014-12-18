@@ -39,7 +39,6 @@ public class MainFrame extends JFrame {
 	JTextField textField = new JTextField();
 	JSlider slider = new JSlider();
 	JSlider slider_1 = new JSlider();
-	JSlider slider_2 = new JSlider();
 	JSlider slider_3 = new JSlider();
 	JSlider slider_5 = new JSlider();
 	JSlider slider_6 = new JSlider();
@@ -330,6 +329,62 @@ public class MainFrame extends JFrame {
 		JMenu mnDemographics = new JMenu("Demographics");
 		menuBar.add(mnDemographics);
 		
+		JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
+		chckbxmntmOpenCensusResults.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					File f = null;
+					
+					if( use_sample) {
+						String os_name = System.getProperty("os.name").toLowerCase();
+						if( os_name.indexOf("windows") >= 0) {
+							f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\census\\population.txt");
+						}
+					} else {
+						JFileChooser jfc = new JFileChooser();
+						jfc.showOpenDialog(null);
+						f = jfc.getSelectedFile();
+					}
+					if( f == null) {
+						return;
+					}
+					StringBuffer sb = new StringBuffer();
+					try {
+						FileInputStream fis = new FileInputStream(f);
+						while( fis.available() > 0) {
+							byte[] bb = new byte[fis.available()];
+							fis.read(bb);
+							sb.append(new String(bb));
+							Thread.sleep(10);
+						}
+						
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+						return;
+					}
+					String s = sb.toString();
+					String[] lines = s.split("\n");
+					for( int i = 0; i < lines.length; i++) {
+						String[] ss = lines[i].split("\t");
+						String district = ss[0].trim();
+						Block b = featureCollection.precinctHash.get(district);
+						b.has_census_results = true;
+						b.population = Double.parseDouble(ss[1].replaceAll(",",""));
+						System.out.println("block "+b.id+" added census "+b.population);
+					}
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+				Feature.display_mode = 2;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnDemographics.add(chckbxmntmOpenCensusResults);
+		
 		JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
@@ -382,7 +437,7 @@ public class MainFrame extends JFrame {
 							votes.put(district, dd);
 						}
 						for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
-							dd[j] += Double.parseDouble(ss[j+1]);
+							dd[j] += Double.parseDouble(ss[j+1].replaceAll(",",""));
 						}
 					}
 					
@@ -416,6 +471,9 @@ public class MainFrame extends JFrame {
 					System.out.println("ex "+ex);
 					ex.printStackTrace();
 				}
+				Feature.display_mode = 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		
@@ -456,6 +514,7 @@ public class MainFrame extends JFrame {
 		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				Feature.display_mode = 0; 
 				Settings.population = Integer.parseInt(textField.getText());
 				Settings.num_districts = Integer.parseInt(textField_2.getText());
 				featureCollection.ecology.startEvolving();
@@ -510,6 +569,13 @@ public class MainFrame extends JFrame {
 		});
 		mnView.add(chckbxmntmShowPrecinctLabels);
 		
+		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
+		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		mnView.add(chckbxmntmShowDistrictLabels);
+		
 		JMenu mnResults = new JMenu("Results");
 		menuBar.add(mnResults);
 		
@@ -532,7 +598,7 @@ public class MainFrame extends JFrame {
 					DistrictMap dm = featureCollection.ecology.population.get(0);
 					int[] blocks = dm.block_districts;
 					for( int i = 0; i < blocks.length; i++) {
-						Block b = featureCollection.ecology.blocks_by_id.get(i);
+						Block b = featureCollection.ecology.blocks.get(i);
 						sb.append(b.name+", "+blocks[i]+"\n");
 					}
 					
@@ -561,7 +627,7 @@ public class MainFrame extends JFrame {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 424, 200, 343);
+		panel_2.setBounds(0, 261, 200, 338);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -573,9 +639,9 @@ public class MainFrame extends JFrame {
 		panel_2.add(slider_3);
 		
 		JLabel lblContiguency = new JLabel("proportional representation");
-		lblContiguency.setBounds(6, 280, 172, 16);
+		lblContiguency.setBounds(6, 218, 172, 16);
 		panel_2.add(lblContiguency);
-		slider_7.setBounds(6, 301, 190, 29);
+		slider_7.setBounds(6, 239, 190, 29);
 		panel_2.add(slider_7);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
@@ -584,20 +650,45 @@ public class MainFrame extends JFrame {
 		panel_2.add(lblEvolutionaryPressure);
 		
 		JLabel lblProportionalRepresentation = new JLabel("population balance");
-		lblProportionalRepresentation.setBounds(6, 161, 172, 16);
+		lblProportionalRepresentation.setBounds(6, 97, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
-		slider_5.setBounds(6, 182, 190, 29);
+		slider_5.setBounds(6, 118, 190, 29);
 		panel_2.add(slider_5);
 		
 		JLabel lblVotingPowerBalance = new JLabel("voting power balance");
-		lblVotingPowerBalance.setBounds(6, 218, 172, 16);
+		lblVotingPowerBalance.setBounds(6, 279, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		slider_6.setBounds(6, 239, 190, 29);
+		slider_6.setBounds(6, 300, 190, 29);
 		panel_2.add(slider_6);
+		textField_1.setBounds(138, 179, 58, 28);
+		panel_2.add(textField_1);
+		textField_1.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				textField_1.postActionEvent();
+			}
+		});
+		textField_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				 try {
+					 Settings.num_elections_simulated = new Integer(textField_1.getText());
+				 } catch (Exception ex) {
+					 
+				 }
+			}
+		});
+		
+		textField_1.setText("64");
+		textField_1.setColumns(10);
+		
+		JLabel lblTrials = new JLabel("Elections simulated");
+		lblTrials.setBounds(6, 185, 134, 16);
+		panel_2.add(lblTrials);
+		
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 55, 200, 358);
+		panel_3.setBounds(0, 55, 200, 195);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -629,47 +720,17 @@ public class MainFrame extends JFrame {
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
-		textField_1.setBounds(105, 68, 91, 28);
-		panel_3.add(textField_1);
-		textField_1.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				textField_1.postActionEvent();
-			}
-		});
-		textField_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 try {
-					 Settings.trials = new Integer(textField_1.getText());
-				 } catch (Exception ex) {
-					 
-				 }
-			}
-		});
-		
-		textField_1.setText("1");
-		textField_1.setColumns(10);
-		
-		JLabel lblTrials = new JLabel("Trials");
-		lblTrials.setBounds(6, 74, 104, 16);
-		panel_3.add(lblTrials);
 		
 		JLabel lblPopulationReplaced = new JLabel("% population replaced");
-		lblPopulationReplaced.setBounds(6, 108, 172, 16);
+		lblPopulationReplaced.setBounds(6, 67, 172, 16);
 		panel_3.add(lblPopulationReplaced);
-		slider.setBounds(6, 129, 190, 29);
+		slider.setBounds(6, 88, 190, 29);
 		panel_3.add(slider);
 		JLabel lblBorderMutation = new JLabel("% border mutation");
-		lblBorderMutation.setBounds(6, 170, 172, 16);
+		lblBorderMutation.setBounds(6, 128, 172, 16);
 		panel_3.add(lblBorderMutation);
-		slider_1.setBounds(6, 191, 190, 29);
+		slider_1.setBounds(6, 149, 190, 29);
 		panel_3.add(slider_1);
-		
-		JLabel lblScatterMutation = new JLabel("% scatter mutation");
-		lblScatterMutation.setBounds(6, 232, 172, 16);
-		panel_3.add(lblScatterMutation);
-		slider_2.setBounds(6, 253, 190, 29);
-		panel_3.add(slider_2);
 		
 		
 		textField_2.addFocusListener(new FocusAdapter() {
@@ -692,11 +753,6 @@ public class MainFrame extends JFrame {
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
 		lblNumOfDistricts.setBounds(10, 17, 94, 16);
 		panel.add(lblNumOfDistricts);
-		slider_2.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_rate = mutation_rate_multiplier*slider_2.getValue()/100.0;
-			}
-		});
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
@@ -729,9 +785,7 @@ public class MainFrame extends JFrame {
 				Settings.geometry_weight = slider_3.getValue()/100.0;
 			}
 		});
-
-		
-		Settings.mutation_rate = mutation_rate_multiplier*slider_2.getValue()/100.0;
+		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.replace_fraction = slider.getValue()/100.0;
 		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
