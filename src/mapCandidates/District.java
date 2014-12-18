@@ -38,6 +38,9 @@ class District extends JSONObject {
     }
 
     public double getSelfEntropy(double[][] outcomes) {
+    	if( outcomes == null) {
+    		outcomes = generateOutcomes(Settings.num_elections_simulated);
+    	}
 
         double total = 0;
         double[] wins  = new double[Candidate.candidates.size()];

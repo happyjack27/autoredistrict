@@ -44,7 +44,16 @@ public class MainFrame extends JFrame {
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
 	
-	
+	JMenu mnGeography = new JMenu("Geography");
+	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
+	JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
+	JMenu mnDemographics = new JMenu("Demographics");
+	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
+	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
+	JMenu mnEvolution = new JMenu("Evolution");
+	JMenuItem mntmStart = new JMenuItem("Start");
+	JMenuItem mntmPause = new JMenuItem("Pause");
+
 	
 	double minx,maxx,miny,maxy;
 	
@@ -53,6 +62,23 @@ public class MainFrame extends JFrame {
 
 	//public Ecology ecology = new Ecology();
 	public FeatureCollection featureCollection = new FeatureCollection();
+	
+	boolean geo_loaded = false;
+	boolean census_loaded = false;
+	boolean election_loaded = false;
+	boolean evolving = false;
+	public void setEnableds() {
+		
+		if( !geo_loaded) {
+			census_loaded = false;
+			election_loaded = false;
+		}
+		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
+		mntmOpenElectionResults.setEnabled(geo_loaded);
+		mntmStart.setEnabled(geo_loaded & election_loaded && !evolving);
+		mntmPause.setEnabled(geo_loaded & election_loaded && evolving);
+		
+	}
 	
 	public MainFrame() { 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -81,13 +107,10 @@ public class MainFrame extends JFrame {
 		});
 		mnFile.add(mntmExit);
 		
-		JMenu mnGeography = new JMenu("Geography");
 		menuBar.add(mnGeography);
 		
-		JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
 		mnGeography.add(mntmOpenGeojson);
 		
-		JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
 		mnGeography.add(mntmOpenGeojsonFolder);
 		
 		JSeparator separator_1 = new JSeparator();
@@ -120,6 +143,13 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				File[] ff = fd.listFiles();
+				
+				featureCollection.ecology.stopEvolving();
+				geo_loaded = false;
+				evolving = false;
+				Feature.display_mode = 0;
+				setEnableds();
+
 				
 				featureCollection = new FeatureCollection(); 
 				featureCollection.features = new Vector<Feature>();
@@ -215,6 +245,9 @@ public class MainFrame extends JFrame {
 				featureCollection.ecology.mapPanel = mapPanel;
 				featureCollection.initEcology();
 				System.out.println("Ready.");
+				
+				geo_loaded = true;
+				setEnableds();
 
 			}
 		});
@@ -257,6 +290,12 @@ public class MainFrame extends JFrame {
 						ex.printStackTrace();
 						return;
 					} 
+					
+					featureCollection.ecology.stopEvolving();
+					geo_loaded = false;
+					evolving = false;
+					Feature.display_mode = 0;
+					setEnableds();
 					
 					FeatureCollection fc = new FeatureCollection();
 					try {
@@ -323,13 +362,15 @@ public class MainFrame extends JFrame {
 				
 
 				System.out.println("Ready.");
+				
+				geo_loaded = true;
+				setEnableds();
+
 			}
 		});
 		
-		JMenu mnDemographics = new JMenu("Demographics");
 		menuBar.add(mnDemographics);
 		
-		JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 		chckbxmntmOpenCensusResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -385,7 +426,6 @@ public class MainFrame extends JFrame {
 		});
 		mnDemographics.add(chckbxmntmOpenCensusResults);
 		
-		JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -474,10 +514,11 @@ public class MainFrame extends JFrame {
 				Feature.display_mode = 1;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				election_loaded = true;
+				setEnableds();
 			}
 		});
 		
-		JMenu mnEvolution = new JMenu("Evolution");
 		menuBar.add(mnEvolution);
 		
 		chckbxmntmInvert.addActionListener(new ActionListener() {
@@ -511,21 +552,23 @@ public class MainFrame extends JFrame {
 		JSeparator separator = new JSeparator();
 		mnEvolution.add(separator);
 		
-		JMenuItem mntmStart = new JMenuItem("Start");
 		mntmStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Feature.display_mode = 0; 
 				Settings.population = Integer.parseInt(textField.getText());
 				Settings.num_districts = Integer.parseInt(textField_2.getText());
 				featureCollection.ecology.startEvolving();
+				evolving = true;
+				setEnableds();
 			}
 		});
 		mnEvolution.add(mntmStart);
 		
-		JMenuItem mntmPause = new JMenuItem("Pause");
 		mntmPause.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				featureCollection.ecology.stopEvolving();
+				evolving = false;
+				setEnableds();
 			}
 		});
 		mnEvolution.add(mntmPause);
@@ -799,5 +842,8 @@ public class MainFrame extends JFrame {
 		Settings.disconnected_population_weight = 0.0;
 
 		splitPane.setRightComponent(mapPanel);
+		
+		
+		setEnableds();
 	}
 }
