@@ -640,13 +640,13 @@ public class MainFrame extends JFrame {
 					FileOutputStream fis = new FileOutputStream(f);
 					
 					DistrictMap dm = featureCollection.ecology.population.get(0);
-					int[] blocks = dm.block_districts;
-					for( int i = 0; i < blocks.length; i++) {
+					for( int i = 0; i < dm.block_districts.length; i++) {
 						Block b = featureCollection.ecology.blocks.get(i);
-						sb.append(b.name+", "+blocks[i]+"\n");
+						//sb.append(b.name+", "+dm.block_districts[i]+"\n\r");
+						fis.write((""+b.name.trim()+", "+dm.block_districts[i]+"\r\n").getBytes());
 					}
 					
-					fis.write(sb.toString().getBytes());
+					//fis.write(sb.toString().getBytes());
 					fis.flush();
 					fis.close();
 					JOptionPane.showMessageDialog(null,"File saved.");
