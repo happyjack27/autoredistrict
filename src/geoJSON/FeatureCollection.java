@@ -34,11 +34,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.block_districts.length);
 			if( dm.block_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
-				int hues = Settings.num_districts;
-				if( hues > 9) hues = 9;
-				int values = Settings.num_districts / 9;
+				int saturations = (int) Math.ceil((double)Settings.num_districts / (double)(8*4));
+				int values = (int) Math.ceil((double)Settings.num_districts / (double)8);
+				int hues = (int) Math.ceil((double)Settings.num_districts / ((double)saturations*(double)values));
+				if( hues > 8) hues = 8;
 				if( values > 4) hues = 4;
-				int saturations = Settings.num_districts / (9*4);
 				
 				float hue_inc = (float)(1.0/(double)hues);
 				float hue_start = 0;
@@ -52,10 +52,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				for( int i = 0; i < c.length; i++) {
 					c[i] = Color.getHSBColor(hue, (float)sat, (float)val);
 					hue += hue_inc;
-					if( hue > 1.0) {
+					if( hue >= 1.0) {
 						hue = hue_start;
 						val += val_inc;
-						if( val > 1.0) {
+						if( val >= 1.0) {
 							val = val_start;
 							sat -= sat_inc;
 						}
