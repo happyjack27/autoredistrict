@@ -324,7 +324,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             double mult = 1.0/(double)population.size();
             for( int j = 0; j < population.size(); j++) {
                 DistrictMap map = population.get(j);
-                map.fairnessScores[i] = ((double)j)*mult; 
+                if( map.fairnessScores[i] != 0) {
+                	map.fairnessScores[i] = ((double)j)*mult;
+                }
             }
         }
 
