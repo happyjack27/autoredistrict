@@ -39,6 +39,7 @@ public class MainFrame extends JFrame {
 	JTextField textField = new JTextField();
 	JSlider slider = new JSlider();
 	JSlider slider_1 = new JSlider();
+	JSlider slider_2 = new JSlider();
 	JSlider slider_3 = new JSlider();
 	JSlider slider_5 = new JSlider();
 	JSlider slider_6 = new JSlider();
@@ -670,7 +671,7 @@ public class MainFrame extends JFrame {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 261, 200, 338);
+		panel_2.setBounds(0, 261, 200, 403);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -682,9 +683,9 @@ public class MainFrame extends JFrame {
 		panel_2.add(slider_3);
 		
 		JLabel lblContiguency = new JLabel("proportional representation");
-		lblContiguency.setBounds(6, 218, 172, 16);
+		lblContiguency.setBounds(6, 281, 172, 16);
 		panel_2.add(lblContiguency);
-		slider_7.setBounds(6, 239, 190, 29);
+		slider_7.setBounds(6, 302, 190, 29);
 		panel_2.add(slider_7);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
@@ -693,17 +694,17 @@ public class MainFrame extends JFrame {
 		panel_2.add(lblEvolutionaryPressure);
 		
 		JLabel lblProportionalRepresentation = new JLabel("population balance");
-		lblProportionalRepresentation.setBounds(6, 97, 172, 16);
+		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
-		slider_5.setBounds(6, 118, 190, 29);
+		slider_5.setBounds(6, 179, 190, 29);
 		panel_2.add(slider_5);
 		
 		JLabel lblVotingPowerBalance = new JLabel("voting power balance");
-		lblVotingPowerBalance.setBounds(6, 279, 172, 16);
+		lblVotingPowerBalance.setBounds(6, 342, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		slider_6.setBounds(6, 300, 190, 29);
+		slider_6.setBounds(6, 363, 190, 29);
 		panel_2.add(slider_6);
-		textField_1.setBounds(138, 179, 58, 28);
+		textField_1.setBounds(138, 242, 58, 28);
 		panel_2.add(textField_1);
 		textField_1.addFocusListener(new FocusAdapter() {
 			@Override
@@ -725,8 +726,20 @@ public class MainFrame extends JFrame {
 		textField_1.setColumns(10);
 		
 		JLabel lblTrials = new JLabel("Elections simulated");
-		lblTrials.setBounds(6, 185, 134, 16);
+		lblTrials.setBounds(6, 248, 134, 16);
 		panel_2.add(lblTrials);
+		
+		JLabel lblConnectedness = new JLabel("connectedness");
+		lblConnectedness.setBounds(6, 97, 172, 16);
+		panel_2.add(lblConnectedness);
+		
+		slider_2.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+			}
+		});
+		slider_2.setBounds(6, 118, 190, 29);
+		panel_2.add(slider_2);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -835,6 +848,8 @@ public class MainFrame extends JFrame {
 		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
 		Settings.population_balance_weight = slider_5.getValue()/100.0;
 		Settings.geometry_weight = slider_3.getValue()/100.0;
+		Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+
 		
 		chckbxmntmMutateAll.setSelected(true);
 		Settings.mutate_all = true;
