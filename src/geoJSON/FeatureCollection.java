@@ -20,7 +20,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Block> blocks;
 	public HashMap<String,Block> precinctHash;
 	public Ecology ecology = new Ecology();
-	double snap_to_grid_resolution = 10000.0;
+	double snap_to_grid_resolution = 1000000.0;
 	
 	static int max_hues = 6;
 	
