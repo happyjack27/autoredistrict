@@ -22,6 +22,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 10000.0;
 	
+	static int max_hues = 6;
+	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 	
@@ -34,10 +36,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.block_districts.length);
 			if( dm.block_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
-				int saturations = (int) Math.ceil((double)Settings.num_districts / (double)(8*4));
-				int values = (int) Math.ceil((double)Settings.num_districts / (double)8);
+				int saturations = (int) Math.ceil((double)Settings.num_districts / (double)(max_hues*4));
+				int values = (int) Math.ceil((double)Settings.num_districts / (double)max_hues);
 				int hues = (int) Math.ceil((double)Settings.num_districts / ((double)saturations*(double)values));
-				if( hues > 8) hues = 8;
+				if( hues > max_hues) hues = max_hues;
 				if( values > 4) hues = 4;
 				
 				float hue_inc = (float)(1.0/(double)hues);
