@@ -6,7 +6,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean multiThreadScoring = true;
 	public static boolean multiThreadMating = true;
 	public static boolean multiThreadMutatting = true;
-	public static boolean mutate_all = false;
+	public static boolean mutate_all = true;
 
     public static boolean mutate_to_neighbor_only = false;
     public static double species_fraction = 0.25;
@@ -24,7 +24,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double replace_fraction = 0.5;
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
-    public static int num_elections_simulated = 64;
+    public static int num_elections_simulated = 32;
     public static int population;
     public static int num_districts = 3;
 	//geometry
@@ -32,7 +32,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//settings
 	//map_population (folder)
 	//
-	public static int num_precinct_outcomes = 256;
+	public static int num_precinct_outcomes = 64;
     
     /*
 	@Override

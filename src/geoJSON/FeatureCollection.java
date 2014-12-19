@@ -115,6 +115,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.block = new Block();
 			f.block.name = f.properties.DISTRICT;
+			if( f.properties.POPULATION > 0) {
+				f.block.population = f.properties.POPULATION;
+				f.block.has_census_results = true;
+			}
 			blocks.add(f.block);
 			precinctHash.put(f.block.name,f.block);
 		}

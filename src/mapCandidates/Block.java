@@ -17,6 +17,7 @@ public class Block extends ReflectionJSONObject<Block> {
     public Vector<Demographic> demographics = new Vector<Demographic>();
     
     public boolean has_census_results = false;
+    public boolean has_election_results = false;
     public double population=1;
     
     

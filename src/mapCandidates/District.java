@@ -23,7 +23,7 @@ class District extends JSONObject {
         double pop = 0;
         for( Block block : blocks) {
         	if( block.demographics == null || block.demographics.size() == 0) {
-        		System.out.println("no demographics!");
+        		//System.out.println("no demographics!");
         	}
         	if( block.has_census_results) {
         		pop += block.population;

@@ -46,6 +46,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public Vector<DistrictMap> population = new Vector<DistrictMap>();
     
     public EvolveThread evolveThread; 
+    public long generation = 0;
     
     class EvolveThread extends Thread {
     	public void run() {
@@ -98,6 +99,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				//if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
                 			resize_population();
+                			match_population();
             	    		for( int i = 0; i < scoringThreads.length; i++) {
             	    			scoringThreads[i] = new ScoringThread();
             	    			scoringThreads[i].population = new Vector<DistrictMap>();
@@ -118,6 +120,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             			}
             			System.out.println();
         			}
+        			generation++;
 
         			
         			if( mapPanel != null) {
@@ -238,6 +241,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
  
     public void reset() {
     	population =  new Vector<DistrictMap>();
+    }
+    public void match_population() {
+    	/*
+    	int[] template = population.get(0).getGenome();
+    	for( DistrictMap dm : population) {
+    		dm.makeLike(template);
+    	}*/
     }
     public void resize_population() {
     	if( population == null) {

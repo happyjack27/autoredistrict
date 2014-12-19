@@ -21,9 +21,10 @@ import javax.swing.border.*;
 
 public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
-	boolean use_sample = true;
+	boolean use_sample = false;
 	double mutation_rate_multiplier = 0.1;
 	double boundary_mutation_rate_multiplier = 0.4;
+	long load_wait = 100;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmSingleThreadScoring = new JCheckBoxMenuItem("Single thread scoring");
@@ -76,8 +77,8 @@ public class MainFrame extends JFrame {
 		}
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
-		mntmStart.setEnabled(geo_loaded & election_loaded && !evolving);
-		mntmPause.setEnabled(geo_loaded & election_loaded && evolving);
+		mntmStart.setEnabled(geo_loaded && !evolving);
+		mntmPause.setEnabled(geo_loaded && evolving);
 		
 	}
 	
@@ -170,7 +171,7 @@ public class MainFrame extends JFrame {
 							byte[] bb = new byte[fis.available()];
 							fis.read(bb);
 							sb.append(new String(bb));
-							Thread.sleep(10);
+							Thread.sleep(load_wait);
 						}
 						
 						fis.close();
@@ -282,7 +283,7 @@ public class MainFrame extends JFrame {
 							byte[] bb = new byte[fis.available()];
 							fis.read(bb);
 							sb.append(new String(bb));
-							Thread.sleep(10);
+							Thread.sleep(load_wait);
 						}
 						
 						fis.close();
@@ -397,7 +398,7 @@ public class MainFrame extends JFrame {
 							byte[] bb = new byte[fis.available()];
 							fis.read(bb);
 							sb.append(new String(bb));
-							Thread.sleep(10);
+							Thread.sleep(load_wait);
 						}
 						
 						fis.close();
@@ -408,6 +409,39 @@ public class MainFrame extends JFrame {
 					}
 					String s = sb.toString();
 					String[] lines = s.split("\n");
+					
+					Vector<String> not_found_in_geo = new Vector<String>();
+					for( Block b : featureCollection.blocks) {
+						b.has_census_results = false;
+					}
+					for( int i = 0; i < lines.length; i++) {
+						String[] ss = lines[i].split("\t");
+						String district = ss[0].trim();
+						Block b = featureCollection.precinctHash.get(district);
+						if( b == null) {
+							not_found_in_geo.add(district);
+						} else {
+							b.has_census_results = true;
+						}
+					}
+					Vector<String> not_found_in_census = new Vector<String>();
+					for( Block b : featureCollection.blocks) {
+						if( b.has_census_results == false) {
+							not_found_in_census.add(b.name);
+						}
+					}
+					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
+						for( Block b : featureCollection.blocks) {
+							b.has_census_results = false;
+						}
+						JOptionPane.showMessageDialog(null,""
+								+"Census data doesn't match geographic data.\n"
+								+"Census data without matching geo data: "+not_found_in_geo.size()+"\n"
+								+"Geo data without matching census data: "+not_found_in_census.size()
+								, "Mismatch of geographic regions"
+								, 0);
+						return;
+					}
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
@@ -453,7 +487,7 @@ public class MainFrame extends JFrame {
 							byte[] bb = new byte[fis.available()];
 							fis.read(bb);
 							sb.append(new String(bb));
-							Thread.sleep(10);
+							Thread.sleep(load_wait);
 						}
 						
 						fis.close();
@@ -465,6 +499,46 @@ public class MainFrame extends JFrame {
 					String s = sb.toString();
 					String[] lines = s.split("\n");
 					int num_candidates = lines[0].split("\t").length - 1;
+					
+					Vector<String> not_found_in_geo = new Vector<String>();
+					for( Block b : featureCollection.blocks) {
+						b.has_election_results = false;
+					}
+					for( int i = 0; i < lines.length; i++) {
+						String[] ss = lines[i].split("\t");
+						String district = ss[0].trim();
+						Block b = featureCollection.precinctHash.get(district);
+						if( b == null) {
+							not_found_in_geo.add(district);
+							System.out.println("not in geo: "+district);
+
+						} else {
+							b.has_election_results = true;
+						}
+					}
+					Vector<String> not_found_in_census = new Vector<String>();
+					for( Block b : featureCollection.blocks) {
+						if( b.has_election_results == false) {
+							not_found_in_census.add(b.name);
+							System.out.println("not in election: |"+b.name+"|");
+
+						}
+					}
+					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
+						for( Block b : featureCollection.blocks) {
+							b.has_election_results = false;
+						}
+						JOptionPane.showMessageDialog(null,""
+								+"Election data doesn't match geographic data.\n"
+								+"Election data without matching geo data: "+not_found_in_geo.size()+"\n"
+								+"Geo data without matching election data: "+not_found_in_census.size()
+								, "Mismatch of geographic regions"
+								, 0);
+						return;
+					}
+					
+					
+					
 					HashMap<String,double[]> votes = new HashMap<String,double[]>();
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
@@ -478,7 +552,11 @@ public class MainFrame extends JFrame {
 							votes.put(district, dd);
 						}
 						for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
-							dd[j] += Double.parseDouble(ss[j+1].replaceAll(",",""));
+							try {
+								dd[j] += Double.parseDouble(ss[j+1].replaceAll(",",""));
+							} catch (Exception ex) {
+								
+							}
 						}
 					}
 					
@@ -722,7 +800,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		textField_1.setText("64");
+		textField_1.setText("32");
 		textField_1.setColumns(10);
 		
 		JLabel lblTrials = new JLabel("Elections simulated");
