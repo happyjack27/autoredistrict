@@ -28,6 +28,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //always find the most identical version before spawning new ones!
     //this dramatically reduces convergence time!
     public int[] getGenome(int[] baseline) {
+    	for( int i = 0; i < block_districts.length; i++) {
+    		while(block_districts[i] >= Settings.num_districts) {
+    			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    		}
+    	}
     	int[][] counts = new int[Settings.num_districts][];
     	for( int i = 0; i < counts.length; i++) {
     		counts[i] = new int[Settings.num_districts];
@@ -61,6 +66,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     	int[] new_baseline = new int[block_districts.length];
     	for( int i = 0; i < block_districts.length; i++) {
+    		while(block_districts[i] >= Settings.num_districts) {
+    			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    		}
     		new_baseline[i] = best_subst[block_districts[i]];
     	}
     	
@@ -87,6 +95,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < block_districts.length; i++) {
             if( Math.random() < prob) {
                 block_districts[i] = (int)(Math.floor(Math.random()*max));
+                while( block_districts[i] > Settings.num_districts) {
+                    block_districts[i] = (int)(Math.floor(Math.random()*max));
+                }
             }
         }
     }
@@ -293,6 +304,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			if( block_districts[i] >= target) {
     				int x = (int)Math.floor(Math.random() * d);
     				block_districts[i] = x;
+    				while( block_districts[i] >= target) {
+    	   				x = (int)Math.floor(Math.random() * d);
+        				block_districts[i] = x;
+        			}
+
     				districts.get(x).blocks.add(blocks.get(i));
     			}
     		}

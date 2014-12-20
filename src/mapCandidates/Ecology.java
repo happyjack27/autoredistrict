@@ -13,7 +13,7 @@ import ui.MapPanel;
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	static int verbosity = 0;
-	static boolean mate_merge = false;
+	static boolean mate_merge = true;
 	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
