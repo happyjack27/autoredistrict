@@ -28,6 +28,46 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //always find the most identical version before spawning new ones!
     //this dramatically reduces convergence time!
     public int[] getGenome(int[] baseline) {
+    	int[][] counts = new int[Settings.num_districts][];
+    	for( int i = 0; i < counts.length; i++) {
+    		counts[i] = new int[Settings.num_districts];
+        	for( int j = 0; j < counts.length; j++) {
+        		counts[i][j] = 0;
+            	for( int k = 0; k < block_districts.length; k++) {
+            		if( block_districts[k] == i && baseline[k] == j) {
+            			counts[i][j]++;
+            		}
+            	}
+        	}
+    	}
+    	int[] best_subst = new int[Settings.num_districts];
+    	int best_subst_matches = 0;
+    	for( int i = 0; i < counts.length; i++) {
+    		best_subst[i] = i;
+    	}  
+
+    	//now iterate through perms
+        for(Iterator<int[]> it = new PermIterator(Settings.num_districts); it.hasNext(); ) {
+        	int[] test_subst = it.next();
+        	int matches = 0;
+            for( int i = 0; i < test_subst.length; i++) {
+            	matches += counts[i][test_subst[i]];
+            }
+            if( matches > best_subst_matches) {
+            	best_subst_matches = matches;
+            	best_subst = test_subst;
+            }
+        }
+
+    	int[] new_baseline = new int[block_districts.length];
+    	for( int i = 0; i < block_districts.length; i++) {
+    		new_baseline[i] = best_subst[block_districts[i]];
+    	}
+    	
+    	return new_baseline;
+    	
+    	
+/*
          Vector<int[]> versions =  getIdenticalGenomes(getGenome());
          long closest = 9999999999999L;
          int[] closest_version = null;
@@ -39,6 +79,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
          }
          return closest_version;
+         */
     }
 
     public void mutate(double prob) {
