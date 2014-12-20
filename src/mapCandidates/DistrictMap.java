@@ -33,6 +33,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
     		}
     	}
+    	/*
+    	for( int i = 0; i < baseline.length; i++) {
+    		while(baseline[i] >= Settings.num_districts) {
+    			baseline[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    		}
+    	}*/
     	int[][] counts = new int[Settings.num_districts][];
     	for( int i = 0; i < counts.length; i++) {
     		counts[i] = new int[Settings.num_districts];
@@ -66,9 +72,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     	int[] new_baseline = new int[block_districts.length];
     	for( int i = 0; i < block_districts.length; i++) {
-    		while(block_districts[i] >= Settings.num_districts) {
-    			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
-    		}
     		new_baseline[i] = best_subst[block_districts[i]];
     	}
     	
