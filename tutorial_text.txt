@@ -25,13 +25,16 @@ How the program evolves districts
 
 * Connectedness -
 The total population that is not connected to the largest block in each district.
+connectedness: minimizes population not connected to the highest population chunk, 
 sum(region(population)) where region is not the largest region for the district
 
 * Compactness -
 The total length of the edges of all districts.
+compactness: minimizes total border length. 
 sum(length(edge)) of all edges where there is a different district on each side.
 
 * Population balance -
+population balance: minimizes the kullbach-leibler divergence from all districts having equal population.
 The amount of imbalance of the population of the districts.
 kullback-leibler divergence of the district populations from an equal distribution.
 total_population/num_districts
@@ -40,14 +43,21 @@ total_population/num_districts
 Number of elections to simulate for the remaining two criteria. (more elections means slower, but more accurate/stable)
 
 * Proportional representation -
+proportional repr. minimizes: the kl-divergence of the proportion of elected officials of each party from the proportion of votes for each party. 
+more weight on proportional representation will make the number of members elected of each party more closely match the proportion of citizens who voted that party. 
 This measures the kullback-leibler divergence of the election results, by party from the popular vote.
 
 * Voting power balance -
+voting power balance: minimizes kl-divergence of the self-entropy of the districts, weighted by population - meaning it makes it so each citizen has about the same chance of being a deciding vote - the same "voting power" - that their vote counts the same amount.
+more weight on voting power balance will make it draw maps where each person has about the same likilihood of affecting the outcome, regardless of what district they're in. 
 This attempts to balance out how much each person's vote counts.
 it calculates the self-entropy of the election results for each district. this represents how much information about the outcome the district create on average.
 the ideal distribution of that information is that each citizen has control over the same number of bits.
 So this ideal distribution of bits is compared against the actual the actual distribution, via the kullback-leibler divergence.
 (measuring how much the actual diverges from the ideal)
+
+these adjustable criteria together will automatically account for demographic imbalances and what not so as not to unfairly dilute any minority (or majority).
+
 
 -------
 each of the above are converted to a percentile.
@@ -83,35 +93,56 @@ select where to save it.
 micheal
 -------
 
-proportional repr. minimizes the kl-divergence of the proportion of elected officials of each party from the proportion of votes for each party. voting power balance minimizes kl-divergence of the self-entropy of the districts, weighted by population - meaning it makes it so each citizen has about the same chance of being a deciding vote - the same "voting power" - that their vote counts the same amount.
+compactness: minimizes total border length. 
+connectedness: minimizes population not connected to the highest population chunk, 
+population balance: minimizes the kullbach-leibler divergence from all districts having equal population.
+proportional repr. minimizes the kl-divergence of the proportion of elected officials of each party from the proportion of votes for each party. 
+voting power balance minimizes kl-divergence of the self-entropy of the districts, weighted by population - meaning it makes it so each citizen has about the same chance of being a deciding vote - the same "voting power" - that their vote counts the same amount.
 
-the resulting scores are converted to a percentile before they're weighted according to the sliders on the left and then added together. details in mapCandidates.Ecology.evolveWithSpeciation: https://github.com/.../master/src/mapCandidates/Ecology.java (note, i turned speciation off because it was too slow. but i might have a fix for that coming.)
+the resulting scores are converted to a percentile before they're weighted according to the sliders on the left and then added together.
+details in mapCandidates.Ecology.evolveWithSpeciation: https://github.com/.../master/src/mapCandidates/Ecology.java (note, i turned speciation off because it was too slow. but i might have a fix for that coming.)
 
 Any analysis of how this compares with current districts or plusses / minuses (or why)?
 
-I'm thinking of adding a feature where it shows the scores for the 5 criteria. And then I could add a feature where you can import a current congressional map. I've let it run to near completion on wisconsin congressional districts, and compared that visually with the actual district map in effect, and also a map of demographics (republican vs democratic), and i can tell just by looking at it that the map it generates has more proportional representation and voting power balance than the current one.
+I'm thinking of adding a feature where it shows the scores for the 5 criteria. 
+And then I could add a feature where you can import a current congressional map. 
+I've let it run to near completion on wisconsin congressional districts, and compared that visually with the actual district map in effect, and also a map of demographics (republican vs democratic), and i can tell just by looking at it that the map it generates has more proportional representation and voting power balance than the current one.
 
 -----------
 will
 ----
 
-I guess one of the tricky things about redistricting is that due relatively high amount segregation in most major urban areas in the country (which is where most Americans actually live nowadays), it's hard to draw straightforward maps like this that don't also have the unintended effect of diluting minority representation in government by packing the majority of the minority voters into a small number of districts. Several states (including Wisconsin) have been taken to court over this in the past few years.
+Q:
+I guess one of the tricky things about redistricting is that due relatively high amount segregation in most major urban areas in the country (which is where most Americans actually live nowadays), 
+it's hard to draw straightforward maps like this that don't also have the unintended effect of diluting minority representation in government by packing the majority of the minority voters into a small number of districts. 
+Several states (including Wisconsin) have been taken to court over this in the past few years.
 
 So, yeah, I guess it would be interesting if you could pull in demographic data on race and see how many minority-majority districts are in the new district maps created by your program vs the status quo.
 
-that's why there's two adjustable optimization parameters in my program: proportional representation and voting power balance. more weight on proportional representation will make the number of members elected of each party more closely match the proportion of citizens who voted that party. more weight on voting power balance will make it draw maps where each person has about the same likilihood of affecting the outcome, regardless of what district they're in. (the other two adjustable weights are geometric compactness and population balance.) these adjustable criteria together will automatically account for demographic imbalances and what not so as not to unfairly dilute any minority (or majority).
+A:
+that's why there's two adjustable optimization parameters in my program: proportional representation and voting power balance. 
+more weight on proportional representation will make the number of members elected of each party more closely match the proportion of citizens who voted that party. 
+more weight on voting power balance will make it draw maps where each person has about the same likilihood of affecting the outcome, regardless of what district they're in. 
+(the other two adjustable weights are geometric compactness and population balance.) 
+these adjustable criteria together will automatically account for demographic imbalances and what not so as not to unfairly dilute any minority (or majority).
 
-All the sliders are fully functional now! The last one i did - because it was the most complicated - was the above-mentioned "voting power" balance. It's based loosely on the http://en.m.wikipedia.org/wiki/Banzhaf_power_index . 
+All the sliders are fully functional now! The last one i did - because it was the most complicated - was the above-mentioned "voting power" balance. 
+It's based loosely on the http://en.m.wikipedia.org/wiki/Banzhaf_power_index . 
 
-Basically it simulates a whole bunch of elections based on the results of previous elections on the precinct-level, and then from those results measures how much of a "swing-district" each district is; how often the results vary. I use the formula for "self-entropy" to measure this. http://en.m.wikipedia.org/wiki/Self-information So then I have a measure of "voting power" in units of "bits" for each district. 
+Basically it simulates a whole bunch of elections based on the results of previous elections on the precinct-level, and then from those results measures how much of a "swing-district" each district is; how often the results vary. 
+I use the formula for "self-entropy" to measure this. http://en.m.wikipedia.org/wiki/Self-information 
+So then I have a measure of "voting power" in units of "bits" for each district. 
 
-Now I want to know how far off this is from each person having the same amount of "bits", so I calculate an "ideal" distribution based on the population of the districts (each person contribution te same number of bits), and then measure the kullbach-liebler divergence of the simulated distribution from the ideal distribution. http://en.m.wikipedia.org/wiki/Kullback-Leibler_divergence. This gives me a measure of the amount of information lost when the simulated distribution is used to estimate the ideal distribution. This is my score of "voting power imbalance".
+Now I want to know how far off this is from each person having the same amount of "bits", so I calculate an "ideal" distribution based on the population of the districts (each person contribution te same number of bits), and then measure the kullbach-liebler divergence of the simulated distribution from the ideal distribution. http://en.m.wikipedia.org/wiki/Kullback-Leibler_divergence. 
+This gives me a measure of the amount of information lost when the simulated distribution is used to estimate the ideal distribution. 
+This is my score of "voting power imbalance".
 
 I then rank all the candidate maps from best to worst, and replace the raw score with the "percentile" so to speak. 
 
 Finally this score is multiplied by where the slider for "voting power balance" is and added to the final score.
 
-This is the only scoring metric that has to simulate a number of election results, rather than just using one, or none. Consequently, it is by far he slowest / most CPU demanding. By orders of magnitude.
+This is the only scoring metric that has to simulate a number of election results, rather than just using one, or none. 
+Consequently, it is by far he slowest / most CPU demanding. By orders of magnitude.
 
 However, I believe it's an essential metric for minimizing injustice due to e.g. the above mentioned minority-majority district effects.
 
