@@ -117,9 +117,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public void mutate(double prob) {
         double max = Settings.num_districts;
         for( int i = 0; i < block_districts.length; i++) {
-            if( Math.random() < prob) {
+            if( Math.random() <= prob) {
                 block_districts[i] = (int)(Math.floor(Math.random()*max));
-                while( block_districts[i] > Settings.num_districts) {
+                while( block_districts[i] >= Settings.num_districts) {
                     block_districts[i] = (int)(Math.floor(Math.random()*max));
                 }
             }
@@ -266,7 +266,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for( District d : districts) {
     		d.blocks = new Vector<Block>();
     	}
-		while( Settings.num_districts >= districts.size()) {
+		while( Settings.num_districts > districts.size()) {
 			districts.add(new District());
 		}
 
@@ -284,7 +284,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		districts.get(district).blocks.add(blocks.get(i));
     	}
     	//make sure each district always has at least 1 block.
-    	for( int i = 0; i < districts.size(); i++) {
+    	for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
     		District d = districts.get(i);
     		if( d.blocks.size() == 0) {
     			int num_to_get = blocks.size() / (districts.size());

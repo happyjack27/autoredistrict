@@ -57,7 +57,9 @@ public class District extends JSONObject {
             		best_value = outcome[j];
             	}
             }
-            wins[best]++;
+            if( best >= 0) {
+            	wins[best]++;
+            }
         }
         for( int i = 0; i < wins.length; i++) {
             total += wins[i];

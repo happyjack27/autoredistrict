@@ -132,12 +132,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				mapPanel.repaint();
         			}
         			if( dostats) {
-        			if( statsPanel != null) {
-        				statsPanel.getStats();
-        			} else {
-        				System.out.println("stats panel is null");
-        			}
-        			}
+               			if( statsPanel != null) {
+            				statsPanel.getStats();
+            			} else {
+            				System.out.println("stats panel is null");
+            			}
+           			}
         			
     			} catch (Exception ex) {
     				System.out.println("ex "+ex);
