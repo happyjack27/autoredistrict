@@ -13,7 +13,8 @@ import ui.MapPanel;
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	static int verbosity = 0;
-	static boolean mate_merge = false;
+	static boolean initial_mate_merge = false;
+	static boolean mate_merge = true;
 	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
@@ -99,7 +100,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				//if( JOptionPane.showConfirmDialog(null, "resize population?") == JOptionPane.YES_OPTION) {
             				System.out.println("Adjusting population from "+population.size()+" to "+Settings.population+"...");
                 			resize_population();
-                			match_population();
+                			if( initial_mate_merge) {
+                				match_population();
+                			}
             	    		for( int i = 0; i < scoringThreads.length; i++) {
             	    			scoringThreads[i] = new ScoringThread();
             	    			scoringThreads[i].population = new Vector<DistrictMap>();
