@@ -126,7 +126,12 @@ public class District extends JSONObject {
                 	tot += block_vote[i];
                     district_vote[i] += block_vote[i];
                 }
-                tot = block.population/tot;
+                if( tot == 0) {
+                	tot = 0;
+                } else {
+                	tot = block.population/tot;
+                }
+                
                 for( int i = 0; i < block_vote.length; i++) {
                     pop_district_vote[i] += block_vote[i]*tot;
                 }

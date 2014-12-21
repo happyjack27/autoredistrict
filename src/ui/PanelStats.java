@@ -25,7 +25,7 @@ public class PanelStats extends JPanel {
 			return;
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
-		dm.calcFairnessScores(0);
+		dm.calcFairnessScores();
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
 		lblNewLabel_1.setText(""+dm.fairnessScores[0]);

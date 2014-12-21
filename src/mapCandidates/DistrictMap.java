@@ -272,6 +272,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     	for( int i = 0; i < block_districts.length; i++) {
     		int district = block_districts[i];
+    		if( district >= Settings.num_districts) {
+    			while( district  >= Settings.num_districts) {
+    				district = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    			}
+    			block_districts[i] = district;
+    		}
     		while( district >= districts.size()) {
     			districts.add(new District());
     		}
@@ -296,6 +302,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for( int i = 0; i < districts.size(); i++) {
     		districts.get(i).resetPopulation();
     	}
+		while( Settings.num_districts < districts.size()) {
+			districts.remove(Settings.num_districts);
+		}
+
     }
     public DistrictMap(Vector<Block> blocks, int num_districts) {
         this.num_districts = num_districts;
@@ -415,7 +425,23 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
     public double getKLDiv(double[] p, double[] q, double regularization_factor) {
-
+    	boolean verbose = false;
+    	if( regularization_factor == 1.1 && false) {
+    		verbose = true;
+    		regularization_factor = 1;
+    	}
+    	if( verbose) {
+            for( int i = 0; i < p.length; i++) {
+            	System.out.println(" "+i+" p: "+p[i]+" q: "+q[i]);
+            }
+    		
+    	}
+        //regularize (see "regularization" in statistics)
+        for( int i = 0; i < p.length; i++)
+            p[i]+=regularization_factor;  
+        for( int i = 0; i < q.length; i++)
+            q[i]+=regularization_factor;  
+        
         //get totals
         double totp = 0;
         for( int i = 0; i < p.length; i++)
@@ -424,16 +450,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < q.length; i++)
             totq += q[i];  
 
-        //make same ratio before regularizing.
+        //make same ratio.
         double ratio = totp/totq;
         for( int i = 0; i < q.length; i++)
             q[i] *= ratio;  
 
-        //regularize (see "regularization" in statistics)
-        for( int i = 0; i < p.length; i++)
-            p[i]+=regularization_factor;  
-        for( int i = 0; i < q.length; i++)
-            q[i]+=regularization_factor;  
 
         //normalize
         totp = 0;
@@ -450,8 +471,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //get kldiv
         double div = 0;
         for( int i = 0; i < q.length; i++) {
+        	if( p[i] == 0) {
+        		continue;
+        	}
         	double kl = p[i]*(Math.log(q[i]) - Math.log(p[i]));
-        	//System.out.println("i: "+i+" \tp: "+p[i]+" \tq:"+q[i]+" \tkl:"+kl);
+        	if( verbose) {
+        		System.out.println("i: "+i+" \tp: "+p[i]+" \tq:"+q[i]+" \tkl:"+kl);
+        	}
             div += kl;
         }
         return -div;
@@ -460,7 +486,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //returns total edge length, unfairness, population imbalance
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
     //all measures should be minimized.
-    public void calcFairnessScores(int trials) {
+    public void calcFairnessScores() {
     	
     	long time0 = System.currentTimeMillis();    	
     	//===fairness score: compactness
@@ -597,7 +623,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
             }
         }
-        disconnected_pops /= total_population;
+        //disconnected_pops /= total_population;
         
     	long time5 = System.currentTimeMillis();
 
