@@ -931,7 +931,7 @@ public class MainFrame extends JFrame {
 		
 		chckbxmntmMutateAll.setSelected(true);
 		Settings.mutate_all = true;
-		Settings.speciation_fraction = 1.0;
+		//Settings.speciation_fraction = 0.5;//1.0;
 		Settings.disconnected_population_weight = 0.0;
 
 		splitPane.setRightComponent(mapPanel);

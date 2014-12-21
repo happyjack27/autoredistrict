@@ -3,6 +3,10 @@ package mapCandidates;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
+	public static boolean mate_merge = false;
+    public static double speciation_fraction = 0;
+
+
 	public static boolean multiThreadScoring = true;
 	public static boolean multiThreadMating = true;
 	public static boolean multiThreadMutatting = true;
@@ -20,7 +24,6 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double disenfranchise_weight = 1;
     public static double voting_power_balance_weight = 1;
     
-    public static double speciation_fraction = 0.5;
     public static double replace_fraction = 0.5;
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;

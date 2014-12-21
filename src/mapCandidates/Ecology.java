@@ -14,8 +14,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	
 	static int verbosity = 0;
 	static boolean initial_mate_merge = false;
-	static boolean mate_merge = true;
-	
 	public ScoringThread[] scoringThreads;
 	public ExecutorService scoringThreadPool;
 	public CountDownLatch scoringLatch;
@@ -399,7 +397,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 DistrictMap map1 = available_mate.get(g1);
                 if( speciation_cutoff != cutoff) {
                     for(DistrictMap m : available_mate) {
-                        if( mate_merge) {
+                        if( Settings.mate_merge) {
                             m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
                         } else {
                             m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
@@ -411,7 +409,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 int g2 = (int)(Math.random()*(double)speciation_cutoff);
                 DistrictMap map2 = available_mate.get(g2);
 
-                if( mate_merge) {
+                if( Settings.mate_merge) {
                     population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
                 } else {
                     population.get(i).crossover(map1.getGenome(), map2.getGenome());
@@ -464,7 +462,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 if( speciation_cutoff != cutoff) {
                     for(DistrictMap m : available_mate) {
                         //m.makeLike(map1.getGenome());
-                        if( mate_merge) {
+                        if( Settings.mate_merge) {
                             m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
                         } else {
                             m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
@@ -479,7 +477,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 int g2 = (int)(Math.random()*(double)speciation_cutoff);
                 DistrictMap map2 = available_mate.get(g2);
 
-                if( mate_merge) {
+                if( Settings.mate_merge) {
                     population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
                 } else {
                     population.get(i).crossover(map1.getGenome(), map2.getGenome());
@@ -550,7 +548,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             int g1 = (int)(Math.random()*(double)cutoff);
             int g2 = (int)(Math.random()*(double)cutoff);
             DistrictMap dm = population.get(i); 
-            if( mate_merge) {
+            if( Settings.mate_merge) {
             	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
             } else {
             	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome());
