@@ -7,6 +7,8 @@ public class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
     
     public static boolean adjust_vote_to_population = true;
+    public static boolean self_entropy_by_vote_count = true;
+
 
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
@@ -49,17 +51,23 @@ public class District extends JSONObject {
         }
         for( int i = 0; i < outcomes.length; i++) {
         	double[] outcome = outcomes[i];
-        	int best = -1;
-        	double best_value = -1;
-            for( int j = 0; j < outcome.length; j++) {
-            	if( outcome[j] > best_value) {
-            		best = j;
-            		best_value = outcome[j];
-            	}
-            }
-            if( best >= 0) {
-            	wins[best]++;
-            }
+        	if( self_entropy_by_vote_count) {
+                for( int j = 0; j < outcome.length; j++) {
+                	wins[j] += outcome[j];
+                }
+        	} else {
+            	int best = -1;
+            	double best_value = -1;
+                for( int j = 0; j < outcome.length; j++) {
+                	if( outcome[j] > best_value) {
+                		best = j;
+                		best_value = outcome[j];
+                	}
+                }
+                if( best >= 0) {
+                	wins[best]++;
+                }
+        	}
         }
         for( int i = 0; i < wins.length; i++) {
             total += wins[i];

@@ -426,9 +426,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
     public double getKLDiv(double[] p, double[] q, double regularization_factor) {
     	boolean verbose = false;
-    	if( regularization_factor == 1.1 && false) {
-    		verbose = true;
-    		regularization_factor = 1;
+    	if( regularization_factor == 1.2 || regularization_factor == 0.01) {
+    		if( false) {
+    			verbose = true;
+    			System.out.println(" reg: "+regularization_factor);
+    		}
+    		//regularization_factor = 1;
     	}
     	if( verbose) {
             for( int i = 0; i < p.length; i++) {
@@ -584,7 +587,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 }
             }
             time20 = System.currentTimeMillis();
-            disproportional_representation = getKLDiv(p,q,1);
+            disproportional_representation = getKLDiv(p,q,1.2);
     	}
 
     	long time3 = System.currentTimeMillis();
