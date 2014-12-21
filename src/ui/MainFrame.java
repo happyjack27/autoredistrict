@@ -60,6 +60,9 @@ public class MainFrame extends JFrame {
 	double minx,maxx,miny,maxy;
 	
 	MapPanel mapPanel = new MapPanel(); 
+	
+	JFrame frameStats = new JFrame();
+	PanelStats panelStats = new PanelStats();
 
 
 	//public Ecology ecology = new Ecology();
@@ -155,6 +158,10 @@ public class MainFrame extends JFrame {
 				
 				featureCollection = new FeatureCollection(); 
 				featureCollection.features = new Vector<Feature>();
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
 				for( int i = 0; i < ff.length; i++) {
@@ -182,6 +189,10 @@ public class MainFrame extends JFrame {
 					} 
 					
 					FeatureCollection fc = new FeatureCollection();
+					if( panelStats != null) {
+						panelStats.featureCollection = featureCollection;
+					}
+
 					try {
 						fc.fromJSON(sb.toString());
 					} catch (Exception ex) {
@@ -245,6 +256,7 @@ public class MainFrame extends JFrame {
 				mapPanel.invalidate();
 				mapPanel.repaint();
 				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.ecology.statsPanel = panelStats;
 				featureCollection.initEcology();
 				System.out.println("Ready.");
 				
@@ -266,6 +278,10 @@ public class MainFrame extends JFrame {
 				File[] ff = new File[]{fd};//fd.listFiles();
 				
 				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
 				featureCollection.features = new Vector<Feature>();
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
@@ -300,6 +316,10 @@ public class MainFrame extends JFrame {
 					setEnableds();
 					
 					FeatureCollection fc = new FeatureCollection();
+					if( panelStats != null) {
+						panelStats.featureCollection = featureCollection;
+					}
+
 					try {
 						fc.fromJSON(sb.toString());
 					} catch (Exception ex) {
@@ -360,6 +380,7 @@ public class MainFrame extends JFrame {
 				mapPanel.invalidate();
 				mapPanel.repaint();
 				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.ecology.statsPanel = panelStats;
 				featureCollection.initEcology();
 				
 
@@ -636,6 +657,9 @@ public class MainFrame extends JFrame {
 				Feature.display_mode = 0; 
 				Settings.population = Integer.parseInt(textField.getText());
 				Settings.num_districts = Integer.parseInt(textField_2.getText().trim());
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
 				featureCollection.ecology.startEvolving();
 				evolving = true;
 				setEnableds();
@@ -699,6 +723,10 @@ public class MainFrame extends JFrame {
 		mnView.add(chckbxmntmShowDistrictLabels);
 		
 		JMenu mnResults = new JMenu("Results");
+		mnResults.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		menuBar.add(mnResults);
 		
 		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
@@ -735,7 +763,28 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
+		
+		JMenuItem mntmShowStats = new JMenuItem("Show stats");
+		mntmShowStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					frameStats.show();
+					frameStats.invalidate();
+					frameStats.repaint();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					
+				}
+			}
+		});
+		mnResults.add(mntmShowStats);
+		
+		JSeparator separator_2 = new JSeparator();
+		mnResults.add(separator_2);
 		mnResults.add(mntmExportcsv);
+		
+		JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
+		mnResults.add(mntmImportcsv);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -936,7 +985,15 @@ public class MainFrame extends JFrame {
 
 		splitPane.setRightComponent(mapPanel);
 		
+		panelStats.featureCollection = featureCollection;
+		frameStats = new JFrame();
+		frameStats.setContentPane(panelStats);
+		frameStats.setTitle("Map stats");
+		//frameStats.setPreferredSize(panelStats.getPreferredSize());
+		Dimension dim = panelStats.getPreferredSize();
+		dim.height += 20;
 		
+		frameStats.setSize(dim);
 		setEnableds();
 	}
 }

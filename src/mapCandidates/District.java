@@ -3,7 +3,7 @@ import java.util.*;
 
 import serialization.JSONObject;
 
-class District extends JSONObject {
+public class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
     
     public static boolean adjust_vote_to_population = true;
@@ -16,7 +16,7 @@ class District extends JSONObject {
     	population = -1;
     }
 
-    double getPopulation() {
+    public double getPopulation() {
     	if( population >= 0) {
     		return population;
     	}

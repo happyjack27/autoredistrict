@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 
 import serialization.*;
 import ui.MapPanel;
+import ui.PanelStats;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
@@ -38,6 +39,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
 	public MapPanel mapPanel;
+	public PanelStats statsPanel;
 	
 
 	Settings settings = new Settings();
@@ -127,6 +129,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         			if( mapPanel != null) {
         				mapPanel.invalidate();
         				mapPanel.repaint();
+        			}
+        			if( statsPanel != null) {
+        				statsPanel.getStats();
+        			} else {
+        				System.out.println("stats panel is null");
         			}
         			
     			} catch (Exception ex) {
