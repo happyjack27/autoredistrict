@@ -9,6 +9,7 @@ import mapCandidates.*;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PanelStats extends JPanel {
@@ -26,13 +27,16 @@ public class PanelStats extends JPanel {
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
 		dm.calcFairnessScores();
+		double conversion_to_bits = 1.0/Math.log(2.0);
+		DecimalFormat decimal = new DecimalFormat("###,##0.000000000");
+		DecimalFormat integer = new DecimalFormat("###,###,###,###,##0");
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
 		lblNewLabel_1.setText(""+dm.fairnessScores[0]);
-		label_1.setText(""+dm.fairnessScores[3]);
-		label_3.setText(""+dm.fairnessScores[2]);
-		label_5.setText(""+dm.fairnessScores[1]);
-		label_7.setText(""+dm.fairnessScores[4]);
+		label_1.setText(""+integer.format(dm.fairnessScores[3]));
+		label_3.setText(""+decimal.format(dm.fairnessScores[2]*conversion_to_bits)+" bits");
+		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
+		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		
 		try {
 			
@@ -59,7 +63,7 @@ public class PanelStats extends JPanel {
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
 				String population = ""+(int)d.getPopulation();
-				String self_entropy = ""+d.getSelfEntropy(null);
+				double self_entropy = d.getSelfEntropy(null);
 				//String edge_length = ""+d.getEdgeLength();
 				double [] dd = d.getVotes();
 				double total = 0;
@@ -79,12 +83,15 @@ public class PanelStats extends JPanel {
 				ddata[i][0] = ""+i;
 				ddata[i][1] = ""+population;
 				ddata[i][2] = ""+winner;
-				ddata[i][3] = ""+self_entropy;
+				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
+				for( int j = 4; j < ddata[i].length; j++) {
+					ddata[i][j] = "";
+				}
 				for( int j = 0; j < dd.length; j++) {
 					ddata[i][j+4] = ""+(dd[j]/total);
 				}
 				for( int j = 0; j < dd.length; j++) {
-					ddata[i][j+4+Candidate.candidates.size()] = ""+(int)dd[j];
+					ddata[i][j+4+Candidate.candidates.size()] = ""+integer.format(dd[j]);
 				}	
 			}
 			//			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
@@ -92,8 +99,8 @@ public class PanelStats extends JPanel {
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				cdata[i] = new String[]{
 						""+i,
-						""+(int)elec_counts[i],
-						""+(int)vote_counts[i],
+						""+integer.format(elec_counts[i]),
+						""+integer.format(vote_counts[i]),
 						""+(elec_counts[i]/(double)dm.districts.size()),
 						""+(vote_counts[i]/tot_votes)
 				};
@@ -125,7 +132,7 @@ public class PanelStats extends JPanel {
 		lblNewLabel.setBounds(6, 6, 202, 16);
 		add(lblNewLabel);
 		
-		lblNewLabel_1.setBounds(220, 5, 120, 16);
+		lblNewLabel_1.setBounds(220, 5, 196, 16);
 		add(lblNewLabel_1);
 		
 		JLabel lblDisconnectedPopulation = new JLabel("Disconnected population:");
@@ -134,7 +141,7 @@ public class PanelStats extends JPanel {
 		lblDisconnectedPopulation.setBounds(6, 34, 202, 16);
 		add(lblDisconnectedPopulation);
 		
-		label_1.setBounds(220, 34, 120, 16);
+		label_1.setBounds(220, 34, 196, 16);
 		add(label_1);
 		
 		JLabel lblPopulationBalance = new JLabel("Population imbalance:");
@@ -143,7 +150,7 @@ public class PanelStats extends JPanel {
 		lblPopulationBalance.setBounds(6, 62, 202, 16);
 		add(lblPopulationBalance);
 		
-		label_3.setBounds(220, 62, 120, 16);
+		label_3.setBounds(220, 62, 196, 16);
 		add(label_3);
 		
 		JLabel lblDisproportionateRepresentation = new JLabel("Representation imbalance:");
@@ -152,7 +159,7 @@ public class PanelStats extends JPanel {
 		lblDisproportionateRepresentation.setBounds(6, 90, 202, 16);
 		add(lblDisproportionateRepresentation);
 		
-		label_5.setBounds(220, 90, 120, 16);
+		label_5.setBounds(220, 90, 196, 16);
 		add(label_5);
 		
 		JLabel lblPowerImbalance = new JLabel("Power imbalance:");
@@ -161,7 +168,7 @@ public class PanelStats extends JPanel {
 		lblPowerImbalance.setBounds(6, 118, 202, 16);
 		add(lblPowerImbalance);
 		
-		label_7.setBounds(220, 118, 120, 16);
+		label_7.setBounds(220, 118, 202, 16);
 		add(label_7);
 		
 		JScrollPane scrollPane = new JScrollPane();

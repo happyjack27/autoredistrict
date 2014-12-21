@@ -4,8 +4,7 @@ import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean mate_merge = false;
-    public static double speciation_fraction = 0;
-
+    public static double species_fraction = 1.0;
 
 	public static boolean multiThreadScoring = true;
 	public static boolean multiThreadMating = true;
@@ -13,7 +12,6 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean mutate_all = true;
 
     public static boolean mutate_to_neighbor_only = false;
-    public static double species_fraction = 0.25;
 
     //spatial metrics
     public static double geometry_weight = 1;

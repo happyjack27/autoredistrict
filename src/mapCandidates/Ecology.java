@@ -12,6 +12,7 @@ import ui.MapPanel;
 import ui.PanelStats;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
+	static boolean dostats = true;
 	
 	static int verbosity = 0;
 	static boolean initial_mate_merge = false;
@@ -130,10 +131,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				mapPanel.invalidate();
         				mapPanel.repaint();
         			}
+        			if( dostats) {
         			if( statsPanel != null) {
         				statsPanel.getStats();
         			} else {
         				System.out.println("stats panel is null");
+        			}
         			}
         			
     			} catch (Exception ex) {
