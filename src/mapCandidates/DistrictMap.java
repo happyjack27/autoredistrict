@@ -32,7 +32,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		while(block_districts[i] >= Settings.num_districts) {
     			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
     		}
-    	}
+    	}/*
+    	int orig_matches = 0;
+    	for( int i = 0; i < block_districts.length; i++) {
+			if( block_districts[i] == baseline[i])
+				orig_matches++;
+    	}*/
     	/*
     	for( int i = 0; i < baseline.length; i++) {
     		while(baseline[i] >= Settings.num_districts) {
@@ -63,18 +68,34 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	int matches = 0;
             for( int i = 0; i < test_subst.length; i++) {
             	matches += counts[i][test_subst[i]];
+            	//matches += counts[test_subst[i]][i];
             }
             if( matches > best_subst_matches) {
             	best_subst_matches = matches;
-            	best_subst = test_subst;
+                for( int i = 0; i < test_subst.length; i++) {
+                	best_subst[i] = test_subst[i];
+                }
             }
         }
-
+        
+        /*
+        for( int i = 0; i < best_subst.length; i++) {
+        	System.out.print(best_subst[i]);
+        }
+        System.out.print(" ");
+*/
     	int[] new_baseline = new int[block_districts.length];
     	for( int i = 0; i < block_districts.length; i++) {
     		new_baseline[i] = best_subst[block_districts[i]];
     	}
-    	
+    	/*
+    	int new_matches = 0;
+    	for( int i = 0; i < new_baseline.length; i++) {
+    			if( new_baseline[i] == baseline[i])
+    				new_matches++;
+    	}*/
+    	//System.out.println("orig: "+orig_matches+" new: "+new_matches+" expected: "+best_subst_matches+" improv: "+(new_matches-orig_matches));
+
     	return new_baseline;
     	
     	
@@ -167,6 +188,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
     }
     public void makeLike(int[] genome) {
+    	setGenome(getGenome(genome));
+    	/*
         Vector<int[]> identicals = getIdenticalGenomes(getGenome());
         int lowest_score = 0;
         int best_match = -1;
@@ -178,6 +201,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
         setGenome(identicals.get(best_match));
+        */
     }
 
 
@@ -333,7 +357,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     public void setGenome(int[] genome) {
         block_districts = genome;
-        System.out.println("setgenome districts "+num_districts);
+        //System.out.println("setgenome districts "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());

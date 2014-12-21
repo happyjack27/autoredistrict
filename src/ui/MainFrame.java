@@ -635,7 +635,7 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				Feature.display_mode = 0; 
 				Settings.population = Integer.parseInt(textField.getText());
-				Settings.num_districts = Integer.parseInt(textField_2.getText());
+				Settings.num_districts = Integer.parseInt(textField_2.getText().trim());
 				featureCollection.ecology.startEvolving();
 				evolving = true;
 				setEnableds();

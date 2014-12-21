@@ -243,11 +243,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	population =  new Vector<DistrictMap>();
     }
     public void match_population() {
-    	/*
+    	
     	int[] template = population.get(0).getGenome();
     	for( DistrictMap dm : population) {
     		dm.makeLike(template);
-    	}*/
+    	}
     }
     public void resize_population() {
     	if( population == null) {
