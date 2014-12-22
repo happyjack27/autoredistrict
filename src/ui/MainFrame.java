@@ -75,6 +75,10 @@ public class MainFrame extends JFrame {
 	private final JSeparator separator_3 = new JSeparator();
 	private final JMenuItem mntmExportPopulation = new JMenuItem("Export population");
 	private final JMenuItem mntmImportPopulation = new JMenuItem("Import population");
+	private final JSeparator separator_4 = new JSeparator();
+	private final JSeparator separator_5 = new JSeparator();
+	private final JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
+	private final JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -86,6 +90,15 @@ public class MainFrame extends JFrame {
 		mntmStart.setEnabled(geo_loaded && !evolving);
 		mntmPause.setEnabled(geo_loaded && evolving);
 		
+	}
+	
+	public void resetZoom() {
+		boolean flipx = chckbxmntmFlipHorizontal.isSelected();
+		boolean flipy = chckbxmntmFlipVertical.isSelected();
+		mapPanel.minx = flipx ? maxx : minx;
+		mapPanel.maxx = flipx ? minx : maxx;
+		mapPanel.miny = flipy ? maxy : miny;
+		mapPanel.maxy = flipy ? miny : maxy;
 	}
 	
 	public MainFrame() { 
@@ -232,13 +245,7 @@ public class MainFrame extends JFrame {
 				}
 				System.out.println(""+minx+","+miny);
 				System.out.println(""+maxx+","+maxy);
-				
-				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
-				boolean flipy = chckbxmntmFlipVertical.isSelected();
-				mapPanel.minx = flipx ? maxx : minx;
-				mapPanel.maxx = flipx ? minx : maxx;
-				mapPanel.miny = flipy ? maxy : miny;
-				mapPanel.maxy = flipy ? miny : maxy;
+				resetZoom();
 				mapPanel.featureCollection = featureCollection;
 				mapPanel.invalidate();
 				mapPanel.repaint();
@@ -338,11 +345,8 @@ public class MainFrame extends JFrame {
 				}
 				System.out.println(""+minx+","+miny);
 				System.out.println(""+maxx+","+maxy);
+				resetZoom();
 				
-				mapPanel.minx = minx;
-				mapPanel.miny = miny;
-				mapPanel.maxx = maxx;
-				mapPanel.maxy = maxy;
 				mapPanel.featureCollection = featureCollection;
 				mapPanel.invalidate();
 				mapPanel.repaint();
@@ -617,28 +621,14 @@ public class MainFrame extends JFrame {
 		menuBar.add(mnView);
 		chckbxmntmFlipVertical.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
-				boolean flipy = chckbxmntmFlipVertical.isSelected();
-				mapPanel.minx = flipx ? maxx : minx;
-				mapPanel.maxx = flipx ? minx : maxx;
-				mapPanel.miny = flipy ? maxy : miny;
-				mapPanel.maxy = flipy ? miny : maxy;
-				mapPanel.invalidate();
-				mapPanel.repaint();
+				resetZoom();
 			}
 		});
 		mnView.add(chckbxmntmFlipVertical);
 		
 		chckbxmntmFlipHorizontal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean flipx = chckbxmntmFlipHorizontal.isSelected();
-				boolean flipy = chckbxmntmFlipVertical.isSelected();
-				mapPanel.minx = flipx ? maxx : minx;
-				mapPanel.maxx = flipx ? minx : maxx;
-				mapPanel.miny = flipy ? maxy : miny;
-				mapPanel.maxy = flipy ? miny : maxy;
-				mapPanel.invalidate();
-				mapPanel.repaint();
+				resetZoom();
 			}
 		});
 		mnView.add(chckbxmntmFlipHorizontal);
@@ -650,20 +640,35 @@ public class MainFrame extends JFrame {
 				mapPanel.repaint();
 			}
 		});
+		
+		mnView.add(separator_4);
 		mnView.add(chckbxmntmShowPrecinctLabels);
 		
 		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(null,"Not implemented");
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
 		
-		JMenu mnResults = new JMenu("Results");
-		mnResults.addActionListener(new ActionListener() {
+		mnView.add(separator_5);
+		mntmResetZoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				resetZoom();
 			}
 		});
+		
+		mnView.add(mntmResetZoom);
+		mntmZoomIn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null,"Not implemented");
+			}
+		});
+		
+		mnView.add(mntmZoomIn);
+		
+		JMenu mnResults = new JMenu("Results");
 		menuBar.add(mnResults);
 		
 		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");

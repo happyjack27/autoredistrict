@@ -2,6 +2,11 @@
 
 How to run the program
 ======================
+1. make sure you have the Java runtime environment (JRE) installed.  It can be downloaded from oracle's website.
+
+2 (windows).  Run jar/run.bat
+
+2 (linux or mac). Run jar/run.sh
 
 
 How to load a map to create districts for

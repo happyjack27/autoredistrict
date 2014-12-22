@@ -1,0 +1,1 @@
+java -jar autoredistrct.jar -Xmx4096M -Xms1024M
