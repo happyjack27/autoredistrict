@@ -784,6 +784,9 @@ public class MainFrame extends JFrame {
 				if( featureCollection.ecology.population.size() < 1) {
 					featureCollection.ecology.population.add(new DistrictMap(featureCollection.blocks,Settings.num_districts,new_block_districts));
 				}
+				while( featureCollection.ecology.population.size() < Settings.population) {
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.blocks,Settings.num_districts,new_block_districts));
+				}
 				for( DistrictMap dm : featureCollection.ecology.population) {
 					dm.setGenome(new_block_districts);
 					dm.fillDistrictBlocks();
@@ -801,7 +804,39 @@ public class MainFrame extends JFrame {
 		mnResults.add(separator_3);
 		mntmExportPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,"Not implemented.");
+				//JOptionPane.showMessageDialog(null,"Not implemented.");
+				if( featureCollection.ecology.population == null || featureCollection.ecology.population.size() == 0) {
+					JOptionPane.showMessageDialog(null,"No results");
+				}
+				JFileChooser jfc = new JFileChooser();
+				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				jfc.showSaveDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				for( int pop = 0; pop < featureCollection.ecology.population.size(); pop++) {
+					//StringBuffer sb = new StringBuffer();
+					try {
+						File f = new File(fd.getAbsolutePath()+File.separator+pop+".csv");
+						FileOutputStream fis = new FileOutputStream(f);
+						
+						DistrictMap dm = featureCollection.ecology.population.get(pop);
+						for( int i = 0; i < dm.block_districts.length; i++) {
+							Block b = featureCollection.ecology.blocks.get(i);
+							//sb.append(b.name+", "+dm.block_districts[i]+"\n\r");
+							fis.write((""+b.name.trim()+", "+dm.block_districts[i]+"\r\n").getBytes());
+						}
+						
+						//fis.write(sb.toString().getBytes());
+						fis.flush();
+						fis.close();
+					} catch (Exception ex) {
+						// TODO Auto-generated catch block
+						ex.printStackTrace();
+					}
+				}
+				JOptionPane.showMessageDialog(null,"File saved.");
 			}
 		});
 		
