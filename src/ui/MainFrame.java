@@ -99,6 +99,8 @@ public class MainFrame extends JFrame {
 		mapPanel.maxx = flipx ? minx : maxx;
 		mapPanel.miny = flipy ? maxy : miny;
 		mapPanel.maxy = flipy ? miny : maxy;
+		mapPanel.invalidate();
+		mapPanel.repaint();
 	}
 	
 	public MainFrame() { 
@@ -662,7 +664,9 @@ public class MainFrame extends JFrame {
 		mnView.add(mntmResetZoom);
 		mntmZoomIn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null,"Not implemented");
+				mapPanel.selection = null;
+				mapPanel.zooming = true;
+				//JOptionPane.showMessageDialog(null,"Not implemented");
 			}
 		});
 		

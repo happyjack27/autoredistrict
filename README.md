@@ -8,15 +8,15 @@ DONE:
 7. multithread testing, but reusable threads.
 8. add exporting of results ( simple tab deliminted: precinct - district)
 *. add listener to num of districts to adjust, should be a target and work together with evolve. 
+1. add zoom in feature
 
 TODO:
-1. add zoom in feature
 2. add load district info from geojson (they can choose the property, shift from 1-index)
 3. add save district info frtoom geojson (they can choose the property, shift to 1-index)
-4. create help text for all of the menu items, sliders, etc.
-5. add tooltips for all of the menu items, sliders, etc.
-6. move algorithm pieces into advanced help
-7. implement show district labels
+4. implement show district labels
+5. create help text for all of the menu items, sliders, etc.
+6. add tooltips for all of the menu items, sliders, etc.
+7. move algorithm pieces into advanced help
 
 
 	/*

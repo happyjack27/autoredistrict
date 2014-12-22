@@ -4,24 +4,23 @@ import geoJSON.Feature;
 import geoJSON.FeatureCollection;
 import geoJSON.Geometry;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Polygon;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Vector;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 
-public class MapPanel extends JPanel implements MouseListener {
+public class MapPanel extends JPanel implements MouseListener, MouseMotionListener {
 	double minx,maxx,miny,maxy;
 	FeatureCollection featureCollection;
+	boolean zooming = false;
+	Rectangle selection = null;
 
 	MapPanel() {
         // set a preferred size for the custom panel.
         setPreferredSize(new Dimension(200,200));
         this.addMouseListener(this);
+        this.addMouseMotionListener(this);
     }
 
     @Override
@@ -36,6 +35,15 @@ public class MapPanel extends JPanel implements MouseListener {
         Geometry.scaley = scaley;
         if( featureCollection != null) {
         	featureCollection.draw(g);
+        }
+        if( zooming) {
+        	if( selection != null) {
+        		//Color c = new Color();
+        		g.setColor(new Color(128,128,128,128));
+        		g.fillRect(selection.x, selection.y, selection.width, selection.height);
+           		g.setColor(new Color(255,255,255,255));
+           		g.drawRect(selection.x, selection.y, selection.width, selection.height);
+        	}
         }
     }
 
@@ -58,6 +66,11 @@ public class MapPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
+		if( zooming) {
+			selection = new Rectangle(arg0.getX(),arg0.getY(),0,0);
+			
+			return;
+		}
 		int x = arg0.getX();
 		int y = arg0.getY();
 		//System.out.println("mouse pressed "+x+" "+y);
@@ -73,6 +86,9 @@ public class MapPanel extends JPanel implements MouseListener {
 		
 	}
 	Feature getFeature(int x, int y) {
+		if( featureCollection == null || featureCollection.features == null) {
+			return null;
+		}
 		for( Feature f : featureCollection.features) {
 			for( Polygon p : f.geometry.polygons) {
 				if( pnpoly(p,x,y)) {
@@ -107,6 +123,56 @@ public class MapPanel extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
+		if( zooming) {
+			if( selection == null) {
+				return;
+			}
+ 			int w = arg0.getX()-selection.x;
+ 			int h = arg0.getY()-selection.y;
+ 			selection.width = w;
+ 			selection.height = h;
+			zooming = false;
+			zoomTo(selection);
+			invalidate();
+			repaint();
+		}
+	}
+	
+	public void zoomTo(Rectangle r) {
+        Dimension d = this.getSize();
+        double scalex = ((double)d.getWidth())/(maxx-minx);
+        double scaley = ((double)d.getHeight())/(maxy-miny);
+        double x0 = minx+r.x/scalex;
+        double y0 = miny+r.y/scaley;
+        double x1 = minx+(r.x+r.width)/scalex;
+        double y1 = miny+(r.y+r.height)/scaley;
+        minx = x0;
+        miny = y0;
+        maxx = x1;
+        maxy = y1;
+
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if( zooming) {
+			if( selection == null) {
+				return;
+			}
+ 			int w = e.getX()-selection.x;
+ 			int h = e.getY()-selection.y;
+ 			selection.width = w;
+ 			selection.height = h;
+			invalidate();
+			repaint();
+		}
+
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
