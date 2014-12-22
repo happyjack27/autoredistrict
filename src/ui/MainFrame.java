@@ -72,6 +72,9 @@ public class MainFrame extends JFrame {
 	boolean census_loaded = false;
 	boolean election_loaded = false;
 	boolean evolving = false;
+	private final JSeparator separator_3 = new JSeparator();
+	private final JMenuItem mntmExportPopulation = new JMenuItem("Export population");
+	private final JMenuItem mntmImportPopulation = new JMenuItem("Import population");
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -136,7 +139,6 @@ public class MainFrame extends JFrame {
 				} else {
 					JFileChooser jfc = new JFileChooser();
 					jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					//jfc.sh
 					jfc.showOpenDialog(null);
 					fd = jfc.getSelectedFile();
 				}
@@ -171,22 +173,7 @@ public class MainFrame extends JFrame {
 					}
 					System.out.println("Processing "+s+"...");
 					File f = ff[i];
-					StringBuffer sb = new StringBuffer();
-					try {
-						FileInputStream fis = new FileInputStream(f);
-						while( fis.available() > 0) {
-							byte[] bb = new byte[fis.available()];
-							fis.read(bb);
-							sb.append(new String(bb));
-							Thread.sleep(load_wait);
-						}
-						
-						fis.close();
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						return;
-					} 
+					StringBuffer sb = getFile(f);
 					
 					FeatureCollection fc = new FeatureCollection();
 					if( panelStats != null) {
@@ -268,13 +255,8 @@ public class MainFrame extends JFrame {
 		mntmOpenGeojson.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
-				//jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				//jfc.sh
 				jfc.showOpenDialog(null);
 				File fd = jfc.getSelectedFile();
-				/*if( !fd.isDirectory()) {
-					return;
-				}*/
 				File[] ff = new File[]{fd};//fd.listFiles();
 				
 				featureCollection = new FeatureCollection(); 
@@ -292,22 +274,7 @@ public class MainFrame extends JFrame {
 					}
 					System.out.println("Processing "+s+"...");
 					File f = ff[i];
-					StringBuffer sb = new StringBuffer();
-					try {
-						FileInputStream fis = new FileInputStream(f);
-						while( fis.available() > 0) {
-							byte[] bb = new byte[fis.available()];
-							fis.read(bb);
-							sb.append(new String(bb));
-							Thread.sleep(load_wait);
-						}
-						
-						fis.close();
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						return;
-					} 
+					StringBuffer sb = getFile(f);
 					
 					featureCollection.ecology.stopEvolving();
 					geo_loaded = false;
@@ -412,22 +379,7 @@ public class MainFrame extends JFrame {
 					if( f == null) {
 						return;
 					}
-					StringBuffer sb = new StringBuffer();
-					try {
-						FileInputStream fis = new FileInputStream(f);
-						while( fis.available() > 0) {
-							byte[] bb = new byte[fis.available()];
-							fis.read(bb);
-							sb.append(new String(bb));
-							Thread.sleep(load_wait);
-						}
-						
-						fis.close();
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						return;
-					}
+					StringBuffer sb = getFile(f);
 					String s = sb.toString();
 					String[] lines = s.split("\n");
 					
@@ -501,22 +453,7 @@ public class MainFrame extends JFrame {
 					if( f == null) {
 						return;
 					}
-					StringBuffer sb = new StringBuffer();
-					try {
-						FileInputStream fis = new FileInputStream(f);
-						while( fis.available() > 0) {
-							byte[] bb = new byte[fis.available()];
-							fis.read(bb);
-							sb.append(new String(bb));
-							Thread.sleep(load_wait);
-						}
-						
-						fis.close();
-					} catch (Exception ex) {
-						// TODO Auto-generated catch block
-						ex.printStackTrace();
-						return;
-					}
+					StringBuffer sb = getFile(f);
 					String s = sb.toString();
 					String[] lines = s.split("\n");
 					int num_candidates = lines[0].split("\t").length - 1;
@@ -784,7 +721,98 @@ public class MainFrame extends JFrame {
 		mnResults.add(mntmExportcsv);
 		
 		JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
+		mntmImportcsv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+
+				String s = getFile(f).toString();
+				String[] lines = s.split("\n");
+				
+				Vector<String> not_found_in_geo = new Vector<String>();
+				for( Block b : featureCollection.blocks) {
+					b.temp = -1;
+				}
+				for( int i = 0; i < lines.length; i++) {
+					try {
+						String[] ss = lines[i].split(",");
+						String district = ss[0].trim();
+						Block b = featureCollection.precinctHash.get(district);
+						if( b == null) {
+							not_found_in_geo.add(district);
+						} else {
+							b.temp = Integer.parseInt(ss[1].trim());
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				Vector<String> not_found_in_census = new Vector<String>();
+				for( Block b : featureCollection.blocks) {
+					if( b.temp < 0) {
+						not_found_in_census.add(b.name);
+					}
+				}
+				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
+					for( Block b : featureCollection.blocks) {
+						b.temp = -1;
+					}
+					JOptionPane.showMessageDialog(null,""
+							+"Result data doesn't match geographic data.\n"
+							+"Result data without matching geo data: "+not_found_in_geo.size()+"\n"
+							+"Geo data without matching result data: "+not_found_in_census.size()
+							, "Mismatch of geographic regions"
+							, 0);
+					return;
+				}
+				int[] new_block_districts = new int[featureCollection.blocks.size()];
+				int num_districts = 0;
+				for( int i = 0; i < new_block_districts.length; i++) {
+					int d = featureCollection.blocks.get(i).temp;
+					if( num_districts < d) {
+						num_districts = d;
+					}
+					new_block_districts[i] = d;
+				}
+				num_districts++;
+				Settings.num_districts = num_districts;
+				textField_2.setText(""+Settings.num_districts);
+				if( featureCollection.ecology.population == null) {
+					featureCollection.ecology.population = new Vector<DistrictMap>();
+				}
+				if( featureCollection.ecology.population.size() < 1) {
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.blocks,Settings.num_districts,new_block_districts));
+				}
+				for( DistrictMap dm : featureCollection.ecology.population) {
+					dm.setGenome(new_block_districts);
+					dm.fillDistrictBlocks();
+				}
+				Feature.display_mode = 0;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				panelStats.getStats();
+				JOptionPane.showMessageDialog(null, "Result loaded.");
+			}
+			
+		});
 		mnResults.add(mntmImportcsv);
+		
+		mnResults.add(separator_3);
+		mntmExportPopulation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null,"Not implemented.");
+			}
+		});
+		
+		mnResults.add(mntmExportPopulation);
+		mntmImportPopulation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null,"Not implemented.");
+			}
+		});
+		
+		mnResults.add(mntmImportPopulation);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -995,5 +1023,24 @@ public class MainFrame extends JFrame {
 		
 		frameStats.setSize(dim);
 		setEnableds();
+	}
+	public StringBuffer getFile(File f) {		
+		StringBuffer sb = new StringBuffer();
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			while( fis.available() > 0) {
+				byte[] bb = new byte[fis.available()];
+				fis.read(bb);
+				sb.append(new String(bb));
+				Thread.sleep(load_wait);
+			}
+			
+			fis.close();
+		} catch (Exception ex) {
+			// TODO Auto-generated catch block
+			ex.printStackTrace();
+			return sb;
+		} 
+		return sb;
 	}
 }

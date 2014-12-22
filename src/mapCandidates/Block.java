@@ -7,6 +7,7 @@ public class Block extends ReflectionJSONObject<Block> {
     public int id;
 	public static int id_enumerator = 0;
 	public int state = 0;
+	public int temp = -1;
 	
 	public String name = "";
 
