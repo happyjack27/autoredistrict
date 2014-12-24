@@ -29,13 +29,15 @@ new ui:
 * remove population replaced slider
 * add play and stop and reverse for evolution (remove invert)
 * show what's loaded ( geography, census/population, elections, districts)
+* change menu to import / export?
+* add sample to load and run (relatively small) 
+
+auto-annealing (instead of having to "drive" it)
 * way to auto-adjust border mutation based on scoring relative to past generation?
 * * use mean expectation of winners as new border mutation (take that and average of last)
 * * means have to store pre-mutation, state, and then count the fraction of mutated borders.
 * * or just do it on the fly - num mutated, vs num total
 * * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
-* change menu to import / export?
-* add sample to load and run (relatively small) 
     
          
 =================
