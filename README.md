@@ -11,14 +11,34 @@ DONE:
 1. add zoom in feature
 
 TODO:
+1. use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
 2. add load district info from geojson (they can choose the property, shift from 1-index)
-3. add save district info frtoom geojson (they can choose the property, shift to 1-index)
+- add screen for loading different data elements from geojson properties
+3. add save district info to geojson (they can choose the property, shift to 1-index)
 4. implement show district labels
 5. create help text for all of the menu items, sliders, etc.
 6. add tooltips for all of the menu items, sliders, etc.
 7. move algorithm pieces into advanced help
+8. create walk-through
+9. create explanation of how to convert to/from geojson (ogr2ogr)
+10. talk about gaps, and how to resolve them (use tiger data)
+11. talk about how to combine data
+12. add option to replace entire population (disables mutate all)
 
-
+new ui:
+* remove population replaced slider
+* add play and stop and reverse for evolution (remove invert)
+* show what's loaded ( geography, census/population, elections, districts)
+* way to auto-adjust border mutation based on scoring relative to past generation?
+\-use mean expectation of winners as new border mutation (take that and average of last)
+  \- means have to store pre-mutation, state, and then count the fraction of mutated borders.
+      \- or just do it on the fly - num mutated, vs num total
+         \- then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
+* change menu to import / export?
+* add sample to load and run (relatively small) 
+    
+         
+=================
 	/*
 	block and length data can be taken from a standard dime file, which i presume any municiplality has. the census data, well i'm sure they have it electronically, cause hey, they draw districts. so getting the geolocation dataset is not a problem. you still have to add in code to make sure the districts are contiguous, though.
 	

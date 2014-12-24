@@ -825,6 +825,7 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				for( int pop = 0; pop < featureCollection.ecology.population.size(); pop++) {
+					System.out.println("Saving map "+pop+"...");
 					//StringBuffer sb = new StringBuffer();
 					try {
 						File f = new File(fd.getAbsolutePath()+File.separator+pop+".csv");
