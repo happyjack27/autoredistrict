@@ -1,39 +1,39 @@
 DONE:
-1. after loading, fill in ecology data structures.
-2. also initalize candidates in ecology on loading of election results. 
-3. write parts to adjust population, number of districts on evolve function
-4. write parts to start and stop evolution
-5. write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
-6. add inverters for score components - in drop down menu.
-7. multithread testing, but reusable threads.
-8. add exporting of results ( simple tab deliminted: precinct - district)
-*. add listener to num of districts to adjust, should be a target and work together with evolve. 
-1. add zoom in feature
+* after loading, fill in ecology data structures.
+* also initalize candidates in ecology on loading of election results. 
+* write parts to adjust population, number of districts on evolve function
+* write parts to start and stop evolution
+* write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
+* add inverters for score components - in drop down menu.
+* multithread testing, but reusable threads.
+* add exporting of results ( simple tab deliminted: precinct - district)
+* add listener to num of districts to adjust, should be a target and work together with evolve. 
+* add zoom in feature
 
 TODO:
-1. use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
-2. add load district info from geojson (they can choose the property, shift from 1-index)
-- add screen for loading different data elements from geojson properties
-3. add save district info to geojson (they can choose the property, shift to 1-index)
-4. implement show district labels
-5. create help text for all of the menu items, sliders, etc.
-6. add tooltips for all of the menu items, sliders, etc.
-7. move algorithm pieces into advanced help
-8. create walk-through
-9. create explanation of how to convert to/from geojson (ogr2ogr)
-10. talk about gaps, and how to resolve them (use tiger data)
-11. talk about how to combine data
-12. add option to replace entire population (disables mutate all)
+* use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
+* add load district info from geojson (they can choose the property, shift from 1-index)
+*  add screen for loading different data elements from geojson properties
+* add save district info to geojson (they can choose the property, shift to 1-index)
+* implement show district labels
+* create help text for all of the menu items, sliders, etc.
+* add tooltips for all of the menu items, sliders, etc.
+* move algorithm pieces into advanced help
+* create walk-through
+* create explanation of how to convert to/from geojson (ogr2ogr)
+* talk about gaps, and how to resolve them (use tiger data)
+* talk about how to combine data
+* add option to replace entire population (disables mutate all)
 
 new ui:
 * remove population replaced slider
 * add play and stop and reverse for evolution (remove invert)
 * show what's loaded ( geography, census/population, elections, districts)
 * way to auto-adjust border mutation based on scoring relative to past generation?
-\-use mean expectation of winners as new border mutation (take that and average of last)
-  \- means have to store pre-mutation, state, and then count the fraction of mutated borders.
-      \- or just do it on the fly - num mutated, vs num total
-         \- then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
+* * use mean expectation of winners as new border mutation (take that and average of last)
+* * means have to store pre-mutation, state, and then count the fraction of mutated borders.
+* * or just do it on the fly - num mutated, vs num total
+* * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
 * change menu to import / export?
 * add sample to load and run (relatively small) 
     
