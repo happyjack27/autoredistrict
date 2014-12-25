@@ -3,6 +3,8 @@ package mapCandidates;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
+	public static boolean auto_anneal = false;
+    public static double auto_anneal_Frac = 0.5;
 	public static boolean mate_merge = false;
     public static double species_fraction = 1.0;
 
@@ -34,6 +36,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//map_population (folder)
 	//
 	public static int num_precinct_outcomes = 128;
+	public static boolean replace_all = false;
     
     /*
 	@Override

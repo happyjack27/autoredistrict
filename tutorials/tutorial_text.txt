@@ -75,12 +75,59 @@ pairs of the top 50% best scoring district maps are randomly selected, (this can
 and a district assignment for each region in that pair is selected randomly with a 50% chance of coming from either district.
 these new district maps replace the 50% worst scoring districts.
 
+    public void crossover(int[] genome1, int[] genome2) {
+        for( int i = 0; i < block_districts.length; i++) {
+            double r = Math.random();
+            block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+        }
+    }
+
 3. Mutation
 -----------
 then the borders of all resulting district maps are mutated.
 each region bordering on a different district has a probability of mutating, controled by the "border mutation" slider.
 if it's selected for mutating, the length of the perimeter that it shares with a district determines the relative likelilhood that it becomes part of that district.
 for instance, a piece of district 7 shares 20 units of edge with district 5, 10 units with district 3, and 10 with district 7, then it has a 50% chance of switching to district 7, 25% of switching to district 3, and 25% chance of staying a part of district 7.
+
+     public void mutate_boundary(double prob) {
+    	boundaries_tested = 0;
+    	boundaries_mutated = 0;
+        for( int i = 0; i < block_districts.length; i++) {
+        	Block block = blocks.get(i);
+        	boolean border = false;
+            for( Block bn : block.neighbors) {
+            	if( block_districts[bn.id] != block_districts[i]) {
+            		border = true;
+            		break;
+            	}
+            }
+            if( border == false) {
+            	continue;
+            }
+            boundaries_tested++;
+            if( Math.random() < prob) {
+            	boundaries_mutated++;
+            	try {
+          			double total_length = 0;
+        			for( int j = 0; j < block.neighbor_lengths.length; j++) {
+        				total_length += block.neighbor_lengths[j];
+        			}
+        			double mutate_to = Math.random()*total_length;
+           			for( int j = 0; j < block.neighbor_lengths.length; j++) {
+        				mutate_to -= block.neighbor_lengths[j];
+        				if( mutate_to < 0) {
+        					Block b = block.neighbors.get(j);
+        					block_districts[i] = block_districts[b.id];
+        					break;
+        				}
+        			}
+            	} catch (Exception ex) {
+            		ex.printStackTrace();
+            	}
+            }
+        }
+    }
+
 
 #. Repeat - then the process repeats.
 ----------

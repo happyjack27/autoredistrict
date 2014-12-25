@@ -78,7 +78,9 @@ public class PanelStats extends JPanel {
 					total += dd[j];
 					tot_votes += dd[j];
 				}
-				elec_counts[iwinner]++;
+				if( elec_counts != null && iwinner >= 0) {
+					elec_counts[iwinner]++;
+				}
 				String winner = ""+iwinner;
 				ddata[i][0] = ""+i;
 				ddata[i][1] = ""+population;

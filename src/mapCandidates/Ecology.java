@@ -392,6 +392,18 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			}
 			System.out.println();
 		}
+        if( Settings.auto_anneal) {
+	        int total = 0;
+	        int mutated = 0;
+	        for(int i = 0; i < cutoff; i++) {
+	            DistrictMap dm = population.get(i);
+	            total += dm.boundaries_tested;
+	            mutated += dm.boundaries_mutated;
+	        }
+        	double new_rate = (double)mutated/(double)total;
+        	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
+        	//TODO: - now adjust the slider in the interface somehow! (with a listener in settings?)
+        }
 
 
         Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
@@ -445,17 +457,49 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
+    		if( Settings.replace_all) {
+    			Vector<DistrictMap> temp = new Vector<DistrictMap>();
+    			for(int j = cutoff; j < population.size(); j++) {
+    				temp.add(population.get(j));
+    				population.set(j, new DistrictMap(blocks,Settings.num_districts));
+    			}
+    			
+    	  		for( int j = 0; j < matingThreads.length; j++) {
+        			matingThreads[j].available_mate.clear();
+        	        for(int i = 0; i < cutoff; i++) {
+        	        	matingThreads[j].available_mate.add(population.get(i));
+        	        }
+        		}
+        		matingLatch = new CountDownLatch(num_threads);
+        		for( int i = 0; i < matingThreads.length; i++) {
+        			matingThreadPool.execute(matingThreads[i]);
+        			//iterationThreads[j].start();
+        		}
+        		try {
+        			matingLatch.await();
+        		} catch (InterruptedException e) {
+        			System.out.println("ex");
+        			// TODO Auto-generated catch block
+        			e.printStackTrace();
+        		}
+        		for( int j = 0; j < cutoff && j+cutoff < population.size(); j++) {
+        			population.set(j, temp.get(j));
+        		}
+      
+    		}
         	
         }
 
         if( verbosity > 1)
         	System.out.println("  applying mutation...");
-        for(int i = Settings.mutate_all ? 0 : cutoff; i < population.size(); i++) {
+
+        for(int i = Settings.mutate_all || Settings.replace_all ? 0 : cutoff; i < population.size(); i++) {
             DistrictMap dm = population.get(i);
             if(Settings.mutation_rate > 0)
             	dm.mutate(Settings.mutation_rate);
-            if(Settings.mutation_boundary_rate > 0)
+            if(Settings.mutation_boundary_rate > 0) {
             	dm.mutate_boundary(Settings.mutation_boundary_rate);
+            }
             dm.fillDistrictBlocks();
         }
         if( verbosity > 1)

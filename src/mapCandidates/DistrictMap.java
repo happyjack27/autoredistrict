@@ -125,68 +125,57 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
     }
+    
+    int boundaries_tested = 2;
+    int boundaries_mutated = 1;
 
     public void mutate_boundary(double prob) {
-        boolean[] allow = new boolean[districts.size()];
+    	//start at 1 for regularization
+    	boundaries_tested = 2;
+    	boundaries_mutated = 1;
         for( int i = 0; i < block_districts.length; i++) {
+        	Block block = blocks.get(i);
+        	boolean border = false;
+            for( Block bn : block.neighbors) {
+            	if( block_districts[bn.id] != block_districts[i]) {
+            		border = true;
+            		break;
+            	}
+            }
+            if( border == false) {
+            	continue;
+            }
+            boundaries_tested++;
             if( Math.random() < prob) {
+            	boundaries_mutated++;
             	try {
-            		
-            		if( use_border_length_on_mutate_boundary) {
-                        Block block = blocks.get(i);
-            			double total_length = 0;
-            			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-            				total_length += block.neighbor_lengths[j];
-            			}
-            			double mutate_to = Math.random()*total_length;
-               			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-            				mutate_to -= block.neighbor_lengths[j];
-            				if( mutate_to < 0) {
-            					Block b = block.neighbors.get(j);
-            					block_districts[i] = block_districts[b.id];
-            					break;
-            				}
-            			}
-            			
-            		} else {
-                        for( int j = 0; j < allow.length; j++) {
-                            allow[j] = false;
-                        }
-                        allow[block_districts[i]] = true;
-                        Block block = blocks.get(i);
-                        for( Block other_block : block.neighbors) {
-                        	if( block_districts[other_block.id] < allow.length) {
-                                allow[block_districts[other_block.id]] = true;
-                        	}
-                        }
-                        double count = 0;
-                        for( int j = 0; j < allow.length; j++) {
-                            if( allow[j])
-                                count++;
-                        }
-                        int d = (int)Math.floor(Math.random()*count); 
-                        for( int j = 0; j < allow.length; j++) {
-                            if( allow[j]) {
-                                if( d == 0) {
-                                    block_districts[i] = j;
-                                    break;
-                                }
-                                d--;
-                            }
-                        }
-            		}
+          			double total_length = 0;
+        			for( int j = 0; j < block.neighbor_lengths.length; j++) {
+        				total_length += block.neighbor_lengths[j];
+        			}
+        			double mutate_to = Math.random()*total_length;
+           			for( int j = 0; j < block.neighbor_lengths.length; j++) {
+        				mutate_to -= block.neighbor_lengths[j];
+        				if( mutate_to < 0) {
+        					Block b = block.neighbors.get(j);
+        					block_districts[i] = block_districts[b.id];
+        					break;
+        				}
+        			}
             	} catch (Exception ex) {
             		ex.printStackTrace();
             	}
             }
         }
     }
+    
     public void crossover(int[] genome1, int[] genome2) {
         for( int i = 0; i < block_districts.length; i++) {
             double r = Math.random();
             block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
         }
     }
+    
     public void makeLike(int[] genome) {
     	setGenome(getGenome(genome));
     	/*

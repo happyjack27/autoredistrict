@@ -35,6 +35,10 @@ public class MainFrame extends JFrame {
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
+	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
+
+
 	JTextField textField_2 = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
@@ -576,6 +580,14 @@ public class MainFrame extends JFrame {
 				Settings.mutate_all = chckbxmntmMutateAll.isSelected();
 			}
 		});
+		
+		chckbxmntmReplaceAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.replace_all = chckbxmntmReplaceAll.isSelected();
+				chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
+			}
+		});
+		mnEvolution.add(chckbxmntmReplaceAll);
 		mnEvolution.add(chckbxmntmMutateAll);
 		
 		chckbxmntmSingleThreadScoring.addActionListener(new ActionListener() {
@@ -583,6 +595,13 @@ public class MainFrame extends JFrame {
 				Settings.multiThreadScoring = !chckbxmntmSingleThreadScoring.isSelected();
 			}
 		});
+		
+		chckbxmntmAutoAnneal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.auto_anneal = chckbxmntmAutoAnneal.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmAutoAnneal);
 		mnEvolution.add(chckbxmntmSingleThreadScoring);
 		
 		chckbxmntmSingleThreadMating.addActionListener(new ActionListener() {
