@@ -24,7 +24,7 @@ public class MainFrame extends JFrame {
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
 	double mutation_rate_multiplier = 0.1;
-	public static double boundary_mutation_rate_multiplier = 0.2;
+	public static double boundary_mutation_rate_multiplier = 0.4;
 	long load_wait = 100;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");

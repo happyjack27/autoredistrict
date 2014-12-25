@@ -9,8 +9,21 @@ DONE:
 * add exporting of results ( simple tab deliminted: precinct - district)
 * add listener to num of districts to adjust, should be a target and work together with evolve. 
 * add zoom in feature
+* remove population replaced slider
+* add option to replace entire population (disables mutate all)
+
+
+DONE:
+auto-annealing (instead of having to "drive" it)
+* way to auto-adjust border mutation based on scoring relative to past generation?
+* * use mean expectation of winners as new border mutation (take that and average of last)
+* * means have to store pre-mutation, state, and then count the fraction of mutated borders.
+* * or just do it on the fly - num mutated, vs num total
+* * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
+
 
 TODO:
+* add border mutation rate to stats screen
 * use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
 * add load district info from geojson (they can choose the property, shift from 1-index)
 *  add screen for loading different data elements from geojson properties
@@ -23,21 +36,13 @@ TODO:
 * create explanation of how to convert to/from geojson (ogr2ogr)
 * talk about gaps, and how to resolve them (use tiger data)
 * talk about how to combine data
-* add option to replace entire population (disables mutate all)
 
 new ui:
-* remove population replaced slider
 * add play and stop and reverse for evolution (remove invert)
 * show what's loaded ( geography, census/population, elections, districts)
 * change menu to import / export?
 * add sample to load and run (relatively small) 
 
-auto-annealing (instead of having to "drive" it)
-* way to auto-adjust border mutation based on scoring relative to past generation?
-* * use mean expectation of winners as new border mutation (take that and average of last)
-* * means have to store pre-mutation, state, and then count the fraction of mutated borders.
-* * or just do it on the fly - num mutated, vs num total
-* * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
 
 =================    
 RESULT SCORING IN DEPTH
