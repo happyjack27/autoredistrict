@@ -42,7 +42,7 @@ new ui:
 * show what's loaded ( geography, census/population, elections, districts)
 * change menu to import / export?
 * add sample to load and run (relatively small) 
-
+* live graphs
 
 =================    
 RESULT SCORING IN DEPTH
