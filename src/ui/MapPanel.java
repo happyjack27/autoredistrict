@@ -15,6 +15,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	FeatureCollection featureCollection;
 	boolean zooming = false;
 	Rectangle selection = null;
+	Stack<double[]> zoomStack = new Stack<double[]>();
 
 	MapPanel() {
         // set a preferred size for the custom panel.
@@ -129,6 +130,14 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 			}
  			int w = arg0.getX()-selection.x;
  			int h = arg0.getY()-selection.y;
+ 			if( w < 0) {
+ 				selection.x = arg0.getX();
+ 				w = -w;
+ 			}
+ 			if( h < 0) {
+ 				selection.y = arg0.getY();
+ 				h = -h;
+ 			}
  			selection.width = w;
  			selection.height = h;
 			zooming = false;
@@ -136,6 +145,20 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 			invalidate();
 			repaint();
 		}
+	}
+	public void zoomOut() {
+		
+		double[] dd = zoomStack.pop();
+		if( dd == null) {
+			return;
+		}
+
+        minx = dd[0];
+        miny = dd[1];
+        maxx = dd[2];
+        maxy = dd[3];
+        invalidate();
+        repaint();
 	}
 	
 	public void zoomTo(Rectangle r) {
@@ -146,6 +169,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         double y0 = miny+r.y/scaley;
         double x1 = minx+(r.x+r.width)/scalex;
         double y1 = miny+(r.y+r.height)/scaley;
+		zoomStack.push(new double[]{minx,miny,maxx,maxy});
+
         minx = x0;
         miny = y0;
         maxx = x1;

@@ -20,10 +20,11 @@ import javax.swing.border.*;
 
 
 public class MainFrame extends JFrame {
+	public static MainFrame mainframe;
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
 	double mutation_rate_multiplier = 0.1;
-	double boundary_mutation_rate_multiplier = 0.4;
+	public static double boundary_mutation_rate_multiplier = 0.2;
 	long load_wait = 100;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
@@ -42,7 +43,7 @@ public class MainFrame extends JFrame {
 	JTextField textField_2 = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
-	JSlider slider_1 = new JSlider();
+	public JSlider slider_1 = new JSlider();
 	JSlider slider_2 = new JSlider();
 	JSlider slider_3 = new JSlider();
 	JSlider slider_5 = new JSlider();
@@ -82,6 +83,7 @@ public class MainFrame extends JFrame {
 	private final JSeparator separator_5 = new JSeparator();
 	private final JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
 	private final JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
+	private final JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -102,11 +104,14 @@ public class MainFrame extends JFrame {
 		mapPanel.maxx = flipx ? minx : maxx;
 		mapPanel.miny = flipy ? maxy : miny;
 		mapPanel.maxy = flipy ? miny : maxy;
+		mapPanel.zoomStack.clear();
+		mntmUndoZoom.setEnabled(false);
 		mapPanel.invalidate();
 		mapPanel.repaint();
 	}
 	
-	public MainFrame() { 
+	public MainFrame() {
+		mainframe = this;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);
@@ -594,6 +599,7 @@ public class MainFrame extends JFrame {
 				Settings.multiThreadScoring = !chckbxmntmSingleThreadScoring.isSelected();
 			}
 		});
+		chckbxmntmAutoAnneal.setSelected(true);
 		
 		chckbxmntmAutoAnneal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -684,9 +690,20 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				mapPanel.selection = null;
 				mapPanel.zooming = true;
+				mntmUndoZoom.setEnabled(true);
 				//JOptionPane.showMessageDialog(null,"Not implemented");
 			}
 		});
+		mntmUndoZoom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mapPanel.zoomOut();
+				if( mapPanel.zoomStack.empty()){
+					mntmUndoZoom.setEnabled(false);
+				}
+			}
+		});
+		
+		mnView.add(mntmUndoZoom);
 		
 		mnView.add(mntmZoomIn);
 		

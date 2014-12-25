@@ -3,7 +3,7 @@ package mapCandidates;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
-	public static boolean auto_anneal = false;
+	public static boolean auto_anneal = true;
     public static double auto_anneal_Frac = 0.5;
 	public static boolean mate_merge = false;
     public static double species_fraction = 1.0;

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
 
 import serialization.*;
+import ui.MainFrame;
 import ui.MapPanel;
 import ui.PanelStats;
 
@@ -401,8 +402,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            mutated += dm.boundaries_mutated;
 	        }
         	double new_rate = (double)mutated/(double)total;
-        	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
-        	//TODO: - now adjust the slider in the interface somehow! (with a listener in settings?)
+        	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
+        	if( MainFrame.mainframe != null) {
+        		System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
+        		MainFrame.mainframe.slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
+        		MainFrame.mainframe.invalidate();
+        		MainFrame.mainframe.repaint();
+        	}
         }
 
 
@@ -614,7 +620,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         for(int i = 0; i < population.size(); i++) {
             DistrictMap dm = population.get(i); 
             dm.mutate(Settings.mutation_rate);
-            dm.mutate_boundary(Settings.mutation_rate);
+            dm.mutate_boundary(Settings.mutation_boundary_rate);
             dm.fillDistrictBlocks();
         }
     }
