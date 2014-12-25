@@ -42,7 +42,6 @@ public class MainFrame extends JFrame {
 	JTextField textField_2 = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
-	JSlider slider = new JSlider();
 	JSlider slider_1 = new JSlider();
 	JSlider slider_2 = new JSlider();
 	JSlider slider_3 = new JSlider();
@@ -890,7 +889,7 @@ public class MainFrame extends JFrame {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 261, 200, 403);
+		panel_2.setBounds(0, 261, 200, 351);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -902,9 +901,9 @@ public class MainFrame extends JFrame {
 		panel_2.add(slider_3);
 		
 		JLabel lblContiguency = new JLabel("proportional representation");
-		lblContiguency.setBounds(6, 281, 172, 16);
+		lblContiguency.setBounds(6, 220, 172, 16);
 		panel_2.add(lblContiguency);
-		slider_7.setBounds(6, 302, 190, 29);
+		slider_7.setBounds(6, 245, 190, 29);
 		panel_2.add(slider_7);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
@@ -919,34 +918,10 @@ public class MainFrame extends JFrame {
 		panel_2.add(slider_5);
 		
 		JLabel lblVotingPowerBalance = new JLabel("voting power balance");
-		lblVotingPowerBalance.setBounds(6, 342, 172, 16);
+		lblVotingPowerBalance.setBounds(6, 286, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		slider_6.setBounds(6, 363, 190, 29);
+		slider_6.setBounds(6, 307, 190, 29);
 		panel_2.add(slider_6);
-		textField_1.setBounds(138, 242, 58, 28);
-		panel_2.add(textField_1);
-		textField_1.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				textField_1.postActionEvent();
-			}
-		});
-		textField_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 try {
-					 Settings.num_elections_simulated = new Integer(textField_1.getText());
-				 } catch (Exception ex) {
-					 
-				 }
-			}
-		});
-		
-		textField_1.setText("32");
-		textField_1.setColumns(10);
-		
-		JLabel lblTrials = new JLabel("Elections simulated");
-		lblTrials.setBounds(6, 248, 134, 16);
-		panel_2.add(lblTrials);
 		
 		JLabel lblConnectedness = new JLabel("connectedness");
 		lblConnectedness.setBounds(6, 97, 172, 16);
@@ -995,17 +970,35 @@ public class MainFrame extends JFrame {
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
-		
-		JLabel lblPopulationReplaced = new JLabel("% population replaced");
-		lblPopulationReplaced.setBounds(6, 67, 172, 16);
-		panel_3.add(lblPopulationReplaced);
-		slider.setBounds(6, 88, 190, 29);
-		panel_3.add(slider);
 		JLabel lblBorderMutation = new JLabel("% border mutation");
 		lblBorderMutation.setBounds(6, 128, 172, 16);
 		panel_3.add(lblBorderMutation);
 		slider_1.setBounds(6, 149, 190, 29);
 		panel_3.add(slider_1);
+		
+		JLabel lblTrials = new JLabel("Elections simulated");
+		lblTrials.setBounds(6, 74, 134, 16);
+		panel_3.add(lblTrials);
+		textField_1.setBounds(138, 68, 58, 28);
+		panel_3.add(textField_1);
+		textField_1.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				textField_1.postActionEvent();
+			}
+		});
+		textField_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				 try {
+					 Settings.num_elections_simulated = new Integer(textField_1.getText());
+				 } catch (Exception ex) {
+					 
+				 }
+			}
+		});
+		
+		textField_1.setText("2");
+		textField_1.setColumns(10);
 		
 		
 		textField_2.addFocusListener(new FocusAdapter() {
@@ -1033,12 +1026,6 @@ public class MainFrame extends JFrame {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
-		
-		slider.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.replace_fraction = slider.getValue()/100.0;
-			}
-		});
 		slider_6.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
@@ -1062,7 +1049,6 @@ public class MainFrame extends JFrame {
 		});
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
-		Settings.replace_fraction = slider.getValue()/100.0;
 		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
 		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
 		Settings.population_balance_weight = slider_5.getValue()/100.0;
