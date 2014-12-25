@@ -664,11 +664,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	
         	
         }
-        /*
-        Vector<Edge> outerEdges = getOuterEdges(block_districts);
-        for( Edge edge : outerEdges)
-            length += edge.length;
-        */
         return length;
     }
     Vector<Edge> getOuterEdges(int[] block_districts) {

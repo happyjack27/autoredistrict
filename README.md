@@ -38,8 +38,208 @@ auto-annealing (instead of having to "drive" it)
 * * means have to store pre-mutation, state, and then count the fraction of mutated borders.
 * * or just do it on the fly - num mutated, vs num total
 * * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
-    
+
+=================    
+RESULT SCORING IN DEPTH
+-------------------
+Initial loading
+1 unique vertexes are collected
+2 unique edges between vertexes are collected, along with what polygons are on each side of the edge.
+3 using these edges, each polygon collects all of its neighbors into a list, along with the total length of edges shared with that neighbor.
          
+census and election data
+* population and vote totals for each polgon are attached to the polygon.
+
+Compactness (border length)
+------------------
+The total of length of all edges that have a different district on each side is accumulated.
+
+	class DistrictMap {
+	    double getEdgeLength() {
+	        double length = 0;
+	        for( Block b : blocks) {
+	        	int d1 = block_districts[b.id];
+	        	for( int i = 0; i < b.neighbor_lengths.length; i++) {
+	        		int b2id = b.neighbors.get(i).id;
+	            	int d2 = block_districts[b2id];
+	            	if( d1 != d2) {
+	            		length += b.neighbor_lengths[i];
+	            	}
+	        	}
+	        }
+	        return length;
+	    }
+	}
+
+
+Connectedness
+------------------
+Each district is broken up into self-connected regions. The total population for each such region is accumulated from the poplygon populationos.
+The total population in the highest such region is subtracted from the total population in all regions combined, giving the toal population _not_ in the largest region.
+This is the "disconnected population".
+
+	class DistrictMap {
+        double disconnected_pops = 0;
+        if( Settings.disconnected_population_weight > 0) {
+            for(District district : districts) {
+            	//int count = district.getRegionCount(block_districts);
+            	//System.out.println("region count: "+count);
+            	//disconnected_pops += count;
+                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
+            }
+        }
+    }
+    class District {
+	    Vector<Block> getTopPopulationRegion(int[] block_districts) {
+	        Vector<Vector<Block>> regions = getRegions(block_districts);
+	        Vector<Block> high = null;
+	        double max_pop = 0;
+	        for( Vector<Block> region : regions) {
+	            double pop = getRegionPopulation(region);
+	            if( pop > max_pop || high == null) {
+	                max_pop = pop;
+	                high = region;
+	            }
+	        }
+	        return high;
+	    }
+	    Vector<Vector<Block>> getRegions(int[] block_districts) {
+	        Hashtable<Integer,Vector<Block>> region_hash = new Hashtable<Integer,Vector<Block>>();
+	        Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
+	        for( Block block : blocks) {
+	            if( region_hash.get(block.id) != null)
+	                continue;
+	            Vector<Block> region = new Vector<Block>();
+	            regions.add(region);
+	            addAllConnected(block,region,region_hash,block_districts);
+	        }
+	        return regions;
+	    }
+	    //recursively insert connected blocks.
+	    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Integer,Vector<Block>> region_hash, int[] block_districts) {
+	        if( region_hash.get(block.id) != null)
+	            return;
+	        region.add(block);
+	        region_hash.put(block.id,region);
+	        for( Block other_block : block.neighbors) {
+	        	if( block_districts[other_block.id] == block_districts[block.id]) {
+	        		addAllConnected( other_block, region, region_hash, block_districts);
+	        	}
+	        }
+	    }
+	    double getRegionPopulation(Vector<Block> region) {
+	        double population = 0;
+	        if( region == null) {
+	        	return 0;
+	        }
+	        for( Block block : region) {
+	        	if( block.has_census_results) {
+	        		population += block.population;
+	        	} else {
+	            	for(Demographic p : block.demographics) {
+	            		population += p.population;
+	            	}
+	        	}
+	        }
+	        return population;
+	    }
+	}
+
+         
+Population balance
+------------------
+The population of each district is accumulated from the polygon populations.
+Then the kullbach-leibler divergence of this from an equal distribution is calculated.
+
+	class DistrictMap {
+        double population_imbalance = 0;
+        if( Settings.population_balance_weight > 0 || Settings.voting_power_balance_weight > 0) {
+            for(int i = 0; i < dist_pops.length; i++) {
+            	if( districts.size() <= i) {
+                    dist_pops[i] = 0;
+            		
+            	} else {
+                    District district = districts.get(i);
+                    dist_pops[i] = district.getPopulation();
+            	}
+                total_population += dist_pops[i];
+            }
+        	double rtotpop = 1.0/ total_population;
+            for(int i = 0; i < dist_pops.length; i++) {
+                dist_pop_frac[i] = dist_pops[i] * rtotpop;
+            }
+
+            double exp_population = total_population/(double)dist_pops.length;
+            //System.out.println("exp. pop. "+exp_population);
+            for( int i = 0; i < perfect_dists.length; i++) {
+                perfect_dists[i] = exp_population;
+            }
+            population_imbalance = getKLDiv(perfect_dists,dist_pops,1);
+        }
+        public double getKLDiv(double[] p, double[] q, double regularization_factor) {
+	    	boolean verbose = false;
+	    	if( regularization_factor == 1.2 || regularization_factor == 0.01) {
+	    		if( false) {
+	    			verbose = true;
+	    			System.out.println(" reg: "+regularization_factor);
+	    		}
+	    		//regularization_factor = 1;
+	    	}
+	    	if( verbose) {
+	            for( int i = 0; i < p.length; i++) {
+	            	System.out.println(" "+i+" p: "+p[i]+" q: "+q[i]);
+	            }
+	    		
+	    	}
+	        //regularize (see "regularization" in statistics)
+	        for( int i = 0; i < p.length; i++)
+	            p[i]+=regularization_factor;  
+	        for( int i = 0; i < q.length; i++)
+	            q[i]+=regularization_factor;  
+	        
+	        //get totals
+	        double totp = 0;
+	        for( int i = 0; i < p.length; i++)
+	            totp += p[i];  
+	        double totq = 0;
+	        for( int i = 0; i < q.length; i++)
+	            totq += q[i];  
+	
+	        //make same ratio.
+	        double ratio = totp/totq;
+	        for( int i = 0; i < q.length; i++)
+	            q[i] *= ratio;  
+	
+	
+	        //normalize
+	        totp = 0;
+	        for( int i = 0; i < p.length; i++)
+	            totp += p[i];  
+	        for( int i = 0; i < p.length; i++)
+	            p[i] /= totp;
+	        totq = 0;
+	        for( int i = 0; i < q.length; i++)
+	            totq += q[i];  
+	        for( int i = 0; i < q.length; i++)
+	            q[i] /= totq;
+	
+	        //get kldiv
+	        double div = 0;
+	        for( int i = 0; i < q.length; i++) {
+	        	if( p[i] == 0) {
+	        		continue;
+	        	}
+	        	double kl = p[i]*(Math.log(q[i]) - Math.log(p[i]));
+	        	if( verbose) {
+	        		System.out.println("i: "+i+" \tp: "+p[i]+" \tq:"+q[i]+" \tkl:"+kl);
+	        	}
+	            div += kl;
+	        }
+	        return -div;
+	    }   
+	}
+
+
 =================
 	/*
 	block and length data can be taken from a standard dime file, which i presume any municiplality has. the census data, well i'm sure they have it electronically, cause hey, they draw districts. so getting the geolocation dataset is not a problem. you still have to add in code to make sure the districts are contiguous, though.
