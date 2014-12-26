@@ -28,10 +28,6 @@ public class MainFrame extends JFrame {
 	long load_wait = 100;
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
-	JCheckBoxMenuItem chckbxmntmSingleThreadScoring = new JCheckBoxMenuItem("Single thread scoring");
-	JCheckBoxMenuItem chckbxmntmSingleThreadMating = new JCheckBoxMenuItem("Single thread mating");
-
-	JCheckBoxMenuItem chckbxmntmInvert = new JCheckBoxMenuItem("Invert");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
@@ -57,13 +53,11 @@ public class MainFrame extends JFrame {
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
-	JMenuItem mntmStart = new JMenuItem("Start");
-	JMenuItem mntmPause = new JMenuItem("Pause");
 
 	
 	double minx,maxx,miny,maxy;
 	
-	MapPanel mapPanel = new MapPanel(); 
+	public MapPanel mapPanel = new MapPanel(); 
 	
 	JFrame frameStats = new JFrame();
 	PanelStats panelStats = new PanelStats();
@@ -92,14 +86,12 @@ public class MainFrame extends JFrame {
 		}
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
-		mntmStart.setEnabled(geo_loaded && !evolving);
-		mntmPause.setEnabled(geo_loaded && evolving);
 		
 	}
 	
 	public void resetZoom() {
 		boolean flipx = chckbxmntmFlipHorizontal.isSelected();
-		boolean flipy = chckbxmntmFlipVertical.isSelected();
+		boolean flipy = !chckbxmntmFlipVertical.isSelected();
 		mapPanel.minx = flipx ? maxx : minx;
 		mapPanel.maxx = flipx ? minx : maxx;
 		mapPanel.miny = flipy ? maxy : miny;
@@ -572,31 +564,17 @@ public class MainFrame extends JFrame {
 		
 		menuBar.add(mnEvolution);
 		
-		chckbxmntmInvert.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Ecology.invert = chckbxmntmInvert.isSelected() ? -1.0 : 1.0;
-			}
-		});
-		mnEvolution.add(chckbxmntmInvert);
-		
 		chckbxmntmMutateAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Settings.mutate_all = chckbxmntmMutateAll.isSelected();
 			}
 		});
+		chckbxmntmReplaceAll.setSelected(Settings.replace_all);
 		
 		chckbxmntmReplaceAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.replace_all = chckbxmntmReplaceAll.isSelected();
 				chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
-			}
-		});
-		mnEvolution.add(chckbxmntmReplaceAll);
-		mnEvolution.add(chckbxmntmMutateAll);
-		
-		chckbxmntmSingleThreadScoring.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.multiThreadScoring = !chckbxmntmSingleThreadScoring.isSelected();
 			}
 		});
 		chckbxmntmAutoAnneal.setSelected(true);
@@ -607,41 +585,8 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnEvolution.add(chckbxmntmAutoAnneal);
-		mnEvolution.add(chckbxmntmSingleThreadScoring);
-		
-		chckbxmntmSingleThreadMating.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.multiThreadMating = !chckbxmntmSingleThreadMating.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmSingleThreadMating);
-		
-		JSeparator separator = new JSeparator();
-		mnEvolution.add(separator);
-		
-		mntmStart.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Feature.display_mode = 0; 
-				Settings.population = Integer.parseInt(textField.getText());
-				Settings.num_districts = Integer.parseInt(textField_2.getText().trim());
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-				featureCollection.ecology.startEvolving();
-				evolving = true;
-				setEnableds();
-			}
-		});
-		mnEvolution.add(mntmStart);
-		
-		mntmPause.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				featureCollection.ecology.stopEvolving();
-				evolving = false;
-				setEnableds();
-			}
-		});
-		mnEvolution.add(mntmPause);
+		mnEvolution.add(chckbxmntmReplaceAll);
+		mnEvolution.add(chckbxmntmMutateAll);
 		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
@@ -906,7 +851,7 @@ public class MainFrame extends JFrame {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 261, 200, 351);
+		panel_2.setBounds(0, 299, 200, 351);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -955,7 +900,7 @@ public class MainFrame extends JFrame {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 55, 200, 195);
+		panel_3.setBounds(0, 92, 200, 195);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1016,6 +961,7 @@ public class MainFrame extends JFrame {
 		
 		textField_1.setText("2");
 		textField_1.setColumns(10);
+		textField_2.setText("3");
 		
 		
 		textField_2.addFocusListener(new FocusAdapter() {
@@ -1032,12 +978,51 @@ public class MainFrame extends JFrame {
 			}
 		});
 		textField_2.setColumns(10);
-		textField_2.setBounds(112, 11, 78, 28);
+		textField_2.setBounds(132, 52, 56, 28);
 		panel.add(textField_2);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
-		lblNumOfDistricts.setBounds(10, 17, 94, 16);
+		lblNumOfDistricts.setBounds(6, 58, 124, 16);
 		panel.add(lblNumOfDistricts);
+		
+		JButton button = new JButton("<");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Ecology.invert = -1;
+				
+				featureCollection.ecology.startEvolving();
+				evolving = true;
+				setEnableds();
+
+			}
+		});
+		button.setBounds(26, 17, 46, 29);
+		panel.add(button);
+		
+		JButton btnX = new JButton("X");
+		btnX.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				featureCollection.ecology.stopEvolving();
+				evolving = false;
+				setEnableds();
+
+			}
+		});
+		btnX.setBounds(84, 17, 46, 29);
+		panel.add(btnX);
+		
+		JButton button_2 = new JButton(">");
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Ecology.invert = 1;
+				featureCollection.ecology.startEvolving();
+				evolving = true;
+				setEnableds();
+
+			}
+		});
+		button_2.setBounds(142, 17, 46, 29);
+		panel.add(button_2);
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
@@ -1064,6 +1049,9 @@ public class MainFrame extends JFrame {
 				Settings.geometry_weight = slider_3.getValue()/100.0;
 			}
 		});
+		
+		chckbxmntmMutateAll.setEnabled(false);
+		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;

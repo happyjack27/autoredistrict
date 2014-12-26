@@ -22,7 +22,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 1000000.0;
 	
-	static int max_hues = 6;
+	static int max_hues = 9;
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();

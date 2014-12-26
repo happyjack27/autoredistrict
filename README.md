@@ -11,6 +11,10 @@ DONE:
 * add zoom in feature
 * remove population replaced slider
 * add option to replace entire population (disables mutate all)
+* add play and stop and reverse for evolution (remove invert)
+* add border mutation rate to stats screen
+* change color profile
+
 
 
 DONE:
@@ -23,7 +27,7 @@ auto-annealing (instead of having to "drive" it)
 
 
 TODO:
-* add border mutation rate to stats screen
+
 * use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
 * add load district info from geojson (they can choose the property, shift from 1-index)
 *  add screen for loading different data elements from geojson properties
@@ -38,7 +42,6 @@ TODO:
 * talk about how to combine data
 
 new ui:
-* add play and stop and reverse for evolution (remove invert)
 * show what's loaded ( geography, census/population, elections, districts)
 * change menu to import / export?
 * add sample to load and run (relatively small) 

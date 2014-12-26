@@ -18,6 +18,9 @@ public class PanelStats extends JPanel {
 	JLabel label_3 = new JLabel();
 	JLabel label_5 = new JLabel();
 	JLabel label_7 = new JLabel();
+	
+	JLabel label_2 = new JLabel();
+
 
 	public void getStats() {
 		try {
@@ -37,6 +40,7 @@ public class PanelStats extends JPanel {
 		label_3.setText(""+decimal.format(dm.fairnessScores[2]*conversion_to_bits)+" bits");
 		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
+		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");
 		
 		try {
 			
@@ -83,7 +87,7 @@ public class PanelStats extends JPanel {
 				}
 				String winner = ""+iwinner;
 				ddata[i][0] = ""+i;
-				ddata[i][1] = ""+population;
+				ddata[i][1] = integer.format(population);
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
 				for( int j = 4; j < ddata[i].length; j++) {
@@ -174,18 +178,27 @@ public class PanelStats extends JPanel {
 		add(label_7);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(26, 148, 390, 203);
+		scrollPane.setBounds(26, 194, 390, 223);
 		add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 368, 390, 130);
+		scrollPane_1.setBounds(26, 426, 390, 72);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
 		scrollPane_1.setViewportView(table_1);
+		
+		JLabel lblBorderMutationRate = new JLabel("Border mutation rate:");
+		lblBorderMutationRate.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblBorderMutationRate.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		lblBorderMutationRate.setBounds(6, 146, 202, 16);
+		add(lblBorderMutationRate);
+		
+		label_2.setBounds(220, 146, 202, 16);
+		add(label_2);
 	}
 	public FeatureCollection featureCollection;
 	private JTable table;

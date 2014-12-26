@@ -1,5 +1,7 @@
 package mapCandidates;
 
+import geoJSON.Feature;
+
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -127,10 +129,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         			}
         			generation++;
 
-        			
+        			if( mapPanel == null)  {
+           				mapPanel = MainFrame.mainframe.mapPanel;
+        			}
         			if( mapPanel != null) {
+        				Feature.display_mode = 0;
         				mapPanel.invalidate();
         				mapPanel.repaint();
+        			} else {
+        				System.out.println("mappanel is null");
         			}
         			if( dostats) {
                			if( statsPanel != null) {
