@@ -4,9 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class PanelGraph extends JPanel {
 	PanelGraphDrawArea drawPanel = new PanelGraphDrawArea();
+	JSlider slider = new JSlider();
+
 	
 	JCheckBox[] cbs = new JCheckBox[16];
 	
@@ -48,6 +52,17 @@ public class PanelGraph extends JPanel {
 		
 		drawPanel.setBounds(20, 6, 559, 210);
 		add(drawPanel);
+		
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				drawPanel.pctToHide = ((double)slider.getValue())/100.0;
+				System.out.println("pct to hide: "+drawPanel.pctToHide);
+				update();
+			}
+		});
+		slider.setBounds(287, 228, 292, 29);
+		slider.setValue(0);
+		add(slider);
 		makeCBs();
 	}
 }

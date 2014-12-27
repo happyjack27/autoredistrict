@@ -9,10 +9,7 @@ import java.awt.*;
 import mapCandidates.Ecology;
 
 public class PanelGraphDrawArea extends JPanel {
-	double minx = 0;
-	double maxx = 1;
-	double miny = 0;
-	double maxy = 1;
+	public double pctToHide = 0.0;
 	
     public String[] ss = new String[]{
     		"Generation",
@@ -80,12 +77,13 @@ public class PanelGraphDrawArea extends JPanel {
         g.setColor(Color.white);
         g.fillRect(0, 0, (int)d.getWidth(), (int)d.getHeight());
         g.setColor(Color.black);
-        g.drawRect(0, 0, (int)d.getWidth(), (int)d.getHeight());
+        g.drawRect(0, 0, (int)d.getWidth()-1, (int)d.getHeight()-1);
 
         if( Ecology.history != null && Ecology.history.size() > 0) {
-            double scalex = ((double)d.getWidth())/(double)(Ecology.history.size());
-            double[] maxys = new double[Ecology.history.get(0).length];
-            for( int i = 0; i < Ecology.history.size(); i++) {
+        	int start = (int)(pctToHide*(double)Ecology.history.size());
+            double scalex = ((double)d.getWidth())/(double)(Ecology.history.size()-start);
+            double[] maxys = new double[Ecology.history.get(start).length];
+            for( int i = start; i < Ecology.history.size(); i++) {
             	double[] vals = Ecology.history.get(i);
             	for( int j = 0; j < vals.length; j++) {
             		if( i == 0 || vals[j] > maxys[j]) {
@@ -96,8 +94,8 @@ public class PanelGraphDrawArea extends JPanel {
         	for( int j = 0; j < maxys.length; j++) {
         		maxys[j] =  ((double)d.getHeight())/maxys[j];
         	}
-            double[] last_vals = Ecology.history.get(0);
-            for( int i = 1; i < Ecology.history.size(); i++) {
+            double[] last_vals = Ecology.history.get(start);
+            for( int i = start+1; i < Ecology.history.size(); i++) {
             	double[] vals = Ecology.history.get(i);
             	
             	for( int j = 0; j < vals.length; j++) {
@@ -106,9 +104,9 @@ public class PanelGraphDrawArea extends JPanel {
             		}
             		g.setColor(cc[j]);
             		g.drawLine(
-            				(int)(scalex*(double)(i-1)),
+            				(int)(scalex*(double)(i-1-start)),
             				(int)(d.getHeight()-maxys[j]*(double)(last_vals[j])),
-            				(int)(scalex*(double)(i)),
+            				(int)(scalex*(double)(i-start)),
             				(int)(d.getHeight()-maxys[j]*(double)(vals[j]))
             				);
             	}
