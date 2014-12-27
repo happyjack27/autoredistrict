@@ -49,11 +49,14 @@ public class PanelStats extends JPanel {
 				featureCollection.ecology.population.size(),
 				Settings.num_districts,
 				Settings.mutation_boundary_rate,
+				
 				Settings.geometry_weight,
 				Settings.disconnected_population_weight,
 				Settings.population_balance_weight,
 				Settings.disenfranchise_weight,
 				Settings.voting_power_balance_weight,
+				
+				dm.fairnessScores[0],
 				dm.fairnessScores[3],
 				dm.fairnessScores[2]*conversion_to_bits,
 				dm.fairnessScores[1]*conversion_to_bits,
