@@ -15,7 +15,11 @@ import ui.MapPanel;
 import ui.PanelStats;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
+	
+	public static Vector<double[]> history = new Vector<double[]>();
+
 	static boolean dostats = true;
+	static public DistrictMap bestMap = null;
 	
 	static int verbosity = 0;
 	static boolean initial_mate_merge = false;
@@ -142,6 +146,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         			if( dostats) {
                			if( statsPanel != null) {
             				statsPanel.getStats();
+            				MainFrame.mainframe.panelGraph.update();
             			} else {
             				System.out.println("stats panel is null");
             			}
@@ -423,6 +428,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         for(int i = 0; i < cutoff; i++) {
             available_mate.add(population.get(i));
         }
+        
+        bestMap = population.get(0);
 
         if( verbosity > 1)
         	System.out.println("  selecting mates... (cutoff: "+cutoff+"  spec_cutoff: "+speciation_cutoff+")");

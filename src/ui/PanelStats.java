@@ -11,8 +11,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class PanelStats extends JPanel {
+	
 	JLabel lblNewLabel_1 = new JLabel();
 	JLabel label_1 = new JLabel();
 	JLabel label_3 = new JLabel();
@@ -40,7 +42,23 @@ public class PanelStats extends JPanel {
 		label_3.setText(""+decimal.format(dm.fairnessScores[2]*conversion_to_bits)+" bits");
 		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
-		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");
+		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");		
+		
+		Ecology.history.add(new double[]{
+				featureCollection.ecology.generation,
+				featureCollection.ecology.population.size(),
+				Settings.num_districts,
+				Settings.mutation_boundary_rate,
+				Settings.geometry_weight,
+				Settings.disconnected_population_weight,
+				Settings.population_balance_weight,
+				Settings.disenfranchise_weight,
+				Settings.voting_power_balance_weight,
+				dm.fairnessScores[3],
+				dm.fairnessScores[2]*conversion_to_bits,
+				dm.fairnessScores[1]*conversion_to_bits,
+				dm.fairnessScores[4]*conversion_to_bits
+		});
 		
 		try {
 			
@@ -66,7 +84,7 @@ public class PanelStats extends JPanel {
 			for( int i = 0; i < dm.districts.size(); i++) {
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
-				String population = ""+(int)d.getPopulation();
+				//String population = ""+(int)d.getPopulation();
 				double self_entropy = d.getSelfEntropy(null);
 				//String edge_length = ""+d.getEdgeLength();
 				double [] dd = d.getVotes();
@@ -87,7 +105,7 @@ public class PanelStats extends JPanel {
 				}
 				String winner = ""+iwinner;
 				ddata[i][0] = ""+i;
-				ddata[i][1] = integer.format(population);
+				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
 				for( int j = 4; j < ddata[i].length; j++) {

@@ -61,6 +61,8 @@ public class MainFrame extends JFrame {
 	
 	JFrame frameStats = new JFrame();
 	PanelStats panelStats = new PanelStats();
+	JFrame frameGraph = new JFrame();
+	public PanelGraph panelGraph = new PanelGraph();
 
 
 	//public Ecology ecology = new Ecology();
@@ -78,6 +80,7 @@ public class MainFrame extends JFrame {
 	private final JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
 	private final JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
 	private final JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
+	private final JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -704,6 +707,13 @@ public class MainFrame extends JFrame {
 			}
 		});
 		mnResults.add(mntmShowStats);
+		mntmShowGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frameGraph.show();
+			}
+		});
+		
+		mnResults.add(mntmShowGraph);
 		
 		JSeparator separator_2 = new JSeparator();
 		mnResults.add(separator_2);
@@ -1050,7 +1060,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		chckbxmntmMutateAll.setEnabled(false);
+		chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
@@ -1072,11 +1082,18 @@ public class MainFrame extends JFrame {
 		frameStats = new JFrame();
 		frameStats.setContentPane(panelStats);
 		frameStats.setTitle("Map stats");
-		//frameStats.setPreferredSize(panelStats.getPreferredSize());
 		Dimension dim = panelStats.getPreferredSize();
-		dim.height += 20;
-		
+		dim.height += 20;		
 		frameStats.setSize(dim);
+		
+		frameGraph = new JFrame();
+		frameGraph.setContentPane(panelGraph);
+		frameGraph.setTitle("Graph");
+		dim = panelGraph.getPreferredSize();
+		dim.height += 20;
+		frameGraph.setSize(dim);
+
+		
 		setEnableds();
 	}
 	public StringBuffer getFile(File f) {		

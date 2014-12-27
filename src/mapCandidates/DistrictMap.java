@@ -172,7 +172,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public void crossover(int[] genome1, int[] genome2) {
         for( int i = 0; i < block_districts.length; i++) {
             double r = Math.random();
-            block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+            if( Settings.pso ) {
+            	block_districts[i] = r < 0.333333333333 ? genome1[i] : r < 0.6666666666666 ? genome2[i] : Ecology.bestMap.getGenome()[i];
+            } else {
+            	block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+            }
         }
     }
     
