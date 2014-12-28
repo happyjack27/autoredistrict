@@ -69,7 +69,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             		}
                 	if( DistrictMap.getGenomeHammingDistance(dm.getGenome(), dm2.getGenome()) == 0) {
                 		dupe = true;
-                		duped = false;
+                		duped = true;
                 		dm.mutate_boundary(Settings.mutation_boundary_rate);
                 	}
             	}
