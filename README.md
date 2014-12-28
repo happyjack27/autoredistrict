@@ -27,7 +27,7 @@ auto-annealing (instead of having to "drive" it)
 
 
 TODO:
-
+* implement import population
 * use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
 * add load district info from geojson (they can choose the property, shift from 1-index)
 *  add screen for loading different data elements from geojson properties
@@ -40,6 +40,8 @@ TODO:
 * create explanation of how to convert to/from geojson (ogr2ogr)
 * talk about gaps, and how to resolve them (use tiger data)
 * talk about how to combine data
+* add command line stuff for scripting
+* rename all labels such as "compactness" so they all use the same naming - use the naming for e.g. "border length" and "x imbalance"
 
 new ui:
 * show what's loaded ( geography, census/population, elections, districts)

@@ -264,7 +264,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
  
     public void reset() {
-    	population =  new Vector<DistrictMap>();
+    	population = new Vector<DistrictMap>();
+    	for( Block b : blocks) {
+    		b.recalcMuSigmaN();
+    	}
     }
     public void match_population() {
     	

@@ -4,9 +4,16 @@ import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	
+	public static double population_redundancy = 100.0;
+
+	public static boolean use_new_self_entropy_method = true;
+	public static double self_entropy_exponent = 1.0;//2.0;
+	public static int voters_to_simulate = 64;
+	public static int approximate_binomial_as_normal_at_n_equals = 32;
+	public static int binomial_cache_size = 128;
 	public static boolean pso = false;
 	public static boolean auto_anneal = true;
-    public static double auto_anneal_Frac = 0.5;
+    public static double auto_anneal_Frac = 0.25;
 	public static boolean mate_merge = false;
     public static double species_fraction = 1.0;
 

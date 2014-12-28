@@ -16,10 +16,45 @@ public class Block extends ReflectionJSONObject<Block> {
     public Vector<Block> neighbors = new Vector<Block>();
     public double[] neighbor_lengths;
     public Vector<Demographic> demographics = new Vector<Demographic>();
+    private double[][] mu_sigma_n = null;
     
     public boolean has_census_results = false;
     public boolean has_election_results = false;
     public double population=1;
+    public void recalcMuSigmaN() {
+    	try {
+   		double[] successes = new double[Candidate.candidates.size()];
+		double total = 0;
+        for( Demographic d : demographics) {
+            for( int j = 0; j < d.vote_prob.length; j++) {
+            	double n = d.population * d.vote_prob[j]*d.turnout_probability;
+            	n /= Settings.population_redundancy;
+            	total += n;
+            	successes[j] += n;
+            }
+        }
+        mu_sigma_n = new double[Candidate.candidates.size()][];
+        for( int j = 0; j < successes.length; j++) {
+        	double n = total;
+        	double p = successes[j] / total;
+			double mu = n*p;
+			double sigma = n*p*(1-p);
+        	mu_sigma_n[j] = new double[]{mu,sigma,n};
+        	if( total == 0) {
+        		mu_sigma_n[j] = new double[]{0,0,0};
+        	}
+        }   
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    	}
+    }
+    
+    public double[][] getMuSigmaN() {
+    	if( mu_sigma_n == null) {
+    		recalcMuSigmaN();    		
+    	}
+    	return mu_sigma_n;
+    }
     
     
 	double[][] outcomes;

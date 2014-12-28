@@ -131,8 +131,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     public void mutate_boundary(double prob) {
     	//start at 1 for regularization
-    	boundaries_tested = 2;
-    	boundaries_mutated = 1;
+    	boundaries_tested = 0;
+    	boundaries_mutated = 0;
         for( int i = 0; i < block_districts.length; i++) {
         	Block block = blocks.get(i);
         	boolean border = false;
@@ -166,6 +166,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             		ex.printStackTrace();
             	}
             }
+        }
+        if( boundaries_tested == 0) {
+        	boundaries_tested++;
+        }
+        if( boundaries_mutated == 0) {
+        	boundaries_mutated+=2;
+        	boundaries_tested+=4;
         }
     }
     

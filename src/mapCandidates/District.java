@@ -47,28 +47,77 @@ public class District extends JSONObject {
         double total = 0;
         double[] wins  = new double[Candidate.candidates.size()];
         for( int i = 0; i < wins.length; i++) {
-        	wins[i] = 1;
+        	wins[i] = 0;
         }
-        for( int i = 0; i < outcomes.length; i++) {
-        	double[] outcome = outcomes[i];
-        	if( self_entropy_by_vote_count) {
-                for( int j = 0; j < outcome.length; j++) {
-                	wins[j] += outcome[j];
-                }
-        	} else {
-            	int best = -1;
-            	double best_value = -1;
-                for( int j = 0; j < outcome.length; j++) {
-                	if( outcome[j] > best_value) {
-                		best = j;
-                		best_value = outcome[j];
+    	if( Settings.use_new_self_entropy_method) {
+    		double[] mu = new double[wins.length];
+    		double[] sigma = new double[wins.length];
+    		double[] n = new double[wins.length];
+    		
+    		for( Block b : blocks) {
+    			double[][] msn = b.getMuSigmaN();
+                for( int i = 0; i < wins.length; i++) {
+                	try {
+            			mu[i] += msn[i][0];
+            			sigma[i] += msn[i][1];
+            			n[i] += msn[i][2];
+                	} catch (Exception ex) {
+                		System.out.println("i "+i+" block "+b.id);
+                		ex.printStackTrace();
+                		
                 	}
-                }
-                if( best >= 0) {
-                	wins[best]++;
-                }
-        	}
-        }
+        		}
+            }
+    		
+    		double t = 0;
+            for( int i = 0; i < wins.length; i++) {
+            	wins[i] = Gaussian.getProbForMuSigmaN(mu[i],sigma[i],n[i]);
+            	if( wins[i] != wins[i] || wins[i] == 0) {
+            		wins[i] = 0.00000001;
+            	}
+            	t += wins[i];
+    		}
+            if( t == 0) {
+            	t = 1;
+            }
+            for( int i = 0; i < wins.length; i++) {
+            	wins[i] /= t;
+            }    		
+    	} else {
+            for( int i = 0; i < outcomes.length; i++) {
+            	double[] outcome = outcomes[i];
+            	if( self_entropy_by_vote_count) {
+            		double[] sim_results;
+                	if( Settings.use_new_self_entropy_method) {
+                		sim_results = Gaussian.getOddsFromBlocks(blocks);
+                	} else {
+
+                    	double total_votes = 0;
+                    	for( int n = 0; n < outcome.length; n++) {
+                    		total_votes += outcome[n];
+                    	}
+                    	System.out.println("total_votes "+total_votes);
+                		//double[] sim_results = StaticFunctions.convertProbsToResults(outcome, Settings.voters_to_simulate);
+                		sim_results = StaticFunctions.convertProbsToResults(outcome,(int)total_votes);
+                	}
+                    for( int j = 0; j < outcome.length; j++) {
+                    	wins[j] += sim_results[j];//outcome[j];
+                    }
+            	} else {
+                	int best = -1;
+                	double best_value = -1;
+                    for( int j = 0; j < outcome.length; j++) {
+                    	if( outcome[j] > best_value) {
+                    		best = j;
+                    		best_value = outcome[j];
+                    	}
+                    }
+                    if( best >= 0) {
+                    	wins[best]++;
+                    }
+            	}
+            }
+    	}
         for( int i = 0; i < wins.length; i++) {
             total += wins[i];
         }
@@ -79,7 +128,7 @@ public class District extends JSONObject {
             H -= p*Math.log(p);
         }
 
-        return H;
+        return Math.pow(H, Settings.self_entropy_exponent);
     }
     public double[][] generateOutcomes(int num) {
     	if( adjust_vote_to_population) {

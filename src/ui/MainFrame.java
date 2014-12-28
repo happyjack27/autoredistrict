@@ -789,6 +789,7 @@ public class MainFrame extends JFrame {
 				for( DistrictMap dm : featureCollection.ecology.population) {
 					dm.setGenome(new_block_districts);
 					dm.fillDistrictBlocks();
+				
 				}
 				Feature.display_mode = 0;
 				mapPanel.invalidate();
