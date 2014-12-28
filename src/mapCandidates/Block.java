@@ -28,7 +28,7 @@ public class Block extends ReflectionJSONObject<Block> {
         for( Demographic d : demographics) {
             for( int j = 0; j < d.vote_prob.length; j++) {
             	double n = d.population * d.vote_prob[j]*d.turnout_probability;
-            	n /= Settings.population_redundancy;
+            	n /= Settings.voting_coalition_size;
             	total += n;
             	successes[j] += n;
             }

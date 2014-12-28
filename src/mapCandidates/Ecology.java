@@ -409,8 +409,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			System.out.println();
 		}
         if( Settings.auto_anneal) {
-	        int total = 0;
-	        int mutated = 0;
+	        int total = 4;
+	        int mutated = 1;
 	        for(int i = 0; i < cutoff; i++) {
 	            DistrictMap dm = population.get(i);
 	            total += dm.boundaries_tested;
@@ -418,6 +418,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        }
         	double new_rate = (double)mutated/(double)total;
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
+        	if( Settings.mutation_boundary_rate < 1.0/(double)Settings.population) {
+        		Settings.mutation_boundary_rate = 1.0/(double)Settings.population;
+        	}
         	if( MainFrame.mainframe != null) {
         		System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
         		MainFrame.mainframe.slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));

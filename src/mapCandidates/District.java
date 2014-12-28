@@ -68,6 +68,17 @@ public class District extends JSONObject {
                 	}
         		}
             }
+            for( int i = 0; i < wins.length; i++) {
+            	double dn = n[i]*Settings.pct_turnover;
+            	mu[i] *= (1.0-Settings.pct_turnover);
+            	sigma[i] *= (1.0-Settings.pct_turnover);
+            	//n[i] *= (1.0-Settings.pct_turnover);
+            	double dp = 0.5;
+    			double dmu = dn*dp;
+    			double dsigma = dn*dp*(1-dp);
+            	mu[i] += dmu;
+            	sigma[i] += dsigma;
+            }
     		
     		double t = 0;
             for( int i = 0; i < wins.length; i++) {
