@@ -57,6 +57,31 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public EvolveThread evolveThread; 
     public long generation = 0;
     
+    public void make_unique() {
+    	for(DistrictMap dm : population) {
+    		boolean dupe = true;
+    		boolean duped = false;
+    		while( dupe) {
+    			dupe = false;
+    	       	for(DistrictMap dm2 : population) {
+            		if( dm == dm2) {
+            			continue;
+            		}
+                	if( DistrictMap.getGenomeHammingDistance(dm.getGenome(), dm2.getGenome()) == 0) {
+                		dupe = true;
+                		duped = false;
+                		dm.mutate_boundary(Settings.mutation_boundary_rate);
+                	}
+            	}
+    		}
+    		if( duped) {
+    			dm.fillDistrictBlocks();
+    		}
+        		
+    	}
+    }
+
+
     class EvolveThread extends Thread {
     	public void run() {
     		for( int i = 0; i < DistrictMap.metrics.length; i++) {
@@ -428,7 +453,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		MainFrame.mainframe.repaint();
         	}
         }
-
+        
 
         Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
         for(int i = 0; i < cutoff; i++) {
@@ -528,6 +553,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             }
             dm.fillDistrictBlocks();
         }
+        make_unique();
         if( verbosity > 1)
         	System.out.println("}");
     }
