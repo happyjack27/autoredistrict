@@ -442,10 +442,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            total += dm.boundaries_tested;
 	            mutated += dm.boundaries_mutated;
 	        }
+	        //minimum 2 mutations
+	        if( mutated < Settings.population*2.0) {
+	        	mutated = (int) (Settings.population*2.0);
+	        }
         	double new_rate = (double)mutated/(double)total;
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
-        	if( Settings.mutation_boundary_rate < 0.5/(double)Settings.population) {
-        		Settings.mutation_boundary_rate = 0.5/(double)Settings.population;
+        	//grow population if under a threshold
+        	if( Settings.mutation_boundary_rate < 0.25/(double)Settings.population) {
+        		Settings.mutation_boundary_rate = 0.25/(double)Settings.population;
         		Settings.setPopulation(Settings.population+1);
         	}
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
