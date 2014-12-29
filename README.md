@@ -42,6 +42,13 @@ TODO:
 * talk about how to combine data
 * add command line stuff for scripting
 * rename all labels such as "compactness" so they all use the same naming - use the naming for e.g. "border length" and "x imbalance"
+* add saving and loading of history graph
+* add forcing precincts to certain district, locking precinct districts so they dont change
+* _ make option to change population balance to minimize pct difference between largest and smallest population
+* show pct diff between largest and smallest pop.  must be w/in 10%  also show average deviation
+* allow to chose method - bits - standard deviation - min. and max
+* ability to set hard reject rules - adding a penalty of say 10 if fails.
+* - implement federal criteria - http://redistricting.lls.edu/where.php#section2
 
 new ui:
 * show what's loaded ( geography, census/population, elections, districts)

@@ -631,7 +631,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time5 = System.currentTimeMillis();
 
         
-        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
+        fairnessScores = new double[]{length,disproportional_representation*0.5,population_imbalance*2.0,disconnected_pops*2.0,power_fairness*0.5}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
     	metrics[1] += time2-time1;

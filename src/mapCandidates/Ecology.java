@@ -550,7 +550,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             }
             dm.fillDistrictBlocks();
         }
-        make_unique();
+        if( Settings.make_unique) {
+        	make_unique();
+        }
         if( verbosity > 1)
         	System.out.println("}");
     }

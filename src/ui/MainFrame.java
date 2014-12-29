@@ -867,13 +867,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		JLabel lblCompactness = new JLabel("compactness");
+		JLabel lblCompactness = new JLabel("Border length");
 		lblCompactness.setBounds(6, 36, 172, 16);
 		panel_2.add(lblCompactness);
 		slider_3.setBounds(6, 57, 190, 29);
 		panel_2.add(slider_3);
 		
-		JLabel lblContiguency = new JLabel("proportional representation");
+		JLabel lblContiguency = new JLabel("Representation imbalance");
 		lblContiguency.setBounds(6, 220, 172, 16);
 		panel_2.add(lblContiguency);
 		slider_7.setBounds(6, 245, 190, 29);
@@ -884,19 +884,19 @@ public class MainFrame extends JFrame implements iChangeListener {
 		lblEvolutionaryPressure.setBounds(6, 8, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
-		JLabel lblProportionalRepresentation = new JLabel("population balance");
+		JLabel lblProportionalRepresentation = new JLabel("Population imbalance");
 		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
 		slider_5.setBounds(6, 179, 190, 29);
 		panel_2.add(slider_5);
 		
-		JLabel lblVotingPowerBalance = new JLabel("voting power balance");
+		JLabel lblVotingPowerBalance = new JLabel("Voting power imbalance");
 		lblVotingPowerBalance.setBounds(6, 286, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
 		slider_6.setBounds(6, 307, 190, 29);
 		panel_2.add(slider_6);
 		
-		JLabel lblConnectedness = new JLabel("connectedness");
+		JLabel lblConnectedness = new JLabel("Disconnected population");
 		lblConnectedness.setBounds(6, 97, 172, 16);
 		panel_2.add(lblConnectedness);
 		

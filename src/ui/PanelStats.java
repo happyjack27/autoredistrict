@@ -156,7 +156,7 @@ public class PanelStats extends JPanel {
 		this.setSize(new Dimension(449, 510));
 		this.setPreferredSize(new Dimension(449, 510));
 		
-		JLabel lblNewLabel = new JLabel("Total edge length:");
+		JLabel lblNewLabel = new JLabel("Border length:");
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel.setBounds(6, 6, 202, 16);
@@ -192,7 +192,7 @@ public class PanelStats extends JPanel {
 		label_5.setBounds(220, 90, 196, 16);
 		add(label_5);
 		
-		JLabel lblPowerImbalance = new JLabel("Power imbalance:");
+		JLabel lblPowerImbalance = new JLabel("Voting power imbalance:");
 		lblPowerImbalance.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblPowerImbalance.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblPowerImbalance.setBounds(6, 118, 202, 16);

@@ -5,10 +5,12 @@ import java.util.Vector;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
+	public static final boolean make_unique = false; //not the cost of this is population times population times precinct count.
+	
 	public static Vector<iChangeListener> populationChangeListeners = new Vector<iChangeListener>();
 	public static Vector<iChangeListener> mutation_rateChangeListeners = new Vector<iChangeListener>();
 	
-	public static double pct_turnover = 0.10; //pct of voters leaving and entering this election cycle. (replaced with 50/50 voters) (or persuadable voters)
+	public static double pct_turnover = 0.15; //pct of voters leaving and entering this election cycle. (replaced with 50/50 voters) (or persuadable voters)
 	public static double voting_coalition_size = 100.0; //every x voters will be considered 1 independant voter
 
 	public static boolean use_new_self_entropy_method = true;
