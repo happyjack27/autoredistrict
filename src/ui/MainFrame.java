@@ -19,7 +19,7 @@ import javax.swing.event.*;
 import javax.swing.border.*;
 
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements iChangeListener {
 	public static MainFrame mainframe;
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -1093,6 +1093,9 @@ public class MainFrame extends JFrame {
 		dim = panelGraph.getPreferredSize();
 		dim.height += 20;
 		frameGraph.setSize(dim);
+		
+		Settings.mutation_rateChangeListeners.add(this);
+		Settings.populationChangeListeners.add(this);
 
 		
 		setEnableds();
@@ -1115,5 +1118,14 @@ public class MainFrame extends JFrame {
 			return sb;
 		} 
 		return sb;
+	}
+
+	@Override
+	public void valueChanged() {
+ 		textField.setText(""+Settings.population);
+		//System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
+		slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
+		invalidate();
+		repaint();
 	}
 }

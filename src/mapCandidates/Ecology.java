@@ -70,6 +70,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 	if( DistrictMap.getGenomeHammingDistance(dm.getGenome(), dm2.getGenome()) == 0) {
                 		dupe = true;
                 		duped = true;
+                		System.out.println("duplicate removed");
                 		dm.mutate_boundary(Settings.mutation_boundary_rate);
                 	}
             	}
@@ -443,15 +444,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        }
         	double new_rate = (double)mutated/(double)total;
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
-        	if( Settings.mutation_boundary_rate < 1.0/(double)Settings.population) {
-        		Settings.mutation_boundary_rate = 1.0/(double)Settings.population;
+        	if( Settings.mutation_boundary_rate < 0.5/(double)Settings.population) {
+        		Settings.mutation_boundary_rate = 0.5/(double)Settings.population;
+        		Settings.setPopulation(Settings.population+1);
         	}
-        	if( MainFrame.mainframe != null) {
-        		System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
-        		MainFrame.mainframe.slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
-        		MainFrame.mainframe.invalidate();
-        		MainFrame.mainframe.repaint();
-        	}
+        	Settings.setMutationRate(Settings.mutation_boundary_rate);
         }
         
 

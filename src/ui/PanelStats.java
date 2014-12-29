@@ -22,6 +22,8 @@ public class PanelStats extends JPanel {
 	JLabel label_7 = new JLabel();
 	
 	JLabel label_2 = new JLabel();
+	JLabel label_4 = new JLabel();
+
 
 
 	public void getStats() {
@@ -43,6 +45,7 @@ public class PanelStats extends JPanel {
 		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");		
+		label_4.setText(""+integer.format(featureCollection.ecology.generation));
 		
 		Ecology.history.add(new double[]{
 				featureCollection.ecology.generation,
@@ -220,6 +223,15 @@ public class PanelStats extends JPanel {
 		
 		label_2.setBounds(220, 146, 202, 16);
 		add(label_2);
+		
+		JLabel lblGeneration = new JLabel("Generation:");
+		lblGeneration.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblGeneration.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		lblGeneration.setBounds(6, 174, 202, 16);
+		add(lblGeneration);
+		
+		label_4.setBounds(220, 174, 202, 16);
+		add(label_4);
 	}
 	public FeatureCollection featureCollection;
 	private JTable table;
