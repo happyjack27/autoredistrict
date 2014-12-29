@@ -153,7 +153,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 			public void actionPerformed(ActionEvent arg0) {
 				File fd;
 				if( use_sample) {
-					fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
+					//fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
+					fd = new File("C:\\Users\\kbaas.000\\git\\autoredistrict_\\data sources\\wisconsin\\2012");
 				} else {
 					JFileChooser jfc = new JFileChooser();
 					jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -452,7 +453,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 					if( use_sample) {
 						String os_name = System.getProperty("os.name").toLowerCase();
 						if( os_name.indexOf("windows") >= 0) {
-							f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
+							//f = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\general election - presidential\\results.txt");
+							f = new File("C:\\Users\\kbaas.000\\git\\autoredistrict_\\data sources\\wisconsin\\2012\\combined_results.txt");
 						}
 					} else {
 						JFileChooser jfc = new JFileChooser();
