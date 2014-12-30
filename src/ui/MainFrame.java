@@ -1096,7 +1096,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		lblNumOfDistricts.setBounds(6, 58, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
-		JButton button = new JButton("<");
+		JButton button = new JButton("<|");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = -1;
@@ -1110,7 +1110,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		button.setBounds(26, 17, 46, 29);
 		panel.add(button);
 		
-		JButton btnX = new JButton("X");
+		JButton btnX = new JButton("| |");
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				featureCollection.ecology.stopEvolving();
@@ -1122,7 +1122,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		btnX.setBounds(84, 17, 46, 29);
 		panel.add(btnX);
 		
-		JButton button_2 = new JButton(">");
+		JButton button_2 = new JButton("|>");
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = 1;
