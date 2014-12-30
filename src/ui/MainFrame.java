@@ -36,6 +36,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 
 
+	JTextField textField_3 = new JTextField();
 	JTextField textField_2 = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
@@ -105,6 +106,155 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.repaint();
 	}
 	
+	public void loadElection(String s) {
+		try {
+			String[] lines = s.split("\n");
+			int num_candidates = lines[0].split("\t").length - 1;
+			
+			Vector<String> not_found_in_geo = new Vector<String>();
+			for( Block b : featureCollection.blocks) {
+				b.has_election_results = false;
+			}
+			for( int i = 0; i < lines.length; i++) {
+				String[] ss = lines[i].split("\t");
+				String district = ss[0].trim();
+				Block b = featureCollection.precinctHash.get(district);
+				if( b == null) {
+					not_found_in_geo.add(district);
+					System.out.println("not in geo: "+district);
+
+				} else {
+					b.has_election_results = true;
+				}
+			}
+			Vector<String> not_found_in_census = new Vector<String>();
+			for( Block b : featureCollection.blocks) {
+				if( b.has_election_results == false) {
+					not_found_in_census.add(b.name);
+					System.out.println("not in election: |"+b.name+"|");
+
+				}
+			}
+			if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
+				for( Block b : featureCollection.blocks) {
+					b.has_election_results = false;
+				}
+				JOptionPane.showMessageDialog(null,""
+						+"Election data doesn't match geographic data.\n"
+						+"Election data without matching geo data: "+not_found_in_geo.size()+"\n"
+						+"Geo data without matching election data: "+not_found_in_census.size()
+						, "Mismatch of geographic regions"
+						, 0);
+				return;
+			}
+			
+			
+			
+			HashMap<String,double[]> votes = new HashMap<String,double[]>();
+			for( int i = 0; i < lines.length; i++) {
+				String[] ss = lines[i].split("\t");
+				String district = ss[0].trim();
+				double[] dd = votes.get(district);
+				if( dd == null) {
+					dd = new double[num_candidates];
+					for( int j = 0; j < num_candidates; j++) {
+						dd[j] = 0;
+					}
+					votes.put(district, dd);
+				}
+				for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
+					try {
+						dd[j] += Double.parseDouble(ss[j+1].replaceAll(",",""));
+					} catch (Exception ex) {
+						
+					}
+				}
+			}
+			
+			for( Entry<String, double[]> es : votes.entrySet()) {
+				Block b = featureCollection.precinctHash.get(es.getKey());
+				double[] dd = es.getValue();
+				for( int j = 0; j < num_candidates; j++) {
+					Demographic d = new Demographic();
+					d.block_id = b.id;
+					d.turnout_probability = 1;
+					d.population = (int) dd[j];
+					d.vote_prob = new double[num_candidates];
+					for( int i = 0; i < d.vote_prob.length; i++) {
+						d.vote_prob[i] = 0;
+					}
+					d.vote_prob[j] = 1;
+					b.demographics.add(d);
+					System.out.println("block "+b.id+" added demo "+d.population+" "+j);
+				}
+			}
+			
+			Candidate.candidates = new Vector<Candidate>();
+			for( int i = 0; i < num_candidates; i++) {
+				Candidate c = new Candidate();
+				c.index = i;
+				c.id = ""+i;
+				Candidate.candidates.add(c);
+			}
+			featureCollection.ecology.reset();
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+		Feature.display_mode = 1;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		election_loaded = true;
+		setEnableds();
+		
+	}
+	
+	public void initFeatures() {
+		Vector<Feature> features = featureCollection.features;
+		System.out.println(features.size()+" precincts loaded.");
+		System.out.println("Initializing blocks...");
+		featureCollection.initBlocks();
+
+		minx = features.get(0).geometry.coordinates[0][0][0];
+		maxx = features.get(0).geometry.coordinates[0][0][0];
+		miny = features.get(0).geometry.coordinates[0][0][1];
+		maxy = features.get(0).geometry.coordinates[0][0][1];
+		HashSet<String> types = new HashSet<String>();
+		for( Feature f : features) {
+			double[][][] coordinates2 = f.geometry.coordinates;
+			for( int j = 0; j < coordinates2.length; j++) {
+				double[][] coordinates = coordinates2[j];
+				for( int i = 0; i < coordinates.length; i++) {
+					if( coordinates[i][0] < minx) {
+						minx = coordinates[i][0];
+					}
+					if( coordinates[i][0] > maxx) {
+						maxx = coordinates[i][0];
+					}
+					if( coordinates[i][1] < miny) {
+						miny = coordinates[i][1];
+					}
+					if( coordinates[i][1] > maxy) {
+						maxy = coordinates[i][1];
+					}
+				}
+			}					
+		}
+		System.out.println(""+minx+","+miny);
+		System.out.println(""+maxx+","+maxy);
+		resetZoom();
+		mapPanel.featureCollection = featureCollection;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		featureCollection.ecology.mapPanel = mapPanel;
+		featureCollection.ecology.statsPanel = panelStats;
+		featureCollection.initEcology();
+		System.out.println("Ready.");
+		
+		geo_loaded = true;
+		setEnableds();
+	}
+	
 	public MainFrame() {
 		mainframe = this;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,6 +283,65 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnFile.add(mntmExit);
 		
+		JMenu mnSamples = new JMenu("Samples");
+		menuBar.add(mnSamples);
+		
+		JMenuItem mntmWisconsin = new JMenuItem("Wisconsin 2012");
+		mntmWisconsin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				StringBuffer sb = new StringBuffer();
+				InputStream in = getClass().getResourceAsStream("/resources/Wards_111312_ED_110612.json"); 
+				//System.exit(0);
+				//BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				try {
+					while( in.available() > 0) {
+						byte[] bb = new byte[in.available()];
+						in.read(bb);
+						sb.append(new String(bb));
+						Thread.sleep(load_wait);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				FeatureCollection fc = new FeatureCollection();
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
+				try {
+					fc.fromJSON(sb.toString());
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+				for( Feature fe : fc.features) {
+						featureCollection.features.add(fe);
+				}
+				initFeatures();
+
+				sb = new StringBuffer();
+				in = getClass().getResourceAsStream("/resources/combined_results.txt"); 
+				//System.exit(0);
+				//BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+				try {
+					while( in.available() > 0) {
+						byte[] bb = new byte[in.available()];
+						in.read(bb);
+						sb.append(new String(bb));
+						Thread.sleep(load_wait);
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				loadElection(sb.toString());
+
+			}
+		});
+		mnSamples.add(mntmWisconsin);
+		
 		menuBar.add(mnGeography);
 		
 		mnGeography.add(mntmOpenGeojson);
@@ -151,6 +360,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mnGeography.add(chckbxmntmLatitudeLongitude);
 		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				StringBuffer sb;
+
 				File fd;
 				if( use_sample) {
 					//fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
@@ -192,7 +403,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					}
 					System.out.println("Processing "+s+"...");
 					File f = ff[i];
-					StringBuffer sb = getFile(f);
+					sb = getFile(f);
 					
 					FeatureCollection fc = new FeatureCollection();
 					if( panelStats != null) {
@@ -219,52 +430,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 				for( Feature fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
-				Vector<Feature> features = featureCollection.features;
-				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing blocks...");
-				featureCollection.initBlocks();
-
-				minx = features.get(0).geometry.coordinates[0][0][0];
-				maxx = features.get(0).geometry.coordinates[0][0][0];
-				miny = features.get(0).geometry.coordinates[0][0][1];
-				maxy = features.get(0).geometry.coordinates[0][0][1];
-				HashSet<String> types = new HashSet<String>();
-				for( Feature f : features) {
-					double[][][] coordinates2 = f.geometry.coordinates;
-					for( int j = 0; j < coordinates2.length; j++) {
-						double[][] coordinates = coordinates2[j];
-						for( int i = 0; i < coordinates.length; i++) {
-							if( coordinates[i][0] < minx) {
-								minx = coordinates[i][0];
-							}
-							if( coordinates[i][0] > maxx) {
-								maxx = coordinates[i][0];
-							}
-							if( coordinates[i][1] < miny) {
-								miny = coordinates[i][1];
-							}
-							if( coordinates[i][1] > maxy) {
-								maxy = coordinates[i][1];
-							}
-						}
-					}					
-				}
-				System.out.println(""+minx+","+miny);
-				System.out.println(""+maxx+","+maxy);
-				resetZoom();
-				mapPanel.featureCollection = featureCollection;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				featureCollection.ecology.mapPanel = mapPanel;
-				featureCollection.ecology.statsPanel = panelStats;
-				featureCollection.initEcology();
-				System.out.println("Ready.");
-				
-				geo_loaded = true;
-				setEnableds();
-
+				initFeatures();
 			}
 		});
+		
+		
 		mntmOpenGeojson.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
@@ -466,104 +636,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 					}
 					StringBuffer sb = getFile(f);
 					String s = sb.toString();
-					String[] lines = s.split("\n");
-					int num_candidates = lines[0].split("\t").length - 1;
-					
-					Vector<String> not_found_in_geo = new Vector<String>();
-					for( Block b : featureCollection.blocks) {
-						b.has_election_results = false;
-					}
-					for( int i = 0; i < lines.length; i++) {
-						String[] ss = lines[i].split("\t");
-						String district = ss[0].trim();
-						Block b = featureCollection.precinctHash.get(district);
-						if( b == null) {
-							not_found_in_geo.add(district);
-							System.out.println("not in geo: "+district);
-
-						} else {
-							b.has_election_results = true;
-						}
-					}
-					Vector<String> not_found_in_census = new Vector<String>();
-					for( Block b : featureCollection.blocks) {
-						if( b.has_election_results == false) {
-							not_found_in_census.add(b.name);
-							System.out.println("not in election: |"+b.name+"|");
-
-						}
-					}
-					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-						for( Block b : featureCollection.blocks) {
-							b.has_election_results = false;
-						}
-						JOptionPane.showMessageDialog(null,""
-								+"Election data doesn't match geographic data.\n"
-								+"Election data without matching geo data: "+not_found_in_geo.size()+"\n"
-								+"Geo data without matching election data: "+not_found_in_census.size()
-								, "Mismatch of geographic regions"
-								, 0);
-						return;
-					}
-					
-					
-					
-					HashMap<String,double[]> votes = new HashMap<String,double[]>();
-					for( int i = 0; i < lines.length; i++) {
-						String[] ss = lines[i].split("\t");
-						String district = ss[0].trim();
-						double[] dd = votes.get(district);
-						if( dd == null) {
-							dd = new double[num_candidates];
-							for( int j = 0; j < num_candidates; j++) {
-								dd[j] = 0;
-							}
-							votes.put(district, dd);
-						}
-						for( int j = 0; j < num_candidates && j < ss.length-1; j++) {
-							try {
-								dd[j] += Double.parseDouble(ss[j+1].replaceAll(",",""));
-							} catch (Exception ex) {
-								
-							}
-						}
-					}
-					
-					for( Entry<String, double[]> es : votes.entrySet()) {
-						Block b = featureCollection.precinctHash.get(es.getKey());
-						double[] dd = es.getValue();
-						for( int j = 0; j < num_candidates; j++) {
-							Demographic d = new Demographic();
-							d.block_id = b.id;
-							d.turnout_probability = 1;
-							d.population = (int) dd[j];
-							d.vote_prob = new double[num_candidates];
-							for( int i = 0; i < d.vote_prob.length; i++) {
-								d.vote_prob[i] = 0;
-							}
-							d.vote_prob[j] = 1;
-							b.demographics.add(d);
-							System.out.println("block "+b.id+" added demo "+d.population+" "+j);
-						}
-					}
-					
-					Candidate.candidates = new Vector<Candidate>();
-					for( int i = 0; i < num_candidates; i++) {
-						Candidate c = new Candidate();
-						c.index = i;
-						c.id = ""+i;
-						Candidate.candidates.add(c);
-					}
-					featureCollection.ecology.reset();
+					loadElection(s);
 				} catch (Exception ex) {
-					System.out.println("ex "+ex);
 					ex.printStackTrace();
 				}
-				Feature.display_mode = 1;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				election_loaded = true;
-				setEnableds();
 			}
 		});
 		
@@ -864,7 +940,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 299, 200, 351);
+		panel_2.setBounds(0, 299, 200, 416);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -909,6 +985,28 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		slider_2.setBounds(6, 118, 190, 29);
 		panel_2.add(slider_2);
+		
+		JLabel lblMaxPop = new JLabel("Max population % diff ");
+		lblMaxPop.setBounds(6, 353, 134, 16);
+		panel_2.add(lblMaxPop);
+		
+		textField_3.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				textField_3.postActionEvent();
+			}
+		});
+		textField_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Settings.max_pop_diff = Integer.parseInt(textField_3.getText());
+				} catch (Exception ex) { }
+			}
+		});
+		textField_3.setText("9");
+		textField_3.setColumns(10);
+		textField_3.setBounds(138, 347, 58, 28);
+		panel_2.add(textField_3);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -1095,6 +1193,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		dim = panelGraph.getPreferredSize();
 		dim.height += 20;
 		frameGraph.setSize(dim);
+		
+		frameGraph.move(this.getWidth(), this.getX());
+		frameStats.move(this.getWidth(), this.getX()+frameGraph.getHeight());
+		frameStats.show();
+		frameGraph.show();
 		
 		Settings.mutation_rateChangeListeners.add(this);
 		Settings.populationChangeListeners.add(this);

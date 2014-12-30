@@ -1,5 +1,7 @@
 package ui;
 
+import java.io.InputStream;
+
 import javax.swing.*;
 
 import mapCandidates.Gaussian;
@@ -17,6 +19,10 @@ public class Applet extends JApplet {
 		new Applet();
 	}
     public Applet() {
+		//InputStream in = getClass().getResourceAsStream("/resources/Wards_111312_ED_110612.json"); 
+		//System.out.println("in: "+in);
+		//System.exit(0);
+
     	StaticFunctions.binomial(1, 1);
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.51));
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.52));

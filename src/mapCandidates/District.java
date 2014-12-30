@@ -83,7 +83,7 @@ public class District extends JSONObject {
     		double t = 0;
             for( int i = 0; i < wins.length; i++) {
             	wins[i] = Gaussian.getProbForMuSigmaN(mu[i],sigma[i],n[i]);
-            	if( wins[i] != wins[i] || wins[i] == 0) {
+            	if( wins[i] != wins[i] || wins[i] <= 0) {
             		wins[i] = 0.00000001;
             	}
             	t += wins[i];
@@ -136,10 +136,16 @@ public class District extends JSONObject {
         double H = 0;
         for( int i = 0; i < wins.length; i++) {
             double p = ((double)wins[i]) / total; 
+            if( p != p || p <= 0) {
+            	continue;
+            }
             H -= p*Math.log(p);
         }
+        if( H != H) {
+        	H = 0;
+        }
 
-        return Math.pow(H, Settings.self_entropy_exponent);
+        return H;//Math.pow(H, Settings.self_entropy_exponent);
     }
     public double[][] generateOutcomes(int num) {
     	if( adjust_vote_to_population) {

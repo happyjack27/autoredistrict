@@ -405,8 +405,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         double[] weights = new double[]{
         		Settings.geometry_weight, 
         		Settings.disenfranchise_weight, 
-        		Settings.population_balance_weight,
-                Settings.disconnected_population_weight,
+        		Settings.population_balance_weight,//*2.0,
+                Settings.disconnected_population_weight*2.0,
                 Settings.voting_power_balance_weight
         };
 
@@ -418,6 +418,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             		map.fairnessScores[i] = 0;
             	}
                 map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
+                if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.98) {
+                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*2.0;
+                	map.fitness_score += 10;
+                }
             }
         }
 
@@ -443,14 +447,20 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            mutated += dm.boundaries_mutated;
 	        }
 	        //minimum 2 mutations
-	        if( mutated < Settings.population*2.0) {
+	        if( mutated < Settings.population*2.0 || mutated != mutated) {
 	        	mutated = (int) (Settings.population*2.0);
 	        }
         	double new_rate = (double)mutated/(double)total;
+        	if( total != total || new_rate == 0 || new_rate != new_rate) {
+        		new_rate = Settings.mutation_boundary_rate;
+        	}
+        	if( generation > 2 && new_rate < 1.0/(double)generation) {
+        		new_rate = 1.0/(double)generation;
+        	}
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
         	//grow population if under a threshold
-        	if( Settings.mutation_boundary_rate < 0.25/(double)Settings.population) {
-        		Settings.mutation_boundary_rate = 0.25/(double)Settings.population;
+        	if( Settings.mutation_boundary_rate < 0.33333/(double)Settings.population) {
+        		Settings.mutation_boundary_rate = 0.33333/(double)Settings.population;
         		Settings.setPopulation(Settings.population+1);
         	}
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
@@ -598,81 +608,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		matingLatch.countDown();
     		
     	}
-    }
-
-
-
-
-    public void evolve() {
-    	boolean score_all = true;
-        int cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
-        System.out.println("replace fraction "+Settings.replace_fraction+" cutoff "+cutoff+" population "+population.size());
-
-        if( score_all) {
-            for( DistrictMap map : population) {
-                map.calcFairnessScores();
-            }
-        } else {
-            for( int i = cutoff; i < population.size(); i++) {
-                population.get(i).calcFairnessScores();
-            }
-        }
-        
-        double mult = 1.0/(double)population.size();
-        for( int i = 0; i < 5; i++) {
-            for( DistrictMap map : population) {
-                map.fitness_score = map.fairnessScores[i];
-            }
-            Collections.sort(population);
-            for( int j = 0; j < population.size(); j++) {
-                DistrictMap map = population.get(j);
-                map.fairnessScores[i] = ((double)j)*mult; 
-            }
-        }
-
-        double[] weights = new double[]{
-        		Settings.geometry_weight, 
-        		Settings.disenfranchise_weight, 
-        		Settings.population_balance_weight,
-        		Settings.disconnected_population_weight,
-        		Settings.voting_power_balance_weight
-        };
-
-        for( int j = 0; j < population.size(); j++) {
-            DistrictMap map = population.get(j);
-            map.fitness_score = 0;
-            for( int i = 0; i < 5; i++) {
-            	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
-            		map.fairnessScores[i] = 0;
-            	}
-                map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
-            }
-        }
-
-        Collections.sort(population);
-        System.out.println("best: "+population.get(0).fitness_score);
-        System.out.println("worst: "+population.get(population.size()-1).fitness_score);
-
-
-        for(int i = cutoff; i < population.size(); i++) {
-            int g1 = (int)(Math.random()*(double)cutoff);
-            int g2 = (int)(Math.random()*(double)cutoff);
-            DistrictMap dm = population.get(i); 
-            if( Settings.mate_merge) {
-            	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome(population.get(g1).getGenome()));
-            } else {
-            	dm.crossover(population.get(g1).getGenome(), population.get(g2).getGenome());
-            }
-            //dm.mutate(Settings.mutation_rate);
-            //dm.mutate_boundary(Settings.mutation_rate);
-            //dm.fillDistrictBlocks();
-        }
-        for(int i = 0; i < population.size(); i++) {
-            DistrictMap dm = population.get(i); 
-            dm.mutate(Settings.mutation_rate);
-            dm.mutate_boundary(Settings.mutation_boundary_rate);
-            dm.fillDistrictBlocks();
-        }
     }
     public void start_from_genome(int[] genome, double mutation_rate) {
         for( DistrictMap map : population) {

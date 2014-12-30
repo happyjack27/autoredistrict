@@ -41,7 +41,7 @@ public class PanelStats extends JPanel {
 
 		lblNewLabel_1.setText(""+dm.fairnessScores[0]);
 		label_1.setText(""+integer.format(dm.fairnessScores[3]));
-		label_3.setText(""+decimal.format(dm.fairnessScores[2]*conversion_to_bits)+" bits");
+		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
 		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");		

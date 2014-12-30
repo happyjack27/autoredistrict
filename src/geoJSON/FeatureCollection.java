@@ -16,7 +16,7 @@ import serialization.ReflectionJSONObject;
 
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
-	public Vector<Feature> features;
+	public Vector<Feature> features = new Vector<Feature>();
 	public Vector<Block> blocks;
 	public HashMap<String,Block> precinctHash;
 	public Ecology ecology = new Ecology();

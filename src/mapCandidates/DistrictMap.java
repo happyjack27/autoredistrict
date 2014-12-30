@@ -629,9 +629,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //disconnected_pops /= total_population;
         
     	long time5 = System.currentTimeMillis();
-
+    	
         
-        fairnessScores = new double[]{length,disproportional_representation*0.5,population_imbalance*2.0,disconnected_pops*2.0,power_fairness*0.5}; //exponentiate because each bit represents twice as many people disenfranched
+        fairnessScores = new double[]{length,disproportional_representation,getPopVariance()/*population_imbalance*2.0*/,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
     	metrics[1] += time2-time1;
@@ -644,6 +644,34 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	metrics[7] += 0;//time11-time10; //
     	metrics[8] += 0;//time12-time11;
     	metrics[9] += 0;//time2-time12;
+    }
+    public double getMaxPopDiff() {
+    	double min = -1;
+    	double max = -1;
+        for(District district : districts) {
+        	double pop = district.getPopulation();
+        	if( min < 0 || pop < min) {
+        		min = pop;
+        	}
+        	if( max < 0 || pop > max) {
+        		max = pop;
+        	}
+        }
+        double d1 = max/min-1.0;
+        double d2 = 1.0-min/max;
+        return d1 > d2 ? d1 : d2;
+    }
+    public double getPopVariance() {
+    	double tot = 0;
+    	double tot2 = 0;
+        for(District district : districts) {
+        	double pop = district.getPopulation();
+        	tot += pop;
+        	tot2 += pop*pop;
+        }
+        tot /= (double) districts.size();
+        tot2 /= (double) districts.size();
+        return Math.sqrt(tot2-tot*tot);
     }
 
     public int compareTo(DistrictMap o) {
