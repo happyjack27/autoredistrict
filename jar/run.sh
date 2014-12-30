@@ -1,1 +1,1 @@
-java -jar autoredistrct.jar -Xmx4096M -Xms1024M
+java -jar autoredistrict.jar -Xmx4096M -Xms1024M

@@ -338,7 +338,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     }
     int step = 0;
     public void evolveWithSpeciation() {
-        cutoff = population.size()-(int)((double)population.size()*Settings.replace_fraction);
+        cutoff = Settings.getCutoff();//population.size()-(int)((double)population.size()*Settings.replace_fraction);
         speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
         if( verbosity > 1) {
         	System.out.println("evolving {");
@@ -454,8 +454,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	if( total != total || new_rate == 0 || new_rate != new_rate) {
         		new_rate = Settings.mutation_boundary_rate;
         	}
-        	if( generation > 2 && new_rate < 1.0/(double)generation) {
-        		new_rate = 1.0/(double)generation;
+        	if( generation > 4.0 && new_rate < 4.0/(double)generation) {
+        		new_rate = 4.0/(double)generation;
         	}
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
         	//grow population if under a threshold

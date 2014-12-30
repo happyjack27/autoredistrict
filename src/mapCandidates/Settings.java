@@ -20,7 +20,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int binomial_cache_size = 128;
 	public static boolean pso = false;
 	public static boolean auto_anneal = true;
-    public static double auto_anneal_Frac = 0.25;
+    public static double auto_anneal_Frac = 0.05;
 	public static boolean mate_merge = false;
     public static double species_fraction = 1.0;
 
@@ -41,7 +41,11 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double disenfranchise_weight = 1;
     public static double voting_power_balance_weight = 1;
     
-    public static double replace_fraction = 0.5;
+    //public static double replace_fraction = 0.5;
+    public static int getCutoff() {
+    	int d = (int)(Math.sqrt(Settings.population)*4.0); 
+    	return d < Settings.population/2 ? d : Settings.population/2;
+    }
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
     public static int num_elections_simulated = 2;
