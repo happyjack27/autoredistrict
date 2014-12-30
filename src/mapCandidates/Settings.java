@@ -20,7 +20,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int binomial_cache_size = 128;
 	public static boolean pso = false;
 	public static boolean auto_anneal = true;
-    public static double auto_anneal_Frac = 0.05;
+    public static double auto_anneal_Frac = 0.025;
 	public static boolean mate_merge = false;
     public static double species_fraction = 1.0;
 

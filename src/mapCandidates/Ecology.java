@@ -404,10 +404,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
         double[] weights = new double[]{
         		Settings.geometry_weight, 
-        		Settings.disenfranchise_weight, 
-        		Settings.population_balance_weight,//*2.0,
-                Settings.disconnected_population_weight*2.0,
-                Settings.voting_power_balance_weight
+        		Settings.disenfranchise_weight*0.5, 
+        		Settings.population_balance_weight*0.5,//*2.0,
+                Settings.disconnected_population_weight*3.0,
+                Settings.voting_power_balance_weight*0.5,
         };
 
         for( int j = 0; j < population.size(); j++) {
@@ -419,8 +419,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	}
                 map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
                 if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.98) {
-                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*2.0;
-                	map.fitness_score += 10;
+                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.0;
+                	map.fitness_score += 5;
                 }
             }
         }
@@ -446,13 +446,25 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            total += dm.boundaries_tested;
 	            mutated += dm.boundaries_mutated;
 	        }
-	        //minimum 2 mutations
-	        if( mutated < Settings.population*2.0 || mutated != mutated) {
-	        	mutated = (int) (Settings.population*2.0);
+	        //minimum 4 mutations
+	        if( mutated < Settings.population*4.0 || mutated != mutated) {
+	        	mutated = (int) (Settings.population*4.0);
 	        }
         	double new_rate = (double)mutated/(double)total;
         	if( total != total || new_rate == 0 || new_rate != new_rate) {
         		new_rate = Settings.mutation_boundary_rate;
+        	}
+        	if( new_rate <= 0.001) {
+        		new_rate = 0.001;
+        	}
+        	double e = 0.25*Math.exp(-0.0015*(double)generation); // reaches 0.000005 at 4000
+        	if( new_rate < e) {
+        		new_rate = e;
+        	}
+        	if( generation < 3000) {
+        		double d = 0.25*(3000.0-(double)generation)/3000.0;
+        		if( new_rate < d)
+        			new_rate = d;
         	}
         	if( generation > 4.0 && new_rate < 4.0/(double)generation) {
         		new_rate = 4.0/(double)generation;
