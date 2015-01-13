@@ -34,6 +34,10 @@ public class PanelStats extends JPanel {
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
 		dm.calcFairnessScores();
+		DistrictMap dm2 = featureCollection.ecology.population.get(1);
+		dm2.calcFairnessScores();
+		DistrictMap dm3 = featureCollection.ecology.population.get(2);
+		dm3.calcFairnessScores();
 		double conversion_to_bits = 1.0/Math.log(2.0);
 		DecimalFormat decimal = new DecimalFormat("###,##0.000000000");
 		DecimalFormat integer = new DecimalFormat("###,###,###,###,##0");
@@ -59,11 +63,11 @@ public class PanelStats extends JPanel {
 				Settings.disenfranchise_weight,
 				Settings.voting_power_balance_weight,
 				
-				dm.fairnessScores[0],
-				dm.fairnessScores[3],
-				dm.fairnessScores[2]*conversion_to_bits,
-				dm.fairnessScores[1]*conversion_to_bits,
-				dm.fairnessScores[4]*conversion_to_bits
+				(dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333,
+				(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333,
+				(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits,
+				(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits,
+				(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333*conversion_to_bits
 		});
 		
 		try {

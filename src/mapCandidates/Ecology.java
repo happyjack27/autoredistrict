@@ -404,10 +404,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
         double[] weights = new double[]{
         		Settings.geometry_weight, 
-        		Settings.disenfranchise_weight*0.5, 
-        		Settings.population_balance_weight*0.5,//*2.0,
-                Settings.disconnected_population_weight*3.0,
-                Settings.voting_power_balance_weight*0.5,
+        		Settings.disenfranchise_weight*0.75, 
+        		Settings.population_balance_weight*1.00,//0.75,//*2.0,
+                Settings.disconnected_population_weight*2.25,
+                Settings.voting_power_balance_weight*1.00,//0.75,
         };
 
         for( int j = 0; j < population.size(); j++) {
@@ -419,7 +419,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	}
                 map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
                 if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.98) {
-                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.0;
+                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.5;
                 	map.fitness_score += 5;
                 }
             }
