@@ -33,7 +33,7 @@ public class PanelStats extends JPanel {
 			return;
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
-		dm.calcFairnessScores();
+		dm.calcFairnessScores(); 
 		DistrictMap dm2 = featureCollection.ecology.population.get(1);
 		dm2.calcFairnessScores();
 		DistrictMap dm3 = featureCollection.ecology.population.get(2);
