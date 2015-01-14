@@ -59,6 +59,8 @@ public class PanelStats extends JPanel {
 				Settings.disenfranchise_weight,
 				Settings.voting_power_balance_weight,
 				
+				Settings.getAnnealingFloor( featureCollection.ecology.generation),
+				
 				dm.fairnessScores[0],
 				dm.fairnessScores[3],
 				dm.fairnessScores[2]*conversion_to_bits,

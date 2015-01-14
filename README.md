@@ -24,9 +24,14 @@ auto-annealing (instead of having to "drive" it)
 * * means have to store pre-mutation, state, and then count the fraction of mutated borders.
 * * or just do it on the fly - num mutated, vs num total
 * * then we add an option to turn on/off auto-annealing, and add a little tutorial about it.
-
+* show annealing floor in graph.
+* dont start annealing until hits 25% mutation
 
 TODO:
+
+* allow adjusting annealing floor rate/period
+
+* add no splitting rule (optional per town?)
 * implement import population
 * use the TIGER data set 'cause that has no gaps - have to figure out how to overlay other gis file.
 * add load district info from geojson (they can choose the property, shift from 1-index)

@@ -214,6 +214,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		System.out.println(features.size()+" precincts loaded.");
 		System.out.println("Initializing blocks...");
 		featureCollection.initBlocks();
+		Settings.resetAnnealing();
+		featureCollection.ecology.generation = 0;
 
 		minx = features.get(0).geometry.coordinates[0][0][0];
 		maxx = features.get(0).geometry.coordinates[0][0][0];
