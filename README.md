@@ -7,6 +7,7 @@ TODO:
 ** add in http://code.google.com/p/jdbf/source/checkout
 ** create reader option
 * how to handle block-level data? (super-fine)
+* check for ideas on what to implement: http://www.fairvote.org/research-and-analysis/redistricting/redistricting-reform/model-state-redistricting-reform-criteria/
 
 
 DONE:
