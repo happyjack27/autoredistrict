@@ -1,3 +1,12 @@
+TODO: 
+* allow feature selection (for choosing population, vote results, etc.)
+* to read esri shapefile directly:
+** add in https://sourceforge.net/projects/javashapefilere/
+** add in http://code.google.com/p/jdbf/source/checkout
+** create reader option
+* how to handle block-level data? (super-fine)
+
+
 DONE:
 * after loading, fill in ecology data structures.
 * also initalize candidates in ecology on loading of election results. 
