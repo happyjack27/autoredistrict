@@ -1,5 +1,7 @@
 TODO: 
 * allow feature selection (for choosing population, vote results, etc.)
+* add ability to lock/unlock precincts together
+* add ability to lock/unlock precincts to certain districts
 * to read esri shapefile directly:
 ** add in https://sourceforge.net/projects/javashapefilere/
 ** add in http://code.google.com/p/jdbf/source/checkout
