@@ -17,6 +17,7 @@ import javax.swing.*;
 import mapCandidates.*;
 
 import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
 
@@ -51,7 +52,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
-	JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
 	//JMenu mnDemographics = new JMenu("Demographics");
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
@@ -84,6 +84,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
 	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	private final JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	
 	public void setEnableds() {
 		
@@ -280,7 +281,110 @@ public class MainFrame extends JFrame implements iChangeListener {
 		menuBar.add(mnFile);
 		
 		mnFile.add(mntmOpenGeojson);
-		mnFile.add(mntmOpenGeojsonFolder);
+		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("ESRI shapefiles", "shp");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				File[] ff = new File[]{fd};//fd.listFiles();
+				
+				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				
+				for( int i = 0; i < ff.length; i++) {
+					String s = ff[i].getName().toLowerCase();
+					/*if(s.indexOf(".json") < 0) {
+						continue;
+					}*/
+					System.out.println("Processing "+s+"...");
+					File f = ff[i];
+					StringBuffer sb = getFile(f);
+					
+					featureCollection.ecology.stopEvolving();
+					geo_loaded = false;
+					evolving = false;
+					Feature.display_mode = 0;
+					setEnableds();
+					
+					//FeatureCollection fc = new FeatureCollection();
+					if( panelStats != null) {
+						panelStats.featureCollection = featureCollection;
+					}
+					featureCollection.loadShapeFile(f);
+					/*
+					for( Feature fe : fc.features) {
+						if( suppress_duplicates) {
+							hmFeatures.put(fe.properties.DISTRICT, fe);
+						} else {
+							featureCollection.features.add(fe);
+						}
+					}
+					*/
+					
+				}
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
+				minx = features.get(0).geometry.coordinates[0][0][0];
+				maxx = features.get(0).geometry.coordinates[0][0][0];
+				miny = features.get(0).geometry.coordinates[0][0][1];
+				maxy = features.get(0).geometry.coordinates[0][0][1];
+				HashSet<String> types = new HashSet<String>();
+				for( Feature f : features) {
+					double[][][] coordinates2 = f.geometry.coordinates;
+					for( int j = 0; j < coordinates2.length; j++) {
+						double[][] coordinates = coordinates2[j];
+						for( int i = 0; i < coordinates.length; i++) {
+							if( coordinates[i][0] < minx) {
+								minx = coordinates[i][0];
+							}
+							if( coordinates[i][0] > maxx) {
+								maxx = coordinates[i][0];
+							}
+							if( coordinates[i][1] < miny) {
+								miny = coordinates[i][1];
+							}
+							if( coordinates[i][1] > maxy) {
+								maxy = coordinates[i][1];
+							}
+						}
+					}					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				resetZoom();
+				
+				mapPanel.featureCollection = featureCollection;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.ecology.statsPanel = panelStats;
+				featureCollection.initEcology();
+				
+
+				System.out.println("Ready.");
+				
+				geo_loaded = true;
+				setEnableds();
+
+			}
+		});
+		
+		mnFile.add(mntmOpenEsriShapefile);
 		mnFile.add(chckbxmntmLatitudeLongitude);
 		
 		mnFile.add(new JSeparator());
@@ -378,81 +482,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			public void actionPerformed(ActionEvent arg0) {
 				Edge.isLatLon = chckbxmntmLatitudeLongitude.isSelected();
 				featureCollection.recalcEdgeLengths();
-			}
-		});
-		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				StringBuffer sb;
-
-				File fd;
-				if( use_sample) {
-					//fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
-					fd = new File("C:\\Users\\kbaas.000\\git\\autoredistrict_\\data sources\\wisconsin\\2012");
-				} else {
-					JFileChooser jfc = new JFileChooser();
-					jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					jfc.showOpenDialog(null);
-					fd = jfc.getSelectedFile();
-				}
-				if( fd == null) {
-					return;
-				}
-
-				if( !fd.isDirectory()) {
-					return;
-				}
-				File[] ff = fd.listFiles();
-				
-				featureCollection.ecology.stopEvolving();
-				geo_loaded = false;
-				evolving = false;
-				Feature.display_mode = 0;
-				setEnableds();
-
-				
-				featureCollection = new FeatureCollection(); 
-				featureCollection.features = new Vector<Feature>();
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-				
-				for( int i = 0; i < ff.length; i++) {
-					String s = ff[i].getName().toLowerCase();
-					if(s.indexOf(".json") < 0) {
-						continue;
-					}
-					System.out.println("Processing "+s+"...");
-					File f = ff[i];
-					sb = getFile(f);
-					
-					FeatureCollection fc = new FeatureCollection();
-					if( panelStats != null) {
-						panelStats.featureCollection = featureCollection;
-					}
-
-					try {
-						fc.fromJSON(sb.toString());
-					} catch (Exception ex) {
-						System.out.println("ex "+ex);
-						ex.printStackTrace();
-					}
-					for( Feature fe : fc.features) {
-						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
-						if( suppress_duplicates) {
-							hmFeatures.put(fe.properties.DISTRICT, fe);
-						} else {
-							featureCollection.features.add(fe);
-						}
-						//}
-					}
-					
-				}
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				initFeatures();
 			}
 		});
 		
