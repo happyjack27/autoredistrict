@@ -34,9 +34,10 @@ public class PanelStats extends JPanel {
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
 		dm.calcFairnessScores(); 
-		DistrictMap dm2 = featureCollection.ecology.population.get(1);
+		boolean single =  featureCollection.ecology.population.size() < 3;
+		DistrictMap dm2 = featureCollection.ecology.population.get(single ? 0 : 1);
 		dm2.calcFairnessScores();
-		DistrictMap dm3 = featureCollection.ecology.population.get(2);
+		DistrictMap dm3 = featureCollection.ecology.population.get(single ? 0 : 2);
 		dm3.calcFairnessScores();
 		double conversion_to_bits = 1.0/Math.log(2.0);
 		DecimalFormat decimal = new DecimalFormat("###,##0.000000000");

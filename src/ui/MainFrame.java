@@ -47,13 +47,16 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
 	
-	JMenu mnGeography = new JMenu("Geography");
+	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
 	JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
-	JMenu mnDemographics = new JMenu("Demographics");
+	//JMenu mnDemographics = new JMenu("Demographics");
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
+	JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
+	JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
+	JMenuItem mntmShowStats = new JMenuItem("Show stats");
 
 	
 	double minx,maxx,miny,maxy;
@@ -73,15 +76,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 	boolean census_loaded = false;
 	boolean election_loaded = false;
 	boolean evolving = false;
-	private final JSeparator separator_3 = new JSeparator();
-	private final JMenuItem mntmExportPopulation = new JMenuItem("Export population");
-	private final JMenuItem mntmImportPopulation = new JMenuItem("Import population");
-	private final JSeparator separator_4 = new JSeparator();
-	private final JSeparator separator_5 = new JSeparator();
-	private final JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
-	private final JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
-	private final JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
-	private final JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
+	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
+	JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
+	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
+	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
+	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -275,6 +276,31 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		menuBar.add(mnFile);
+		
+		mnFile.add(mntmOpenGeojson);
+		mnFile.add(mntmOpenGeojsonFolder);
+		mnFile.add(chckbxmntmLatitudeLongitude);
+		
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(chckbxmntmOpenCensusResults);
+
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(mntmOpenElectionResults);
+
+		mnFile.add(new JSeparator());
+
+		mnFile.add(mntmImportcsv);
+		mnFile.add(mntmExportcsv);
+
+		
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(mntmImportPopulation);
+		mnFile.add(mntmExportPopulation);
+
+		
 		mnFile.add(new JSeparator());
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -344,14 +370,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnSamples.add(mntmWisconsin);
 		
-		menuBar.add(mnGeography);
-		
-		mnGeography.add(mntmOpenGeojson);
-		
-		mnGeography.add(mntmOpenGeojsonFolder);
-		
-		JSeparator separator_1 = new JSeparator();
-		mnGeography.add(separator_1);
+		//menuBar.add(mnGeography);
 		
 		chckbxmntmLatitudeLongitude.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -359,7 +378,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 				featureCollection.recalcEdgeLengths();
 			}
 		});
-		mnGeography.add(chckbxmntmLatitudeLongitude);
 		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				StringBuffer sb;
@@ -541,7 +559,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		menuBar.add(mnDemographics);
+		//menuBar.add(mnDemographics);
 		
 		chckbxmntmOpenCensusResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -614,9 +632,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 				mapPanel.repaint();
 			}
 		});
-		mnDemographics.add(chckbxmntmOpenCensusResults);
-		
-		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -695,7 +710,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		mnView.add(separator_4);
+		mnView.add(new JSeparator());
 		mnView.add(chckbxmntmShowPrecinctLabels);
 		
 		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
@@ -706,7 +721,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
 		
-		mnView.add(separator_5);
+		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				resetZoom();
@@ -735,10 +750,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnView.add(mntmZoomIn);
 		
-		JMenu mnResults = new JMenu("Results");
-		menuBar.add(mnResults);
+		mnView.add(new JSeparator());
+
+		mnView.add(mntmShowStats);
+		mnView.add(mntmShowGraph);
+
 		
-		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
+		//JMenu mnResults = new JMenu("Results");
+		//menuBar.add(mnResults);
+		
 		mntmExportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if( featureCollection.ecology.population == null || featureCollection.ecology.population.size() == 0) {
@@ -773,7 +793,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		JMenuItem mntmShowStats = new JMenuItem("Show stats");
 		mntmShowStats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -786,20 +805,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 			}
 		});
-		mnResults.add(mntmShowStats);
 		mntmShowGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frameGraph.show();
 			}
 		});
 		
-		mnResults.add(mntmShowGraph);
 		
-		JSeparator separator_2 = new JSeparator();
-		mnResults.add(separator_2);
-		mnResults.add(mntmExportcsv);
-		
-		JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
 		mntmImportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
@@ -874,14 +886,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 				Feature.display_mode = 0;
 				mapPanel.invalidate();
 				mapPanel.repaint();
+				JOptionPane.showMessageDialog(null, "click for stats.");
 				panelStats.getStats();
 				JOptionPane.showMessageDialog(null, "Result loaded.");
 			}
 			
 		});
-		mnResults.add(mntmImportcsv);
-		
-		mnResults.add(separator_3);
 		mntmExportPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//JOptionPane.showMessageDialog(null,"Not implemented.");
@@ -921,14 +931,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		mnResults.add(mntmExportPopulation);
 		mntmImportPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,"Not implemented.");
 			}
 		});
-		
-		mnResults.add(mntmImportPopulation);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
