@@ -403,11 +403,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	System.out.println("  weighing fairness...");
 
         double[] weights = new double[]{
-        		Settings.geometry_weight, 
-        		Settings.disenfranchise_weight*0.75, 
-        		Settings.population_balance_weight*1.00,//0.75,//*2.0,
-                Settings.disconnected_population_weight*2.25,
-                Settings.voting_power_balance_weight*1.00,//0.75,
+        		Settings.geometry_weight*1.0, 
+        		Settings.disenfranchise_weight*1.00, 
+        		Settings.population_balance_weight,//*2.0,
+                Settings.disconnected_population_weight*2.5,
+                Settings.voting_power_balance_weight*1.0,
         };
 
         for( int j = 0; j < population.size(); j++) {
@@ -419,7 +419,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	}
                 map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
                 if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.98) {
-                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.5;
+                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.0;
                 	map.fitness_score += 5;
                 }
             }
@@ -441,33 +441,26 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( Settings.auto_anneal) {
 	        int total = 4;
 	        int mutated = 1;
+	       
 	        for(int i = 0; i < cutoff; i++) {
 	            DistrictMap dm = population.get(i);
 	            total += dm.boundaries_tested;
 	            mutated += dm.boundaries_mutated;
 	        }
-	        //minimum 4 mutations
-	        if( mutated < Settings.population*4.0 || mutated != mutated) {
-	        	mutated = (int) (Settings.population*4.0);
+	        //minimum 3 mutations
+	        if( mutated < Settings.population*3.0 || mutated != mutated) {
+	        	mutated = (int) (Settings.population*3.0);
 	        }
         	double new_rate = (double)mutated/(double)total;
+	        if( new_rate < 0.25) {
+	        	Settings.startAnnealing(generation);
+	        }
+
         	if( total != total || new_rate == 0 || new_rate != new_rate) {
         		new_rate = Settings.mutation_boundary_rate;
         	}
-        	if( new_rate <= 0.001) {
-        		new_rate = 0.001;
-        	}
-        	double e = 0.25*Math.exp(-0.0015*(double)generation); // reaches 0.000005 at 4000
-        	if( new_rate < e) {
-        		new_rate = e;
-        	}
-        	if( generation < 3000) {
-        		double d = 0.25*(3000.0-(double)generation)/3000.0;
-        		if( new_rate < d)
-        			new_rate = d;
-        	}
-        	if( generation > 4.0 && new_rate < 4.0/(double)generation) {
-        		new_rate = 4.0/(double)generation;
+        	if( new_rate < Settings.getAnnealingFloor(generation) ){
+        		new_rate = Settings.getAnnealingFloor(generation);
         	}
         	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
         	//grow population if under a threshold

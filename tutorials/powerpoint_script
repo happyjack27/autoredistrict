@@ -1,0 +1,138 @@
+
+
+
+start program...
+
+
+-----
+
+show gerrymandering examples
+
+- hypothesis of even mix
+-- horribly bad result - the worst
+- add in compact districts, equal population
+--- no better.
+
+
+--
+
+
+democracy
+
+one person one vote
+
+is that true?
+
+
+Are contiguency, compactness, and population balance sufficient to determine fair districts, on average?
+
+NO.
+
+scenario 1:
+if the population is well mixed:
+* majority party gets nearly ALL of the seats.
+NO
+
+show example of urban vs rural.
+
+why does population density affect this?
+
+
+-----
+
+
+
+how to measure?
+
+one person one vote 
+- each person gets about the same representation in congress
+- each person has the same likilihood of altering an election outcome
+
+ 
+- each person gets about the same representation in congress
+  - proportional representation 
+- each person has the same likilihood of altering an election outcome
+  - voting power balance
+  
+  
+  scoring
+  
+  how to score proportional representation?
+  
+  * develop a metric to measure the distribution of a population.
+  for instance: % dem, % republican, % independant.
+  * measure the distribution of a simulated election result, and the citizen population
+  * construct a way to score the similarity.
+  * multiple such ways
+   - pearson correlation
+   - kl-divergence. <- measures how much information is in the actual that is not in the model 
+   
+  
+  now that we can score, how to design?
+  
+  candidates -> scores -> recombination -> mutation -> repeat
+  
+  general class of algorithms known as "heuristic optimization"
+  
+  a wonderful feature of heuristic optimization methods is that you do not need to know how to generate good solutions, 
+  you only need to know how to score the quality of a solution! 
+  
+  scores -> generate new set based on old set and scores -> repeat
+  
+  heuristic:  using experience to learn and improve
+  optimization: an act, process, or methodology of making something (as a design, system, or decision) as fully perfect, functional, or effective as possible; 
+  specifically :  the mathematical procedures (as finding the maximum of a function) involved in this
+  
+  scores -> generate new set based on old set and scores -> repeat
+  
+  "genetic algorithm"
+  
+  candidates -> scores -> recombination -> mutation -> repeat
+  
+  
+  ----
+  what we did
+  
+  - broke it down into wards, got geometry, census, and election data for each word.
+  
+  - chose criteria to optimize:
+  
+  -----------
+  
+  recombination explores the solution set very quickly.
+  
+  try 33, 22, 11, 00, 
+  11 is best, 00 is second best.
+  okay, try re-combinations of these:
+  
+  try 11, 00, 10, 01,
+  10 is best, 11 is second best.
+  done.
+  
+  without recombination, we'd have to try each possibility individually, which is 4^2 = 16 combinations.
+  with recombination we only had to try 8.
+  recombination arrives at the solution twice as fast.
+  
+  what happens when we add more?  let's say we double the number of digits:
+  it turns if we add another digit, without recombination we'd have to try 4^4 combinations = 64.
+  but with recombination, we'd only have to try double the number of generations. = 8*2 = 16.
+  now recombination arrives at the solution FOUR times as fast.
+  
+  as we add more digits, the advantage of recombination over checking each individual solution grows EXPONENTIALLY.
+  
+  mutation is added in to keep the variety of candidate solutions from getting too low.
+  
+  as we approach the solution, we can lower the amount of mutation. (this is known as "annealing".  analgous to slowly lowering the temperature of melted metal to help it form a more regular structure) 
+  ----
+  
+  now let's say we only needed to get our solution in the top 25%.  that is, we only need to eliminate the 75% worst candidates.
+  well each generation eliminates, on average, the same percentage of the population.
+   
+  
+  
+  
+  
+  out to double the 
+  
+  
+  

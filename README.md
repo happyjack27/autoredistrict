@@ -1,3 +1,21 @@
+TODO: 
+* allow feature selection (for choosing population, vote results, etc.)
+* add ability to lock/unlock precincts together
+* add ability to lock/unlock precincts to certain districts
+* to read esri shapefile directly:
+** add in https://sourceforge.net/projects/javashapefilere/
+** add in http://code.google.com/p/jdbf/source/checkout
+** create reader option
+* how to handle block-level data? (super-fine)
+* check for ideas on what to implement: http://www.fairvote.org/research-and-analysis/redistricting/redistricting-reform/model-state-redistricting-reform-criteria/
+** local representativeness score - based on other factors. - local competitiveness? (for responsiveness)
+
+a.    A representative plan is one where racial groups and other communities of interest are able to elect representatives in proportion to their percentage of the voting age population.
+7.    District boundaries shall conform to the existing geographic boundaries of a county, city, or city and county, and shall preserve identifiable communities of interest to the greatest extent possible. A redistricting plan shall provide for the most whole counties and the fewest county fragments possible, and the most whole cities and fewest city fragments possible. For the purposes of this section, communities of interest are defined by similarities in social, cultural, ethnic, and economic interest, school districts, and other formal relationships between municipalities.
+
+5.    Information concerning party registration and historical election returns shall only be used once a plan has been drawn, and shall only be used to test the plan for compliance with the stated goals of this article.
+
+
 DONE:
 * after loading, fill in ecology data structures.
 * also initalize candidates in ecology on loading of election results. 
@@ -18,7 +36,7 @@ DONE:
 
 
 DONE:
-auto-annealing (instead of having to "drive" it)
+auto-annealing (instead of having to "drive" it) 
 * way to auto-adjust border mutation based on scoring relative to past generation?
 * * use mean expectation of winners as new border mutation (take that and average of last)
 * * means have to store pre-mutation, state, and then count the fraction of mutated borders.
