@@ -2,6 +2,7 @@ package ui;
 
 import geoJSON.Feature;
 import geoJSON.FeatureCollection;
+import geoJSON.Geometry;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -29,6 +30,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
@@ -54,8 +56,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
-	JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
-	JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
+	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
+	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
 	JMenuItem mntmShowStats = new JMenuItem("Show stats");
 
 	
@@ -712,7 +714,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnView.add(new JSeparator());
 		mnView.add(chckbxmntmShowPrecinctLabels);
-		
 		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -720,6 +721,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
+
+		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.draw_lines = !chckbxmntmHideMapLines.isSelected();
+			}
+		});
+		mnView.add(chckbxmntmHideMapLines);
+		
 		
 		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
@@ -886,7 +895,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 				Feature.display_mode = 0;
 				mapPanel.invalidate();
 				mapPanel.repaint();
-				JOptionPane.showMessageDialog(null, "click for stats.");
 				panelStats.getStats();
 				JOptionPane.showMessageDialog(null, "Result loaded.");
 			}
