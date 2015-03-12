@@ -69,7 +69,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
 		            PointData[] points = aPolygon.getPointsOfPart(i);
 		            feature.geometry.coordinates[i] = new double[points.length][2];
-		            for( int j = 0; i < points.length; j++) {
+		            for( int j = 0; j < points.length; j++) {
 		            	feature.geometry.coordinates[i][j][0] = points[j].getX();
 		            	feature.geometry.coordinates[i][j][1] = points[j].getY();
 		            }
