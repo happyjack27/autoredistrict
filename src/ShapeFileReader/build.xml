@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+
+<project name="shapefile-reader" basedir="." default="build">
+
+  <property name="projectName" value="shapefilereader" />
+
+  <property name="main.src.dir" value="src/main/java" />
+  <property name="test.src.dir" value="src/test/java" />
+  <property name="example.src.dir" value="src/example/java" />
+
+  <property name="build.dir" value="build" />
+  <property name="main.build.dir" value="build/main" />
+  <property name="test.build.dir" value="build/test" />
+  <property name="example.build.dir" value="build/example" />
+  <property name="dist.dir" value="dist" />
+  <property name="lib.dir" value="lib" />
+
+  <loadproperties srcFile="conf/version.properties" />
+  <property name="jarfile" value="${dist.dir}/${projectName}-${version}.jar" />
+  <property name="zipfile" value="${dist.dir}/${projectName}-${version}.zip" />
+
+  <target name="init">
+    <mkdir dir="${main.build.dir}" />
+    <mkdir dir="${test.build.dir}" />
+    <mkdir dir="${example.build.dir}" />
+    <mkdir dir="${dist.dir}" />
+  </target>
+
+  <target name="clean" depends="init">
+    <delete includeemptydirs="true">
+      <fileset dir="${build.dir}" includes="**/*" />
+      <fileset dir="${dist.dir}" includes="**/*" />
+    </delete>
+    <antcall target="init" />
+  </target>
+
+  <target name="compile" depends="init">
+
+    <javac destdir="${main.build.dir}"
+           includes="**/*.java"
+           debug="true"
+           source="1.5"
+           target="1.5"
+           includeantruntime="false"
+           deprecation="true">
+      <src path="${main.src.dir}" />
+      <classpath>
+      </classpath>
+    </javac>
+
+    <javac destdir="${example.build.dir}"
+           includes="**/*.java"
+           debug="true"
+           source="1.5"
+           target="1.5"
+           includeantruntime="false"
+           deprecation="true">
+      <src path="${example.src.dir}" />
+      <classpath>
+        <pathelement path="${main.build.dir}" />
+      </classpath>
+    </javac>
+
+  </target>
+
+  <target name="jar">
+    <jar destfile="${jarfile}">
+      <fileset dir="${main.build.dir}" />
+    </jar>
+  </target>
+
+  <target name="build" depends="compile" />
+
+  <target name="clean-build" depends="clean, build" />
+
+  <target name="release" depends="clean-build, jar, javadoc">
+    <zip destfile="${zipfile}">
+      <zipfileset file="${jarfile}" prefix="lib" />
+      <zipfileset dir="${example.src.dir}" prefix="examples" />
+      <zipfileset dir="${dist.dir}/api" prefix="docs" />
+    </zip>
+    <delete file="${jarfile}" />
+    <delete dir="${dist.dir}/api" />
+  </target>
+
+  <target name="javadoc">
+    <javadoc destdir="${dist.dir}/api"
+             verbose="true"
+             sourcepath="${main.src.dir}"
+             author="false"
+             version="true"
+             use="true"
+             windowtitle="Java Shape File Reader - API">
+      <doctitle>
+        <![CDATA[<h1>Java Shape File Reader</h1>]]></doctitle>
+    <tag name="todo" scope="all" description="To do:" />
+  </javadoc>
+</target>
+
+<target name="loc-counter">
+  <taskdef name="loc"
+           classname="loc.LocCounterAntTask"
+           classpath="${lib.dir}/loc.jar" />
+  <tstamp>
+    <format property="now" pattern="yyyy.MM.dd-HH.mm" />
+  </tstamp>
+  <loc>
+    <consolereport />
+    <htmlfilereport filename="dist/locreport-${now}.html" />
+    <module name="Main" basedir=".">
+      <axis path="src/main/java" ext="java" />
+    </module>
+    <module name="Test" basedir=".">
+      <axis path="src/test/java" ext="java" />
+    </module>
+  </loc>
+</target>
+
+<target name="test-compile" depends="init">
+  <javac destdir="${test.build.dir}"
+         includes="**/*.java"
+         debug="true"
+         source="1.5"
+         target="1.5"
+         includeantruntime="false"
+         deprecation="true">
+    <src path="${test.src.dir}" />
+    <classpath>
+      <pathelement path="${main.build.dir}" />
+      <pathelement location="${lib.dir}/junit.jar" />
+    </classpath>
+  </javac>
+</target>
+
+<target name="test-run" depends="clean, compile, test-compile">
+  <java classname="tests.AllTests" failonerror="true">
+    <classpath>
+      <pathelement path="${test.build.dir}" />
+      <pathelement path="${main.build.dir}" />
+      <pathelement location="${lib.dir}/junit.jar" />
+    </classpath>
+  </java>
+</target>
+
+</project>
