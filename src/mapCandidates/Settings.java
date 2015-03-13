@@ -6,7 +6,35 @@ import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static final boolean make_unique = false; //not the cost of this is population times population times precinct count.
-	
+	public static long annealing_starts_at = 0;
+	public static boolean annealing_has_started = false;
+	public static void resetAnnealing() { annealing_has_started = false; }
+	public static void startAnnealing(long generation) { if( annealing_has_started) { return; } annealing_starts_at = generation; annealing_has_started = true; }
+	public static double getAnnealingFloor(long generation) {
+		if( !annealing_has_started) {
+			return 0.25;
+		}
+		generation -= annealing_starts_at;
+		double new_rate = 0;
+       	if( new_rate <= 0.001) {
+    		new_rate = 0.001;
+    	}
+    	double e = 0.25*Math.exp(-0.0005*(double)generation); // reaches 0.000005 at 4000
+    	if( new_rate < e) {
+    		new_rate = e;
+    	}
+    	/*
+    	if( generation < 1000) {
+    		double d = 0.25*(1000.0-(double)generation)/1000.0;
+    		if( new_rate < d)
+    			new_rate = d;
+    	}*/
+    	/*
+    	if( generation > 16.0 && new_rate < 4.0/(double)generation && 4.0/(double)generation < 0.25) {
+    		new_rate = 4.0/(double)generation;
+    	}*/
+    	return new_rate;
+	}
 	public static Vector<iChangeListener> populationChangeListeners = new Vector<iChangeListener>();
 	public static Vector<iChangeListener> mutation_rateChangeListeners = new Vector<iChangeListener>();
 	

@@ -17,6 +17,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	
 	public static boolean showPrecinctLabels = false;
 	public static int display_mode = 0;
+	public static boolean draw_lines = true;
 	
 	public void toggleClicked() {
 		try {
@@ -108,7 +109,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				g.fillPolygon(geometry.polygons[i]);
 			}
 		}
-		if( geometry.outlineColor != null) {
+		if( geometry.outlineColor != null && draw_lines) {
 			g.setColor(geometry.outlineColor);
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);

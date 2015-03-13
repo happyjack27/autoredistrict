@@ -17,12 +17,17 @@ public class PanelGraphDrawArea extends JPanel {
     		"Num. of districts",
     		"Mutation rate",
     		
+    		//4
     		"Border length weight",
     		"Disconnected population weight",
     		"Population imbalance weight",
     		"Representation imbalance weight",
     		"Voting power imbalance weight",
+
+    		//9
+    		"Annealing floor",
     		
+    		//10
     		"Border length",
     		"Disconnected population",
     		"Population imbalance",
@@ -34,6 +39,7 @@ public class PanelGraphDrawArea extends JPanel {
     public boolean[] b_draw = new boolean[]{
     		false,true,false,true,
     		false,false,false,false,false,
+    		true,
     		true,true,true,false,true,
     		true,true,
     };
@@ -50,6 +56,8 @@ public class PanelGraphDrawArea extends JPanel {
     		Color.green,
     		Color.red,
     		Color.magenta,
+    		
+    		Color.gray,
     		
     		Color.blue.darker(),
     		Color.cyan.darker(),
@@ -91,6 +99,8 @@ public class PanelGraphDrawArea extends JPanel {
             		}
             	}
             }
+            maxys[3] = maxys[3] > maxys[9] ? maxys[3] : maxys[9];
+            maxys[9] = maxys[3];
         	for( int j = 0; j < maxys.length; j++) {
         		maxys[j] =  ((double)d.getHeight())/maxys[j];
         	}

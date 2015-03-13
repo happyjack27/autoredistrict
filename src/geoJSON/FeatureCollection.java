@@ -3,6 +3,18 @@ package geoJSON;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.*;
+import java.io.*;
+import java.nio.charset.Charset;
+
+import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
+import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
+import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineShape;
+
+import com.hexiong.jdbf.DBFReader;
 
 import mapCandidates.Block;
 import mapCandidates.DistrictMap;
@@ -26,6 +38,84 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
+	
+	public void loadShapeFile(File f) {
+		try {
+			FileInputStream is = new FileInputStream(f);
+			ValidationPreferences prefs = new ValidationPreferences();
+		    prefs.setMaxNumberOfPointsPerShape(16650);
+		    ShapeFileReader r = new ShapeFileReader(is, prefs);
+		    
+			String dbfname = f.getAbsolutePath();//.getName();
+			dbfname = dbfname.substring(0,dbfname.length()-4)+".dbf";
+			
+			DBFReader dbfreader = new DBFReader(dbfname);
+			String[] cols = new String[dbfreader.getFieldCount()];
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+		    
+
+		    ShapeFileHeader h = r.getHeader();
+		    System.out.println("The shape type of this files is " + h.getShapeType());
+
+		    int total = 0;
+		    AbstractShape s;
+		    while ((s = r.next()) != null) {
+		    	Object aobj[] = dbfreader.nextRecord(Charset.defaultCharset());
+		      switch (s.getShapeType()) {
+		      case POLYGON:
+		    	  int rec_num = s.getHeader().getRecordNumber();
+		    	  //System.out.println("record number: "+rec_num);
+		          PolygonShape aPolygon = (PolygonShape) s;
+		          
+		          Feature feature = new Feature();
+		          features.add(feature);
+		          feature.properties = new Properties();
+		          feature.geometry = new Geometry();
+		          feature.properties.ID = rec_num;
+		          for( int i = 0; i < cols.length; i++) {
+		        	  feature.properties.put(cols[i],aobj[i].toString());
+		        	  System.out.print(aobj[i].toString()+" ");
+		          }
+		          System.out.println();
+		          feature.properties.post_deserialize();
+		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+		          
+		          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+		            PointData[] points = aPolygon.getPointsOfPart(i);
+		            feature.geometry.coordinates[i] = new double[points.length][2];
+		            for( int j = 0; j < points.length; j++) {
+		            	feature.geometry.coordinates[i][j][0] = points[j].getX();
+		            	feature.geometry.coordinates[i][j][1] = points[j].getY();
+		            }
+		          }
+		          feature.geometry.post_deserialize();
+		          feature.post_deserialize();
+		          break;
+		      default:
+		        System.out.println("Read other type of shape.");
+		      }
+		      total++;
+		    }
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+
+
+		    System.out.println("Total shapes read: " + total);
+
+		    is.close();		
+		} catch (Exception ex) {
+			System.out.println("exception in processing shapefile: "+ex);
+			ex.printStackTrace();
+			
+		}
+	}
 	
 	public void draw(Graphics g) {
 		if( features == null) {

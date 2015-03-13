@@ -37,9 +37,9 @@ public class PanelGraph extends JPanel {
 					update();
 				}
 			});
-			int x = (i-4)/5;
-			int y = (i-4)%5;
-			cbs[i].setBounds(x*300+20, y*20+250+60, 300, 20);
+			int x = (i-3)/6;
+			int y = (i-3)%6;
+			cbs[i].setBounds(x*300+20, y*20+250+60-20, 300, 20);
 			add(cbs[i]);
 		}
 		

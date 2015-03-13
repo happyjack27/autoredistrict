@@ -2,6 +2,7 @@ package ui;
 
 import geoJSON.Feature;
 import geoJSON.FeatureCollection;
+import geoJSON.Geometry;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -16,6 +17,7 @@ import javax.swing.*;
 import mapCandidates.*;
 
 import javax.swing.event.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
 
@@ -29,6 +31,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
 	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
@@ -47,13 +50,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JSlider slider_6 = new JSlider();
 	JSlider slider_7 = new JSlider();
 	
-	JMenu mnGeography = new JMenu("Geography");
+	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
-	JMenuItem mntmOpenGeojsonFolder = new JMenuItem("Open GeoJSON folder");
-	JMenu mnDemographics = new JMenu("Demographics");
+	//JMenu mnDemographics = new JMenu("Demographics");
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
+	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
+	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
+	JMenuItem mntmShowStats = new JMenuItem("Show stats");
 
 	
 	double minx,maxx,miny,maxy;
@@ -73,15 +78,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 	boolean census_loaded = false;
 	boolean election_loaded = false;
 	boolean evolving = false;
-	private final JSeparator separator_3 = new JSeparator();
-	private final JMenuItem mntmExportPopulation = new JMenuItem("Export population");
-	private final JMenuItem mntmImportPopulation = new JMenuItem("Import population");
-	private final JSeparator separator_4 = new JSeparator();
-	private final JSeparator separator_5 = new JSeparator();
-	private final JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
-	private final JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
-	private final JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
-	private final JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
+	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
+	JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
+	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
+	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
+	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	private final JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+	
 	public void setEnableds() {
 		
 		if( !geo_loaded) {
@@ -214,6 +218,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		System.out.println(features.size()+" precincts loaded.");
 		System.out.println("Initializing blocks...");
 		featureCollection.initBlocks();
+		Settings.resetAnnealing();
+		featureCollection.ecology.generation = 0;
 
 		minx = features.get(0).geometry.coordinates[0][0][0];
 		maxx = features.get(0).geometry.coordinates[0][0][0];
@@ -273,6 +279,134 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		menuBar.add(mnFile);
+		
+		mnFile.add(mntmOpenGeojson);
+		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("ESRI shapefiles", "shp");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				File[] ff = new File[]{fd};//fd.listFiles();
+				
+				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				
+				for( int i = 0; i < ff.length; i++) {
+					String s = ff[i].getName().toLowerCase();
+					/*if(s.indexOf(".json") < 0) {
+						continue;
+					}*/
+					System.out.println("Processing "+s+"...");
+					File f = ff[i];
+					StringBuffer sb = getFile(f);
+					
+					featureCollection.ecology.stopEvolving();
+					geo_loaded = false;
+					evolving = false;
+					Feature.display_mode = 0;
+					setEnableds();
+					
+					//FeatureCollection fc = new FeatureCollection();
+					if( panelStats != null) {
+						panelStats.featureCollection = featureCollection;
+					}
+					featureCollection.loadShapeFile(f);
+					/*
+					for( Feature fe : fc.features) {
+						if( suppress_duplicates) {
+							hmFeatures.put(fe.properties.DISTRICT, fe);
+						} else {
+							featureCollection.features.add(fe);
+						}
+					}
+					*/
+					
+				}
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
+				minx = features.get(0).geometry.coordinates[0][0][0];
+				maxx = features.get(0).geometry.coordinates[0][0][0];
+				miny = features.get(0).geometry.coordinates[0][0][1];
+				maxy = features.get(0).geometry.coordinates[0][0][1];
+				HashSet<String> types = new HashSet<String>();
+				for( Feature f : features) {
+					double[][][] coordinates2 = f.geometry.coordinates;
+					for( int j = 0; j < coordinates2.length; j++) {
+						double[][] coordinates = coordinates2[j];
+						for( int i = 0; i < coordinates.length; i++) {
+							if( coordinates[i][0] < minx) {
+								minx = coordinates[i][0];
+							}
+							if( coordinates[i][0] > maxx) {
+								maxx = coordinates[i][0];
+							}
+							if( coordinates[i][1] < miny) {
+								miny = coordinates[i][1];
+							}
+							if( coordinates[i][1] > maxy) {
+								maxy = coordinates[i][1];
+							}
+						}
+					}					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				resetZoom();
+				
+				mapPanel.featureCollection = featureCollection;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.ecology.statsPanel = panelStats;
+				featureCollection.initEcology();
+				
+
+				System.out.println("Ready.");
+				
+				geo_loaded = true;
+				setEnableds();
+
+			}
+		});
+		
+		mnFile.add(mntmOpenEsriShapefile);
+		mnFile.add(chckbxmntmLatitudeLongitude);
+		
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(chckbxmntmOpenCensusResults);
+
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(mntmOpenElectionResults);
+
+		mnFile.add(new JSeparator());
+
+		mnFile.add(mntmImportcsv);
+		mnFile.add(mntmExportcsv);
+
+		
+		mnFile.add(new JSeparator());
+		
+		mnFile.add(mntmImportPopulation);
+		mnFile.add(mntmExportPopulation);
+
+		
 		mnFile.add(new JSeparator());
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -342,95 +476,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnSamples.add(mntmWisconsin);
 		
-		menuBar.add(mnGeography);
-		
-		mnGeography.add(mntmOpenGeojson);
-		
-		mnGeography.add(mntmOpenGeojsonFolder);
-		
-		JSeparator separator_1 = new JSeparator();
-		mnGeography.add(separator_1);
+		//menuBar.add(mnGeography);
 		
 		chckbxmntmLatitudeLongitude.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Edge.isLatLon = chckbxmntmLatitudeLongitude.isSelected();
 				featureCollection.recalcEdgeLengths();
-			}
-		});
-		mnGeography.add(chckbxmntmLatitudeLongitude);
-		mntmOpenGeojsonFolder.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				StringBuffer sb;
-
-				File fd;
-				if( use_sample) {
-					//fd = new File("C:\\Users\\kbaas.000\\Documents\\shapefiles\\dallas texas\\2012\\precincts");
-					fd = new File("C:\\Users\\kbaas.000\\git\\autoredistrict_\\data sources\\wisconsin\\2012");
-				} else {
-					JFileChooser jfc = new JFileChooser();
-					jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					jfc.showOpenDialog(null);
-					fd = jfc.getSelectedFile();
-				}
-				if( fd == null) {
-					return;
-				}
-
-				if( !fd.isDirectory()) {
-					return;
-				}
-				File[] ff = fd.listFiles();
-				
-				featureCollection.ecology.stopEvolving();
-				geo_loaded = false;
-				evolving = false;
-				Feature.display_mode = 0;
-				setEnableds();
-
-				
-				featureCollection = new FeatureCollection(); 
-				featureCollection.features = new Vector<Feature>();
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-				
-				for( int i = 0; i < ff.length; i++) {
-					String s = ff[i].getName().toLowerCase();
-					if(s.indexOf(".json") < 0) {
-						continue;
-					}
-					System.out.println("Processing "+s+"...");
-					File f = ff[i];
-					sb = getFile(f);
-					
-					FeatureCollection fc = new FeatureCollection();
-					if( panelStats != null) {
-						panelStats.featureCollection = featureCollection;
-					}
-
-					try {
-						fc.fromJSON(sb.toString());
-					} catch (Exception ex) {
-						System.out.println("ex "+ex);
-						ex.printStackTrace();
-					}
-					for( Feature fe : fc.features) {
-						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
-						if( suppress_duplicates) {
-							hmFeatures.put(fe.properties.DISTRICT, fe);
-						} else {
-							featureCollection.features.add(fe);
-						}
-						//}
-					}
-					
-				}
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				initFeatures();
 			}
 		});
 		
@@ -539,7 +590,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		menuBar.add(mnDemographics);
+		//menuBar.add(mnDemographics);
 		
 		chckbxmntmOpenCensusResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -612,9 +663,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 				mapPanel.repaint();
 			}
 		});
-		mnDemographics.add(chckbxmntmOpenCensusResults);
-		
-		mnDemographics.add(mntmOpenElectionResults);
 		mntmOpenElectionResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -693,9 +741,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		mnView.add(separator_4);
+		mnView.add(new JSeparator());
 		mnView.add(chckbxmntmShowPrecinctLabels);
-		
 		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -703,8 +750,16 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
+
+		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.draw_lines = !chckbxmntmHideMapLines.isSelected();
+			}
+		});
+		mnView.add(chckbxmntmHideMapLines);
 		
-		mnView.add(separator_5);
+		
+		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				resetZoom();
@@ -733,10 +788,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnView.add(mntmZoomIn);
 		
-		JMenu mnResults = new JMenu("Results");
-		menuBar.add(mnResults);
+		mnView.add(new JSeparator());
+
+		mnView.add(mntmShowStats);
+		mnView.add(mntmShowGraph);
+
 		
-		JMenuItem mntmExportcsv = new JMenuItem("Export .csv");
+		//JMenu mnResults = new JMenu("Results");
+		//menuBar.add(mnResults);
+		
 		mntmExportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if( featureCollection.ecology.population == null || featureCollection.ecology.population.size() == 0) {
@@ -771,7 +831,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		JMenuItem mntmShowStats = new JMenuItem("Show stats");
 		mntmShowStats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -784,20 +843,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 			}
 		});
-		mnResults.add(mntmShowStats);
 		mntmShowGraph.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				frameGraph.show();
 			}
 		});
 		
-		mnResults.add(mntmShowGraph);
 		
-		JSeparator separator_2 = new JSeparator();
-		mnResults.add(separator_2);
-		mnResults.add(mntmExportcsv);
-		
-		JMenuItem mntmImportcsv = new JMenuItem("Import .csv");
 		mntmImportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
@@ -877,9 +929,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 			
 		});
-		mnResults.add(mntmImportcsv);
-		
-		mnResults.add(separator_3);
 		mntmExportPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//JOptionPane.showMessageDialog(null,"Not implemented.");
@@ -919,14 +968,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		mnResults.add(mntmExportPopulation);
 		mntmImportPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null,"Not implemented.");
 			}
 		});
-		
-		mnResults.add(mntmImportPopulation);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
