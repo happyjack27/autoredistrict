@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.*;
 import java.io.*;
+import java.nio.charset.Charset;
 
 import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
 import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
@@ -12,6 +13,8 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineShape;
+
+import com.hexiong.jdbf.DBFReader;
 
 import mapCandidates.Block;
 import mapCandidates.DistrictMap;
@@ -42,6 +45,18 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			ValidationPreferences prefs = new ValidationPreferences();
 		    prefs.setMaxNumberOfPointsPerShape(16650);
 		    ShapeFileReader r = new ShapeFileReader(is, prefs);
+		    
+			String dbfname = f.getAbsolutePath();//.getName();
+			dbfname = dbfname.substring(0,dbfname.length()-4)+".dbf";
+			
+			DBFReader dbfreader = new DBFReader(dbfname);
+			String[] cols = new String[dbfreader.getFieldCount()];
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+		    
 
 		    ShapeFileHeader h = r.getHeader();
 		    System.out.println("The shape type of this files is " + h.getShapeType());
@@ -49,21 +64,22 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		    int total = 0;
 		    AbstractShape s;
 		    while ((s = r.next()) != null) {
+		    	Object aobj[] = dbfreader.nextRecord(Charset.defaultCharset());
 		      switch (s.getShapeType()) {
 		      case POLYGON:
 		    	  int rec_num = s.getHeader().getRecordNumber();
-		    	  System.out.println("record number: "+rec_num);
+		    	  //System.out.println("record number: "+rec_num);
 		          PolygonShape aPolygon = (PolygonShape) s;
-		          System.out.println("I read a Polygon with "
-		              + aPolygon.getNumberOfParts() + " parts and "
-		              + aPolygon.getNumberOfPoints() + " points");
 		          
 		          Feature feature = new Feature();
 		          features.add(feature);
 		          feature.properties = new Properties();
 		          feature.geometry = new Geometry();
 		          feature.properties.ID = rec_num;
-		          feature.post_deserialize();
+		          for( int i = 0; i < cols.length; i++) {
+		        	  feature.properties.put(cols[i],aobj[i].toString());
+		          }
+		          feature.properties.post_deserialize();
 		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
 		          
 		          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
@@ -73,8 +89,6 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		            	feature.geometry.coordinates[i][j][0] = points[j].getX();
 		            	feature.geometry.coordinates[i][j][1] = points[j].getY();
 		            }
-		            System.out.println("- part " + i + " has " + points.length
-		                + " points.");
 		          }
 		          feature.geometry.post_deserialize();
 		          feature.post_deserialize();
@@ -87,7 +101,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 		    System.out.println("Total shapes read: " + total);
 
-		    is.close();
+		    is.close();		
 		} catch (Exception ex) {
 			System.out.println("exception in processing shapefile: "+ex);
 			ex.printStackTrace();
