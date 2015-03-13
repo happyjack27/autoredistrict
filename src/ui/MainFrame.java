@@ -390,10 +390,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mnFile.add(new JSeparator());
 		
 		mnFile.add(chckbxmntmOpenCensusResults);
-
-		mnFile.add(new JSeparator());
 		
 		mnFile.add(mntmOpenElectionResults);
+		
+		JMenuItem mntmImportData = new JMenuItem("Import data");
+		mntmImportData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		mnFile.add(mntmImportData);
 
 		mnFile.add(new JSeparator());
 
@@ -792,6 +797,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 		mnView.add(mntmShowStats);
 		mnView.add(mntmShowGraph);
+		
+		JMenuItem mntmShowProperties = new JMenuItem("Show properties");
+		mntmShowProperties.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		mnView.add(mntmShowProperties);
 
 		
 		//JMenu mnResults = new JMenu("Results");
