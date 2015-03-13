@@ -1,4 +1,10 @@
-TODO: 
+TODO:
+* allow to see properties in a table.  
+* on importing, allow to match columns to features.
+* on exporting, allow to identify what columns to export.
+* this includes for results.
+* and identifying which columns are population, or demographics.
+ 
 * allow feature selection (for choosing population, vote results, etc.)
 * add ability to lock/unlock precincts together
 * add ability to lock/unlock precincts to certain districts

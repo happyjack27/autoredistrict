@@ -78,7 +78,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		          feature.properties.ID = rec_num;
 		          for( int i = 0; i < cols.length; i++) {
 		        	  feature.properties.put(cols[i],aobj[i].toString());
+		        	  System.out.print(aobj[i].toString()+" ");
 		          }
+		          System.out.println();
 		          feature.properties.post_deserialize();
 		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
 		          
@@ -98,6 +100,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		      }
 		      total++;
 		    }
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+
 
 		    System.out.println("Total shapes read: " + total);
 
