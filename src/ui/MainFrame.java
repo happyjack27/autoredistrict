@@ -619,9 +619,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnFile.add(new JSeparator());
 		
-		mnFile.add(chckbxmntmOpenCensusResults);
+		//mnFile.add(chckbxmntmOpenCensusResults);
 		
-		mnFile.add(mntmOpenElectionResults);
+		//mnFile.add(mntmOpenElectionResults);
 		
 		
 		mntmImportData.addActionListener(new ActionListener() {
@@ -664,6 +664,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				selectLayers();
 			}
 		});
+
+		mnFile.add(new JSeparator());
 		
 		mnFile.add(mntmSelectLayers);
 

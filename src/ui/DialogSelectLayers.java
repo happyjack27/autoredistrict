@@ -46,7 +46,7 @@ public class DialogSelectLayers extends JDialog {
 	}
 	
 	public DialogSelectLayers() {
-		setTitle("Import data");
+		setTitle("Select layers");
 		setModal(true);
 		getContentPane().setLayout(null);
 		this.setSize(new Dimension(500,600));
