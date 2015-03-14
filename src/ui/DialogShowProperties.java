@@ -10,18 +10,11 @@ import java.util.*;
 public class DialogShowProperties extends JDialog {
 	private JTable table;
 	
-	FeatureCollection fc;
-	
-	public void setTableSource(FeatureCollection fc) {
-		this.fc = fc;
-		String[] headers = fc.getHeaders();
-		String[][] data = fc.getData(headers);
-		Vector<Feature> vf = fc.features;
-		System.out.println("found "+headers.length+" headers and "+vf.size()+" rows");
+	public void setTableSource(DataAndHeader dh) {
 		
 
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		table.setModel(new DefaultTableModel(data,headers));
+		table.setModel(new DefaultTableModel(dh.data,dh.header));
 		table.invalidate();
 		table.repaint();
 		

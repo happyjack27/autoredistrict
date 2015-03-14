@@ -99,7 +99,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
 	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
-	private final JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
 	
 	public void setEnableds() {
 		
@@ -110,6 +111,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
 		mntmImportData.setEnabled(geo_loaded);
+		mntmSelectLayers.setEnabled(geo_loaded);
 		
 	}
 	
@@ -125,6 +127,62 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.invalidate();
 		mapPanel.repaint();
 	}
+	
+	public void selectLayers() {
+		DialogSelectLayers dlg = new DialogSelectLayers();
+		dlg.setData(featureCollection);
+		dlg.show();
+		if( !dlg.ok || !dlg.lblSelectDemographicelectionResult.isSelected())
+			return;
+		try {
+			Vector<String> candidate_cols = dlg.in;
+			int num_candidates = candidate_cols.size()-1;
+			
+			for( Block b : featureCollection.blocks) {
+				b.has_election_results = true;
+			}
+			
+			for( Feature f : featureCollection.features) {
+				Block b = f.block;
+				double[] dd = new double[num_candidates];
+				for( int i = 0; i < candidate_cols.size(); i++) {
+					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+				}
+			
+				for( int j = 0; j < num_candidates; j++) {
+					Demographic d = new Demographic();
+					d.block_id = b.id;
+					d.turnout_probability = 1;
+					d.population = (int) dd[j];
+					d.vote_prob = new double[num_candidates];
+					for( int i = 0; i < d.vote_prob.length; i++) {
+						d.vote_prob[i] = 0;
+					}
+					d.vote_prob[j] = 1;
+					b.demographics.add(d);
+					System.out.println("block "+b.id+" added demo "+d.population+" "+j);
+				}
+			}
+			
+			Candidate.candidates = new Vector<Candidate>();
+			for( int i = 0; i < num_candidates; i++) {
+				Candidate c = new Candidate();
+				c.index = i;
+				c.id = ""+i;
+				Candidate.candidates.add(c);
+			}
+			featureCollection.ecology.reset();
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+		Feature.display_mode = 1;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		election_loaded = true;
+		setEnableds();	
+	}
+	
 	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
 		DataAndHeader dh = new DataAndHeader();
 		try {
@@ -455,8 +513,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 			    JProgressBar dpb = new JProgressBar(0, 500);
 			    JLabel dlbl = new JLabel();
 			    dpb.setIndeterminate(true);
-			    dlg.add(BorderLayout.CENTER, dpb);
-			    dlg.add(BorderLayout.NORTH, dlbl);
+			    dlg.getContentPane().add(BorderLayout.CENTER, dpb);
+			    dlg.getContentPane().add(BorderLayout.NORTH, dlbl);
 			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 			    dlg.setSize(300, 75);
 			    dlg.setLocationRelativeTo(mainframe);
@@ -601,6 +659,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnFile.add(mntmImportData);
+		mntmSelectLayers.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectLayers();
+			}
+		});
+		
+		mnFile.add(mntmSelectLayers);
 
 		mnFile.add(new JSeparator());
 
@@ -712,8 +777,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 			    JProgressBar dpb = new JProgressBar(0, 500);
 			    JLabel dlbl = new JLabel();
 			    dpb.setIndeterminate(true);
-			    dlg.add(BorderLayout.CENTER, dpb);
-			    dlg.add(BorderLayout.NORTH, dlbl);
+			    dlg.getContentPane().add(BorderLayout.CENTER, dpb);
+			    dlg.getContentPane().add(BorderLayout.NORTH, dlbl);
 			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 			    dlg.setSize(300, 75);
 			    dlg.setLocationRelativeTo(mainframe);
@@ -1024,7 +1089,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JMenuItem mntmShowProperties = new JMenuItem("Show properties");
 		mntmShowProperties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				df.setTableSource(featureCollection);
+				String[] headers = featureCollection.getHeaders();
+				String[][] data = featureCollection.getData(headers);
+
+				df.setTableSource(new DataAndHeader(data,headers));
+				df.setTitle("Map Properties");
 				df.show();//new DialogShowProperties(featureCollection).show();
 			}
 		});

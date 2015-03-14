@@ -136,12 +136,12 @@ public class DialogImport extends JDialog {
 
 				HashMap<String,Feature> hmmap = new HashMap<String,Feature>();
 				for( int i = 0; i < map_data.length; i++) {
-					hmmap.put(map_data[i][file_index], fc.features.get(i));
+					hmmap.put(map_data[i][map_index], fc.features.get(i));
 				}
 				
 				for( int i = 0; i < data.length; i++) {		
-					if( hmmap.containsKey(data[i])) {
-						Feature f = hmmap.get(data[i]);
+					if( hmmap.containsKey(data[i][file_index])) {
+						Feature f = hmmap.get(data[i][file_index]);
 						/*
 						try {
 							if( load_pop) {
