@@ -68,6 +68,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JFrame frameStats = new JFrame();
 	PanelStats panelStats = new PanelStats();
 	JFrame frameGraph = new JFrame();
+	DialogShowProperties df = new DialogShowProperties();
 	public PanelGraph panelGraph = new PanelGraph();
 
 
@@ -801,6 +802,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JMenuItem mntmShowProperties = new JMenuItem("Show properties");
 		mntmShowProperties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				df.setTableSource(featureCollection);
+				df.show();//new DialogShowProperties(featureCollection).show();
 			}
 		});
 		mnView.add(mntmShowProperties);
