@@ -12,7 +12,6 @@ import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineShape;
 
 import com.hexiong.jdbf.DBFReader;
 
@@ -38,6 +37,34 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
+	
+	public String[] getHeaders() {
+		String[] headers;
+		if( features == null || features.size() < 1) {
+			return null;
+		}
+		Set<String> keyset = features.get(0).properties.keySet(); 
+		headers = new String[keyset.size()];
+		int i = 0;
+		
+		for( String s : keyset) {
+			headers[i] = s;
+			System.out.println(s);
+			i++;
+		}
+		return headers;
+	}
+	
+	public String[][] getData(String[] headers) {
+		String[][] data = new String[features.size()][headers.length];
+		for( int j = 0; j < features.size(); j++) {
+			Feature f = features.get(j);
+			for( int k = 0; k < headers.length; k++) {
+				data[j][k] = f.properties.get(headers[k]).toString();
+			}
+		}
+		return data;
+	}
 	
 	public void loadShapeFile(File f) {
 		try {
@@ -78,7 +105,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		          feature.properties.ID = rec_num;
 		          for( int i = 0; i < cols.length; i++) {
 		        	  feature.properties.put(cols[i],aobj[i].toString());
-		        	  System.out.print(aobj[i].toString()+" ");
+		        	  //System.out.print(aobj[i].toString()+" ");
 		          }
 		          System.out.println();
 		          feature.properties.post_deserialize();

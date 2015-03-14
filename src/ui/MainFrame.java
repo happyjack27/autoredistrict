@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -19,6 +20,12 @@ import mapCandidates.*;
 import javax.swing.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
+
+import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
+
+import com.hexiong.jdbf.DBFReader;
+import com.hexiong.jdbf.JDBFException;
 
 
 public class MainFrame extends JFrame implements iChangeListener {
@@ -109,6 +116,61 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mntmUndoZoom.setEnabled(false);
 		mapPanel.invalidate();
 		mapPanel.repaint();
+	}
+	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
+		DataAndHeader dh = new DataAndHeader();
+		try {
+			String[] lines = s.split("\n");
+			dh.header = lines[0].split(delimiter);
+			if( !has_headers) {
+				for( int i = 0; i < dh.header.length; i++) {
+					dh.header[i] = "col_"+i;
+				}
+			}
+			dh.data = new String[lines.length - (has_headers ? 1 : 0)][];
+			for( int i = has_headers ? 1 : 0; i < lines.length; i++) {
+				dh.data[i-(has_headers ? 1 : 0)] = lines[i].split(delimiter);
+			}
+			return dh;
+		} catch (Exception ex) {
+			
+		}
+		return dh;
+	}
+	public DataAndHeader readDBF(String dbfname) {
+		DBFReader dbfreader;
+		try {
+			dbfreader = new DBFReader(dbfname);
+		} catch (JDBFException e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		DataAndHeader dh = new DataAndHeader();
+		
+		dh.header = new String[dbfreader.getFieldCount()];
+		for( int i = 0; i < dh.header.length; i++) {
+			dh.header[i] = dbfreader.getField(i).getName();
+		}
+		Vector<String[]> vd = new Vector<String[]>();
+
+	    while (dbfreader.hasNextRecord()) {
+	    	try {
+	    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+	    		String[] ss = new String[oo.length];
+	    		for( int i = 0; i < oo.length; i++) {
+	    			ss[i] = oo[i].toString();
+	    		}
+				vd.add(ss);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	    dh.data = new String[vd.size()][];
+	    for( int i = 0; i < dh.data.length; i++) {
+	    	dh.data[i] = vd.get(i);
+	    }
+	    return dh;
 	}
 	
 	public void loadElection(String s) {
@@ -394,9 +456,40 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnFile.add(mntmOpenElectionResults);
 		
+		
 		JMenuItem mntmImportData = new JMenuItem("Import data");
 		mntmImportData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				String fn = f.getName();
+				String ext = fn.substring(fn.length()-3).toLowerCase();
+				DataAndHeader dh = null;
+				if( ext.equals("csv")) {
+					String s = getFile(f).toString();
+					dh = readDelimited(s,",",true);
+				} else
+				if( ext.equals("txt")) {
+					String s = getFile(f).toString();
+					dh = readDelimited(s,"\t",true);
+				} else
+				if( ext.equals("dbf")) {
+					String s = getFile(f).toString();
+					dh = readDBF(f.getAbsolutePath());
+				} else {
+					JOptionPane.showMessageDialog(null, "File format not recognized.");
+					return;
+				}
+				DialogImport di = new DialogImport();
+				di.setData(featureCollection, dh.header, dh.data);
+				di.show();
 			}
 		});
 		mnFile.add(mntmImportData);

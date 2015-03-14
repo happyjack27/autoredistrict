@@ -14,29 +14,12 @@ public class DialogShowProperties extends JDialog {
 	
 	public void setTableSource(FeatureCollection fc) {
 		this.fc = fc;
-		String[] headers;
+		String[] headers = fc.getHeaders();
+		String[][] data = fc.getData(headers);
 		Vector<Feature> vf = fc.features;
-		if( vf == null || vf.size() < 1) {
-			return;
-		}
-		Set<String> keyset = vf.get(0).properties.keySet(); 
-		headers = new String[keyset.size()];
-		int i = 0;
-		
-		for( String s : keyset) {
-			headers[i] = s;
-			System.out.println(s);
-			i++;
-		}
 		System.out.println("found "+headers.length+" headers and "+vf.size()+" rows");
 		
-		String[][] data = new String[vf.size()][headers.length];
-		for( int j = 0; j < vf.size(); j++) {
-			Feature f = vf.get(j);
-			for( int k = 0; k < headers.length; k++) {
-				data[j][k] = f.properties.get(headers[k]).toString();
-			}
-		}
+
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setModel(new DefaultTableModel(data,headers));
 		table.invalidate();
