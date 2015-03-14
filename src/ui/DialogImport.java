@@ -54,37 +54,39 @@ public class DialogImport extends JDialog {
 		comboBoxFilePopulationColumn.setSelectedIndex(0);
 	}
 	public void recalc_matches() {
-		int non_matches_map = 0;
-		int non_matches_file = 0;
-		int map_index = comboBoxMapLayer.getSelectedIndex();
-		int file_index = comboBoxFileLinkColumn.getSelectedIndex();
-		if( map_index < 0 || file_index < 0) {
-			System.out.println("recalc: bad index");
-			return;
-		}
-
-		HashMap<String,String> hmfile = new HashMap<String,String>();
-		for( int i = 0; i < data.length; i++) {
-			hmfile.put(data[i][file_index], data[i][file_index]);
-		}
-		HashMap<String,String> hmmap = new HashMap<String,String>();
-		for( int i = 0; i < map_data.length; i++) {
-			hmmap.put(map_data[i][map_index], map_data[i][map_index]);
-		}
-		
-		for( int i = 0; i < map_data.length; i++) {
-			if( !hmfile.containsKey(map_data[i])) {
-				non_matches_map++;
+		try {
+			int non_matches_map = 0;
+			int non_matches_file = 0;
+			int map_index = comboBoxMapLayer.getSelectedIndex();
+			int file_index = comboBoxFileLinkColumn.getSelectedIndex();
+			if( map_index < 0 || file_index < 0) {
+				System.out.println("recalc: bad index");
+				return;
 			}
-		}
-		for( int i = 0; i < data.length; i++) {
-			if( !hmmap.containsKey(data[i])) {
-				non_matches_file++;
+	
+			HashMap<String,String> hmfile = new HashMap<String,String>();
+			for( int i = 0; i < data.length; i++) {
+				hmfile.put(data[i][file_index].trim().toLowerCase(), data[i][file_index]);
 			}
-		}
-		lblNonmatchesMap.setText(""+non_matches_map+" non-matches");
-		lblNonmatchesFile.setText(""+non_matches_file+" non-matches");
-		System.out.println("recalc: done.");
+			HashMap<String,String> hmmap = new HashMap<String,String>();
+			for( int i = 0; i < map_data.length; i++) {
+				hmmap.put(map_data[i][map_index].trim().toLowerCase(), map_data[i][map_index]);
+			}
+			
+			for( int i = 0; i < map_data.length; i++) {
+				if( !hmfile.containsKey(map_data[i][map_index].trim().toLowerCase())) {
+					non_matches_map++;
+				}
+			}
+			for( int i = 0; i < data.length; i++) {
+				if( !hmmap.containsKey(data[i][file_index].trim().toLowerCase())) {
+					non_matches_file++;
+				}
+			}
+			lblNonmatchesMap.setText(""+non_matches_map+" non-matches");
+			lblNonmatchesFile.setText(""+non_matches_file+" non-matches");
+			System.out.println("recalc: done.");
+		} catch (Exception ex) { ex.printStackTrace(); }
 		
 	}
 	
