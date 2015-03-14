@@ -3,6 +3,7 @@ package ui;
 import geoJSON.Feature;
 import geoJSON.FeatureCollection;
 import geoJSON.Geometry;
+import geoJSON.Properties;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -21,8 +22,12 @@ import javax.swing.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
+import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
+import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
 import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.JDBFException;
@@ -175,7 +180,86 @@ public class MainFrame extends JFrame implements iChangeListener {
 	    }
 	    return dh;
 	}
-	
+	public void loadShapeFile(File f) {
+
+	    try {
+			FileInputStream is = new FileInputStream(f);
+			ValidationPreferences prefs = new ValidationPreferences();
+		    prefs.setMaxNumberOfPointsPerShape(16650);
+		    ShapeFileReader r = new ShapeFileReader(is, prefs);
+		    
+			String dbfname = f.getAbsolutePath();//.getName();
+			dbfname = dbfname.substring(0,dbfname.length()-4)+".dbf";
+			
+			DBFReader dbfreader = new DBFReader(dbfname);
+			String[] cols = new String[dbfreader.getFieldCount()];
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+		    
+			
+
+		    ShapeFileHeader h = r.getHeader();
+		    System.out.println("The shape type of this files is " + h.getShapeType());
+
+		    int total = 0;
+		    AbstractShape s;
+		    while ((s = r.next()) != null) {
+		    	Object aobj[] = dbfreader.nextRecord(Charset.defaultCharset());
+		      switch (s.getShapeType()) {
+		      case POLYGON:
+		    	  int rec_num = s.getHeader().getRecordNumber();
+		    	  //System.out.println("record number: "+rec_num);
+		          PolygonShape aPolygon = (PolygonShape) s;
+		          
+		          Feature feature = new Feature();
+		          featureCollection.features.add(feature);
+		          feature.properties = new Properties();
+		          feature.geometry = new Geometry();
+		          feature.properties.ID = rec_num;
+		          for( int i = 0; i < cols.length; i++) {
+		        	  feature.properties.put(cols[i],aobj[i].toString());
+		        	  //System.out.print(aobj[i].toString()+" ");
+		          }
+		          System.out.println();
+		          feature.properties.post_deserialize();
+		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+		          
+		          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+		            PointData[] points = aPolygon.getPointsOfPart(i);
+		            feature.geometry.coordinates[i] = new double[points.length][2];
+		            for( int j = 0; j < points.length; j++) {
+		            	feature.geometry.coordinates[i][j][0] = points[j].getX();
+		            	feature.geometry.coordinates[i][j][1] = points[j].getY();
+		            }
+		          }
+		          feature.geometry.post_deserialize();
+		          feature.post_deserialize();
+		          break;
+		      default:
+		        System.out.println("Read other type of shape.");
+		      }
+		      total++;
+		    }
+			for( int i=0; i<cols.length; i++) {
+				cols[i] = dbfreader.getField(i).getName();
+				System.out.print(cols[i]+"  ");
+			}
+			System.out.print("\n");
+
+
+		    System.out.println("Total shapes read: " + total);
+
+		    is.close();		
+		} catch (Exception ex) {
+			System.out.println("exception in processing shapefile: "+ex);
+			ex.printStackTrace();
+			
+		}
+	}
+
 	public void loadElection(String s) {
 		try {
 			String[] lines = s.split("\n");
@@ -367,6 +451,21 @@ public class MainFrame extends JFrame implements iChangeListener {
 				featureCollection.features = new Vector<Feature>();
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
+			    final JDialog dlg = new JDialog(mainframe, "Working", true);
+			    JProgressBar dpb = new JProgressBar(0, 500);
+			    JLabel dlbl = new JLabel();
+			    dpb.setIndeterminate(true);
+			    dlg.add(BorderLayout.CENTER, dpb);
+			    dlg.add(BorderLayout.NORTH, dlbl);
+			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			    dlg.setSize(300, 75);
+			    dlg.setLocationRelativeTo(mainframe);
+			    dlbl.setText("Loading file...");
+
+			    Thread t = new Thread(new Runnable() { public void run() { dlg.setVisible(true); } });
+			    t.start();
+
+				
 				for( int i = 0; i < ff.length; i++) {
 					String s = ff[i].getName().toLowerCase();
 					/*if(s.indexOf(".json") < 0) {
@@ -386,7 +485,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					if( panelStats != null) {
 						panelStats.featureCollection = featureCollection;
 					}
-					featureCollection.loadShapeFile(f);
+					loadShapeFile(f);
 					/*
 					for( Feature fe : fc.features) {
 						if( suppress_duplicates) {
@@ -398,6 +497,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					*/
 					
 				}
+
 				for( Feature fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
@@ -405,6 +505,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				System.out.println(features.size()+" precincts loaded.");
 				System.out.println("Initializing blocks...");
 				featureCollection.initBlocks();
+			    dlbl.setText("Setting min and max coordinates..");
+
 				minx = features.get(0).geometry.coordinates[0][0][0];
 				maxx = features.get(0).geometry.coordinates[0][0][0];
 				miny = features.get(0).geometry.coordinates[0][0][1];
@@ -439,9 +541,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 				mapPanel.repaint();
 				featureCollection.ecology.mapPanel = mapPanel;
 				featureCollection.ecology.statsPanel = panelStats;
+				
+			    dlbl.setText("Initializing ecology...");
+
 				featureCollection.initEcology();
 				
-
+		        dlg.setVisible(false);
+			    t.stop();
 				System.out.println("Ready.");
 				
 				geo_loaded = true;
@@ -602,6 +708,20 @@ public class MainFrame extends JFrame implements iChangeListener {
 				featureCollection.features = new Vector<Feature>();
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
+			    final JDialog dlg = new JDialog(mainframe, "Working", true);
+			    JProgressBar dpb = new JProgressBar(0, 500);
+			    JLabel dlbl = new JLabel();
+			    dpb.setIndeterminate(true);
+			    dlg.add(BorderLayout.CENTER, dpb);
+			    dlg.add(BorderLayout.NORTH, dlbl);
+			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+			    dlg.setSize(300, 75);
+			    dlg.setLocationRelativeTo(mainframe);
+			    dlbl.setText("Loading file...");
+
+			    Thread t = new Thread(new Runnable() { public void run() { dlg.setVisible(true); } });
+			    t.start();
+				
 				for( int i = 0; i < ff.length; i++) {
 					String s = ff[i].getName().toLowerCase();
 					if(s.indexOf(".json") < 0) {
@@ -639,6 +759,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 					}
 					
 				}
+			    dlbl.setText("Initializing blocks...");
+
 				for( Feature fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
@@ -646,6 +768,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				System.out.println(features.size()+" precincts loaded.");
 				System.out.println("Initializing blocks...");
 				featureCollection.initBlocks();
+			    dlbl.setText("Setting min and max coordinates...");
+
 				minx = features.get(0).geometry.coordinates[0][0][0];
 				maxx = features.get(0).geometry.coordinates[0][0][0];
 				miny = features.get(0).geometry.coordinates[0][0][1];
@@ -680,9 +804,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 				mapPanel.repaint();
 				featureCollection.ecology.mapPanel = mapPanel;
 				featureCollection.ecology.statsPanel = panelStats;
+			    dlbl.setText("Initializing ecology...");
+
 				featureCollection.initEcology();
 				
-
+				dlg.setVisible(false);
+				t.stop();
 				System.out.println("Ready.");
 				
 				geo_loaded = true;
