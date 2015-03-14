@@ -281,7 +281,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		        	  feature.properties.put(cols[i],aobj[i].toString());
 		        	  //System.out.print(aobj[i].toString()+" ");
 		          }
-		          System.out.println();
+		          //System.out.println();
 		          feature.properties.post_deserialize();
 		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
 		          
