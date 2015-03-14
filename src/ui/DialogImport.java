@@ -86,6 +86,8 @@ public class DialogImport extends JDialog {
 			lblNonmatchesMap.setText(""+non_matches_map+" non-matches");
 			lblNonmatchesFile.setText(""+non_matches_file+" non-matches");
 			System.out.println("recalc: done.");
+			comboBoxMapLayer.repaint();
+			comboBoxFileLinkColumn.repaint();
 		} catch (Exception ex) { ex.printStackTrace(); }
 		
 	}
@@ -172,7 +174,7 @@ public class DialogImport extends JDialog {
 							}
 						} catch (Exception ex) { }
 						for( int j = 0; j < data_headers.length; j++) {
-							f.put(data_headers[j], data[i][j]);
+							f.properties.put(data_headers[j], data[i][j]);
 						}
 					}
 				}
