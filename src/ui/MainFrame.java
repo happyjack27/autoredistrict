@@ -136,7 +136,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			return;
 		try {
 			Vector<String> candidate_cols = dlg.in;
-			int num_candidates = candidate_cols.size()-1;
+			int num_candidates = candidate_cols.size();
 			
 			for( Block b : featureCollection.blocks) {
 				b.has_election_results = true;
