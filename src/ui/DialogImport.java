@@ -12,9 +12,6 @@ import java.awt.event.ItemEvent;
 import java.util.HashMap;
 
 public class DialogImport extends JDialog {
-	JCheckBox lblSelectDemographicelectionResult = new JCheckBox("Select demographic / election result columns");
-	JCheckBox lblLoadPopulationFrom = new JCheckBox("Load population from");
-	JComboBox comboBoxFilePopulationColumn = new JComboBox();
 	JComboBox comboBoxMapLayer = new JComboBox();
 	JComboBox comboBoxFileLinkColumn = new JComboBox();
 	
@@ -47,11 +44,13 @@ public class DialogImport extends JDialog {
 		}
 		comboBoxFileLinkColumn.setSelectedIndex(0);
 		
+		/*
 		comboBoxFilePopulationColumn.removeAllItems();
 		for( int i = 0; i < data_headers.length; i++) {
 			comboBoxFilePopulationColumn.addItem(data_headers[i]);
 		}
 		comboBoxFilePopulationColumn.setSelectedIndex(0);
+		*/
 	}
 	public void recalc_matches() {
 		try {
@@ -96,7 +95,7 @@ public class DialogImport extends JDialog {
 		setTitle("Import data");
 		setModal(true);
 		getContentPane().setLayout(null);
-		this.setSize(new Dimension(500,600));
+		this.setSize(new Dimension(366, 188));
 		getContentPane().setPreferredSize(new Dimension(500,600));
 		comboBoxMapLayer.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
@@ -114,10 +113,6 @@ public class DialogImport extends JDialog {
 		
 		comboBoxFileLinkColumn.setBounds(10, 87, 137, 20);
 		getContentPane().add(comboBoxFileLinkColumn);
-		comboBoxFilePopulationColumn.setEnabled(false);
-		
-		comboBoxFilePopulationColumn.setBounds(10, 139, 137, 20);
-		getContentPane().add(comboBoxFilePopulationColumn);
 		
 		JLabel lblLinkMapLayer = new JLabel("Link map layer");
 		lblLinkMapLayer.setBounds(10, 11, 125, 14);
@@ -126,35 +121,18 @@ public class DialogImport extends JDialog {
 		JLabel lblToColumn = new JLabel("To column");
 		lblToColumn.setBounds(10, 64, 89, 14);
 		getContentPane().add(lblToColumn);
-		lblLoadPopulationFrom.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				comboBoxFilePopulationColumn.setEnabled(lblLoadPopulationFrom.isSelected());
-			}
-		});
-		
-		lblLoadPopulationFrom.setBounds(10, 118, 182, 14);
-		getContentPane().add(lblLoadPopulationFrom);
 		
 		lblNonmatchesMap.setBounds(157, 36, 175, 14);
 		getContentPane().add(lblNonmatchesMap);
 		
 		lblNonmatchesFile.setBounds(157, 90, 189, 14);
 		getContentPane().add(lblNonmatchesFile);
-		lblSelectDemographicelectionResult.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		
-		lblSelectDemographicelectionResult.setBounds(154, 175, 318, 14);
-		getContentPane().add(lblSelectDemographicelectionResult);
 		
 		JButton btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int map_index = comboBoxMapLayer.getSelectedIndex();
 				int file_index = comboBoxFileLinkColumn.getSelectedIndex();
-				int pop_index = comboBoxFilePopulationColumn.getSelectedIndex();
-				boolean load_pop = lblLoadPopulationFrom.isSelected();
 
 				HashMap<String,Feature> hmmap = new HashMap<String,Feature>();
 				for( int i = 0; i < map_data.length; i++) {
@@ -164,6 +142,7 @@ public class DialogImport extends JDialog {
 				for( int i = 0; i < data.length; i++) {		
 					if( hmmap.containsKey(data[i])) {
 						Feature f = hmmap.get(data[i]);
+						/*
 						try {
 							if( load_pop) {
 								if( f.block != null) {
@@ -173,6 +152,7 @@ public class DialogImport extends JDialog {
 								f.properties.POPULATION = (int) Double.parseDouble(data[i][pop_index]);
 							}
 						} catch (Exception ex) { }
+						*/
 						for( int j = 0; j < data_headers.length; j++) {
 							f.properties.put(data_headers[j], data[i][j]);
 						}
@@ -182,7 +162,7 @@ public class DialogImport extends JDialog {
 				hide();
 			}
 		});
-		btnOk.setBounds(122, 384, 89, 23);
+		btnOk.setBounds(37, 119, 89, 23);
 		getContentPane().add(btnOk);
 		
 		JButton btnCancel = new JButton("Cancel");
@@ -191,29 +171,7 @@ public class DialogImport extends JDialog {
 				hide();
 			}
 		});
-		btnCancel.setBounds(243, 384, 89, 23);
+		btnCancel.setBounds(167, 119, 89, 23);
 		getContentPane().add(btnCancel);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 211, 182, 161);
-		getContentPane().add(scrollPane);
-		
-		JList list = new JList();
-		scrollPane.setViewportView(list);
-		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(286, 211, 182, 161);
-		getContentPane().add(scrollPane_1);
-		
-		JList list_1 = new JList();
-		scrollPane_1.setViewportView(list_1);
-		
-		JButton button = new JButton(">");
-		button.setBounds(214, 239, 49, 29);
-		getContentPane().add(button);
-		
-		JButton button_1 = new JButton("<");
-		button_1.setBounds(214, 296, 49, 29);
-		getContentPane().add(button_1);
 	}
 }

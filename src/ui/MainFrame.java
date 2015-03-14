@@ -44,6 +44,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
+	JMenuItem mntmImportData = new JMenuItem("Import data");
+
 
 
 	JTextField textField_3 = new JTextField();
@@ -102,6 +104,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		}
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
+		mntmImportData.setEnabled(geo_loaded);
 		
 	}
 	
@@ -457,7 +460,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mnFile.add(mntmOpenElectionResults);
 		
 		
-		JMenuItem mntmImportData = new JMenuItem("Import data");
 		mntmImportData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
