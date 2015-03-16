@@ -787,6 +787,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			    dlbl.setText("Loading file...");
 
 			    Thread t = new Thread(new Runnable() { public void run() { dlg.setVisible(true); } });
+			    t.setPriority(Thread.NORM_PRIORITY+1);
 			    t.start();
 				
 				for( int i = 0; i < ff.length; i++) {
