@@ -45,12 +45,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		Set<String> keyset = features.get(0).properties.keySet(); 
 		headers = new String[keyset.size()];
-		int i = 0;
 		
+		Vector<String> v_headers = new Vector<String>();
 		for( String s : keyset) {
-			headers[i] = s;
-			System.out.println(s);
-			i++;
+			v_headers.add(s);
+		}
+		
+		Collections.sort(v_headers);
+		
+		for( int i = 0; i < v_headers.size(); i++) {
+			headers[i] = v_headers.get(i);
 		}
 		return headers;
 	}
@@ -174,6 +178,34 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.block.collectNeighborLengths();
 		}
+		Geometry.shiftx = Geometry.shifty = 0;
+		Geometry.scalex = Geometry.scaley = 1;
+		for( Feature f : features) {
+			if( f.block.neighbors.size() == 0) {
+				if( f.geometry == null || f.geometry.polygons == null) {
+					f.geometry.makePolys();
+				}
+				if( f.geometry == null || f.geometry.polygons == null) {
+					continue;
+				}
+
+				Feature nearest = getNearestFeature(f);
+				double total_length = 0;
+				double[] new_neighbbor_lengths = new double[nearest.block.neighbor_lengths.length+1];
+				for( int i = 0; i < nearest.block.neighbor_lengths.length; i++) {
+					total_length += nearest.block.neighbor_lengths[i];
+					new_neighbbor_lengths[i] = nearest.block.neighbor_lengths[i]; 
+				}
+				total_length /= (double)nearest.block.neighbor_lengths.length;
+				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = total_length;
+				
+				nearest.block.neighbors.add(f.block);
+				nearest.block.neighbor_lengths = new_neighbbor_lengths;
+				
+				f.block.neighbors.add(nearest.block);
+				f.block.neighbor_lengths = new double[]{total_length};
+			}
+		}
 		
 		/*
 		for( Feature f : features) {
@@ -182,6 +214,60 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		*/
 		//vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		//edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
+	}
+	public double[] getAvgCentroid(Feature f) {
+		double[] source = new double[]{0,0};
+		if( f.geometry == null || f.geometry.polygons == null) {
+			f.geometry.makePolys();
+		}
+		if( f.geometry == null || f.geometry.polygons == null) {
+			return new double[]{0,0};
+		}
+		for( int i = 0; i < f.geometry.coordinates.length; i++) {
+			int[] xpolys = new int[f.geometry.coordinates[i].length];
+			int[] ypolys = new int[f.geometry.coordinates[i].length];
+			for( int j = 0; j < f.geometry.coordinates[i].length; j++) {
+				xpolys[j] = (int)f.geometry.coordinates[i][j][0];
+			}
+			for( int j = 0; j <f.geometry. coordinates[i].length; j++) {
+				ypolys[j] = (int)f.geometry.coordinates[i][j][1];
+			}
+			
+			double[] dd = f.geometry.compute2DPolygonCentroid(xpolys,ypolys);//.polygons[i]);
+			//double[] dd = f.geometry.compute2DPolygonCentroid(f.geometry.coordinates[i]);//.polygons[i]);
+			//coordinates[i]
+			source[0] += dd[0];
+			source[1] += dd[1];
+		}
+		source[0] /= (double)f.geometry.coordinates.length;//f.geometry.polygons.length;
+		source[1] /= (double)f.geometry.coordinates.length;//f.geometry.polygons.length;
+		return source;
+	}
+	public Feature getNearestFeature(Feature f) {
+		double[] target = getAvgCentroid(f);
+		Feature best = null;
+		double best_r = 0;
+		for( int i = 0; i < features.size(); i++) {
+			Feature test = features.get(i);
+			if( test == f || test.block.neighbors.size() == 0) {
+				continue;
+			}
+			if( test.geometry == null || test.geometry.polygons == null) {
+				test.geometry.makePolys();
+			}
+			if( test.geometry == null || test.geometry.polygons == null) {
+				continue;
+			}
+			double[] cur = getAvgCentroid(test);
+			double dx = cur[0]-target[0];
+			double dy = cur[1]-target[1];
+			double r = dx*dx+dy*dy;
+			if( best == null || r < best_r) {
+				best_r = r;
+				best = test;
+			}
+		}
+		return best;
 	}
 	
 	public void initEcology() {

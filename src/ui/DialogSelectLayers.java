@@ -51,9 +51,9 @@ public class DialogSelectLayers extends JDialog {
 		getContentPane().setLayout(null);
 		this.setSize(new Dimension(500,600));
 		getContentPane().setPreferredSize(new Dimension(500,600));
-		comboBoxFilePopulationColumn.setEnabled(false);
 		
 		comboBoxFilePopulationColumn.setBounds(10, 27, 137, 20);
+		lblLoadPopulationFrom.setSelected(true);
 		getContentPane().add(comboBoxFilePopulationColumn);
 		lblLoadPopulationFrom.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -62,6 +62,7 @@ public class DialogSelectLayers extends JDialog {
 		});
 		
 		lblLoadPopulationFrom.setBounds(10, 6, 182, 14);
+		lblSelectDemographicelectionResult.setSelected(true);
 		getContentPane().add(lblLoadPopulationFrom);
 		lblSelectDemographicelectionResult.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -75,17 +76,6 @@ public class DialogSelectLayers extends JDialog {
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ok = true;
-				if( lblLoadPopulationFrom.isSelected() ) {
-					int pop_index = comboBoxFilePopulationColumn.getSelectedIndex();
-					for( Feature f : fc.features) {
-						String pop = f.properties.get(map_headers[pop_index]).toString();
-						if( f.block != null) {
-							f.block.has_census_results = true;
-							f.block.population = Double.parseDouble(pop.replaceAll(",",""));
-						}
-						f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
-					}
-				}
 				hide();
 			}
 		});

@@ -22,8 +22,13 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	
 	public static boolean isLatLon = false; 
 	
-	public static double shiftx,shifty,scalex,scaley;
+	public static double shiftx=0,shifty=0,scalex=1,scaley=1;
 	public void makePolys() {
+		if( scalex == 0 || scalex != scalex) scalex = 1;
+		if( scaley == 0 || scaley != scaley) scaley = 1;
+		if( shiftx != shiftx) shiftx = 0;
+		if( shifty != shifty) shifty = 0;
+		
 		polygons = new Polygon[coordinates.length];
 		for( int i = 0; i < coordinates.length; i++) {
 			xpolys = new int[coordinates[i].length];
@@ -110,8 +115,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 
 			    double retx = 0;
 			    double rety = 0;
-			    for(int i=0; i < xs.length; i++)
-			    {
+			    for(int i=0; i < xs.length; i++) {
 			        x0 = xs[i];
 			        y0 = ys[i];
 			        x1 = xs[i+1 == xs.length ? 0 : i+1];
@@ -125,6 +129,16 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 			    signedArea *= 0.5;
 			    retx /= (6.0*signedArea);
 			    rety /= (6.0*signedArea);
+			    if( retx != retx || rety != rety) {
+			    	retx = 0;
+			    	rety = 0;
+				    for(int i=0; i < xs.length; i++) {
+				    	retx += xs[i];
+				    	rety += ys[i];
+				    }
+				    retx /= (double) xs.length;
+				    rety /= (double) xs.length;
+			    }
 
 			    return new double[]{retx,rety};
 	}
