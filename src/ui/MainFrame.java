@@ -292,9 +292,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 		} else { System.out.println("source_file not found"); return; }
 
 		if( config.containsKey("number_of_districts")) {
-			textField_2.setText(config.getString("number_of_districts").trim());
-			textField_2.postActionEvent();
+			textFieldNumDistricts.setText(config.getString("number_of_districts").trim());
+			textFieldNumDistricts.postActionEvent();
 		} else { System.out.println("number_of_districts not found"); }
+		if( config.containsKey("members_per_district")) {
+			textFieldMembersPerDistrict.setText(config.getString("members_per_district").trim());
+			textFieldMembersPerDistrict.postActionEvent();
+		} else { System.out.println("members_per_district not found"); }
 		
 		if( config.containsKey("initial_population")) {
 			textField.setText(config.getString("initial_population").trim());
@@ -354,7 +358,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 
 	JTextField textField_3 = new JTextField();
-	JTextField textField_2 = new JTextField();
+	JTextField textFieldNumDistricts = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	public JSlider slider_1 = new JSlider();
@@ -401,6 +405,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
+	private JTextField textFieldMembersPerDistrict;
 	
 	public void setEnableds() {
 		
@@ -1348,7 +1353,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				num_districts++;
 				Settings.num_districts = num_districts;
-				textField_2.setText(""+Settings.num_districts);
+				textFieldNumDistricts.setText(""+Settings.num_districts);
 				if( featureCollection.ecology.population == null) {
 					featureCollection.ecology.population = new Vector<DistrictMap>();
 				}
@@ -1428,7 +1433,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 299, 200, 416);
+		panel_2.setBounds(0, 334, 200, 416);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1499,7 +1504,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 92, 200, 195);
+		panel_3.setBounds(0, 128, 200, 195);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1560,25 +1565,25 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		textField_1.setText("2");
 		textField_1.setColumns(10);
-		textField_2.setText("3");
+		textFieldNumDistricts.setText("10");
 		
 		
-		textField_2.addFocusListener(new FocusAdapter() {
+		textFieldNumDistricts.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				textField_2.postActionEvent();
+				textFieldNumDistricts.postActionEvent();
 			}
 		});
-		textField_2.addActionListener(new ActionListener() {
+		textFieldNumDistricts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Settings.num_districts = Integer.parseInt(textField_2.getText());
+					Settings.num_districts = Integer.parseInt(textFieldNumDistricts.getText());
 				} catch (Exception ex) { }
 			}
 		});
-		textField_2.setColumns(10);
-		textField_2.setBounds(132, 52, 56, 28);
-		panel.add(textField_2);
+		textFieldNumDistricts.setColumns(10);
+		textFieldNumDistricts.setBounds(132, 52, 56, 28);
+		panel.add(textFieldNumDistricts);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
 		lblNumOfDistricts.setBounds(6, 58, 124, 16);
@@ -1622,6 +1627,29 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		button_2.setBounds(142, 17, 46, 29);
 		panel.add(button_2);
+		
+		textFieldMembersPerDistrict = new JTextField();
+		textFieldMembersPerDistrict.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				textFieldMembersPerDistrict.postActionEvent();
+			}
+		});
+		textFieldMembersPerDistrict.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Settings.members_per_district = Integer.parseInt(textFieldMembersPerDistrict.getText());
+				} catch (Exception ex) { }
+			}
+		});
+		textFieldMembersPerDistrict.setText("1");
+		textFieldMembersPerDistrict.setColumns(10);
+		textFieldMembersPerDistrict.setBounds(132, 89, 56, 28);
+		panel.add(textFieldMembersPerDistrict);
+		
+		JLabel lblMembersPerDistrict = new JLabel("Members per district");
+		lblMembersPerDistrict.setBounds(6, 95, 124, 16);
+		panel.add(lblMembersPerDistrict);
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
