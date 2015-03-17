@@ -248,6 +248,76 @@ public class MainFrame extends JFrame implements iChangeListener {
     	}
     }
 	
+	public void openProjectFile(File f0) {
+		ReflectionJSONObject<Object> config = new ReflectionJSONObject<Object>();
+		
+		config.fromJSON(getFile(f0).toString());
+		
+		System.out.println("found keys:");
+		Set<String> keys = config.keySet();
+		for( String s : keys) {
+			System.out.println(s);
+		}
+		if( config.containsKey("source_file")) {
+			String source = config.getString("source_file").trim();
+			System.out.println("source file: "+source);
+			String ext = source.substring(source.length()-4).toLowerCase();
+			File f = new File(source);
+			if( f == null) {
+				JOptionPane.showMessageDialog(mainframe, "File not found: "+source);
+				return;
+			} else if( ext.equals(".shp")) {
+				Thread t = new OpenShapeFileThread(f);
+				t.start();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if( ext.equals("json")) {
+				Thread t = new OpenGeoJsonFileThread(f);
+				t.start();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			} else {
+				JOptionPane.showMessageDialog(mainframe, "Invalid file format: "+source);
+				return;
+			}
+		} else { System.out.println("source_file not found"); return; }
+
+		if( config.containsKey("number_of_districts")) {
+			textField_2.setText(config.getString("number_of_districts").trim());
+			textField_2.postActionEvent();
+		} else { System.out.println("number_of_districts not found"); }
+		
+		if( config.containsKey("initial_population")) {
+			textField.setText(config.getString("initial_population").trim());
+			textField.postActionEvent();
+		} else { System.out.println("initial_population not found"); }
+		
+		if( config.containsKey("population_column")) {
+			setPopulationColumn(config.getString("population_column").trim());
+		} else { System.out.println("population_column not found"); }
+		
+		if( config.containsKey("demographic_columns")) {
+			Vector v = config.getVector("demographic_columns");
+			Vector<String> vs = new Vector<String>();
+			for( int i = 0; i < v.size(); i++) {
+				vs.add((String)v.get(i));
+			}
+			setDemographicColumns(vs);
+		} else { System.out.println("demographic_columns not found"); }
+
+		featureCollection.ecology.startEvolving();
+
+	}
+	
 	
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
@@ -364,6 +434,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
 			}
 		
+			b.demographics.clear();
 			for( int j = 0; j < num_candidates; j++) {
 				Demographic d = new Demographic();
 				d.block_id = b.id;
@@ -375,7 +446,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				d.vote_prob[j] = 1;
 				b.demographics.add(d);
-				System.out.println("block "+b.id+" added demo "+d.population+" "+j);
+				System.out.println("block "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
@@ -741,73 +812,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				if( fd == null) {
 					return;
 				}
-				ReflectionJSONObject<Object> config = new ReflectionJSONObject<Object>();
-				
-				config.fromJSON(getFile(fd).toString());
-				
-				System.out.println("found keys:");
-				Set<String> keys = config.keySet();
-				for( String s : keys) {
-					System.out.println(s);
-				}
-				if( config.containsKey("source_file")) {
-					String source = config.getString("source_file").trim();
-					System.out.println("source file: "+source);
-					String ext = source.substring(source.length()-4).toLowerCase();
-					File f = new File(source);
-					if( f == null) {
-						JOptionPane.showMessageDialog(mainframe, "File not found: "+source);
-						return;
-					} else if( ext.equals(".shp")) {
-						Thread t = new OpenShapeFileThread(f);
-						t.start();
-						try {
-							t.join();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} else if( ext.equals("json")) {
-						Thread t = new OpenGeoJsonFileThread(f);
-						t.start();
-						try {
-							t.join();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						
-					} else {
-						JOptionPane.showMessageDialog(mainframe, "Invalid file format: "+source);
-						return;
-					}
-				} else { System.out.println("source_file not found"); return; }
-
-				if( config.containsKey("number_of_districts")) {
-					textField_2.setText(config.getString("number_of_districts").trim());
-					textField_2.postActionEvent();
-				} else { System.out.println("number_of_districts not found"); }
-				
-				if( config.containsKey("initial_population")) {
-					textField.setText(config.getString("initial_population").trim());
-					textField.postActionEvent();
-				} else { System.out.println("initial_population not found"); }
-				
-				if( config.containsKey("population_column")) {
-					setPopulationColumn(config.getString("population_column").trim());
-				} else { System.out.println("population_column not found"); }
-				
-				if( config.containsKey("demographic_columns")) {
-					Vector v = config.getVector("demographic_columns");
-					Vector<String> vs = new Vector<String>();
-					for( int i = 0; i < v.size(); i++) {
-						vs.add((String)v.get(i));
-					}
-					setDemographicColumns(vs);
-				} else { System.out.println("demographic_columns not found"); }
-
-				featureCollection.ecology.startEvolving();
-
+				openProjectFile(fd);
 			}
 		});
 		mnFile.add(mntmOpenProjectFile);
