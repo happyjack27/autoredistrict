@@ -97,6 +97,37 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				g.setColor(block.demographics != null && block.demographics.size() > 0 ? Color.white :  Color.black);
 			} else if( display_mode == 2) {
 				g.setColor(block.has_census_results ? Color.white :  Color.black);
+			} else if( display_mode == 3) {
+				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+				int max_col = -1;
+				int max_num = 0;
+				double tot = 0;
+				double red = 0;
+				double green = 0;
+				double blue = 0;
+				for( int i = 0; i < block.demographics.size() && i < colors.length; i++) {
+					int pop = block.demographics.get(i).population;
+					tot += pop;
+					red += colors[i].getRed()*pop;
+					green += colors[i].getGreen()*pop;
+					blue += colors[i].getBlue()*pop;
+				}
+				red /= tot;
+				green /= tot;
+				blue /= tot;
+				g.setColor(new Color((int)red,(int)green,(int)blue));
+			} else if( display_mode == 4) {
+				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+				int max_col = -1;
+				int max_num = 0;
+				for( int i = 0; i < block.demographics.size() && i < colors.length; i++) {
+					int pop = block.demographics.get(i).population;
+					if( pop > max_num || max_col < 0) {
+						max_num = pop;
+						max_col = i;
+					}
+				}
+				g.setColor(colors[max_col]);
 			} else {
 				if( block.state == 1) {
 					g.setColor(Color.blue);

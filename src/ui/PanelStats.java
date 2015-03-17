@@ -162,7 +162,7 @@ public class PanelStats extends JPanel {
 	public PanelStats() {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(449, 510));
+		this.setPreferredSize(new Dimension(449, 612));
 		
 		JLabel lblNewLabel = new JLabel("Border length:");
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -217,7 +217,7 @@ public class PanelStats extends JPanel {
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 426, 390, 72);
+		scrollPane_1.setBounds(26, 426, 390, 155);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
@@ -240,6 +240,8 @@ public class PanelStats extends JPanel {
 		
 		label_4.setBounds(220, 174, 202, 16);
 		add(label_4);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
 	}
 	public FeatureCollection featureCollection;
 	private JTable table;

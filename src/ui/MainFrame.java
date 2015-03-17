@@ -314,11 +314,29 @@ public class MainFrame extends JFrame implements iChangeListener {
 			setDemographicColumns(vs);
 		} else { System.out.println("demographic_columns not found"); }
 
+		if( config.containsKey("disconnected_weight")) {
+			sliderDisconnected.setValue((int)(100.0*Double.parseDouble(config.getString("disconnected_weight").trim())));
+		}
+		if( config.containsKey("population_balance_weight")) {
+			sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(config.getString("population_balance_weight").trim())));
+		}
+		if( config.containsKey("border_length_weight")) {
+			sliderBorderLength.setValue((int)(100.0*Double.parseDouble(config.getString("border_length_weight").trim())));
+		}
+		if( config.containsKey("voting_power_weight")) {
+			sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(config.getString("voting_power_weight").trim())));
+		}
+		if( config.containsKey("representation_weight")) {
+			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(config.getString("representation_weight").trim())));
+		}
+
+		
 		featureCollection.ecology.startEvolving();
 
 	}
 	
 	
+	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
@@ -340,11 +358,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	public JSlider slider_1 = new JSlider();
-	JSlider slider_2 = new JSlider();
-	JSlider slider_3 = new JSlider();
-	JSlider slider_5 = new JSlider();
-	JSlider slider_6 = new JSlider();
-	JSlider slider_7 = new JSlider();
+	JSlider sliderDisconnected = new JSlider();
+	JSlider sliderBorderLength = new JSlider();
+	JSlider sliderPopulationBalance = new JSlider();
+	JSlider sliderVotingPowerBalance = new JSlider();
+	JSlider sliderRepresentation = new JSlider();
 	
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
@@ -394,6 +412,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mntmOpenElectionResults.setEnabled(geo_loaded);
 		mntmImportData.setEnabled(geo_loaded);
 		mntmSelectLayers.setEnabled(geo_loaded);
+		mntmImportcsv.setEnabled(geo_loaded);
+		mntmExportcsv.setEnabled(geo_loaded);
 		
 	}
 	
@@ -896,10 +916,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mnFile.add(mntmExportcsv);
 
 		
-		mnFile.add(new JSeparator());
+		//mnFile.add(new JSeparator());
 		
-		mnFile.add(mntmImportPopulation);
-		mnFile.add(mntmExportPopulation);
+		//mnFile.add(mntmImportPopulation);
+		//mnFile.add(mntmExportPopulation);
 
 		
 		mnFile.add(new JSeparator());
@@ -911,9 +931,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnFile.add(mntmExit);
-		
-		JMenu mnSamples = new JMenu("Samples");
-		menuBar.add(mnSamples);
 		
 		JMenuItem mntmWisconsin = new JMenuItem("Wisconsin 2012");
 		mntmWisconsin.addActionListener(new ActionListener() {
@@ -969,7 +986,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 			}
 		});
-		mnSamples.add(mntmWisconsin);
 		
 		//menuBar.add(mnGeography);
 		
@@ -1158,6 +1174,18 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnView.add(chckbxmntmHideMapLines);
+		
+		mntmShowDemographics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("old mode: "+Feature.display_mode );
+				Feature.display_mode = mntmShowDemographics.isSelected() ? 3 : 0;
+				System.out.println("new mode: "+Feature.display_mode );
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+			}
+		});
+		mnView.add(mntmShowDemographics);
 		
 		
 		mnView.add(new JSeparator());
@@ -1408,14 +1436,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblCompactness = new JLabel("Border length");
 		lblCompactness.setBounds(6, 36, 172, 16);
 		panel_2.add(lblCompactness);
-		slider_3.setBounds(6, 57, 190, 29);
-		panel_2.add(slider_3);
+		sliderBorderLength.setBounds(6, 57, 190, 29);
+		panel_2.add(sliderBorderLength);
 		
 		JLabel lblContiguency = new JLabel("Representation imbalance");
 		lblContiguency.setBounds(6, 220, 172, 16);
 		panel_2.add(lblContiguency);
-		slider_7.setBounds(6, 245, 190, 29);
-		panel_2.add(slider_7);
+		sliderRepresentation.setBounds(6, 245, 190, 29);
+		panel_2.add(sliderRepresentation);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1425,26 +1453,26 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblProportionalRepresentation = new JLabel("Population imbalance");
 		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
-		slider_5.setBounds(6, 179, 190, 29);
-		panel_2.add(slider_5);
+		sliderPopulationBalance.setBounds(6, 179, 190, 29);
+		panel_2.add(sliderPopulationBalance);
 		
 		JLabel lblVotingPowerBalance = new JLabel("Voting power imbalance");
 		lblVotingPowerBalance.setBounds(6, 286, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		slider_6.setBounds(6, 307, 190, 29);
-		panel_2.add(slider_6);
+		sliderVotingPowerBalance.setBounds(6, 307, 190, 29);
+		panel_2.add(sliderVotingPowerBalance);
 		
 		JLabel lblConnectedness = new JLabel("Disconnected population");
 		lblConnectedness.setBounds(6, 97, 172, 16);
 		panel_2.add(lblConnectedness);
 		
-		slider_2.addChangeListener(new ChangeListener() {
+		sliderDisconnected.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+				Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 			}
 		});
-		slider_2.setBounds(6, 118, 190, 29);
-		panel_2.add(slider_2);
+		sliderDisconnected.setBounds(6, 118, 190, 29);
+		panel_2.add(sliderDisconnected);
 		
 		JLabel lblMaxPop = new JLabel("Max population % diff ");
 		lblMaxPop.setBounds(6, 353, 134, 16);
@@ -1599,25 +1627,25 @@ public class MainFrame extends JFrame implements iChangeListener {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
-		slider_6.addChangeListener(new ChangeListener() {
+		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
+				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
 			}
 		});
-		slider_7.addChangeListener(new ChangeListener() {
+		sliderRepresentation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.disenfranchise_weight = slider_7.getValue()/100.0;
+				Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 
 			}
 		});
-		slider_5.addChangeListener(new ChangeListener() {
+		sliderPopulationBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.population_balance_weight = slider_5.getValue()/100.0;
+				Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 			}
 		});
-		slider_3.addChangeListener(new ChangeListener() {
+		sliderBorderLength.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.geometry_weight = slider_3.getValue()/100.0;
+				Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 			}
 		});
 		
@@ -1625,11 +1653,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
-		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
-		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
-		Settings.population_balance_weight = slider_5.getValue()/100.0;
-		Settings.geometry_weight = slider_3.getValue()/100.0;
-		Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
+		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
+		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
+		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 
 		
 		chckbxmntmMutateAll.setSelected(true);

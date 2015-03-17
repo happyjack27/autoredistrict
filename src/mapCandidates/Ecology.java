@@ -163,7 +163,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
            				mapPanel = MainFrame.mainframe.mapPanel;
         			}
         			if( mapPanel != null) {
-        				Feature.display_mode = 0;
         				mapPanel.invalidate();
         				mapPanel.repaint();
         			} else {
@@ -190,6 +189,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( !evolve_paused) {
 			return;
 		}
+		Feature.display_mode = 0;
+
 		if( evolveThread != null) {
 			try {
 				evolveThread.stop();
@@ -291,6 +292,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
  
     public void reset() {
     	population = new Vector<DistrictMap>();
+    	this.generation = 0;
     	for( Block b : blocks) {
     		b.recalcMuSigmaN();
     	}
