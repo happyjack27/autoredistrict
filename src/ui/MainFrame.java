@@ -29,6 +29,9 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 
+import serialization.JSONObject;
+import serialization.ReflectionJSONObject;
+
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.JDBFException;
 
@@ -40,7 +43,304 @@ public class MainFrame extends JFrame implements iChangeListener {
 	double mutation_rate_multiplier = 0.1;
 	public static double boundary_mutation_rate_multiplier = 0.4;
 	long load_wait = 100;
+
+	class FileThread extends Thread {
+    	public File f = null;
+    	FileThread() { super(); }
+    	FileThread(File f) {
+    		super();
+    		this.f = f;
+    	}
+	}
+
+	class OpenGeoJsonFileThread extends FileThread {
+		OpenGeoJsonFileThread(File f) { super(f); }
+    	public void run() {
+		    dlbl.setText("Loading file "+f.getName()+"...");
+			
+			featureCollection = new FeatureCollection(); 
+			if( panelStats != null) {
+				panelStats.featureCollection = featureCollection;
+			}
+
+			featureCollection.features = new Vector<Feature>();
+			HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+
+		    dlg.setVisible(true);
 	
+			String s = f.getName().toLowerCase();
+			System.out.println("Processing "+s+"...");
+			StringBuffer sb = getFile(f);
+			
+			featureCollection.ecology.stopEvolving();
+			geo_loaded = false;
+			evolving = false;
+			Feature.display_mode = 0;
+			setEnableds();
+			
+			FeatureCollection fc = new FeatureCollection();
+			if( panelStats != null) {
+				panelStats.featureCollection = featureCollection;
+			}
+
+			try {
+				fc.fromJSON(sb.toString());
+			} catch (Exception ex) {
+				System.out.println("ex "+ex);
+				ex.printStackTrace();
+			}
+			for( Feature fe : fc.features) {
+				//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
+				if( suppress_duplicates) {
+					hmFeatures.put(fe.properties.DISTRICT, fe);
+				} else {
+					featureCollection.features.add(fe);
+				}
+				//}
+			}
+			
+		    dlbl.setText("Initializing blocks...");
+
+			for( Feature fe : hmFeatures.values()) {
+				featureCollection.features.add(fe);
+			}
+			Vector<Feature> features = featureCollection.features;
+			System.out.println(features.size()+" precincts loaded.");
+			System.out.println("Initializing blocks...");
+			featureCollection.initBlocks();
+		    dlbl.setText("Setting min and max coordinates...");
+
+			minx = features.get(0).geometry.coordinates[0][0][0];
+			maxx = features.get(0).geometry.coordinates[0][0][0];
+			miny = features.get(0).geometry.coordinates[0][0][1];
+			maxy = features.get(0).geometry.coordinates[0][0][1];
+			HashSet<String> types = new HashSet<String>();
+			for( Feature f : features) {
+				double[][][] coordinates2 = f.geometry.coordinates;
+				for( int j = 0; j < coordinates2.length; j++) {
+					double[][] coordinates = coordinates2[j];
+					for( int i = 0; i < coordinates.length; i++) {
+						if( coordinates[i][0] < minx) {
+							minx = coordinates[i][0];
+						}
+						if( coordinates[i][0] > maxx) {
+							maxx = coordinates[i][0];
+						}
+						if( coordinates[i][1] < miny) {
+							miny = coordinates[i][1];
+						}
+						if( coordinates[i][1] > maxy) {
+							maxy = coordinates[i][1];
+						}
+					}
+				}					
+			}
+			System.out.println(""+minx+","+miny);
+			System.out.println(""+maxx+","+maxy);
+			resetZoom();
+			
+			mapPanel.featureCollection = featureCollection;
+			mapPanel.invalidate();
+			mapPanel.repaint();
+			featureCollection.ecology.mapPanel = mapPanel;
+			featureCollection.ecology.statsPanel = panelStats;
+		    dlbl.setText("Initializing ecology...");
+
+			featureCollection.initEcology();
+			
+			dlg.setVisible(false);
+			System.out.println("Ready.");
+			
+			geo_loaded = true;
+			setEnableds();
+    	}
+	}
+
+	class OpenShapeFileThread extends FileThread {
+		OpenShapeFileThread(File f) { super(f); }
+    	public void run() { 
+    		try {
+    		    dlbl.setText("Loading file "+f.getName()+"...");
+    			
+	    		dlg.setVisible(true);
+	    		
+				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+	
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+	
+				String s = f.getName().toLowerCase();
+				System.out.println("Processing "+s+"...");
+				StringBuffer sb = getFile(f);
+				
+				featureCollection.ecology.stopEvolving();
+				geo_loaded = false;
+				evolving = false;
+				Feature.display_mode = 0;
+				setEnableds();
+				
+				//FeatureCollection fc = new FeatureCollection();
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+				loadShapeFile(f);
+	
+	
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				Vector<Feature> features = featureCollection.features;
+				System.out.println(features.size()+" precincts loaded.");
+				System.out.println("Initializing blocks...");
+				featureCollection.initBlocks();
+			    dlbl.setText("Setting min and max coordinates..");
+	
+				minx = features.get(0).geometry.coordinates[0][0][0];
+				maxx = features.get(0).geometry.coordinates[0][0][0];
+				miny = features.get(0).geometry.coordinates[0][0][1];
+				maxy = features.get(0).geometry.coordinates[0][0][1];
+				HashSet<String> types = new HashSet<String>();
+				for( Feature f : features) {
+					double[][][] coordinates2 = f.geometry.coordinates;
+					for( int j = 0; j < coordinates2.length; j++) {
+						double[][] coordinates = coordinates2[j];
+						for( int i = 0; i < coordinates.length; i++) {
+							if( coordinates[i][0] < minx) {
+								minx = coordinates[i][0];
+							}
+							if( coordinates[i][0] > maxx) {
+								maxx = coordinates[i][0];
+							}
+							if( coordinates[i][1] < miny) {
+								miny = coordinates[i][1];
+							}
+							if( coordinates[i][1] > maxy) {
+								maxy = coordinates[i][1];
+							}
+						}
+					}					
+				}
+				System.out.println(""+minx+","+miny);
+				System.out.println(""+maxx+","+maxy);
+				resetZoom();
+				
+				mapPanel.featureCollection = featureCollection;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				featureCollection.ecology.mapPanel = mapPanel;
+				featureCollection.ecology.statsPanel = panelStats;
+				
+			    dlbl.setText("Initializing ecology...");
+	
+				featureCollection.initEcology();
+				
+				System.out.println("Ready.");
+	    		dlg.setVisible(false);
+				geo_loaded = true;
+				setEnableds();
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+    }
+	
+	public void openProjectFile(File f0) {
+		ReflectionJSONObject<Object> config = new ReflectionJSONObject<Object>();
+		
+		config.fromJSON(getFile(f0).toString());
+		
+		System.out.println("found keys:");
+		Set<String> keys = config.keySet();
+		for( String s : keys) {
+			System.out.println(s);
+		}
+		if( config.containsKey("source_file")) {
+			String source = config.getString("source_file").trim();
+			System.out.println("source file: "+source);
+			String ext = source.substring(source.length()-4).toLowerCase();
+			File f = new File(source);
+			if( f == null) {
+				JOptionPane.showMessageDialog(mainframe, "File not found: "+source);
+				return;
+			} else if( ext.equals(".shp")) {
+				Thread t = new OpenShapeFileThread(f);
+				t.start();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else if( ext.equals("json")) {
+				Thread t = new OpenGeoJsonFileThread(f);
+				t.start();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			} else {
+				JOptionPane.showMessageDialog(mainframe, "Invalid file format: "+source);
+				return;
+			}
+		} else { System.out.println("source_file not found"); return; }
+
+		if( config.containsKey("number_of_districts")) {
+			textFieldNumDistricts.setText(config.getString("number_of_districts").trim());
+			textFieldNumDistricts.postActionEvent();
+		} else { System.out.println("number_of_districts not found"); }
+		if( config.containsKey("members_per_district")) {
+			textFieldMembersPerDistrict.setText(config.getString("members_per_district").trim());
+			textFieldMembersPerDistrict.postActionEvent();
+		} else { System.out.println("members_per_district not found"); }
+		
+		if( config.containsKey("initial_population")) {
+			textField.setText(config.getString("initial_population").trim());
+			textField.postActionEvent();
+		} else { System.out.println("initial_population not found"); }
+		
+		if( config.containsKey("population_column")) {
+			setPopulationColumn(config.getString("population_column").trim());
+		} else { System.out.println("population_column not found"); }
+		
+		if( config.containsKey("demographic_columns")) {
+			Vector v = config.getVector("demographic_columns");
+			Vector<String> vs = new Vector<String>();
+			for( int i = 0; i < v.size(); i++) {
+				vs.add((String)v.get(i));
+			}
+			setDemographicColumns(vs);
+		} else { System.out.println("demographic_columns not found"); }
+
+		if( config.containsKey("disconnected_weight")) {
+			sliderDisconnected.setValue((int)(100.0*Double.parseDouble(config.getString("disconnected_weight").trim())));
+		}
+		if( config.containsKey("population_balance_weight")) {
+			sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(config.getString("population_balance_weight").trim())));
+		}
+		if( config.containsKey("border_length_weight")) {
+			sliderBorderLength.setValue((int)(100.0*Double.parseDouble(config.getString("border_length_weight").trim())));
+		}
+		if( config.containsKey("voting_power_weight")) {
+			sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(config.getString("voting_power_weight").trim())));
+		}
+		if( config.containsKey("representation_weight")) {
+			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(config.getString("representation_weight").trim())));
+		}
+
+		
+		featureCollection.ecology.startEvolving();
+
+	}
+	
+	
+	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
@@ -51,18 +351,22 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JMenuItem mntmImportData = new JMenuItem("Import data");
 
+    final JDialog dlg = new JDialog(mainframe, "Working", true);
+    JProgressBar dpb = new JProgressBar(0, 500);
+    JLabel dlbl = new JLabel();
+
 
 
 	JTextField textField_3 = new JTextField();
-	JTextField textField_2 = new JTextField();
+	JTextField textFieldNumDistricts = new JTextField();
 	JTextField textField_1 = new JTextField();
 	JTextField textField = new JTextField();
 	public JSlider slider_1 = new JSlider();
-	JSlider slider_2 = new JSlider();
-	JSlider slider_3 = new JSlider();
-	JSlider slider_5 = new JSlider();
-	JSlider slider_6 = new JSlider();
-	JSlider slider_7 = new JSlider();
+	JSlider sliderDisconnected = new JSlider();
+	JSlider sliderBorderLength = new JSlider();
+	JSlider sliderPopulationBalance = new JSlider();
+	JSlider sliderVotingPowerBalance = new JSlider();
+	JSlider sliderRepresentation = new JSlider();
 	
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
@@ -101,6 +405,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
+	private JTextField textFieldMembersPerDistrict;
 	
 	public void setEnableds() {
 		
@@ -112,6 +417,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mntmOpenElectionResults.setEnabled(geo_loaded);
 		mntmImportData.setEnabled(geo_loaded);
 		mntmSelectLayers.setEnabled(geo_loaded);
+		mntmImportcsv.setEnabled(geo_loaded);
+		mntmExportcsv.setEnabled(geo_loaded);
 		
 	}
 	
@@ -127,51 +434,74 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.invalidate();
 		mapPanel.repaint();
 	}
-	
+
+	public void setPopulationColumn(String pop_col) {
+		for( Feature f : featureCollection.features) {
+			String pop = f.properties.get(pop_col).toString();
+			if( f.block != null) {
+				f.block.has_census_results = true;
+				f.block.population = Double.parseDouble(pop.replaceAll(",",""));
+			}
+			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
+		}
+	}
+	public void setDemographicColumns(Vector<String> candidate_cols) {
+		int num_candidates = candidate_cols.size();
+		
+		for( Block b : featureCollection.blocks) {
+			b.has_election_results = true;
+		}
+		
+		for( Feature f : featureCollection.features) {
+			Block b = f.block;
+			double[] dd = new double[num_candidates];
+			for( int i = 0; i < candidate_cols.size(); i++) {
+				dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+			}
+		
+			b.demographics.clear();
+			for( int j = 0; j < num_candidates; j++) {
+				Demographic d = new Demographic();
+				d.block_id = b.id;
+				d.turnout_probability = 1;
+				d.population = (int) dd[j];
+				d.vote_prob = new double[num_candidates];
+				for( int i = 0; i < d.vote_prob.length; i++) {
+					d.vote_prob[i] = 0;
+				}
+				d.vote_prob[j] = 1;
+				b.demographics.add(d);
+				System.out.println("block "+b.id+" added demo "+j+" "+d.population);
+			}
+		}
+		
+		Candidate.candidates = new Vector<Candidate>();
+		for( int i = 0; i < num_candidates; i++) {
+			Candidate c = new Candidate();
+			c.index = i;
+			c.id = ""+i;
+			Candidate.candidates.add(c);
+		}
+		featureCollection.ecology.reset();
+		election_loaded = true;
+		setEnableds();	
+	}
 	public void selectLayers() {
 		DialogSelectLayers dlg = new DialogSelectLayers();
 		dlg.setData(featureCollection);
 		dlg.show();
-		if( !dlg.ok || !dlg.lblSelectDemographicelectionResult.isSelected())
+		if( !dlg.ok)
 			return;
 		try {
+			if( dlg.lblLoadPopulationFrom.isSelected() ) {
+				setPopulationColumn((String)dlg.comboBoxFilePopulationColumn.getSelectedItem());
+			}
+			
+			if( dlg.lblSelectDemographicelectionResult.isSelected() ) {
+				setDemographicColumns(dlg.in);
+			}
+			
 			Vector<String> candidate_cols = dlg.in;
-			int num_candidates = candidate_cols.size();
-			
-			for( Block b : featureCollection.blocks) {
-				b.has_election_results = true;
-			}
-			
-			for( Feature f : featureCollection.features) {
-				Block b = f.block;
-				double[] dd = new double[num_candidates];
-				for( int i = 0; i < candidate_cols.size(); i++) {
-					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
-				}
-			
-				for( int j = 0; j < num_candidates; j++) {
-					Demographic d = new Demographic();
-					d.block_id = b.id;
-					d.turnout_probability = 1;
-					d.population = (int) dd[j];
-					d.vote_prob = new double[num_candidates];
-					for( int i = 0; i < d.vote_prob.length; i++) {
-						d.vote_prob[i] = 0;
-					}
-					d.vote_prob[j] = 1;
-					b.demographics.add(d);
-					System.out.println("block "+b.id+" added demo "+d.population+" "+j);
-				}
-			}
-			
-			Candidate.candidates = new Vector<Candidate>();
-			for( int i = 0; i < num_candidates; i++) {
-				Candidate c = new Candidate();
-				c.index = i;
-				c.id = ""+i;
-				Candidate.candidates.add(c);
-			}
-			featureCollection.ecology.reset();
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
@@ -179,8 +509,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		Feature.display_mode = 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
-		election_loaded = true;
-		setEnableds();	
 	}
 	
 	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
@@ -476,6 +804,16 @@ public class MainFrame extends JFrame implements iChangeListener {
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
 		this.setSize(d);
+		
+		dlg.setModal(false);
+	    dpb.setIndeterminate(true);
+	    dlg.getContentPane().add(BorderLayout.CENTER, dpb);
+	    dlg.getContentPane().add(BorderLayout.NORTH, dlbl);
+	    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+	    dlg.setSize(300, 75);
+	    dlg.setLocationRelativeTo(mainframe);
+	    dlbl.setText("Loading file...");
+
 		//this.getContentPane().setPreferredSize(d);
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -488,6 +826,25 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		menuBar.add(mnFile);
 		
+		JMenuItem mntmOpenProjectFile = new JMenuItem("Open project file");
+		mntmOpenProjectFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				openProjectFile(fd);
+			}
+		});
+		mnFile.add(mntmOpenProjectFile);
+		
+		JSeparator separator = new JSeparator();
+		mnFile.add(separator);
+		
 		mnFile.add(mntmOpenGeojson);
 		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -499,119 +856,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				if( fd == null) {
 					return;
 				}
-				File[] ff = new File[]{fd};//fd.listFiles();
-				
-				featureCollection = new FeatureCollection(); 
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-				
-			    final JDialog dlg = new JDialog(mainframe, "Working", true);
-			    JProgressBar dpb = new JProgressBar(0, 500);
-			    JLabel dlbl = new JLabel();
-			    dpb.setIndeterminate(true);
-			    dlg.getContentPane().add(BorderLayout.CENTER, dpb);
-			    dlg.getContentPane().add(BorderLayout.NORTH, dlbl);
-			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-			    dlg.setSize(300, 75);
-			    dlg.setLocationRelativeTo(mainframe);
-			    dlbl.setText("Loading file...");
-
-			    Thread t = new Thread(new Runnable() { public void run() { dlg.setVisible(true); } });
-			    t.start();
-
-				
-				for( int i = 0; i < ff.length; i++) {
-					String s = ff[i].getName().toLowerCase();
-					/*if(s.indexOf(".json") < 0) {
-						continue;
-					}*/
-					System.out.println("Processing "+s+"...");
-					File f = ff[i];
-					StringBuffer sb = getFile(f);
-					
-					featureCollection.ecology.stopEvolving();
-					geo_loaded = false;
-					evolving = false;
-					Feature.display_mode = 0;
-					setEnableds();
-					
-					//FeatureCollection fc = new FeatureCollection();
-					if( panelStats != null) {
-						panelStats.featureCollection = featureCollection;
-					}
-					loadShapeFile(f);
-					/*
-					for( Feature fe : fc.features) {
-						if( suppress_duplicates) {
-							hmFeatures.put(fe.properties.DISTRICT, fe);
-						} else {
-							featureCollection.features.add(fe);
-						}
-					}
-					*/
-					
-				}
-
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				Vector<Feature> features = featureCollection.features;
-				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing blocks...");
-				featureCollection.initBlocks();
-			    dlbl.setText("Setting min and max coordinates..");
-
-				minx = features.get(0).geometry.coordinates[0][0][0];
-				maxx = features.get(0).geometry.coordinates[0][0][0];
-				miny = features.get(0).geometry.coordinates[0][0][1];
-				maxy = features.get(0).geometry.coordinates[0][0][1];
-				HashSet<String> types = new HashSet<String>();
-				for( Feature f : features) {
-					double[][][] coordinates2 = f.geometry.coordinates;
-					for( int j = 0; j < coordinates2.length; j++) {
-						double[][] coordinates = coordinates2[j];
-						for( int i = 0; i < coordinates.length; i++) {
-							if( coordinates[i][0] < minx) {
-								minx = coordinates[i][0];
-							}
-							if( coordinates[i][0] > maxx) {
-								maxx = coordinates[i][0];
-							}
-							if( coordinates[i][1] < miny) {
-								miny = coordinates[i][1];
-							}
-							if( coordinates[i][1] > maxy) {
-								maxy = coordinates[i][1];
-							}
-						}
-					}					
-				}
-				System.out.println(""+minx+","+miny);
-				System.out.println(""+maxx+","+maxy);
-				resetZoom();
-				
-				mapPanel.featureCollection = featureCollection;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				featureCollection.ecology.mapPanel = mapPanel;
-				featureCollection.ecology.statsPanel = panelStats;
-				
-			    dlbl.setText("Initializing ecology...");
-
-				featureCollection.initEcology();
-				
-		        dlg.setVisible(false);
-			    t.stop();
-				System.out.println("Ready.");
-				
-				geo_loaded = true;
-				setEnableds();
-
-			}
+				new OpenShapeFileThread(fd).start();
+			}				
 		});
 		
 		mnFile.add(mntmOpenEsriShapefile);
@@ -675,10 +921,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mnFile.add(mntmExportcsv);
 
 		
-		mnFile.add(new JSeparator());
+		//mnFile.add(new JSeparator());
 		
-		mnFile.add(mntmImportPopulation);
-		mnFile.add(mntmExportPopulation);
+		//mnFile.add(mntmImportPopulation);
+		//mnFile.add(mntmExportPopulation);
 
 		
 		mnFile.add(new JSeparator());
@@ -690,9 +936,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		mnFile.add(mntmExit);
-		
-		JMenu mnSamples = new JMenu("Samples");
-		menuBar.add(mnSamples);
 		
 		JMenuItem mntmWisconsin = new JMenuItem("Wisconsin 2012");
 		mntmWisconsin.addActionListener(new ActionListener() {
@@ -748,7 +991,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 			}
 		});
-		mnSamples.add(mntmWisconsin);
 		
 		//menuBar.add(mnGeography);
 		
@@ -765,123 +1007,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				JFileChooser jfc = new JFileChooser();
 				jfc.showOpenDialog(null);
 				File fd = jfc.getSelectedFile();
-				File[] ff = new File[]{fd};//fd.listFiles();
 				
-				featureCollection = new FeatureCollection(); 
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-				
-			    final JDialog dlg = new JDialog(mainframe, "Working", true);
-			    JProgressBar dpb = new JProgressBar(0, 500);
-			    JLabel dlbl = new JLabel();
-			    dpb.setIndeterminate(true);
-			    dlg.getContentPane().add(BorderLayout.CENTER, dpb);
-			    dlg.getContentPane().add(BorderLayout.NORTH, dlbl);
-			    dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-			    dlg.setSize(300, 75);
-			    dlg.setLocationRelativeTo(mainframe);
-			    dlbl.setText("Loading file...");
-
-			    Thread t = new Thread(new Runnable() { public void run() { dlg.setVisible(true); } });
-			    t.start();
-				
-				for( int i = 0; i < ff.length; i++) {
-					String s = ff[i].getName().toLowerCase();
-					if(s.indexOf(".json") < 0) {
-						continue;
-					}
-					System.out.println("Processing "+s+"...");
-					File f = ff[i];
-					StringBuffer sb = getFile(f);
-					
-					featureCollection.ecology.stopEvolving();
-					geo_loaded = false;
-					evolving = false;
-					Feature.display_mode = 0;
-					setEnableds();
-					
-					FeatureCollection fc = new FeatureCollection();
-					if( panelStats != null) {
-						panelStats.featureCollection = featureCollection;
-					}
-
-					try {
-						fc.fromJSON(sb.toString());
-					} catch (Exception ex) {
-						System.out.println("ex "+ex);
-						ex.printStackTrace();
-					}
-					for( Feature fe : fc.features) {
-						//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
-						if( suppress_duplicates) {
-							hmFeatures.put(fe.properties.DISTRICT, fe);
-						} else {
-							featureCollection.features.add(fe);
-						}
-						//}
-					}
-					
-				}
-			    dlbl.setText("Initializing blocks...");
-
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				Vector<Feature> features = featureCollection.features;
-				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing blocks...");
-				featureCollection.initBlocks();
-			    dlbl.setText("Setting min and max coordinates...");
-
-				minx = features.get(0).geometry.coordinates[0][0][0];
-				maxx = features.get(0).geometry.coordinates[0][0][0];
-				miny = features.get(0).geometry.coordinates[0][0][1];
-				maxy = features.get(0).geometry.coordinates[0][0][1];
-				HashSet<String> types = new HashSet<String>();
-				for( Feature f : features) {
-					double[][][] coordinates2 = f.geometry.coordinates;
-					for( int j = 0; j < coordinates2.length; j++) {
-						double[][] coordinates = coordinates2[j];
-						for( int i = 0; i < coordinates.length; i++) {
-							if( coordinates[i][0] < minx) {
-								minx = coordinates[i][0];
-							}
-							if( coordinates[i][0] > maxx) {
-								maxx = coordinates[i][0];
-							}
-							if( coordinates[i][1] < miny) {
-								miny = coordinates[i][1];
-							}
-							if( coordinates[i][1] > maxy) {
-								maxy = coordinates[i][1];
-							}
-						}
-					}					
-				}
-				System.out.println(""+minx+","+miny);
-				System.out.println(""+maxx+","+maxy);
-				resetZoom();
-				
-				mapPanel.featureCollection = featureCollection;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				featureCollection.ecology.mapPanel = mapPanel;
-				featureCollection.ecology.statsPanel = panelStats;
-			    dlbl.setText("Initializing ecology...");
-
-				featureCollection.initEcology();
-				
-				dlg.setVisible(false);
-				t.stop();
-				System.out.println("Ready.");
-				
-				geo_loaded = true;
-				setEnableds();
-
+				new OpenGeoJsonFileThread(fd).start();
 			}
 		});
 		
@@ -1053,6 +1180,18 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnView.add(chckbxmntmHideMapLines);
 		
+		mntmShowDemographics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("old mode: "+Feature.display_mode );
+				Feature.display_mode = mntmShowDemographics.isSelected() ? 3 : 0;
+				System.out.println("new mode: "+Feature.display_mode );
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+			}
+		});
+		mnView.add(mntmShowDemographics);
+		
 		
 		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
@@ -1214,7 +1353,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				num_districts++;
 				Settings.num_districts = num_districts;
-				textField_2.setText(""+Settings.num_districts);
+				textFieldNumDistricts.setText(""+Settings.num_districts);
 				if( featureCollection.ecology.population == null) {
 					featureCollection.ecology.population = new Vector<DistrictMap>();
 				}
@@ -1294,7 +1433,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 299, 200, 416);
+		panel_2.setBounds(0, 334, 200, 416);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1302,14 +1441,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblCompactness = new JLabel("Border length");
 		lblCompactness.setBounds(6, 36, 172, 16);
 		panel_2.add(lblCompactness);
-		slider_3.setBounds(6, 57, 190, 29);
-		panel_2.add(slider_3);
+		sliderBorderLength.setBounds(6, 57, 190, 29);
+		panel_2.add(sliderBorderLength);
 		
 		JLabel lblContiguency = new JLabel("Representation imbalance");
 		lblContiguency.setBounds(6, 220, 172, 16);
 		panel_2.add(lblContiguency);
-		slider_7.setBounds(6, 245, 190, 29);
-		panel_2.add(slider_7);
+		sliderRepresentation.setBounds(6, 245, 190, 29);
+		panel_2.add(sliderRepresentation);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1319,26 +1458,26 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblProportionalRepresentation = new JLabel("Population imbalance");
 		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
-		slider_5.setBounds(6, 179, 190, 29);
-		panel_2.add(slider_5);
+		sliderPopulationBalance.setBounds(6, 179, 190, 29);
+		panel_2.add(sliderPopulationBalance);
 		
 		JLabel lblVotingPowerBalance = new JLabel("Voting power imbalance");
 		lblVotingPowerBalance.setBounds(6, 286, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		slider_6.setBounds(6, 307, 190, 29);
-		panel_2.add(slider_6);
+		sliderVotingPowerBalance.setBounds(6, 307, 190, 29);
+		panel_2.add(sliderVotingPowerBalance);
 		
 		JLabel lblConnectedness = new JLabel("Disconnected population");
 		lblConnectedness.setBounds(6, 97, 172, 16);
 		panel_2.add(lblConnectedness);
 		
-		slider_2.addChangeListener(new ChangeListener() {
+		sliderDisconnected.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+				Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 			}
 		});
-		slider_2.setBounds(6, 118, 190, 29);
-		panel_2.add(slider_2);
+		sliderDisconnected.setBounds(6, 118, 190, 29);
+		panel_2.add(sliderDisconnected);
 		
 		JLabel lblMaxPop = new JLabel("Max population % diff ");
 		lblMaxPop.setBounds(6, 353, 134, 16);
@@ -1365,7 +1504,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 92, 200, 195);
+		panel_3.setBounds(0, 128, 200, 195);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1426,25 +1565,25 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		textField_1.setText("2");
 		textField_1.setColumns(10);
-		textField_2.setText("3");
+		textFieldNumDistricts.setText("10");
 		
 		
-		textField_2.addFocusListener(new FocusAdapter() {
+		textFieldNumDistricts.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				textField_2.postActionEvent();
+				textFieldNumDistricts.postActionEvent();
 			}
 		});
-		textField_2.addActionListener(new ActionListener() {
+		textFieldNumDistricts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Settings.num_districts = Integer.parseInt(textField_2.getText());
+					Settings.num_districts = Integer.parseInt(textFieldNumDistricts.getText());
 				} catch (Exception ex) { }
 			}
 		});
-		textField_2.setColumns(10);
-		textField_2.setBounds(132, 52, 56, 28);
-		panel.add(textField_2);
+		textFieldNumDistricts.setColumns(10);
+		textFieldNumDistricts.setBounds(132, 52, 56, 28);
+		panel.add(textFieldNumDistricts);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
 		lblNumOfDistricts.setBounds(6, 58, 124, 16);
@@ -1488,30 +1627,53 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		button_2.setBounds(142, 17, 46, 29);
 		panel.add(button_2);
+		
+		textFieldMembersPerDistrict = new JTextField();
+		textFieldMembersPerDistrict.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				textFieldMembersPerDistrict.postActionEvent();
+			}
+		});
+		textFieldMembersPerDistrict.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Settings.members_per_district = Integer.parseInt(textFieldMembersPerDistrict.getText());
+				} catch (Exception ex) { }
+			}
+		});
+		textFieldMembersPerDistrict.setText("1");
+		textFieldMembersPerDistrict.setColumns(10);
+		textFieldMembersPerDistrict.setBounds(132, 89, 56, 28);
+		panel.add(textFieldMembersPerDistrict);
+		
+		JLabel lblMembersPerDistrict = new JLabel("Members per district");
+		lblMembersPerDistrict.setBounds(6, 95, 124, 16);
+		panel.add(lblMembersPerDistrict);
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
-		slider_6.addChangeListener(new ChangeListener() {
+		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
+				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
 			}
 		});
-		slider_7.addChangeListener(new ChangeListener() {
+		sliderRepresentation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.disenfranchise_weight = slider_7.getValue()/100.0;
+				Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 
 			}
 		});
-		slider_5.addChangeListener(new ChangeListener() {
+		sliderPopulationBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.population_balance_weight = slider_5.getValue()/100.0;
+				Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 			}
 		});
-		slider_3.addChangeListener(new ChangeListener() {
+		sliderBorderLength.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.geometry_weight = slider_3.getValue()/100.0;
+				Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 			}
 		});
 		
@@ -1519,11 +1681,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
-		Settings.voting_power_balance_weight = slider_6.getValue()/100.0;
-		Settings.disenfranchise_weight = slider_7.getValue()/100.0;
-		Settings.population_balance_weight = slider_5.getValue()/100.0;
-		Settings.geometry_weight = slider_3.getValue()/100.0;
-		Settings.disconnected_population_weight = slider_2.getValue()/100.0;
+		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
+		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
+		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
+		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 
 		
 		chckbxmntmMutateAll.setSelected(true);
@@ -1586,5 +1748,5 @@ public class MainFrame extends JFrame implements iChangeListener {
 		slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
 		invalidate();
 		repaint();
-	}
+	}	
 }
