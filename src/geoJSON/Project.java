@@ -16,7 +16,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	public String source_file = "";
 	public int number_of_districts = 10;
 	public int members_per_district = 1;
-	public boolean area_weigthed = true;
+	public boolean area_weighted = true;
 	public int initial_population = 128;
 	public int simulated_elections = 4;
 	public String population_column = "";
@@ -120,6 +120,11 @@ public class Project extends ReflectionJSONObject<Project> {
 
 	@Override
 	public void pre_serialize() {
+		voting_power_weight = Settings.voting_power_balance_weight;
+		disconnected_weight = Settings.disconnected_population_weight;
+		population_balance_weight = Settings.population_balance_weight;
+		representation_weight = Settings.disenfranchise_weight;
+		border_length_weight = Settings.geometry_weight;
 		super.pre_serialize();
 	}
 

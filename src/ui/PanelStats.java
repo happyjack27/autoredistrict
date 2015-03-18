@@ -132,7 +132,7 @@ public class PanelStats extends JPanel {
 					ddata[i][j+4+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
 			}
-			System.out.println("tot votes "+tot_votes);
+			//System.out.println("tot votes "+tot_votes);
 			//			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
 
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
