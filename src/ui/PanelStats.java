@@ -95,9 +95,12 @@ public class PanelStats extends JPanel {
 				dcolumns[i+4] = ""+i+" %";
 				dcolumns[i+4+Candidate.candidates.size()] = ""+i+" votes";
 			}
+			
+			double total_population = 0;
 			for( int i = 0; i < dm.districts.size(); i++) {
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
+				total_population += d.getPopulation();
 				//String population = ""+(int)d.getPopulation();
 				double[][] result = d.getElectionResults();
 				double self_entropy = d.getSelfEntropy(result[Settings.self_entropy_use_votecount?0:1]);
@@ -129,13 +132,14 @@ public class PanelStats extends JPanel {
 					ddata[i][j+4+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
 			}
+			System.out.println("tot votes "+tot_votes);
 			//			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
 
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				cdata[i] = new String[]{
 						""+i,
 						""+integer.format(elec_counts[i]),
-						""+integer.format(vote_counts[i]),
+						""+integer.format(vote_counts[i]*total_population/tot_votes),
 						""+(elec_counts[i]/((double)(dm.districts.size()*Settings.members_per_district))),
 						""+(vote_counts[i]/tot_votes)
 				};

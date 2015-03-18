@@ -304,7 +304,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 			textField.setText(config.getString("initial_population").trim());
 			textField.postActionEvent();
 		} else { System.out.println("initial_population not found"); }
-		
+
+		if( config.containsKey("elections_simulated")) {
+			textFieldElectionsSimulated.setText(config.getString("elections_simulated").trim());
+			textFieldElectionsSimulated.postActionEvent();
+		} else { System.out.println("elections_simulated not found"); }
+
 		if( config.containsKey("population_column")) {
 			setPopulationColumn(config.getString("population_column").trim());
 		} else { System.out.println("population_column not found"); }
@@ -334,7 +339,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(config.getString("representation_weight").trim())));
 		}
 		if( config.containsKey("area_weighted")) {
-			Settings.border_length_area_weighted = config.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false;
+			chckbxAreaWeighted.setSelected(config.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false);
 		}
 
 		
@@ -363,7 +368,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 	JTextField textField_3 = new JTextField();
 	JTextField textFieldNumDistricts = new JTextField();
-	JTextField textField_1 = new JTextField();
+	JTextField textFieldElectionsSimulated = new JTextField();
 	JTextField textField = new JTextField();
 	public JSlider slider_1 = new JSlider();
 	JSlider sliderDisconnected = new JSlider();
@@ -1504,6 +1509,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		textField_3.setColumns(10);
 		textField_3.setBounds(138, 347, 58, 28);
 		panel_2.add(textField_3);
+		chckbxAreaWeighted.setSelected(true);
 		
 		chckbxAreaWeighted.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1541,7 +1547,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		
-		textField.setText("64");
+		textField.setText("128");
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");
@@ -1557,26 +1563,26 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblTrials = new JLabel("Elections simulated");
 		lblTrials.setBounds(6, 74, 134, 16);
 		panel_3.add(lblTrials);
-		textField_1.setBounds(138, 68, 58, 28);
-		panel_3.add(textField_1);
-		textField_1.addFocusListener(new FocusAdapter() {
+		textFieldElectionsSimulated.setBounds(138, 68, 58, 28);
+		panel_3.add(textFieldElectionsSimulated);
+		textFieldElectionsSimulated.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				textField_1.postActionEvent();
+				textFieldElectionsSimulated.postActionEvent();
 			}
 		});
-		textField_1.addActionListener(new ActionListener() {
+		textFieldElectionsSimulated.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 try {
-					 Settings.num_elections_simulated = new Integer(textField_1.getText());
+					 Settings.num_elections_simulated = new Integer(textFieldElectionsSimulated.getText());
 				 } catch (Exception ex) {
 					 
 				 }
 			}
 		});
 		
-		textField_1.setText("2");
-		textField_1.setColumns(10);
+		textFieldElectionsSimulated.setText("4");
+		textFieldElectionsSimulated.setColumns(10);
 		textFieldNumDistricts.setText("10");
 		
 		
