@@ -38,6 +38,10 @@ import com.hexiong.jdbf.JDBFException;
 
 public class MainFrame extends JFrame implements iChangeListener {
 	public static MainFrame mainframe;
+	
+	public String openedGeoFilePath = "";
+	public String openedProjectFilePath = "";
+	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
 	double mutation_rate_multiplier = 0.1;
@@ -57,6 +61,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		OpenGeoJsonFileThread(File f) { super(f); }
     	public void run() {
 		    dlbl.setText("Loading file "+f.getName()+"...");
+		    
+		    openedGeoFilePath = f.getAbsolutePath();
 			
 			featureCollection = new FeatureCollection(); 
 			if( panelStats != null) {
@@ -161,7 +167,9 @@ public class MainFrame extends JFrame implements iChangeListener {
     	public void run() { 
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
-    			
+
+    		    openedGeoFilePath = f.getAbsolutePath();
+
 	    		dlg.setVisible(true);
 	    		
 				featureCollection = new FeatureCollection(); 
@@ -250,6 +258,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	public void openProjectFile(File f0) {
 		ReflectionJSONObject<Object> config = new ReflectionJSONObject<Object>();
+		
+	    openedProjectFilePath = f0.getAbsolutePath();
+		
 		
 		config.fromJSON(getFile(f0).toString());
 		

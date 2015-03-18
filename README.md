@@ -1,15 +1,15 @@
-IN PROCESS - PROPORTIONAL REPRESENTATION:
-* DONE for prop repsentation score
-* do it for voting power balance
-* do it for display in stats panel
 
 
 TODO:
-* allow to see properties in a table.  
-* on importing, allow to match columns to features.
-* on exporting, allow to identify what columns to export.
-* this includes for results.
-* and identifying which columns are population, or demographics.
+* export all columns, including new district, to .dbf.
+* remember opened geo file path, opened project file path.
+* save project
+* more population column selection on to main view (and remember it)
+* remember demographics columns and show on layer selection
+* add multiple demographics and elections
+
+--------------
+
  
 * allow feature selection (for choosing population, vote results, etc.)
 * add ability to lock/unlock precincts together
