@@ -558,6 +558,42 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
                 double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+                
+                for(District district : districts) {
+                	try {
+                		int n = (int)Math.floor(Math.random()*(double)district.outcomes.length);
+                        double[] prop_rep = new double[Candidate.candidates.size()];
+                        double[] district_vote = district.outcomes[n];
+                        double[] pop_district_vote = district.pop_balanced_outcomes[n];
+                        double tot_vote = 0;
+                        int winner_num = -1;
+                        double winner_vote_count = -1;
+                        for( int j = 0; j < district_vote.length; j++) {
+                            popular_vote[j] += pop_district_vote[j];
+                            tot_vote += district_vote[j];
+                        }
+                        double max_res = 0;
+                        int max_res_ind = -1;
+                        double multiplier = ((double)Settings.members_per_district) / tot_vote;
+                        for( int j = 0; j < district_vote.length; j++) {
+                        	prop_rep[j] = multiplier*(double)district_vote[j];
+                        	double residue = prop_rep[j] - Math.floor(prop_rep[j]);
+                        	prop_rep[j] = Math.floor(prop_rep[j]);
+                        	if( residue > max_res || max_res_ind < 0) {
+                        		max_res = residue;
+                        		max_res_ind = j;
+                        	}
+                        }
+                        prop_rep[max_res_ind]++;
+                        for( int j = 0; j < district_vote.length; j++) {
+                        	elected_vote[j] += prop_rep[j];
+                        }
+                	} catch (Exception ex) {
+                		break;
+                	}
+                }
+      /* old way - single member 
+                
                 for(District district : districts) {
                 	try {
                 		int n = (int)Math.floor(Math.random()*(double)district.outcomes.length);
@@ -579,6 +615,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 		break;
                 	}
                 }
+                */
                 //double[][] results = new double[][]{popular_vote,elected_vote};
             	
                 for( int j = 0; j < Candidate.candidates.size(); j++) {

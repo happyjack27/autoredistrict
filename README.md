@@ -1,3 +1,9 @@
+IN PROCESS - PROPORTIONAL REPRESENTATION:
+* DONE for prop repsentation score
+* do it for voting power balance
+* do it for display in stats panel
+
+
 TODO:
 * allow to see properties in a table.  
 * on importing, allow to match columns to features.
