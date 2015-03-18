@@ -7,6 +7,8 @@ TODO:
 * move population column selection on to main view (and remember it) (and remember from layer selection)
 * remember demographics columns and show on layer selection
 * add multiple demographics and elections
+* change back arrow to total reset ( |<<)
+* get graphics for arror buttons
 
 --------------
 
