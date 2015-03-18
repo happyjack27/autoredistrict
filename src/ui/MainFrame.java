@@ -3,6 +3,7 @@ package ui;
 import geoJSON.Feature;
 import geoJSON.FeatureCollection;
 import geoJSON.Geometry;
+import geoJSON.Project;
 import geoJSON.Properties;
 
 import java.awt.*;
@@ -41,6 +42,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	public String openedGeoFilePath = "";
 	public String openedProjectFilePath = "";
+	public Project project = new Project();
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -257,20 +259,20 @@ public class MainFrame extends JFrame implements iChangeListener {
     }
 	
 	public void openProjectFile(File f0) {
-		ReflectionJSONObject<Object> config = new ReflectionJSONObject<Object>();
+		project = new Project();
 		
 	    openedProjectFilePath = f0.getAbsolutePath();
 		
 		
-		config.fromJSON(getFile(f0).toString());
+	    project.fromJSON(getFile(f0).toString());
 		
 		System.out.println("found keys:");
-		Set<String> keys = config.keySet();
+		Set<String> keys = project.keySet();
 		for( String s : keys) {
 			System.out.println(s);
 		}
-		if( config.containsKey("source_file")) {
-			String source = config.getString("source_file").trim();
+		if( project.containsKey("source_file")) {
+			String source = project.getString("source_file").trim();
 			System.out.println("source file: "+source);
 			String ext = source.substring(source.length()-4).toLowerCase();
 			File f = new File(source);
@@ -302,31 +304,31 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		} else { System.out.println("source_file not found"); return; }
 
-		if( config.containsKey("number_of_districts")) {
-			textFieldNumDistricts.setText(config.getString("number_of_districts").trim());
+		if( project.containsKey("number_of_districts")) {
+			textFieldNumDistricts.setText(project.getString("number_of_districts").trim());
 			textFieldNumDistricts.postActionEvent();
 		} else { System.out.println("number_of_districts not found"); }
-		if( config.containsKey("members_per_district")) {
-			textFieldMembersPerDistrict.setText(config.getString("members_per_district").trim());
+		if( project.containsKey("members_per_district")) {
+			textFieldMembersPerDistrict.setText(project.getString("members_per_district").trim());
 			textFieldMembersPerDistrict.postActionEvent();
 		} else { System.out.println("members_per_district not found"); }
 		
-		if( config.containsKey("initial_population")) {
-			textField.setText(config.getString("initial_population").trim());
+		if( project.containsKey("initial_population")) {
+			textField.setText(project.getString("initial_population").trim());
 			textField.postActionEvent();
 		} else { System.out.println("initial_population not found"); }
 
-		if( config.containsKey("elections_simulated")) {
-			textFieldElectionsSimulated.setText(config.getString("elections_simulated").trim());
+		if( project.containsKey("elections_simulated")) {
+			textFieldElectionsSimulated.setText(project.getString("elections_simulated").trim());
 			textFieldElectionsSimulated.postActionEvent();
 		} else { System.out.println("elections_simulated not found"); }
 
-		if( config.containsKey("population_column")) {
-			setPopulationColumn(config.getString("population_column").trim());
+		if( project.containsKey("population_column")) {
+			setPopulationColumn(project.getString("population_column").trim());
 		} else { System.out.println("population_column not found"); }
 		
-		if( config.containsKey("demographic_columns")) {
-			Vector v = config.getVector("demographic_columns");
+		if( project.containsKey("demographic_columns")) {
+			Vector v = project.getVector("demographic_columns");
 			Vector<String> vs = new Vector<String>();
 			for( int i = 0; i < v.size(); i++) {
 				vs.add((String)v.get(i));
@@ -334,23 +336,23 @@ public class MainFrame extends JFrame implements iChangeListener {
 			setDemographicColumns(vs);
 		} else { System.out.println("demographic_columns not found"); }
 
-		if( config.containsKey("disconnected_weight")) {
-			sliderDisconnected.setValue((int)(100.0*Double.parseDouble(config.getString("disconnected_weight").trim())));
+		if( project.containsKey("disconnected_weight")) {
+			sliderDisconnected.setValue((int)(100.0*Double.parseDouble(project.getString("disconnected_weight").trim())));
 		}
-		if( config.containsKey("population_balance_weight")) {
-			sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(config.getString("population_balance_weight").trim())));
+		if( project.containsKey("population_balance_weight")) {
+			sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(project.getString("population_balance_weight").trim())));
 		}
-		if( config.containsKey("border_length_weight")) {
-			sliderBorderLength.setValue((int)(100.0*Double.parseDouble(config.getString("border_length_weight").trim())));
+		if( project.containsKey("border_length_weight")) {
+			sliderBorderLength.setValue((int)(100.0*Double.parseDouble(project.getString("border_length_weight").trim())));
 		}
-		if( config.containsKey("voting_power_weight")) {
-			sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(config.getString("voting_power_weight").trim())));
+		if( project.containsKey("voting_power_weight")) {
+			sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(project.getString("voting_power_weight").trim())));
 		}
-		if( config.containsKey("representation_weight")) {
-			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(config.getString("representation_weight").trim())));
+		if( project.containsKey("representation_weight")) {
+			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(project.getString("representation_weight").trim())));
 		}
-		if( config.containsKey("area_weighted")) {
-			chckbxAreaWeighted.setSelected(config.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false);
+		if( project.containsKey("area_weighted")) {
+			chckbxAreaWeighted.setSelected(project.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false);
 		}
 
 		
