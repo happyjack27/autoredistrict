@@ -43,6 +43,8 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double voting_coalition_size = 100.0; //every x voters will be considered 1 independant voter
 
 	public static boolean self_entropy_use_votecount = true;
+	public static boolean self_entropy_square_votecount = true;
+	
 	public static boolean use_new_self_entropy_method = true;
 	public static double self_entropy_exponent = 1.0;//2.0;
 	public static int voters_to_simulate = 64;

@@ -81,6 +81,11 @@ public class District extends JSONObject {
 
     public double getSelfEntropy(double[] result) {
     	double tot = 0;
+    	if( Settings.self_entropy_square_votecount && Settings.self_entropy_use_votecount) {
+        	for( int i = 0; i < result.length; i++) {
+        		result[i] *= result[i];
+        	}
+    	}
     	for( int i = 0; i < result.length; i++) {
     		tot += result[i];
     	}
