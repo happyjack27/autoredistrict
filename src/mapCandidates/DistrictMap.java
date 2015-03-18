@@ -376,6 +376,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     //helper functions
+    /*
     public double[][] getStandardResult() {
     	//System.out.println("num dists "+districts.size());
     	
@@ -398,8 +399,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return new double[][]{popular_vote,elected_vote};
     }
+    */
 
-    
+    /*
     public double[][] getRandomResultSample() {
     	//System.out.println("num dists "+districts.size());
     	
@@ -422,6 +424,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return new double[][]{popular_vote,elected_vote};
     }
+    */
 
     //calculate kldiv as http://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence [wikipedia.org] , where p=popular_results and q=election_results (q is used to approximate p)
     public double getKLDiv(double[] p, double[] q, double regularization_factor) {
@@ -560,36 +563,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
                 
                 for(District district : districts) {
-                	try {
-                		int n = (int)Math.floor(Math.random()*(double)district.outcomes.length);
-                        double[] prop_rep = new double[Candidate.candidates.size()];
-                        double[] district_vote = district.outcomes[n];
-                        double[] pop_district_vote = district.pop_balanced_outcomes[n];
-                        double tot_vote = 0;
-                        int winner_num = -1;
-                        double winner_vote_count = -1;
-                        for( int j = 0; j < district_vote.length; j++) {
-                            popular_vote[j] += pop_district_vote[j];
-                            tot_vote += district_vote[j];
-                        }
-                        double max_res = 0;
-                        int max_res_ind = -1;
-                        double multiplier = ((double)Settings.members_per_district) / tot_vote;
-                        for( int j = 0; j < district_vote.length; j++) {
-                        	prop_rep[j] = multiplier*(double)district_vote[j];
-                        	double residue = prop_rep[j] - Math.floor(prop_rep[j]);
-                        	prop_rep[j] = Math.floor(prop_rep[j]);
-                        	if( residue > max_res || max_res_ind < 0) {
-                        		max_res = residue;
-                        		max_res_ind = j;
-                        	}
-                        }
-                        prop_rep[max_res_ind]++;
-                        for( int j = 0; j < district_vote.length; j++) {
-                        	elected_vote[j] += prop_rep[j];
-                        }
-                	} catch (Exception ex) {
-                		break;
+                	double[][] res = district.getElectionResults();
+                	for( int j = 0; j < popular_vote.length; j++) {
+                		popular_vote[j] += res[0][j];
+                		elected_vote[j] += res[1][j];
                 	}
                 }
       /* old way - single member 
@@ -638,7 +615,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
             for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
-                voting_power[i] = district.getSelfEntropy(district.outcomes);
+                voting_power[i] = district.getSelfEntropy(district.getElectionResults()[Settings.self_entropy_use_votecount?0:1]);
                 total_voting_power += voting_power[i];
             }
 

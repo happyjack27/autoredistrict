@@ -99,25 +99,22 @@ public class PanelStats extends JPanel {
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
 				//String population = ""+(int)d.getPopulation();
-				double self_entropy = d.getSelfEntropy(null);
+				double[][] result = d.getElectionResults();
+				double self_entropy = d.getSelfEntropy(result[Settings.self_entropy_use_votecount?0:1]);
 				//String edge_length = ""+d.getEdgeLength();
-				double [] dd = d.getVotes();
+				//double [] dd = d.getVotes();
 				double total = 0;
-				double max = -1;
-				int iwinner  = -1;
-				for( int j = 0; j < dd.length; j++) {
-					vote_counts[j] += dd[j];
-					if( dd[j] > max) {
-						max = dd[j];
-						iwinner = j;
-					}
-					total += dd[j];
-					tot_votes += dd[j];
+				//double max = -1;
+				//int iwinner  = -1;
+				String winner = "";
+				for( int j = 0; j < result[0].length; j++) {
+					winner += ""+result[1][j]+",";
+					elec_counts[j] += result[1][j];
+					vote_counts[j] += result[0][j];
+					total += result[0][j];
+					tot_votes += result[0][j];
 				}
-				if( elec_counts != null && iwinner >= 0) {
-					elec_counts[iwinner]++;
-				}
-				String winner = ""+iwinner;
+				//String winner = ""+iwinner;
 				ddata[i][0] = ""+i;
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
@@ -125,11 +122,11 @@ public class PanelStats extends JPanel {
 				for( int j = 4; j < ddata[i].length; j++) {
 					ddata[i][j] = "";
 				}
-				for( int j = 0; j < dd.length; j++) {
-					ddata[i][j+4] = ""+(dd[j]/total);
+				for( int j = 0; j < result[0].length; j++) {
+					ddata[i][j+4] = ""+(result[0][j]/total);
 				}
-				for( int j = 0; j < dd.length; j++) {
-					ddata[i][j+4+Candidate.candidates.size()] = ""+integer.format(dd[j]);
+				for( int j = 0; j < result[0].length; j++) {
+					ddata[i][j+4+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
 			}
 			//			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
@@ -139,7 +136,7 @@ public class PanelStats extends JPanel {
 						""+i,
 						""+integer.format(elec_counts[i]),
 						""+integer.format(vote_counts[i]),
-						""+(elec_counts[i]/(double)dm.districts.size()),
+						""+(elec_counts[i]/((double)(dm.districts.size()*Settings.members_per_district))),
 						""+(vote_counts[i]/tot_votes)
 				};
 			}

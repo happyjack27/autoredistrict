@@ -142,9 +142,6 @@ public class Block extends ReflectionJSONObject<Block> {
 		return null;
 	}
 	
-    double[] getVotes() {
-    	return generateVotes();
-    }
     double[] getOutcome() {
     	if( outcomes == null) {
     		generateOutComes();
@@ -189,57 +186,4 @@ public class Block extends ReflectionJSONObject<Block> {
     		}
     	}
     }
-
-    double[] generateVotes() {
-        double[] votes = new double[Candidate.candidates.size()];
-        for(int i = 0; i < votes.length; i++) {
-            votes[i] = 0;
-        }
-        for( Demographic d : demographics) {
-            int single_voting = -1;
-            for( int j = 0; j < d.vote_prob.length; j++) {
-            	if( d.vote_prob[j] == 1) {
-            		single_voting = j;
-                    break;
-                }
-            }
-        	if( d.turnout_probability == 1) {
-        		if( single_voting >= 0) {
-        			votes[single_voting] = d.population;
-        		} else {
-                    double p = Math.random();
-                    for( int j = 0; j < d.vote_prob.length; j++) {
-                        p -=  d.vote_prob[j];
-                        if( p <= 0) {
-                            votes[j]++;
-                            break;
-                        }
-                    }
-        		}
-        	} else {
-                for(int i = 0; i < d.population; i++) {
-                    double p = Math.random();
-                    if( p > d.turnout_probability) {
-                        continue;
-                    }
-            		if( single_voting >= 0) {
-            			votes[single_voting]++;
-            		} else {
-                        p = Math.random();
-                        for( int j = 0; j < d.vote_prob.length; j++) {
-                            p -=  d.vote_prob[j];
-                            if( p <= 0) {
-                                votes[j]++;
-                                break;
-                            }
-                        }
-            		}
-                }
-        	}
-        	
-        }
-        return votes;
-    }
-
-
 }

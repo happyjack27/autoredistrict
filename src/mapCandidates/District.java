@@ -7,8 +7,6 @@ public class District extends JSONObject {
     Vector<Block> blocks = new Vector<Block>();
     
     public static boolean adjust_vote_to_population = true;
-    public static boolean self_entropy_by_vote_count = true;
-
 
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
@@ -38,8 +36,66 @@ public class District extends JSONObject {
         population = pop;
         return pop;
     }
+    
+    public double[][] getElectionResults() {
+        double[] tot_popular_vote = new double[Candidate.candidates.size()];
+        double[] tot_elected_vote = new double[Candidate.candidates.size()];
+   		for( int i = 0; i < outcomes.length; i++) {
+   	       	try {
+   	            double[] popular_vote = new double[Candidate.candidates.size()];
+   	    		//int n = (int)Math.floor(Math.random()*(double)outcomes.length);
+   	            double[] prop_rep = new double[Candidate.candidates.size()];
+   	            double[] district_vote = outcomes[i];
+   	            double[] pop_district_vote = pop_balanced_outcomes[i];
+   	            double tot_vote = 0;
+   	            for( int j = 0; j < district_vote.length; j++) {
+   	                popular_vote[j] += pop_district_vote[j];
+   	                tot_vote += district_vote[j];
+   	            }
+   	            double max_res = 0;
+   	            int max_res_ind = -1;
+   	            double multiplier = ((double)Settings.members_per_district) / tot_vote;
+   	            for( int j = 0; j < district_vote.length; j++) {
+   	            	prop_rep[j] = multiplier*(double)district_vote[j];
+   	            	double residue = prop_rep[j] - Math.floor(prop_rep[j]);
+   	            	prop_rep[j] = Math.floor(prop_rep[j]);
+   	            	if( residue > max_res || max_res_ind < 0) {
+   	            		max_res = residue;
+   	            		max_res_ind = j;
+   	            	}
+   	            }
+   	            prop_rep[max_res_ind]++;
+   	            for( int j = 0; j < district_vote.length; j++) {
+   	            	tot_elected_vote[j] += prop_rep[j];
+   	            	tot_popular_vote[j] += popular_vote[j];
+   	            }
+   	    	} catch (Exception ex) {
+   	    	}
+    	}
+   		for( int j = 0; j < tot_popular_vote.length; j++) {
+        	tot_elected_vote[j] /= (double)outcomes.length;
+        	tot_popular_vote[j] /= (double)outcomes.length;
+        }
+       	return new double[][]{tot_popular_vote,tot_elected_vote};
+    }
 
-    public double getSelfEntropy(double[][] outcomes) {
+    public double getSelfEntropy(double[] result) {
+    	double tot = 0;
+    	for( int i = 0; i < result.length; i++) {
+    		tot += result[i];
+    	}
+    	for( int i = 0; i < result.length; i++) {
+    		result[i] /= tot;
+    	}
+    	double H = 0;
+    	for( int i = 0; i < result.length; i++) {
+    		if( result[i] > 0) {
+    			H += -result[i]*Math.log(result[i]);
+    		}
+    	}
+    	return H;
+    }
+    public double getSelfEntropyOld(double[][] outcomes) {
     	if( outcomes == null) {
     		outcomes = generateOutcomes(Settings.num_elections_simulated);
     	}
@@ -59,7 +115,7 @@ public class District extends JSONObject {
                 for( int i = 0; i < wins.length; i++) {
                 	try {
             			mu[i] += msn[i][0];
-            			sigma[i] += msn[i][1];
+            			sigma[i] += msn[i][1]; 
             			n[i] += msn[i][2];
                 	} catch (Exception ex) {
                 		System.out.println("i "+i+" block "+b.id);
@@ -97,7 +153,7 @@ public class District extends JSONObject {
     	} else {
             for( int i = 0; i < outcomes.length; i++) {
             	double[] outcome = outcomes[i];
-            	if( self_entropy_by_vote_count) {
+            	if( true) {
             		double[] sim_results;
                 	if( Settings.use_new_self_entropy_method) {
                 		sim_results = Gaussian.getOddsFromBlocks(blocks);
@@ -217,7 +273,7 @@ public class District extends JSONObject {
     }
 
 
-
+/*
     public double[] getVotes() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
         if( blocks.size() == 0) {
@@ -236,6 +292,7 @@ public class District extends JSONObject {
         }
         return district_vote;
     }
+    */
 
     //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
     //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
