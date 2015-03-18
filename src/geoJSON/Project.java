@@ -1,9 +1,15 @@
 package geoJSON;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.*;
 
+import javax.swing.JOptionPane;
+
+import mapCandidates.Settings;
+
 import serialization.*;
+import ui.MainFrame;
 
 
 public class Project extends ReflectionJSONObject<Project> {
@@ -26,6 +32,90 @@ public class Project extends ReflectionJSONObject<Project> {
 
 	public void post_deserialize() {
 		super.post_deserialize();
+
+
+		if( containsKey("equalize_turnout")) {
+			Settings.adjust_vote_to_population = getString("equalize_turnout").trim().toLowerCase().equals("true");
+		} else { System.out.println("equalize_turnout not found"); }
+	    
+		System.out.println("found keys:");
+		Set<String> keys = keySet();
+		for( String s : keys) {
+			System.out.println(s);
+		}
+		if( containsKey("source_file")) {
+			String source = getString("source_file").trim();
+			System.out.println("source file: "+source);
+			String ext = source.substring(source.length()-4).toLowerCase();
+			File f = new File(source);
+			if( f == null) {
+				JOptionPane.showMessageDialog(MainFrame.mainframe, "File not found: "+source);
+				return;
+			} else if( ext.equals(".shp")) {
+				MainFrame.mainframe.openShapeFile(f,true);
+			} else if( ext.equals("json")) {
+				MainFrame.mainframe.openGeoJson(f,true);
+				
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.mainframe, "Invalid file format: "+source);
+				return;
+			}
+		} else { System.out.println("source_file not found"); return; }
+
+		if( containsKey("number_of_districts")) {
+			MainFrame.mainframe.textFieldNumDistricts.setText(getString("number_of_districts").trim());
+			MainFrame.mainframe.textFieldNumDistricts.postActionEvent();
+		} else { System.out.println("number_of_districts not found"); }
+		if( containsKey("members_per_district")) {
+			MainFrame.mainframe.textFieldMembersPerDistrict.setText(getString("members_per_district").trim());
+			MainFrame.mainframe.textFieldMembersPerDistrict.postActionEvent();
+		} else { System.out.println("members_per_district not found"); }
+		
+		if( containsKey("initial_population")) {
+			MainFrame.mainframe.textField.setText(getString("initial_population").trim());
+			MainFrame.mainframe.textField.postActionEvent();
+		} else { System.out.println("initial_population not found"); }
+
+		if( containsKey("elections_simulated")) {
+			MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("elections_simulated").trim());
+			MainFrame.mainframe.textFieldElectionsSimulated.postActionEvent();
+		} else { System.out.println("elections_simulated not found"); }
+
+		if( containsKey("population_column")) {
+			MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
+		} else { System.out.println("population_column not found"); }
+		
+		if( containsKey("demographic_columns")) {
+			Vector v = getVector("demographic_columns");
+			Vector<String> vs = new Vector<String>();
+			for( int i = 0; i < v.size(); i++) {
+				vs.add((String)v.get(i));
+			}
+			MainFrame.mainframe.setDemographicColumns(vs);
+		} else { System.out.println("demographic_columns not found"); }
+
+		if( containsKey("disconnected_weight")) {
+			MainFrame.mainframe.sliderDisconnected.setValue((int)(100.0*Double.parseDouble(getString("disconnected_weight").trim())));
+		}
+		if( containsKey("population_balance_weight")) {
+			MainFrame.mainframe.sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(getString("population_balance_weight").trim())));
+		}
+		if( containsKey("border_length_weight")) {
+			MainFrame.mainframe.sliderBorderLength.setValue((int)(100.0*Double.parseDouble(getString("border_length_weight").trim())));
+		}
+		if( containsKey("voting_power_weight")) {
+			MainFrame.mainframe.sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(getString("voting_power_weight").trim())));
+		}
+		if( containsKey("representation_weight")) {
+			MainFrame.mainframe.sliderRepresentation.setValue((int)(100.0*Double.parseDouble(getString("representation_weight").trim())));
+		}
+		if( containsKey("area_weighted")) {
+			MainFrame.mainframe.chckbxAreaWeighted.setSelected(getString("area_weighted").trim().toLowerCase().equals("true"));
+		}
+
+		
+		MainFrame.mainframe.featureCollection.ecology.startEvolving();
+	
 	}
 
 	@Override

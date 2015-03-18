@@ -156,6 +156,28 @@ public class MainFrame extends JFrame implements iChangeListener {
 			setEnableds();
     	}
 	}
+	public void openShapeFile(File f,boolean synchronous) {
+		Thread t = new OpenShapeFileThread(f);
+		t.start();
+		try {
+			if( synchronous)
+				t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch ward
+			e.printStackTrace();
+		}
+	}
+	public void openGeoJson(File f,boolean synchronous) {
+		Thread t = new OpenGeoJsonFileThread(f);
+		t.start();
+		try {
+			if( synchronous)
+				t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch ward
+			e.printStackTrace();
+		}
+	}
 
 	class OpenShapeFileThread extends FileThread {
 		OpenShapeFileThread(File f) { super(f); }
@@ -258,7 +280,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		
 	    project.fromJSON(getFile(f0).toString());
-	    
+	    /*
 		if( project.containsKey("equalize_turnout")) {
 			Settings.adjust_vote_to_population = project.getString("equalize_turnout").trim().toLowerCase().equals("true");
 		} else { System.out.println("equalize_turnout not found"); }
@@ -354,11 +376,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 		
 		featureCollection.ecology.startEvolving();
+		*/
 
 	}
 	
 	
-	JCheckBox chckbxAreaWeighted = new JCheckBox("Area weighted");
+	public JCheckBox chckbxAreaWeighted = new JCheckBox("Area weighted");
 	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
@@ -376,16 +399,16 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 
 
-	JTextField textField_3 = new JTextField();
-	JTextField textFieldNumDistricts = new JTextField();
-	JTextField textFieldElectionsSimulated = new JTextField();
-	JTextField textField = new JTextField();
+    public JTextField textField_3 = new JTextField();
+    public JTextField textFieldNumDistricts = new JTextField();
+    public JTextField textFieldElectionsSimulated = new JTextField();
+    public JTextField textField = new JTextField();
 	public JSlider slider_1 = new JSlider();
-	JSlider sliderDisconnected = new JSlider();
-	JSlider sliderBorderLength = new JSlider();
-	JSlider sliderPopulationBalance = new JSlider();
-	JSlider sliderVotingPowerBalance = new JSlider();
-	JSlider sliderRepresentation = new JSlider();
+	public JSlider sliderDisconnected = new JSlider();
+	public JSlider sliderBorderLength = new JSlider();
+	public JSlider sliderPopulationBalance = new JSlider();
+	public JSlider sliderVotingPowerBalance = new JSlider();
+	public JSlider sliderRepresentation = new JSlider();
 	
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
@@ -424,7 +447,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
-	private JTextField textFieldMembersPerDistrict;
+	public JTextField textFieldMembersPerDistrict;
 	
 	public void setEnableds() {
 		
