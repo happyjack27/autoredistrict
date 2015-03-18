@@ -340,6 +340,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	}
 	
 	
+	JCheckBox chckbxAreaWeighted = new JCheckBox("Area weighted");
 	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
@@ -462,7 +463,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			b.demographics.clear();
 			for( int j = 0; j < num_candidates; j++) {
 				Demographic d = new Demographic();
-				d.block_id = b.id;
+				//d.block_id = b.id;
 				d.turnout_probability = 1;
 				d.population = (int) dd[j];
 				d.vote_prob = new double[num_candidates];
@@ -716,7 +717,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				double[] dd = es.getValue();
 				for( int j = 0; j < num_candidates; j++) {
 					Demographic d = new Demographic();
-					d.block_id = b.id;
+					//d.block_id = b.id;
 					d.turnout_probability = 1;
 					d.population = (int) dd[j];
 					d.vote_prob = new double[num_candidates];
@@ -1439,7 +1440,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JLabel lblCompactness = new JLabel("Border length");
-		lblCompactness.setBounds(6, 36, 172, 16);
+		lblCompactness.setBounds(6, 36, 90, 16);
 		panel_2.add(lblCompactness);
 		sliderBorderLength.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderBorderLength);
@@ -1500,6 +1501,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 		textField_3.setColumns(10);
 		textField_3.setBounds(138, 347, 58, 28);
 		panel_2.add(textField_3);
+		
+		chckbxAreaWeighted.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.border_length_area_weighted = chckbxAreaWeighted.isSelected();
+			}
+		});
+		chckbxAreaWeighted.setBounds(99, 33, 97, 23);
+		panel_2.add(chckbxAreaWeighted);
 		
 		
 		JPanel panel_3 = new JPanel();

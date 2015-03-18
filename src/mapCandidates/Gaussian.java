@@ -27,6 +27,7 @@ public class Gaussian {
 		}
 		return new double[]{tmu,tsigma,tn};
 	}
+	/*
 	public static double[] getOddsFromBlocks(Vector<Block> blocks) {
         double[] events = new double[blocks.size()];
         double[][] successes = new double[Candidate.candidates.size()][blocks.size()];
@@ -45,7 +46,7 @@ public class Gaussian {
         	odds[j] = getProbForMuSigmaN(get_mu_and_sigma_and_n(events,successes[j]));
         }
         return odds;
-	}
+	}*/
 	public static double getProbForMuSigmaN(double mu, double sigma, double n) {
 		double z = n/2.0;
 		

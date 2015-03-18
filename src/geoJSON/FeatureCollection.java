@@ -178,6 +178,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.block.collectNeighborLengths();
 		}
+		for( Feature f : features) {
+			f.calcArea();
+		}
+		
 		Geometry.shiftx = Geometry.shifty = 0;
 		Geometry.scalex = Geometry.scaley = 1;
 		for( Feature f : features) {

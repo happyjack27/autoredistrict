@@ -492,11 +492,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //returns total edge length, unfairness, population imbalance
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
     //all measures should be minimized.
-    public void calcFairnessScores() {
+    public void calcFairnessScores() {//border_length_area_weighted
     	
     	long time0 = System.currentTimeMillis();    	
     	//===fairness score: compactness
-        double length = getEdgeLength();
+        double length = Settings.border_length_area_weighted ? getWeightedEdgeLength() : getEdgeLength();
         
     	long time1 = System.currentTimeMillis();
     	//===fairness score: population balance
@@ -692,6 +692,29 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double d = (fitness_score-o.fitness_score)*sorting_polarity; 
         return  d > 0 ? 1 : d == 0 ? 0 : -1;
     }
+    double getWeightedEdgeLength() {
+    	double[] lengths = new double[districts.size()]; 
+    	double[] areas = new double[districts.size()]; 
+        for( Block b : blocks) {
+        	int d1 = block_districts[b.id];
+        	areas[d1] += b.area;
+        	for( int i = 0; i < b.neighbor_lengths.length; i++) {
+        		int b2id = b.neighbors.get(i).id;
+            	int d2 = block_districts[b2id];
+            	if( d1 != d2) {
+            		lengths[d1] += b.neighbor_lengths[i];
+            		lengths[d2] += b.neighbor_lengths[i];
+            	}
+        	}
+        }
+        
+        double weighted_sum = 0;
+        for( int i = 0; i < lengths.length; i++) {
+        	weighted_sum += lengths[i] / areas[i];
+        }
+        return weighted_sum;
+    }
+    
     double getEdgeLength() {
         double length = 0;
         for( Block b : blocks) {

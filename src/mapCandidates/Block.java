@@ -8,6 +8,7 @@ public class Block extends ReflectionJSONObject<Block> {
 	public static int id_enumerator = 0;
 	public int state = 0;
 	public int temp = -1;
+	public double area = 0;
 	
 	public String name = "";
 

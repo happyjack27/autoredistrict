@@ -4,12 +4,13 @@ import java.util.Vector;
 
 import serialization.ReflectionJSONObject;
 
-public class Demographic extends ReflectionJSONObject<Demographic> {
-	public int block_id;
+public class Demographic  {//extends ReflectionJSONObject<Demographic> {
+	//public int block_id;
 	public int population;
 	public double turnout_probability;
 	public double[] vote_prob;
 	
+	/*
 	public void post_deserialize() {
 		super.post_deserialize();
 		Vector<String> v_vote_prob = getVector("vote_probs");
@@ -23,4 +24,5 @@ public class Demographic extends ReflectionJSONObject<Demographic> {
 		super.pre_serialize();
 		
 	}
+	*/
 }

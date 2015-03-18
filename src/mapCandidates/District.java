@@ -22,16 +22,9 @@ public class District extends JSONObject {
     	}
         double pop = 0;
         for( Block block : blocks) {
-        	if( block.demographics == null || block.demographics.size() == 0) {
-        		//System.out.println("no demographics!");
-        	}
         	if( block.has_census_results) {
         		pop += block.population;
-        	} else {
-            	for(Demographic p : block.demographics) {
-                    pop += p.population;
-            	}
-        	}
+        	} 
         }
         population = pop;
         return pop;
@@ -100,6 +93,8 @@ public class District extends JSONObject {
     	}
     	return H;
     }
+    
+    /*
     public double getSelfEntropyOld(double[][] outcomes) {
     	if( outcomes == null) {
     		outcomes = generateOutcomes(Settings.num_elections_simulated);
@@ -208,6 +203,8 @@ public class District extends JSONObject {
 
         return H;//Math.pow(H, Settings.self_entropy_exponent);
     }
+    */
+    
     public double[][] generateOutcomes(int num) {
     	if( adjust_vote_to_population) {
         	outcomes = new double[num][];
@@ -350,10 +347,6 @@ public class District extends JSONObject {
         for( Block block : region) {
         	if( block.has_census_results) {
         		population += block.population;
-        	} else {
-            	for(Demographic p : block.demographics) {
-            		population += p.population;
-            	}
         	}
         }
         return population;
