@@ -4,7 +4,7 @@ import java.util.*;
 import serialization.JSONObject;
 
 public class District extends JSONObject {
-    Vector<Block> blocks = new Vector<Block>();
+    Vector<Ward> wards = new Vector<Ward>();
     
     public static boolean adjust_vote_to_population = true;
 
@@ -21,9 +21,9 @@ public class District extends JSONObject {
     		return population;
     	}
         double pop = 0;
-        for( Block block : blocks) {
-        	if( block.has_census_results) {
-        		pop += block.population;
+        for( Ward ward : wards) {
+        	if( ward.has_census_results) {
+        		pop += ward.population;
         	} 
         }
         population = pop;
@@ -110,7 +110,7 @@ public class District extends JSONObject {
     		double[] sigma = new double[wins.length];
     		double[] n = new double[wins.length];
     		
-    		for( Block b : blocks) {
+    		for( ward b : wards) {
     			double[][] msn = b.getMuSigmaN();
                 for( int i = 0; i < wins.length; i++) {
                 	try {
@@ -118,7 +118,7 @@ public class District extends JSONObject {
             			sigma[i] += msn[i][1]; 
             			n[i] += msn[i][2];
                 	} catch (Exception ex) {
-                		System.out.println("i "+i+" block "+b.id);
+                		System.out.println("i "+i+" ward "+b.id);
                 		ex.printStackTrace();
                 		
                 	}
@@ -156,7 +156,7 @@ public class District extends JSONObject {
             	if( true) {
             		double[] sim_results;
                 	if( Settings.use_new_self_entropy_method) {
-                		sim_results = Gaussian.getOddsFromBlocks(blocks);
+                		sim_results = Gaussian.getOddsFromwards(wards);
                 	} else {
 
                     	double total_votes = 0;
@@ -227,17 +227,17 @@ public class District extends JSONObject {
     
     public double[] getAnOutcome() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
-        if( blocks.size() == 0) {
+        if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
             }
             return district_vote;
         }
-        for( Block block : blocks) {
-            double[] block_vote = block.getOutcome();
-            if( block_vote != null) {
-                for( int i = 0; i < block_vote.length; i++) {//most_value) {
-                    district_vote[i] += block_vote[i];
+        for( Ward ward : wards) {
+            double[] ward_vote = ward.getOutcome();
+            if( ward_vote != null) {
+                for( int i = 0; i < ward_vote.length; i++) {//most_value) {
+                    district_vote[i] += ward_vote[i];
                 }
             }
         }
@@ -246,28 +246,28 @@ public class District extends JSONObject {
     public double[][] getAnOutcomePair() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
         double[] pop_district_vote = new double[Candidate.candidates.size()]; //inited to 0
-        if( blocks.size() == 0) {
+        if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {
                 district_vote[i] = 0;
             }
             return new double[][]{district_vote,district_vote};
         }
-        for( Block block : blocks) {
-            double[] block_vote = block.getOutcome();
-            if( block_vote != null) {
+        for( Ward ward : wards) {
+            double[] ward_vote = ward.getOutcome();
+            if( ward_vote != null) {
             	double tot = 0;
-                for( int i = 0; i < block_vote.length; i++) {
-                	tot += block_vote[i];
-                    district_vote[i] += block_vote[i];
+                for( int i = 0; i < ward_vote.length; i++) {
+                	tot += ward_vote[i];
+                    district_vote[i] += ward_vote[i];
                 }
                 if( tot == 0) {
                 	tot = 0;
                 } else {
-                	tot = block.population/tot;
+                	tot = ward.population/tot;
                 }
                 
-                for( int i = 0; i < block_vote.length; i++) {
-                    pop_district_vote[i] += block_vote[i]*tot;
+                for( int i = 0; i < ward_vote.length; i++) {
+                    pop_district_vote[i] += ward_vote[i]*tot;
                 }
             }
         }
@@ -278,17 +278,17 @@ public class District extends JSONObject {
 /*
     public double[] getVotes() {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
-        if( blocks.size() == 0) {
+        if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
             }
             return district_vote;
         }
-        for( Block block : blocks) {
-            double[] block_vote = block.getVotes();
-            if( block_vote != null) {
-                for( int i = 0; i < block_vote.length; i++) {//most_value) {
-                    district_vote[i] += block_vote[i];
+        for( ward ward : wards) {
+            double[] ward_vote = ward.getVotes();
+            if( ward_vote != null) {
+                for( int i = 0; i < ward_vote.length; i++) {//most_value) {
+                    district_vote[i] += ward_vote[i];
                 }
             }
         }
@@ -298,15 +298,15 @@ public class District extends JSONObject {
 
     //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
     //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
-    int getRegionCount(int[] block_districts) {
-        return getRegions(block_districts).size();
+    int getRegionCount(int[] ward_districts) {
+        return getRegions(ward_districts).size();
     }
 
-    Vector<Block> getTopPopulationRegion(int[] block_districts) {
-        Vector<Vector<Block>> regions = getRegions(block_districts);
-        Vector<Block> high = null;
+    Vector<Ward> getTopPopulationRegion(int[] ward_districts) {
+        Vector<Vector<Ward>> regions = getRegions(ward_districts);
+        Vector<Ward> high = null;
         double max_pop = 0;
-        for( Vector<Block> region : regions) {
+        for( Vector<Ward> region : regions) {
             double pop = getRegionPopulation(region);
             if( pop > max_pop || high == null) {
                 max_pop = pop;
@@ -315,38 +315,38 @@ public class District extends JSONObject {
         }
         return high;
     }
-    Vector<Vector<Block>> getRegions(int[] block_districts) {
-        Hashtable<Integer,Vector<Block>> region_hash = new Hashtable<Integer,Vector<Block>>();
-        Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
-        for( Block block : blocks) {
-            if( region_hash.get(block.id) != null)
+    Vector<Vector<Ward>> getRegions(int[] ward_districts) {
+        Hashtable<Integer,Vector<Ward>> region_hash = new Hashtable<Integer,Vector<Ward>>();
+        Vector<Vector<Ward>> regions = new Vector<Vector<Ward>>();
+        for( Ward ward : wards) {
+            if( region_hash.get(ward.id) != null)
                 continue;
-            Vector<Block> region = new Vector<Block>();
+            Vector<Ward> region = new Vector<Ward>();
             regions.add(region);
-            addAllConnected(block,region,region_hash,block_districts);
+            addAllConnected(ward,region,region_hash,ward_districts);
         }
         return regions;
     }
-    //recursively insert connected blocks.
-    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Integer,Vector<Block>> region_hash, int[] block_districts) {
-        if( region_hash.get(block.id) != null)
+    //recursively insert connected wards.
+    void addAllConnected( Ward ward, Vector<Ward> region,  Hashtable<Integer,Vector<Ward>> region_hash, int[] ward_districts) {
+        if( region_hash.get(ward.id) != null)
             return;
-        region.add(block);
-        region_hash.put(block.id,region);
-        for( Block other_block : block.neighbors) {
-        	if( block_districts[other_block.id] == block_districts[block.id]) {
-        		addAllConnected( other_block, region, region_hash, block_districts);
+        region.add(ward);
+        region_hash.put(ward.id,region);
+        for( Ward other_ward : ward.neighbors) {
+        	if( ward_districts[other_ward.id] == ward_districts[ward.id]) {
+        		addAllConnected( other_ward, region, region_hash, ward_districts);
         	}
         }
     }
-    double getRegionPopulation(Vector<Block> region) {
+    double getRegionPopulation(Vector<Ward> region) {
         double population = 0;
         if( region == null) {
         	return 0;
         }
-        for( Block block : region) {
-        	if( block.has_census_results) {
-        		population += block.population;
+        for( Ward ward : region) {
+        	if( ward.has_census_results) {
+        		population += ward.population;
         	}
         }
         return population;

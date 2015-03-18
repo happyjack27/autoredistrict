@@ -3,7 +3,7 @@ import java.util.*;
 
 import serialization.*;
 
-public class Block extends ReflectionJSONObject<Block> {
+public class Ward extends ReflectionJSONObject<Ward> {
     public int id;
 	public static int id_enumerator = 0;
 	public int state = 0;
@@ -14,7 +14,7 @@ public class Block extends ReflectionJSONObject<Block> {
 
 
     public Vector<Edge> edges = new Vector<Edge>();
-    public Vector<Block> neighbors = new Vector<Block>();
+    public Vector<Ward> neighbors = new Vector<Ward>();
     public double[] neighbor_lengths;
     public Vector<Demographic> demographics = new Vector<Demographic>();
     private double[][] mu_sigma_n = null;
@@ -60,17 +60,17 @@ public class Block extends ReflectionJSONObject<Block> {
     
 	double[][] outcomes;
 
-    public Block() {
+    public Ward() {
     	super();
     	id = id_enumerator++;
     }
-    public boolean equals(Block b) {
+    public boolean equals(Ward b) {
     	return b != null && b.id == this.id;
     }
     public void syncNeighbors() {
-		for(Block b : neighbors) {
+		for(Ward b : neighbors) {
 			boolean is_in = false;
-			for(Block b2 : b.neighbors) {
+			for(Ward b2 : b.neighbors) {
 				if( b2.id == this.id){
 					is_in = true;
 					break;
@@ -89,8 +89,8 @@ public class Block extends ReflectionJSONObject<Block> {
     	}
 		for(Edge e : edges) {
 	    	for( int i = 0; i < neighbor_lengths.length; i++) {
-	    		Block b = neighbors.get(i);
-	    		if( e.block1_id == b.id || e.block2_id == b.id){
+	    		Ward b = neighbors.get(i);
+	    		if( e.ward1_id == b.id || e.ward2_id == b.id){
 	    			neighbor_lengths[i] += e.length;	
 	    		}
 	    	}
@@ -99,15 +99,15 @@ public class Block extends ReflectionJSONObject<Block> {
     }
     
     public void collectNeighbors() {
-		//HashSet<Block> hashBlocks = new HashSet<Block>(); 
-		neighbors = new Vector<Block>();
+		//HashSet<ward> hashwards = new HashSet<ward>(); 
+		neighbors = new Vector<Ward>();
 		//System.out.println("edges: "+edges.size());
-		//System.out.print("block "+id+" neighbors: ");
+		//System.out.print("ward "+id+" neighbors: ");
 		for( Edge e : edges) {
-			Block b = e.block1.id == this.id ? e.block2 : e.block1;
+			Ward b = e.ward1.id == this.id ? e.ward2 : e.ward1;
 			if( b != null && b.id != this.id) {
 				boolean is_in = false;
-				for(Block b2 : neighbors) {
+				for(Ward b2 : neighbors) {
 					if( b2.id == b.id){
 						is_in = true;
 						break;
@@ -152,7 +152,7 @@ public class Block extends ReflectionJSONObject<Block> {
     }
     
     public void generateOutComes() {
-    	outcomes = new double[Settings.num_precinct_outcomes][];
+    	outcomes = new double[Settings.num_ward_outcomes][];
     	
         //aggregate and normalize voting probs
     	double[] probs = new double[Candidate.candidates.size()];

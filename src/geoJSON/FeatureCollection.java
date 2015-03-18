@@ -15,7 +15,7 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 
 import com.hexiong.jdbf.DBFReader;
 
-import mapCandidates.Block;
+import mapCandidates.Ward;
 import mapCandidates.DistrictMap;
 import mapCandidates.Ecology;
 import mapCandidates.Edge;
@@ -28,8 +28,8 @@ import serialization.ReflectionJSONObject;
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
-	public Vector<Block> blocks;
-	public HashMap<String,Block> precinctHash;
+	public Vector<Ward> wards;
+	public HashMap<String,Ward> precinctHash;
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 1000000.0;
 	
@@ -76,8 +76,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		if( ecology.population != null && ecology.population.size() > 0) {
 			DistrictMap dm  = ecology.population.get(0);
-			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.block_districts.length);
-			if( dm.block_districts != null) {
+			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.ward_districts.length);
+			if( dm.ward_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
 				int saturations = (int) Math.ceil((double)Settings.num_districts / (double)(max_hues*4));
 				int values = (int) Math.ceil((double)Settings.num_districts / (double)max_hues);
@@ -107,10 +107,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 				for( int i = 0; i < features.size(); i++) {
-					Block b = features.get(i).block;
+					Ward b = features.get(i).ward;
 					Geometry geo = features.get(i).geometry;
 					try {
-						int color = dm.block_districts[b.id];
+						int color = dm.ward_districts[b.id];
 						if( color < c.length) {
 							geo.fillColor = c[color];
 						}
@@ -153,30 +153,30 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		return super.instantiateObject(key);
 	}
 	
-	public void initBlocks() {
-		blocks = new Vector<Block>();
-		precinctHash = new HashMap<String,Block>();
-		Block.id_enumerator = 0;
+	public void initwards() {
+		wards = new Vector<Ward>();
+		precinctHash = new HashMap<String,Ward>();
+		Ward.id_enumerator = 0;
 		for( Feature f : features) {
-			f.block = new Block();
-			f.block.name = f.properties.DISTRICT;
+			f.ward = new Ward();
+			f.ward.name = f.properties.DISTRICT;
 			if( f.properties.POPULATION > 0) {
-				f.block.population = f.properties.POPULATION;
-				f.block.has_census_results = true;
+				f.ward.population = f.properties.POPULATION;
+				f.ward.has_census_results = true;
 			}
-			blocks.add(f.block);
-			precinctHash.put(f.block.name,f.block);
+			wards.add(f.ward);
+			precinctHash.put(f.ward.name,f.ward);
 		}
 		collectVertexes();
 		collectEdges();
 		for( Feature f : features) {
-			f.block.collectNeighbors();
+			f.ward.collectNeighbors();
 		}
 		for( Feature f : features) {
-			f.block.syncNeighbors();
+			f.ward.syncNeighbors();
 		}
 		for( Feature f : features) {
-			f.block.collectNeighborLengths();
+			f.ward.collectNeighborLengths();
 		}
 		for( Feature f : features) {
 			f.calcArea();
@@ -185,7 +185,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		Geometry.shiftx = Geometry.shifty = 0;
 		Geometry.scalex = Geometry.scaley = 1;
 		for( Feature f : features) {
-			if( f.block.neighbors.size() == 0) {
+			if( f.ward.neighbors.size() == 0) {
 				if( f.geometry == null || f.geometry.polygons == null) {
 					f.geometry.makePolys();
 				}
@@ -195,25 +195,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 				Feature nearest = getNearestFeature(f);
 				double total_length = 0;
-				double[] new_neighbbor_lengths = new double[nearest.block.neighbor_lengths.length+1];
-				for( int i = 0; i < nearest.block.neighbor_lengths.length; i++) {
-					total_length += nearest.block.neighbor_lengths[i];
-					new_neighbbor_lengths[i] = nearest.block.neighbor_lengths[i]; 
+				double[] new_neighbbor_lengths = new double[nearest.ward.neighbor_lengths.length+1];
+				for( int i = 0; i < nearest.ward.neighbor_lengths.length; i++) {
+					total_length += nearest.ward.neighbor_lengths[i];
+					new_neighbbor_lengths[i] = nearest.ward.neighbor_lengths[i]; 
 				}
-				total_length /= (double)nearest.block.neighbor_lengths.length;
+				total_length /= (double)nearest.ward.neighbor_lengths.length;
 				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = total_length;
 				
-				nearest.block.neighbors.add(f.block);
-				nearest.block.neighbor_lengths = new_neighbbor_lengths;
+				nearest.ward.neighbors.add(f.ward);
+				nearest.ward.neighbor_lengths = new_neighbbor_lengths;
 				
-				f.block.neighbors.add(nearest.block);
-				f.block.neighbor_lengths = new double[]{total_length};
+				f.ward.neighbors.add(nearest.ward);
+				f.ward.neighbor_lengths = new double[]{total_length};
 			}
 		}
 		
 		/*
 		for( Feature f : features) {
-			f.block.edges = new Vector<Edge>();
+			f.ward.edges = new Vector<Edge>();
 		}
 		*/
 		//vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
@@ -253,7 +253,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double best_r = 0;
 		for( int i = 0; i < features.size(); i++) {
 			Feature test = features.get(i);
-			if( test == f || test.block.neighbors.size() == 0) {
+			if( test == f || test.ward.neighbors.size() == 0) {
 				continue;
 			}
 			if( test.geometry == null || test.geometry.polygons == null) {
@@ -275,27 +275,27 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	
 	public void initEcology() {
-		ecology.blocks = blocks;
+		ecology.wards = wards;
 		//ecology.edges = edgeHash.values();
 		//ecology.vertexes = vertexes;
 	}
 	
 	public void recalcEdgeLengths() {
 		for( Feature f : features) {
-			f.block = new Block();
-			for( Edge e : f.block.edges) {
+			f.ward = new Ward();
+			for( Edge e : f.ward.edges) {
 				e.setLength();
 			}
 		}
 		for( Feature f : features) {
-			f.block.collectNeighborLengths();
+			f.ward.collectNeighborLengths();
 		}
 
 	}
 	void collectEdges() {
 		edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
 		for( Feature f : features) {
-			f.block.edges = new Vector<Edge>();
+			f.ward.edges = new Vector<Edge>();
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
@@ -321,16 +321,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						e.vertex2_id = v2.id;
 						e.vertex1 = v1;
 						e.vertex2 = v2;
-						e.block1_id = f.block.id;
-						e.block1 = f.block;
+						e.ward1_id = f.ward.id;
+						e.ward1 = f.ward;
 						e.setLength();
 						ve.put(v2.id,e);
-						f.block.edges.add(e);
+						f.ward.edges.add(e);
 					} else {
-						if( e.block1 != f.block) {
-							e.block2_id = f.block.id;
-							e.block2 = f.block;
-							f.block.edges.add(e);
+						if( e.ward1 != f.ward) {
+							e.ward2_id = f.ward.id;
+							e.ward2 = f.ward;
+							f.ward.edges.add(e);
 						}
 					}
 					
@@ -341,7 +341,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		int unpaired_edges = 0;
 		for( HashMap<Integer,Edge> ev : edgeHash.values()) {
 			for( Edge e : ev.values()) {
-				if( e.block2 == null) {
+				if( e.ward2 == null) {
 					unpaired_edges++;
 				} else {
 					paired_edges++;

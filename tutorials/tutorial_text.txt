@@ -29,7 +29,7 @@ How the program evolves districts
 
 
 * Connectedness -
-The total population that is not connected to the largest block in each district.
+The total population that is not connected to the largest ward in each district.
 connectedness: minimizes population not connected to the highest population chunk, 
 sum(region(population)) where region is not the largest region for the district
 
@@ -76,9 +76,9 @@ and a district assignment for each region in that pair is selected randomly with
 these new district maps replace the 50% worst scoring districts.
 
     public void crossover(int[] genome1, int[] genome2) {
-        for( int i = 0; i < block_districts.length; i++) {
+        for( int i = 0; i < ward_districts.length; i++) {
             double r = Math.random();
-            block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+            ward_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
         }
     }
 
@@ -92,11 +92,11 @@ for instance, a piece of district 7 shares 20 units of edge with district 5, 10 
      public void mutate_boundary(double prob) {
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
-        for( int i = 0; i < block_districts.length; i++) {
-        	Block block = blocks.get(i);
+        for( int i = 0; i < ward_districts.length; i++) {
+        	ward ward = wards.get(i);
         	boolean border = false;
-            for( Block bn : block.neighbors) {
-            	if( block_districts[bn.id] != block_districts[i]) {
+            for( ward bn : ward.neighbors) {
+            	if( ward_districts[bn.id] != ward_districts[i]) {
             		border = true;
             		break;
             	}
@@ -109,15 +109,15 @@ for instance, a piece of district 7 shares 20 units of edge with district 5, 10 
             	boundaries_mutated++;
             	try {
           			double total_length = 0;
-        			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-        				total_length += block.neighbor_lengths[j];
+        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+        				total_length += ward.neighbor_lengths[j];
         			}
         			double mutate_to = Math.random()*total_length;
-           			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-        				mutate_to -= block.neighbor_lengths[j];
+           			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+        				mutate_to -= ward.neighbor_lengths[j];
         				if( mutate_to < 0) {
-        					Block b = block.neighbors.get(j);
-        					block_districts[i] = block_districts[b.id];
+        					ward b = ward.neighbors.get(j);
+        					ward_districts[i] = ward_districts[b.id];
         					break;
         				}
         			}

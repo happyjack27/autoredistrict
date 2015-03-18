@@ -4,24 +4,24 @@ import serialization.ReflectionJSONObject;
 
 public class Edge extends ReflectionJSONObject<Edge> {
 	public int id;
-	public int block1_id;
-	public int block2_id;
+	public int ward1_id;
+	public int ward2_id;
 	public int vertex1_id;
 	public int vertex2_id;
     public double length;
     
-	public Block block1 = null;
-	public Block block2 = null;
+	public Ward ward1 = null;
+	public Ward ward2 = null;
 	public Vertex vertex1;
 	public Vertex vertex2;
 	
 	public static boolean isLatLon = false;
 	
-    boolean areBothSidesSameDistrict(int[] block_districts) {
-    	if( block1 == null || block2 == null) {
+    boolean areBothSidesSameDistrict(int[] ward_districts) {
+    	if( ward1 == null || ward2 == null) {
     		return false;
     	}
-        return block_districts[block1.id] == block_districts[block2.id];
+        return ward_districts[ward1.id] == ward_districts[ward2.id];
     }
     
 	public void setLength() {

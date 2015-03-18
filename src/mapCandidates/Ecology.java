@@ -41,9 +41,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	int last_population = 0;
 	int last_num_districts = 0;
 	
-	public HashMap<Integer,Block> blocks_by_id;
+	public HashMap<Integer,Ward> wards_by_id;
 	
-	public Vector<Block> blocks = new Vector<Block>();
+	public Vector<Ward> wards = new Vector<Ward>();
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
 	public MapPanel mapPanel;
@@ -76,7 +76,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	}
     		}
     		if( duped) {
-    			dm.fillDistrictBlocks();
+    			dm.fillDistrictwards();
     		}
         		
     	}
@@ -212,15 +212,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void post_deserialize() {
-		blocks_by_id = new HashMap<Integer,Block>();
+		wards_by_id = new HashMap<Integer,Ward>();
 		HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
 		HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
 		
 		//geometry
-		if( containsKey("blocks")) {
-			blocks = getVector("blocks");
-			for( Block block: blocks) {
-				blocks_by_id.put(block.id,block);
+		if( containsKey("wards")) {
+			wards = getVector("wards");
+			for( Ward ward: wards) {
+				wards_by_id.put(ward.id,ward);
 			}
 		}
 		if( containsKey("edges")) { 
@@ -237,15 +237,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		}
 		if( edges != null) {
 			for( Edge edge: edges) {
-				edge.block1 = blocks_by_id.get(edge.block1_id);
-				edge.block2 = blocks_by_id.get(edge.block2_id);
+				edge.ward1 = wards_by_id.get(edge.ward1_id);
+				edge.ward2 = wards_by_id.get(edge.ward2_id);
 				edge.vertex1 = vertexes_by_id.get(edge.vertex1_id);
 				edge.vertex2 = vertexes_by_id.get(edge.vertex2_id);
-				edge.block1.edges.add(edge);
-				edge.block2.edges.add(edge);
+				edge.ward1.edges.add(edge);
+				edge.ward2.edges.add(edge);
 			}
 		}
-		for( Block b : blocks) {
+		for( Ward b : wards) {
 			b.collectNeighbors();
 		}
 
@@ -259,7 +259,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void pre_serialize() {		
-		put("blocks",blocks);
+		put("wards",wards);
 		put("edges",edges);
 		put("vertexes",vertexes);
 		
@@ -274,8 +274,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( key.equals("edges")) {
 			return new Edge();
 		}
-		if( key.equals("blocks")) {
-			return new Block();
+		if( key.equals("wards")) {
+			return new Ward();
 		}
 		
 		if( key.equals("candidates")) {
@@ -293,7 +293,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public void reset() {
     	population = new Vector<DistrictMap>();
     	this.generation = 0;
-    	for( Block b : blocks) {
+    	for( Ward b : wards) {
     		b.recalcMuSigmaN();
     	}
     }
@@ -309,7 +309,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		population =  new Vector<DistrictMap>();
     	}
         while( population.size() < Settings.population) {
-            population.add(new DistrictMap(blocks,Settings.num_districts));
+            population.add(new DistrictMap(wards,Settings.num_districts));
         }
         while( population.size() > Settings.population) {
             population.remove(Settings.population);
@@ -371,7 +371,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			scoringLatch.await();
     		} catch (InterruptedException e) {
     			System.out.println("ex");
-    			// TODO Auto-generated catch block
+    			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
         }
@@ -524,14 +524,14 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			matingLatch.await();
     		} catch (InterruptedException e) {
     			System.out.println("ex");
-    			// TODO Auto-generated catch block
+    			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
     		if( Settings.replace_all) {
     			Vector<DistrictMap> temp = new Vector<DistrictMap>();
     			for(int j = cutoff; j < population.size(); j++) {
     				temp.add(population.get(j));
-    				population.set(j, new DistrictMap(blocks,Settings.num_districts));
+    				population.set(j, new DistrictMap(wards,Settings.num_districts));
     			}
     			
     	  		for( int j = 0; j < matingThreads.length; j++) {
@@ -549,7 +549,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         			matingLatch.await();
         		} catch (InterruptedException e) {
         			System.out.println("ex");
-        			// TODO Auto-generated catch block
+        			// TODO Auto-generated catch ward
         			e.printStackTrace();
         		}
         		for( int j = 0; j < cutoff && j+cutoff < population.size(); j++) {
@@ -570,7 +570,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             if(Settings.mutation_boundary_rate > 0) {
             	dm.mutate_boundary(Settings.mutation_boundary_rate);
             }
-            dm.fillDistrictBlocks();
+            dm.fillDistrictwards();
         }
         if( Settings.make_unique) {
         	make_unique();

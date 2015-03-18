@@ -28,13 +28,13 @@ public class Gaussian {
 		return new double[]{tmu,tsigma,tn};
 	}
 	/*
-	public static double[] getOddsFromBlocks(Vector<Block> blocks) {
-        double[] events = new double[blocks.size()];
-        double[][] successes = new double[Candidate.candidates.size()][blocks.size()];
+	public static double[] getOddsFromwards(Vector<ward> wards) {
+        double[] events = new double[wards.size()];
+        double[][] successes = new double[Candidate.candidates.size()][wards.size()];
         double[] odds = new double[Candidate.candidates.size()];
-        for( int i = 0; i < blocks.size(); i++) {
-        	Block block = blocks.get(i);
-            for( Demographic d : block.demographics) {
+        for( int i = 0; i < wards.size(); i++) {
+        	ward ward = wards.get(i);
+            for( Demographic d : ward.demographics) {
                 for( int j = 0; j < d.vote_prob.length; j++) {
                 	double n = d.population * d.vote_prob[j]*d.turnout_probability;
                 	events[i] += n;

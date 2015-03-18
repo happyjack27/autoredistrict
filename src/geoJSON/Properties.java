@@ -14,8 +14,8 @@ public class Properties extends ReflectionJSONObject<Properties> {
 		if( !containsKey("DISTRICT")) {
 			if( containsKey("PCT")) {
 				DISTRICT = getString("PCT");
-			} else if( containsKey("BLOCK")) {
-				DISTRICT = getString("BLOCK");
+			} else if( containsKey("ward")) {
+				DISTRICT = getString("ward");
 			} else if( containsKey("WARD")) {
 				DISTRICT = getString("WARD");
 			} else if( containsKey("NAME")) {

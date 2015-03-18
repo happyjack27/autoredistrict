@@ -89,7 +89,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//settings
 	//map_population (folder)
 	//
-	public static int num_precinct_outcomes = 32;
+	public static int num_ward_outcomes = 32;
 	public static boolean replace_all = false;
 	public static void setPopulation(double i) {
 		population = (int)i;

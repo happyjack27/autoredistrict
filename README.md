@@ -18,7 +18,7 @@ TODO:
 ** add in https://sourceforge.net/projects/javashapefilere/
 ** add in http://code.google.com/p/jdbf/source/checkout
 ** create reader option
-* how to handle block-level data? (super-fine)
+* how to handle ward-level data? (super-fine)
 * check for ideas on what to implement: http://www.fairvote.org/research-and-analysis/redistricting/redistricting-reform/model-state-redistricting-reform-criteria/
 ** local representativeness score - based on other factors. - local competitiveness? (for responsiveness)
 
@@ -33,7 +33,7 @@ DONE:
 * also initalize candidates in ecology on loading of election results. 
 * write parts to adjust population, number of districts on evolve function
 * write parts to start and stop evolution
-* write parts to color code blocks by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
+* write parts to color code wards by district based on best scoring map. (make sure to invalidate and repaint each evolve iteration)
 * add inverters for score components - in drop down menu.
 * multithread testing, but reusable threads.
 * add exporting of results ( simple tab deliminted: precinct - district)
@@ -109,11 +109,11 @@ The total of length of all edges that have a different district on each side is 
 	class DistrictMap {
 	    double getEdgeLength() {
 	        double length = 0;
-	        for( Block b : blocks) {
-	        	int d1 = block_districts[b.id];
+	        for( ward b : wards) {
+	        	int d1 = ward_districts[b.id];
 	        	for( int i = 0; i < b.neighbor_lengths.length; i++) {
 	        		int b2id = b.neighbors.get(i).id;
-	            	int d2 = block_districts[b2id];
+	            	int d2 = ward_districts[b2id];
 	            	if( d1 != d2) {
 	            		length += b.neighbor_lengths[i];
 	            	}
@@ -134,19 +134,19 @@ This is the "disconnected population".
         double disconnected_pops = 0;
         if( Settings.disconnected_population_weight > 0) {
             for(District district : districts) {
-            	//int count = district.getRegionCount(block_districts);
+            	//int count = district.getRegionCount(ward_districts);
             	//System.out.println("region count: "+count);
             	//disconnected_pops += count;
-                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
+                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(ward_districts));
             }
         }
     }
     class District {
-	    Vector<Block> getTopPopulationRegion(int[] block_districts) {
-	        Vector<Vector<Block>> regions = getRegions(block_districts);
-	        Vector<Block> high = null;
+	    Vector<ward> getTopPopulationRegion(int[] ward_districts) {
+	        Vector<Vector<ward>> regions = getRegions(ward_districts);
+	        Vector<ward> high = null;
 	        double max_pop = 0;
-	        for( Vector<Block> region : regions) {
+	        for( Vector<ward> region : regions) {
 	            double pop = getRegionPopulation(region);
 	            if( pop > max_pop || high == null) {
 	                max_pop = pop;
@@ -155,40 +155,40 @@ This is the "disconnected population".
 	        }
 	        return high;
 	    }
-	    Vector<Vector<Block>> getRegions(int[] block_districts) {
-	        Hashtable<Integer,Vector<Block>> region_hash = new Hashtable<Integer,Vector<Block>>();
-	        Vector<Vector<Block>> regions = new Vector<Vector<Block>>();
-	        for( Block block : blocks) {
-	            if( region_hash.get(block.id) != null)
+	    Vector<Vector<ward>> getRegions(int[] ward_districts) {
+	        Hashtable<Integer,Vector<ward>> region_hash = new Hashtable<Integer,Vector<ward>>();
+	        Vector<Vector<ward>> regions = new Vector<Vector<ward>>();
+	        for( ward ward : wards) {
+	            if( region_hash.get(ward.id) != null)
 	                continue;
-	            Vector<Block> region = new Vector<Block>();
+	            Vector<ward> region = new Vector<ward>();
 	            regions.add(region);
-	            addAllConnected(block,region,region_hash,block_districts);
+	            addAllConnected(ward,region,region_hash,ward_districts);
 	        }
 	        return regions;
 	    }
-	    //recursively insert connected blocks.
-	    void addAllConnected( Block block, Vector<Block> region,  Hashtable<Integer,Vector<Block>> region_hash, int[] block_districts) {
-	        if( region_hash.get(block.id) != null)
+	    //recursively insert connected wards.
+	    void addAllConnected( ward ward, Vector<ward> region,  Hashtable<Integer,Vector<ward>> region_hash, int[] ward_districts) {
+	        if( region_hash.get(ward.id) != null)
 	            return;
-	        region.add(block);
-	        region_hash.put(block.id,region);
-	        for( Block other_block : block.neighbors) {
-	        	if( block_districts[other_block.id] == block_districts[block.id]) {
-	        		addAllConnected( other_block, region, region_hash, block_districts);
+	        region.add(ward);
+	        region_hash.put(ward.id,region);
+	        for( ward other_ward : ward.neighbors) {
+	        	if( ward_districts[other_ward.id] == ward_districts[ward.id]) {
+	        		addAllConnected( other_ward, region, region_hash, ward_districts);
 	        	}
 	        }
 	    }
-	    double getRegionPopulation(Vector<Block> region) {
+	    double getRegionPopulation(Vector<ward> region) {
 	        double population = 0;
 	        if( region == null) {
 	        	return 0;
 	        }
-	        for( Block block : region) {
-	        	if( block.has_census_results) {
-	        		population += block.population;
+	        for( ward ward : region) {
+	        	if( ward.has_census_results) {
+	        		population += ward.population;
 	        	} else {
-	            	for(Demographic p : block.demographics) {
+	            	for(Demographic p : ward.demographics) {
 	            		population += p.population;
 	            	}
 	        	}

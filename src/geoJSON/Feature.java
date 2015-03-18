@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-import mapCandidates.Block;
+import mapCandidates.Ward;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
@@ -13,7 +13,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public String type;
 	public Properties properties;
 	public Geometry geometry;
-	public Block block = null;
+	public Ward ward = null;
 	
 	public static boolean showPrecinctLabels = false;
 	public static int display_mode = 0;
@@ -31,16 +31,16 @@ public class Feature extends ReflectionJSONObject<Feature> {
 			}
 			tot_area += Math.abs(area)/2.0;
 		}
-		block.area = tot_area;
+		ward.area = tot_area;
 		return tot_area;
 	}
 	
 	public void toggleClicked() {
 		try {
 
-		if( block.state == 0) {
-			block.state = 2;
-			for( Block b : block.neighbors) {
+		if( ward.state == 0) {
+			ward.state = 2;
+			for( Ward b : ward.neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -49,9 +49,9 @@ public class Feature extends ReflectionJSONObject<Feature> {
 					b.state = 1;
 				}
 			}
-		} else if( block.state == 2) { 
-			block.state = 0;
-			for( Block b : block.neighbors) {
+		} else if( ward.state == 2) { 
+			ward.state = 0;
+			for( Ward b : ward.neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -107,12 +107,12 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null || block.state != 0 || display_mode != 0) {
+		if( geometry.fillColor != null || ward.state != 0 || display_mode != 0) {
 			g.setColor(geometry.fillColor);
 			if( display_mode == 1) {
-				g.setColor(block.demographics != null && block.demographics.size() > 0 ? Color.white :  Color.black);
+				g.setColor(ward.demographics != null && ward.demographics.size() > 0 ? Color.white :  Color.black);
 			} else if( display_mode == 2) {
-				g.setColor(block.has_census_results ? Color.white :  Color.black);
+				g.setColor(ward.has_census_results ? Color.white :  Color.black);
 			} else if( display_mode == 3) {
 				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 				int max_col = -1;
@@ -121,8 +121,8 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				for( int i = 0; i < block.demographics.size() && i < colors.length; i++) {
-					int pop = block.demographics.get(i).population;
+				for( int i = 0; i < ward.demographics.size() && i < colors.length; i++) {
+					int pop = ward.demographics.get(i).population;
 					tot += pop;
 					red += colors[i].getRed()*pop;
 					green += colors[i].getGreen()*pop;
@@ -136,8 +136,8 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 				int max_col = -1;
 				int max_num = 0;
-				for( int i = 0; i < block.demographics.size() && i < colors.length; i++) {
-					int pop = block.demographics.get(i).population;
+				for( int i = 0; i < ward.demographics.size() && i < colors.length; i++) {
+					int pop = ward.demographics.get(i).population;
 					if( pop > max_num || max_col < 0) {
 						max_num = pop;
 						max_col = i;
@@ -145,10 +145,10 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				}
 				g.setColor(colors[max_col]);
 			} else {
-				if( block.state == 1) {
+				if( ward.state == 1) {
 					g.setColor(Color.blue);
 				}
-				if( block.state == 2) {
+				if( ward.state == 2) {
 					g.setColor(Color.white);
 				}
 			}

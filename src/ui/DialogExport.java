@@ -145,9 +145,9 @@ public class DialogExport extends JDialog {
 						/*
 						try {
 							if( load_pop) {
-								if( f.block != null) {
-									f.block.has_census_results = true;
-									f.block.population = Double.parseDouble(data[i][pop_index].replaceAll(",",""));
+								if( f.ward != null) {
+									f.ward.has_census_results = true;
+									f.ward.population = Double.parseDouble(data[i][pop_index].replaceAll(",",""));
 								}
 								f.properties.POPULATION = (int) Double.parseDouble(data[i][pop_index]);
 							}

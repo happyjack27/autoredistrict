@@ -99,15 +99,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 				//}
 			}
 			
-		    dlbl.setText("Initializing blocks...");
+		    dlbl.setText("Initializing wards...");
 
 			for( Feature fe : hmFeatures.values()) {
 				featureCollection.features.add(fe);
 			}
 			Vector<Feature> features = featureCollection.features;
 			System.out.println(features.size()+" precincts loaded.");
-			System.out.println("Initializing blocks...");
-			featureCollection.initBlocks();
+			System.out.println("Initializing wards...");
+			featureCollection.initwards();
 		    dlbl.setText("Setting min and max coordinates...");
 
 			minx = features.get(0).geometry.coordinates[0][0][0];
@@ -194,8 +194,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				Vector<Feature> features = featureCollection.features;
 				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing blocks...");
-				featureCollection.initBlocks();
+				System.out.println("Initializing wards...");
+				featureCollection.initwards();
 			    dlbl.setText("Setting min and max coordinates..");
 	
 				minx = features.get(0).geometry.coordinates[0][0][0];
@@ -272,7 +272,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				try {
 					t.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch ward
 					e.printStackTrace();
 				}
 			} else if( ext.equals("json")) {
@@ -281,7 +281,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				try {
 					t.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch ward
 					e.printStackTrace();
 				}
 				
@@ -332,6 +332,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		}
 		if( config.containsKey("representation_weight")) {
 			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(config.getString("representation_weight").trim())));
+		}
+		if( config.containsKey("area_weighted")) {
+			Settings.border_length_area_weighted = config.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false;
 		}
 
 		
@@ -439,9 +442,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 	public void setPopulationColumn(String pop_col) {
 		for( Feature f : featureCollection.features) {
 			String pop = f.properties.get(pop_col).toString();
-			if( f.block != null) {
-				f.block.has_census_results = true;
-				f.block.population = Double.parseDouble(pop.replaceAll(",",""));
+			if( f.ward != null) {
+				f.ward.has_census_results = true;
+				f.ward.population = Double.parseDouble(pop.replaceAll(",",""));
 			}
 			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
 		}
@@ -449,12 +452,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 	public void setDemographicColumns(Vector<String> candidate_cols) {
 		int num_candidates = candidate_cols.size();
 		
-		for( Block b : featureCollection.blocks) {
+		for( Ward b : featureCollection.wards) {
 			b.has_election_results = true;
 		}
 		
 		for( Feature f : featureCollection.features) {
-			Block b = f.block;
+			Ward b = f.ward;
 			double[] dd = new double[num_candidates];
 			for( int i = 0; i < candidate_cols.size(); i++) {
 				dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
@@ -463,7 +466,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			b.demographics.clear();
 			for( int j = 0; j < num_candidates; j++) {
 				Demographic d = new Demographic();
-				//d.block_id = b.id;
+				//d.ward_id = b.id;
 				d.turnout_probability = 1;
 				d.population = (int) dd[j];
 				d.vote_prob = new double[num_candidates];
@@ -472,7 +475,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				d.vote_prob[j] = 1;
 				b.demographics.add(d);
-				System.out.println("block "+b.id+" added demo "+j+" "+d.population);
+				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
@@ -557,7 +560,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	    		}
 				vd.add(ss);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				// TODO Auto-generated catch ward
 				e.printStackTrace();
 			}
 	    }
@@ -653,13 +656,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 			int num_candidates = lines[0].split("\t").length - 1;
 			
 			Vector<String> not_found_in_geo = new Vector<String>();
-			for( Block b : featureCollection.blocks) {
+			for( Ward b : featureCollection.wards) {
 				b.has_election_results = false;
 			}
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
 				String district = ss[0].trim();
-				Block b = featureCollection.precinctHash.get(district);
+				Ward b = featureCollection.precinctHash.get(district);
 				if( b == null) {
 					not_found_in_geo.add(district);
 					System.out.println("not in geo: "+district);
@@ -669,7 +672,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 			}
 			Vector<String> not_found_in_census = new Vector<String>();
-			for( Block b : featureCollection.blocks) {
+			for( Ward b : featureCollection.wards) {
 				if( b.has_election_results == false) {
 					not_found_in_census.add(b.name);
 					System.out.println("not in election: |"+b.name+"|");
@@ -677,7 +680,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 			}
 			if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-				for( Block b : featureCollection.blocks) {
+				for( Ward b : featureCollection.wards) {
 					b.has_election_results = false;
 				}
 				JOptionPane.showMessageDialog(null,""
@@ -713,11 +716,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 			
 			for( Entry<String, double[]> es : votes.entrySet()) {
-				Block b = featureCollection.precinctHash.get(es.getKey());
+				Ward b = featureCollection.precinctHash.get(es.getKey());
 				double[] dd = es.getValue();
 				for( int j = 0; j < num_candidates; j++) {
 					Demographic d = new Demographic();
-					//d.block_id = b.id;
+					//d.ward_id = b.id;
 					d.turnout_probability = 1;
 					d.population = (int) dd[j];
 					d.vote_prob = new double[num_candidates];
@@ -726,7 +729,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					}
 					d.vote_prob[j] = 1;
 					b.demographics.add(d);
-					System.out.println("block "+b.id+" added demo "+d.population+" "+j);
+					System.out.println("ward "+b.id+" added demo "+d.population+" "+j);
 				}
 			}
 			
@@ -753,8 +756,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	public void initFeatures() {
 		Vector<Feature> features = featureCollection.features;
 		System.out.println(features.size()+" precincts loaded.");
-		System.out.println("Initializing blocks...");
-		featureCollection.initBlocks();
+		System.out.println("Initializing wards...");
+		featureCollection.initwards();
 		Settings.resetAnnealing();
 		featureCollection.ecology.generation = 0;
 
@@ -953,7 +956,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 						Thread.sleep(load_wait);
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch ward
 					e.printStackTrace();
 				}
 				
@@ -985,7 +988,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 						Thread.sleep(load_wait);
 					}
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch ward
 					e.printStackTrace();
 				}
 				loadElection(sb.toString());
@@ -1038,13 +1041,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 					String[] lines = s.split("\n");
 					
 					Vector<String> not_found_in_geo = new Vector<String>();
-					for( Block b : featureCollection.blocks) {
+					for( Ward b : featureCollection.wards) {
 						b.has_census_results = false;
 					}
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Block b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.precinctHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -1052,13 +1055,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 						}
 					}
 					Vector<String> not_found_in_census = new Vector<String>();
-					for( Block b : featureCollection.blocks) {
+					for( Ward b : featureCollection.wards) {
 						if( b.has_census_results == false) {
 							not_found_in_census.add(b.name);
 						}
 					}
 					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-						for( Block b : featureCollection.blocks) {
+						for( Ward b : featureCollection.wards) {
 							b.has_census_results = false;
 						}
 						JOptionPane.showMessageDialog(null,""
@@ -1072,10 +1075,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Block b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.precinctHash.get(district);
 						b.has_census_results = true;
 						b.population = Double.parseDouble(ss[1].replaceAll(",",""));
-						System.out.println("block "+b.id+" added census "+b.population);
+						System.out.println("ward "+b.id+" added census "+b.population);
 					}
 				} catch (Exception ex) {
 					System.out.println("ex "+ex);
@@ -1261,10 +1264,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 					FileOutputStream fis = new FileOutputStream(f);
 					
 					DistrictMap dm = featureCollection.ecology.population.get(0);
-					for( int i = 0; i < dm.block_districts.length; i++) {
-						Block b = featureCollection.ecology.blocks.get(i);
-						//sb.append(b.name+", "+dm.block_districts[i]+"\n\r");
-						fis.write((""+b.name.trim()+", "+dm.block_districts[i]+"\r\n").getBytes());
+					for( int i = 0; i < dm.ward_districts.length; i++) {
+						Ward b = featureCollection.ecology.wards.get(i);
+						//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
+						fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 					}
 					
 					//fis.write(sb.toString().getBytes());
@@ -1272,7 +1275,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					fis.close();
 					JOptionPane.showMessageDialog(null,"File saved.");
 				} catch (Exception ex) {
-					// TODO Auto-generated catch block
+					// TODO Auto-generated catch ward
 					ex.printStackTrace();
 					return;
 				}
@@ -1308,14 +1311,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 				String[] lines = s.split("\n");
 				
 				Vector<String> not_found_in_geo = new Vector<String>();
-				for( Block b : featureCollection.blocks) {
+				for( Ward b : featureCollection.wards) {
 					b.temp = -1;
 				}
 				for( int i = 0; i < lines.length; i++) {
 					try {
 						String[] ss = lines[i].split(",");
 						String district = ss[0].trim();
-						Block b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.precinctHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -1326,13 +1329,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 					}
 				}
 				Vector<String> not_found_in_census = new Vector<String>();
-				for( Block b : featureCollection.blocks) {
+				for( Ward b : featureCollection.wards) {
 					if( b.temp < 0) {
 						not_found_in_census.add(b.name);
 					}
 				}
 				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-					for( Block b : featureCollection.blocks) {
+					for( Ward b : featureCollection.wards) {
 						b.temp = -1;
 					}
 					JOptionPane.showMessageDialog(null,""
@@ -1343,14 +1346,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 							, 0);
 					return;
 				}
-				int[] new_block_districts = new int[featureCollection.blocks.size()];
+				int[] new_ward_districts = new int[featureCollection.wards.size()];
 				int num_districts = 0;
-				for( int i = 0; i < new_block_districts.length; i++) {
-					int d = featureCollection.blocks.get(i).temp;
+				for( int i = 0; i < new_ward_districts.length; i++) {
+					int d = featureCollection.wards.get(i).temp;
 					if( num_districts < d) {
 						num_districts = d;
 					}
-					new_block_districts[i] = d;
+					new_ward_districts[i] = d;
 				}
 				num_districts++;
 				Settings.num_districts = num_districts;
@@ -1359,14 +1362,14 @@ public class MainFrame extends JFrame implements iChangeListener {
 					featureCollection.ecology.population = new Vector<DistrictMap>();
 				}
 				if( featureCollection.ecology.population.size() < 1) {
-					featureCollection.ecology.population.add(new DistrictMap(featureCollection.blocks,Settings.num_districts,new_block_districts));
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.wards,Settings.num_districts,new_ward_districts));
 				}
 				while( featureCollection.ecology.population.size() < Settings.population) {
-					featureCollection.ecology.population.add(new DistrictMap(featureCollection.blocks,Settings.num_districts,new_block_districts));
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.wards,Settings.num_districts,new_ward_districts));
 				}
 				for( DistrictMap dm : featureCollection.ecology.population) {
-					dm.setGenome(new_block_districts);
-					dm.fillDistrictBlocks();
+					dm.setGenome(new_ward_districts);
+					dm.fillDistrictwards();
 				
 				}
 				Feature.display_mode = 0;
@@ -1398,17 +1401,17 @@ public class MainFrame extends JFrame implements iChangeListener {
 						FileOutputStream fis = new FileOutputStream(f);
 						
 						DistrictMap dm = featureCollection.ecology.population.get(pop);
-						for( int i = 0; i < dm.block_districts.length; i++) {
-							Block b = featureCollection.ecology.blocks.get(i);
-							//sb.append(b.name+", "+dm.block_districts[i]+"\n\r");
-							fis.write((""+b.name.trim()+", "+dm.block_districts[i]+"\r\n").getBytes());
+						for( int i = 0; i < dm.ward_districts.length; i++) {
+							Ward b = featureCollection.ecology.wards.get(i);
+							//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
+							fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 						}
 						
 						//fis.write(sb.toString().getBytes());
 						fis.flush();
 						fis.close();
 					} catch (Exception ex) {
-						// TODO Auto-generated catch block
+						// TODO Auto-generated catch ward
 						ex.printStackTrace();
 					}
 				}
@@ -1743,7 +1746,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			
 			fis.close();
 		} catch (Exception ex) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch ward
 			ex.printStackTrace();
 			return sb;
 		} 

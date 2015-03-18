@@ -8,10 +8,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static boolean use_border_length_on_mutate_boundary = true;
 
     public static int num_districts = 0;
-	public Vector<Block> blocks = new Vector<Block>();
+	public Vector<Ward> wards = new Vector<Ward>();
 	public Vector<District> districts = new Vector<District>();
     
-    public int[] block_districts = new int[]{};
+    public int[] ward_districts = new int[]{};
     public double[] fairnessScores = new double[5];
     public double fitness_score = 0;
     
@@ -28,14 +28,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //always find the most identical version before spawning new ones!
     //this dramatically reduces convergence time!
     public int[] getGenome(int[] baseline) {
-    	for( int i = 0; i < block_districts.length; i++) {
-    		while(block_districts[i] >= Settings.num_districts) {
-    			block_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    	for( int i = 0; i < ward_districts.length; i++) {
+    		while(ward_districts[i] >= Settings.num_districts) {
+    			ward_districts[i] = (int)Math.floor(Math.random()*(double)Settings.num_districts);
     		}
     	}/*
     	int orig_matches = 0;
-    	for( int i = 0; i < block_districts.length; i++) {
-			if( block_districts[i] == baseline[i])
+    	for( int i = 0; i < ward_districts.length; i++) {
+			if( ward_districts[i] == baseline[i])
 				orig_matches++;
     	}*/
     	/*
@@ -49,8 +49,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		counts[i] = new int[Settings.num_districts];
         	for( int j = 0; j < counts.length; j++) {
         		counts[i][j] = 0;
-            	for( int k = 0; k < block_districts.length; k++) {
-            		if( block_districts[k] == i && baseline[k] == j) {
+            	for( int k = 0; k < ward_districts.length; k++) {
+            		if( ward_districts[k] == i && baseline[k] == j) {
             			counts[i][j]++;
             		}
             	}
@@ -84,9 +84,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         System.out.print(" ");
 */
-    	int[] new_baseline = new int[block_districts.length];
-    	for( int i = 0; i < block_districts.length; i++) {
-    		new_baseline[i] = best_subst[block_districts[i]];
+    	int[] new_baseline = new int[ward_districts.length];
+    	for( int i = 0; i < ward_districts.length; i++) {
+    		new_baseline[i] = best_subst[ward_districts[i]];
     	}
     	/*
     	int new_matches = 0;
@@ -116,11 +116,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     public void mutate(double prob) {
         double max = Settings.num_districts;
-        for( int i = 0; i < block_districts.length; i++) {
+        for( int i = 0; i < ward_districts.length; i++) {
             if( Math.random() <= prob) {
-                block_districts[i] = (int)(Math.floor(Math.random()*max));
-                while( block_districts[i] >= Settings.num_districts) {
-                    block_districts[i] = (int)(Math.floor(Math.random()*max));
+                ward_districts[i] = (int)(Math.floor(Math.random()*max));
+                while( ward_districts[i] >= Settings.num_districts) {
+                    ward_districts[i] = (int)(Math.floor(Math.random()*max));
                 }
             }
         }
@@ -133,11 +133,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//start at 1 for regularization
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
-        for( int i = 0; i < block_districts.length; i++) {
-        	Block block = blocks.get(i);
+        for( int i = 0; i < ward_districts.length; i++) {
+        	Ward ward = wards.get(i);
         	boolean border = false;
-            for( Block bn : block.neighbors) {
-            	if( block_districts[bn.id] != block_districts[i]) {
+            for( Ward bn : ward.neighbors) {
+            	if( ward_districts[bn.id] != ward_districts[i]) {
             		border = true;
             		break;
             	}
@@ -150,15 +150,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             	boundaries_mutated++;
             	try {
           			double total_length = 0;
-        			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-        				total_length += block.neighbor_lengths[j];
+        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+        				total_length += ward.neighbor_lengths[j];
         			}
         			double mutate_to = Math.random()*total_length;
-           			for( int j = 0; j < block.neighbor_lengths.length; j++) {
-        				mutate_to -= block.neighbor_lengths[j];
+           			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+        				mutate_to -= ward.neighbor_lengths[j];
         				if( mutate_to < 0) {
-        					Block b = block.neighbors.get(j);
-        					block_districts[i] = block_districts[b.id];
+        					Ward b = ward.neighbors.get(j);
+        					ward_districts[i] = ward_districts[b.id];
         					break;
         				}
         			}
@@ -177,12 +177,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public void crossover(int[] genome1, int[] genome2) {
-        for( int i = 0; i < block_districts.length; i++) {
+        for( int i = 0; i < ward_districts.length; i++) {
             double r = Math.random();
             if( Settings.pso ) {
-            	block_districts[i] = r < 0.333333333333 ? genome1[i] : r < 0.6666666666666 ? genome2[i] : Ecology.bestMap.getGenome()[i];
+            	ward_districts[i] = r < 0.333333333333 ? genome1[i] : r < 0.6666666666666 ? genome2[i] : Ecology.bestMap.getGenome()[i];
             } else {
-            	block_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
+            	ward_districts[i] = r < 0.5 ? genome1[i] : genome2[i];
             }
         }
     }
@@ -257,45 +257,45 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     //constructors
-    public DistrictMap(Vector<Block> blocks, int num_districts, int[] genome) {
-        this(blocks,num_districts);
+    public DistrictMap(Vector<Ward> wards, int num_districts, int[] genome) {
+        this(wards,num_districts);
         setGenome(genome);
     }
     
-    public void fillDistrictBlocks() {
+    public void fillDistrictwards() {
     	for( District d : districts) {
-    		d.blocks = new Vector<Block>();
+    		d.wards = new Vector<Ward>();
     	}
 		while( Settings.num_districts > districts.size()) {
 			districts.add(new District());
 		}
 
-    	for( int i = 0; i < block_districts.length; i++) {
-    		int district = block_districts[i];
+    	for( int i = 0; i < ward_districts.length; i++) {
+    		int district = ward_districts[i];
     		if( district >= Settings.num_districts) {
     			while( district  >= Settings.num_districts) {
     				district = (int)Math.floor(Math.random()*(double)Settings.num_districts);
     			}
-    			block_districts[i] = district;
+    			ward_districts[i] = district;
     		}
     		while( district >= districts.size()) {
     			districts.add(new District());
     		}
-    		districts.get(district).blocks.add(blocks.get(i));
+    		districts.get(district).wards.add(wards.get(i));
     	}
-    	//make sure each district always has at least 1 block.
+    	//make sure each district always has at least 1 ward.
     	for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
     		District d = districts.get(i);
-    		if( d.blocks.size() == 0) {
-    			int num_to_get = blocks.size() / (districts.size());
+    		if( d.wards.size() == 0) {
+    			int num_to_get = wards.size() / (districts.size());
     			if( num_to_get < 1) {
     				num_to_get = 1;
     			}
     			for( int k = 0; k < num_to_get; k++) {
-        			int j = (int) (Math.random()*(double)blocks.size());
-        			districts.get(block_districts[j]).blocks.remove(blocks.get(j));
-        			block_districts[j] = i;
-        			d.blocks.add(blocks.get(j));
+        			int j = (int) (Math.random()*(double)wards.size());
+        			districts.get(ward_districts[j]).wards.remove(wards.get(j));
+        			ward_districts[j] = i;
+        			d.wards.add(wards.get(j));
     			}
     		}
     	}
@@ -307,16 +307,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 
     }
-    public DistrictMap(Vector<Block> blocks, int num_districts) {
+    public DistrictMap(Vector<Ward> wards, int num_districts) {
         this.num_districts = num_districts;
-        this.blocks = blocks;
+        this.wards = wards;
         //System.out.println(" districtmap constructor numdists "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
-        block_districts = new int[blocks.size()];
+        ward_districts = new int[wards.size()];
         mutate(1);
-        fillDistrictBlocks();
+        fillDistrictwards();
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
     public void resize_districts(int target) {
@@ -337,20 +337,20 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		
     	if( num_districts > target) {
     		double d = target;
-    		for( int i = 0; i < block_districts.length; i++) {
-    			if( block_districts[i] >= target) {
+    		for( int i = 0; i < ward_districts.length; i++) {
+    			if( ward_districts[i] >= target) {
     				int x = (int)Math.floor(Math.random() * d);
-    				block_districts[i] = x;
-    				while( block_districts[i] >= target) {
+    				ward_districts[i] = x;
+    				while( ward_districts[i] >= target) {
     	   				x = (int)Math.floor(Math.random() * d);
-        				block_districts[i] = x;
+        				ward_districts[i] = x;
         			}
 
-    				districts.get(x).blocks.add(blocks.get(i));
+    				districts.get(x).wards.add(wards.get(i));
     			}
     		}
     	}
-        fillDistrictBlocks();
+        fillDistrictwards();
     	if( num_districts < target) {
     	}
     	num_districts = target;
@@ -363,16 +363,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //genetic evolution primary functions
     public int[] getGenome() {
-        return block_districts;
+        return ward_districts;
     }
     public void setGenome(int[] genome) {
-        block_districts = genome;
+        ward_districts = genome;
         //System.out.println("setgenome districts "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
         for( int i = 0; i < genome.length; i++)
-            districts.get(genome[i]).blocks.add(blocks.get(i));
+            districts.get(genome[i]).wards.add(wards.get(i));
     }
 
     //helper functions
@@ -634,10 +634,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double disconnected_pops = 0;
         if( Settings.disconnected_population_weight > 0) {
             for(District district : districts) {
-            	//int count = district.getRegionCount(block_districts);
+            	//int count = district.getRegionCount(ward_districts);
             	//System.out.println("region count: "+count);
             	//disconnected_pops += count;
-                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(block_districts));
+                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(ward_districts));
             }
         }
         //disconnected_pops /= total_population;
@@ -695,12 +695,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     double getWeightedEdgeLength() {
     	double[] lengths = new double[districts.size()]; 
     	double[] areas = new double[districts.size()]; 
-        for( Block b : blocks) {
-        	int d1 = block_districts[b.id];
+        for( Ward b : wards) {
+        	int d1 = ward_districts[b.id];
         	areas[d1] += b.area;
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id;
-            	int d2 = block_districts[b2id];
+            	int d2 = ward_districts[b2id];
             	if( d1 != d2) {
             		lengths[d1] += b.neighbor_lengths[i];
             		lengths[d2] += b.neighbor_lengths[i];
@@ -717,11 +717,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     double getEdgeLength() {
         double length = 0;
-        for( Block b : blocks) {
-        	int d1 = block_districts[b.id];
+        for( Ward b : wards) {
+        	int d1 = ward_districts[b.id];
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id;
-            	int d2 = block_districts[b2id];
+            	int d2 = ward_districts[b2id];
             	if( d1 != d2) {
             		length += b.neighbor_lengths[i];
             	}
@@ -731,11 +731,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return length;
     }
-    Vector<Edge> getOuterEdges(int[] block_districts) {
+    Vector<Edge> getOuterEdges(int[] ward_districts) {
         Vector<Edge> outerEdges = new Vector<Edge>();
-        for( Block block : blocks)
-            for( Edge edge : block.edges)
-                if( !edge.areBothSidesSameDistrict(block_districts))
+        for( Ward ward : wards)
+            for( Edge edge : ward.edges)
+                if( !edge.areBothSidesSameDistrict(ward_districts))
                     outerEdges.add(edge);
         return outerEdges;
     }
