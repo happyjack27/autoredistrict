@@ -1,9 +1,6 @@
 package ui;
 
-import geoJSON.Feature;
-import geoJSON.FeatureCollection;
-import geoJSON.Geometry;
-import geoJSON.Project;
+import geoJSON.*;
 import geoJSON.Properties;
 
 import java.awt.*;
@@ -23,15 +20,10 @@ import javax.swing.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
-import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
-import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
-import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
-
-import serialization.JSONObject;
-import serialization.ReflectionJSONObject;
+import org.nocrala.tools.gis.data.esri.shapefile.*;
+import org.nocrala.tools.gis.data.esri.shapefile.header.*;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.JDBFException;
@@ -40,9 +32,10 @@ import com.hexiong.jdbf.JDBFException;
 public class MainFrame extends JFrame implements iChangeListener {
 	public static MainFrame mainframe;
 	
-	public String openedGeoFilePath = "";
+	//public String openedGeoFilePath = "";
 	public String openedProjectFilePath = "";
 	public Project project = new Project();
+	public DemographicSet activeDemographicSet = new DemographicSet();
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -64,7 +57,7 @@ public class MainFrame extends JFrame implements iChangeListener {
     	public void run() {
 		    dlbl.setText("Loading file "+f.getName()+"...");
 		    
-		    openedGeoFilePath = f.getAbsolutePath();
+		    project.source_file = f.getAbsolutePath();
 			
 			featureCollection = new FeatureCollection(); 
 			if( panelStats != null) {
@@ -170,7 +163,7 @@ public class MainFrame extends JFrame implements iChangeListener {
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
 
-    		    openedGeoFilePath = f.getAbsolutePath();
+    		    project.source_file = f.getAbsolutePath();
 
 	    		dlg.setVisible(true);
 	    		
@@ -265,7 +258,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		
 	    project.fromJSON(getFile(f0).toString());
-		
+	    
+		if( project.containsKey("equalize_turnout")) {
+			Settings.adjust_vote_to_population = project.getString("equalize_turnout").trim().toLowerCase().equals("true");
+		} else { System.out.println("equalize_turnout not found"); }
+	    
 		System.out.println("found keys:");
 		Set<String> keys = project.keySet();
 		for( String s : keys) {
@@ -352,7 +349,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(project.getString("representation_weight").trim())));
 		}
 		if( project.containsKey("area_weighted")) {
-			chckbxAreaWeighted.setSelected(project.getString("area_weighted").trim().toLowerCase().equals("true") ? true : false);
+			chckbxAreaWeighted.setSelected(project.getString("area_weighted").trim().toLowerCase().equals("true"));
 		}
 
 		

@@ -6,8 +6,6 @@ import serialization.JSONObject;
 public class District extends JSONObject {
     Vector<Ward> wards = new Vector<Ward>();
     
-    public static boolean adjust_vote_to_population = true;
-
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
     
@@ -206,7 +204,7 @@ public class District extends JSONObject {
     */
     
     public double[][] generateOutcomes(int num) {
-    	if( adjust_vote_to_population) {
+    	if( Settings.adjust_vote_to_population) {
         	outcomes = new double[num][];
         	pop_balanced_outcomes = new double[num][];
         	for( int i = 0; i < num; i++) {

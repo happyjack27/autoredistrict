@@ -1,10 +1,10 @@
 
 
 TODO:
-* export all columns, including new district, to .dbf.
-* remember opened geo file path, opened project file path.
 * save project
-* more population column selection on to main view (and remember it)
+* import result column
+* export all columns, including new district, to .dbf.
+* move population column selection on to main view (and remember it) (and remember from layer selection)
 * remember demographics columns and show on layer selection
 * add multiple demographics and elections
 

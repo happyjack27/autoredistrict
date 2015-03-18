@@ -12,7 +12,7 @@ public class DemographicSet extends ReflectionJSONObject<DemographicSet> {
 	public String year = "";
     public Vector<String> columns = new Vector<String>();
 	
-    public Vector<Demographic> demographics = new Vector<Demographic>();
+    //public Vector<Demographic> demographics = new Vector<Demographic>();
 
 	public void post_deserialize() {
 		super.post_deserialize();
