@@ -92,7 +92,7 @@ public class PanelStats extends JPanel {
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
-				dcolumns[i+4] = ""+i+" %";
+				dcolumns[i+4] = ""+i+" vote %";
 				dcolumns[i+4+Candidate.candidates.size()] = ""+i+" votes";
 			}
 			
