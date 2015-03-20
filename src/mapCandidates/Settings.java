@@ -25,16 +25,6 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     	if( new_rate < e) {
     		new_rate = e;
     	}
-    	/*
-    	if( generation < 1000) {
-    		double d = 0.25*(1000.0-(double)generation)/1000.0;
-    		if( new_rate < d)
-    			new_rate = d;
-    	}*/
-    	/*
-    	if( generation > 16.0 && new_rate < 4.0/(double)generation && 4.0/(double)generation < 0.25) {
-    		new_rate = 4.0/(double)generation;
-    	}*/
     	return new_rate;
 	}
 	public static Vector<iChangeListener> populationChangeListeners = new Vector<iChangeListener>();
@@ -104,43 +94,4 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		}
 	}
 	public static boolean adjust_vote_to_population = true;
-    
-    /*
-	@Override
-	public void post_deserialize() {
-		species_fraction = this.getDouble("species_fraction");
-		geometry_weight = this.getDouble("geometry_weight");
-		population_balance_weight = this.getDouble("population_balance_weight");
-		disconnected_population_weight = this.getDouble("disconnected_population_weight");
-		disenfranchise_weight = this.getDouble("disenfranchise_weight");
-		voting_power_balance_weight = this.getDouble("voting_power_balance_weight");
-
-		speciation_fraction = this.getDouble("speciation_fraction");
-		replace_fraction = this.getDouble("replace_fraction");
-		mutation_rate = this.getDouble("mutation_rate");
-		mutation_boundary_rate = this.getDouble("mutation_boundary_rate");
-		trials = (int)this.getDouble("trials");
-		population = (int)this.getDouble("population");
-	}
-	@Override
-	public void pre_serialize() {
-		put("species_fraction",species_fraction);
-		put("geometry_weight",geometry_weight);
-		put("population_balance_weight",population_balance_weight);
-		put("disconnected_population_weight",disconnected_population_weight);
-		put("disenfranchise_weight",disenfranchise_weight);
-		put("voting_power_balance_weight",voting_power_balance_weight);
-
-		put("speciation_fraction",speciation_fraction);
-		put("replace_fraction",replace_fraction);
-		put("mutation_rate",mutation_rate);
-		put("mutation_boundary_rate",mutation_boundary_rate);
-		put("trials",trials);
-		put("population",population);
-	}
-	@Override
-	public JSONObject instantiateObject(String key) {
-		return null;
-	} */
-
 }

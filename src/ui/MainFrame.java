@@ -36,6 +36,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	public String openedProjectFilePath = "";
 	public Project project = new Project();
 	public DemographicSet activeDemographicSet = new DemographicSet();
+	JComboBox comboBoxPrimaryKey = new JComboBox();
+	JComboBox comboBoxPopulation = new JComboBox();
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -273,111 +275,17 @@ public class MainFrame extends JFrame implements iChangeListener {
     	}
     }
 	
+	class OpenProjectFileThread extends FileThread {
+		OpenProjectFileThread(File f) { super(f); }
+    	public void run() { 
+    	    project.fromJSON(getFile(f).toString());
+    	}
+	}
+	
 	public void openProjectFile(File f0) {
 		project = new Project();
-		
 	    openedProjectFilePath = f0.getAbsolutePath();
-		
-		
-	    project.fromJSON(getFile(f0).toString());
-	    /*
-		if( project.containsKey("equalize_turnout")) {
-			Settings.adjust_vote_to_population = project.getString("equalize_turnout").trim().toLowerCase().equals("true");
-		} else { System.out.println("equalize_turnout not found"); }
-	    
-		System.out.println("found keys:");
-		Set<String> keys = project.keySet();
-		for( String s : keys) {
-			System.out.println(s);
-		}
-		if( project.containsKey("source_file")) {
-			String source = project.getString("source_file").trim();
-			System.out.println("source file: "+source);
-			String ext = source.substring(source.length()-4).toLowerCase();
-			File f = new File(source);
-			if( f == null) {
-				JOptionPane.showMessageDialog(mainframe, "File not found: "+source);
-				return;
-			} else if( ext.equals(".shp")) {
-				Thread t = new OpenShapeFileThread(f);
-				t.start();
-				try {
-					t.join();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch ward
-					e.printStackTrace();
-				}
-			} else if( ext.equals("json")) {
-				Thread t = new OpenGeoJsonFileThread(f);
-				t.start();
-				try {
-					t.join();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch ward
-					e.printStackTrace();
-				}
-				
-			} else {
-				JOptionPane.showMessageDialog(mainframe, "Invalid file format: "+source);
-				return;
-			}
-		} else { System.out.println("source_file not found"); return; }
-
-		if( project.containsKey("number_of_districts")) {
-			textFieldNumDistricts.setText(project.getString("number_of_districts").trim());
-			textFieldNumDistricts.postActionEvent();
-		} else { System.out.println("number_of_districts not found"); }
-		if( project.containsKey("members_per_district")) {
-			textFieldMembersPerDistrict.setText(project.getString("members_per_district").trim());
-			textFieldMembersPerDistrict.postActionEvent();
-		} else { System.out.println("members_per_district not found"); }
-		
-		if( project.containsKey("initial_population")) {
-			textField.setText(project.getString("initial_population").trim());
-			textField.postActionEvent();
-		} else { System.out.println("initial_population not found"); }
-
-		if( project.containsKey("elections_simulated")) {
-			textFieldElectionsSimulated.setText(project.getString("elections_simulated").trim());
-			textFieldElectionsSimulated.postActionEvent();
-		} else { System.out.println("elections_simulated not found"); }
-
-		if( project.containsKey("population_column")) {
-			setPopulationColumn(project.getString("population_column").trim());
-		} else { System.out.println("population_column not found"); }
-		
-		if( project.containsKey("demographic_columns")) {
-			Vector v = project.getVector("demographic_columns");
-			Vector<String> vs = new Vector<String>();
-			for( int i = 0; i < v.size(); i++) {
-				vs.add((String)v.get(i));
-			}
-			setDemographicColumns(vs);
-		} else { System.out.println("demographic_columns not found"); }
-
-		if( project.containsKey("disconnected_weight")) {
-			sliderDisconnected.setValue((int)(100.0*Double.parseDouble(project.getString("disconnected_weight").trim())));
-		}
-		if( project.containsKey("population_balance_weight")) {
-			sliderPopulationBalance.setValue((int)(100.0*Double.parseDouble(project.getString("population_balance_weight").trim())));
-		}
-		if( project.containsKey("border_length_weight")) {
-			sliderBorderLength.setValue((int)(100.0*Double.parseDouble(project.getString("border_length_weight").trim())));
-		}
-		if( project.containsKey("voting_power_weight")) {
-			sliderVotingPowerBalance.setValue((int)(100.0*Double.parseDouble(project.getString("voting_power_weight").trim())));
-		}
-		if( project.containsKey("representation_weight")) {
-			sliderRepresentation.setValue((int)(100.0*Double.parseDouble(project.getString("representation_weight").trim())));
-		}
-		if( project.containsKey("area_weighted")) {
-			chckbxAreaWeighted.setSelected(project.getString("area_weighted").trim().toLowerCase().equals("true"));
-		}
-
-		
-		featureCollection.ecology.startEvolving();
-		*/
-
+	    new OpenProjectFileThread(f0).start();
 	}
 	
 	
@@ -391,6 +299,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
+	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
+	JMenuItem mntmExportData = new JMenuItem("Export data");
 	JMenuItem mntmImportData = new JMenuItem("Import data");
 
     final JDialog dlg = new JDialog(mainframe, "Working", true);
@@ -461,6 +371,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mntmSelectLayers.setEnabled(geo_loaded);
 		mntmImportcsv.setEnabled(geo_loaded);
 		mntmExportcsv.setEnabled(geo_loaded);
+		mntmExportData.setEnabled(geo_loaded);
+		mntmSaveProjectFile.setEnabled(geo_loaded);
+
 		
 	}
 	
@@ -884,6 +797,31 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		mnFile.add(mntmOpenProjectFile);
 		
+		mntmSaveProjectFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
+				jfc.setFileFilter(filter);
+				jfc.showSaveDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				String s = project.toJSON();
+				try {
+					FileOutputStream fos = new FileOutputStream(fd);
+					fos.write(s.getBytes());
+					fos.flush();
+					fos.close();
+					JOptionPane.showMessageDialog(mainframe,"Project file saved.");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+			}
+		});
+		mnFile.add(mntmSaveProjectFile);
+		
 		JSeparator separator = new JSeparator();
 		mnFile.add(separator);
 		
@@ -952,6 +890,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 				selectLayers();
 			}
 		});
+		
+		mntmExportData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		mnFile.add(mntmExportData);
 
 		mnFile.add(new JSeparator());
 		
@@ -1475,7 +1419,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 334, 200, 416);
+		panel_2.setBounds(0, 400, 200, 386);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1494,7 +1438,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblEvolutionaryPressure.setBounds(6, 8, 179, 16);
+		lblEvolutionaryPressure.setBounds(6, 9, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
 		JLabel lblProportionalRepresentation = new JLabel("Population imbalance");
@@ -1555,7 +1499,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 128, 200, 195);
+		panel_3.setBounds(0, 223, 200, 166);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1588,9 +1532,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
 		JLabel lblBorderMutation = new JLabel("% border mutation");
-		lblBorderMutation.setBounds(6, 128, 172, 16);
+		lblBorderMutation.setBounds(6, 103, 172, 16);
 		panel_3.add(lblBorderMutation);
-		slider_1.setBounds(6, 149, 190, 29);
+		slider_1.setBounds(6, 130, 190, 29);
 		panel_3.add(slider_1);
 		
 		JLabel lblTrials = new JLabel("Elections simulated");
@@ -1701,6 +1645,28 @@ public class MainFrame extends JFrame implements iChangeListener {
 		JLabel lblMembersPerDistrict = new JLabel("Members per district");
 		lblMembersPerDistrict.setBounds(6, 95, 124, 16);
 		panel.add(lblMembersPerDistrict);
+		
+		comboBoxPrimaryKey.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+			}
+		});
+		comboBoxPrimaryKey.setBounds(10, 141, 178, 20);
+		panel.add(comboBoxPrimaryKey);
+		
+		comboBoxPopulation.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+			}
+		});
+		comboBoxPopulation.setBounds(10, 192, 178, 20);
+		panel.add(comboBoxPopulation);
+		
+		JLabel lblPrimaryKeyColumn = new JLabel("Primary key column");
+		lblPrimaryKeyColumn.setBounds(6, 122, 182, 16);
+		panel.add(lblPrimaryKeyColumn);
+		
+		JLabel lblPopulationColumn = new JLabel("Population column");
+		lblPopulationColumn.setBounds(6, 172, 182, 16);
+		panel.add(lblPopulationColumn);
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;

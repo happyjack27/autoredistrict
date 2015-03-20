@@ -19,9 +19,11 @@ public class Project extends ReflectionJSONObject<Project> {
 	public boolean area_weighted = true;
 	public int initial_population = 128;
 	public int simulated_elections = 4;
+	
+	public String primary_key_column = "";
 	public String population_column = "";
-	public String result_column = "";
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
+	
 	public String active_demographic_set = "";
 	public double disconnected_weight = 0.5;
 	public double population_balance_weight = 0.5;
@@ -125,6 +127,18 @@ public class Project extends ReflectionJSONObject<Project> {
 		population_balance_weight = Settings.population_balance_weight;
 		representation_weight = Settings.disenfranchise_weight;
 		border_length_weight = Settings.geometry_weight;
+		
+		initial_population = Settings.population;
+		number_of_districts = Settings.num_districts;
+		members_per_district = Settings.members_per_district;
+		simulated_elections = Settings.num_elections_simulated;
+		
+		equalize_turnout = Settings.adjust_vote_to_population;
+		
+		members_per_district = Settings.members_per_district;
+		area_weighted = Settings.border_length_area_weighted;
+		
+		//initial_population = Integer.parseInt(((String)MainFrame.mainframe.textField.getText()).trim()));
 		super.pre_serialize();
 	}
 
