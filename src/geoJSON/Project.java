@@ -22,6 +22,8 @@ public class Project extends ReflectionJSONObject<Project> {
 	
 	public String primary_key_column = "";
 	public String population_column = "";
+	
+	public Vector<String> demographic_columns = new Vector<String>();
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
 	
 	public String active_demographic_set = "";
@@ -82,6 +84,14 @@ public class Project extends ReflectionJSONObject<Project> {
 			MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("elections_simulated").trim());
 			MainFrame.mainframe.textFieldElectionsSimulated.postActionEvent();
 		} else { System.out.println("elections_simulated not found"); }
+		
+		if( !containsKey("primary_key_column")) {
+			if( isEsriSapefile()) {
+				put("primary_key_column","REC_NUM");
+				primary_key_column = "REC_NUM";
+			}
+			
+		}
 
 		if( containsKey("population_column")) {
 			MainFrame.mainframe.comboBoxPopulation.setSelectedItem(getString("population_column").trim());
@@ -94,6 +104,7 @@ public class Project extends ReflectionJSONObject<Project> {
 		
 		if( containsKey("demographic_columns")) {
 			Vector v = getVector("demographic_columns");
+			demographic_columns = v;
 			Vector<String> vs = new Vector<String>();
 			for( int i = 0; i < v.size(); i++) {
 				vs.add((String)v.get(i));
@@ -124,6 +135,10 @@ public class Project extends ReflectionJSONObject<Project> {
 		MainFrame.mainframe.featureCollection.ecology.startEvolving();
 	
 	}
+	
+	boolean isEsriSapefile() {
+		return source_file != null && source_file.substring(source_file.length()-4).trim().toLowerCase().equals(".shp");
+	}
 
 	@Override
 	public void pre_serialize() {
@@ -143,6 +158,12 @@ public class Project extends ReflectionJSONObject<Project> {
 		members_per_district = Settings.members_per_district;
 		area_weighted = Settings.border_length_area_weighted;
 		
+		if( primary_key_column == null || primary_key_column.length() == 0) {
+			if( isEsriSapefile())
+				primary_key_column = "REC_NUM";
+		}
+		
+		put("demographic_columns",demographic_columns);
 		//initial_population = Integer.parseInt(((String)MainFrame.mainframe.textField.getText()).trim()));
 		super.pre_serialize();
 	}

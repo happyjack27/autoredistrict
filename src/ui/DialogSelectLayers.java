@@ -19,8 +19,12 @@ public class DialogSelectLayers extends JDialog {
 
 	public Vector<String> not_in = new Vector<String>();
 	public Vector<String> in = new Vector<String>();
-	
+
 	public void setData(FeatureCollection fc) {
+		setData(fc,null);
+		
+	}
+	public void setData(FeatureCollection fc, Vector<String> current) {
 		ok = false;
 		this.fc = fc;
 		map_headers = fc.getHeaders();
@@ -31,6 +35,15 @@ public class DialogSelectLayers extends JDialog {
 		for( String s : map_headers) {
 			not_in.add(s);
 		}
+		
+		if( current != null) {
+			for( int i = 0; i < current.size(); i++) {
+				String s = current.get(i);
+				in.add(s);
+				not_in.remove(s);
+			}
+		}
+		
 		list.setListData(not_in);
 		list_1.setListData(in);
 		
@@ -40,7 +53,7 @@ public class DialogSelectLayers extends JDialog {
 		setTitle("Select layers");
 		setModal(true);
 		getContentPane().setLayout(null);
-		this.setSize(new Dimension(500,600));
+		this.setSize(new Dimension(498, 479));
 		getContentPane().setPreferredSize(new Dimension(500,600));
 		
 		JButton btnOk = new JButton("OK");
@@ -63,13 +76,13 @@ public class DialogSelectLayers extends JDialog {
 		getContentPane().add(btnCancel);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 88, 182, 284);
+		scrollPane.setBounds(10, 11, 182, 361);
 		getContentPane().add(scrollPane);
 		
 		scrollPane.setViewportView(list);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(286, 88, 182, 284);
+		scrollPane_1.setBounds(286, 11, 182, 361);
 		getContentPane().add(scrollPane_1);
 		
 		scrollPane_1.setViewportView(list_1);
@@ -85,7 +98,7 @@ public class DialogSelectLayers extends JDialog {
 				list_1.setListData(in);
 			}
 		});
-		button.setBounds(214, 143, 49, 29);
+		button.setBounds(214, 87, 49, 29);
 		getContentPane().add(button);
 		
 		JButton button_1 = new JButton("<");

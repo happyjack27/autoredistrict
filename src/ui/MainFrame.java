@@ -53,27 +53,44 @@ public class MainFrame extends JFrame implements iChangeListener {
     		this.f = f;
     	}
 	}
-	
+	public boolean hushcomboBoxPopulation = false;
+	public boolean hushcomboBoxPrimaryKey = false;
 	public void fillComboBoxes() {
 		String[] map_headers = featureCollection.getHeaders();
 		//String[][] map_data = featureCollection.getData(map_headers);
+		System.out.println("population..");
 		
-		
-		comboBoxPopulation.removeAllItems();
-		comboBoxPopulation.addItem("");
-		for( int i = 0; i < map_headers.length; i++) {
-			comboBoxPopulation.addItem(map_headers[i]);
+		try {
+			hushcomboBoxPopulation = true;
+			comboBoxPopulation.removeAllItems();
+			comboBoxPopulation.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxPopulation.addItem(map_headers[i]);
+			}
+			hushcomboBoxPopulation = false;
+			if( project.population_column != null && project.population_column.length() > 0) {
+				comboBoxPopulation.setSelectedItem(project.population_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
 		}
-		if( project.population_column != null && project.population_column.length() > 0) {
-			comboBoxPopulation.setSelectedItem(project.population_column);
-		}
-		comboBoxPrimaryKey.removeAllItems();
-		comboBoxPrimaryKey.addItem("");
-		for( int i = 0; i < map_headers.length; i++) {
-			comboBoxPrimaryKey.addItem(map_headers[i]);
-		}
-		if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
-			comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
+		System.out.println("pkey..");
+
+		try {
+			hushcomboBoxPrimaryKey = true;
+			comboBoxPrimaryKey.removeAllItems();
+			comboBoxPrimaryKey.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxPrimaryKey.addItem(map_headers[i]);
+			}
+			hushcomboBoxPrimaryKey = false;
+			if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
+				comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
 		}
 		//comboBoxPopulation.setSelectedIndex(0);
 		
@@ -181,8 +198,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 		featureCollection.ecology.mapPanel = mapPanel;
 		featureCollection.ecology.statsPanel = panelStats;
 	    dlbl.setText("Initializing ecology...");
-	
-		featureCollection.initEcology();
+	    try {
+	    	featureCollection.initEcology();
+	    } catch (Exception ex) {
+	    	System.out.println("init ecology ex: "+ex);
+	    	ex.printStackTrace();
+	    }
+		System.out.println("filling combo boxes...");
 		fillComboBoxes();
 		
 		dlg.setVisible(false);
@@ -434,14 +456,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 	}
 	public void selectLayers() {
 		DialogSelectLayers dlg = new DialogSelectLayers();
-		dlg.setData(featureCollection);
+		dlg.setData(featureCollection,project.demographic_columns);
 		dlg.show();
 		if( !dlg.ok)
 			return;
 		try {
+			project.demographic_columns = dlg.in;
 			setDemographicColumns(dlg.in);
-			
-			Vector<String> candidate_cols = dlg.in;
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
@@ -1634,6 +1655,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		comboBoxPrimaryKey.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
+				if( hushcomboBoxPrimaryKey) return;
 				setPrimaryKeyColumn((String)comboBoxPrimaryKey.getSelectedItem());
 			}
 		});
@@ -1642,6 +1664,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		comboBoxPopulation.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
+				if( hushcomboBoxPopulation) return;
 				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
