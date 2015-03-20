@@ -5,10 +5,8 @@ import geoJSON.Properties;
 
 import java.awt.*;
 import java.awt.event.*;
-
 import java.io.*;
 import java.nio.charset.Charset;
-
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -30,14 +28,16 @@ import com.hexiong.jdbf.JDBFException;
 
 
 public class MainFrame extends JFrame implements iChangeListener {
-	public static MainFrame mainframe;
 	
+	
+	public static MainFrame mainframe;
+	 
 	//public String openedGeoFilePath = "";
 	public String openedProjectFilePath = "";
 	public Project project = new Project();
 	public DemographicSet activeDemographicSet = new DemographicSet();
-	JComboBox comboBoxPrimaryKey = new JComboBox();
-	JComboBox comboBoxPopulation = new JComboBox();
+	public JComboBox comboBoxPrimaryKey = new JComboBox();
+	public JComboBox comboBoxPopulation = new JComboBox();
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -52,6 +52,31 @@ public class MainFrame extends JFrame implements iChangeListener {
     		super();
     		this.f = f;
     	}
+	}
+	
+	public void fillComboBoxes() {
+		String[] map_headers = featureCollection.getHeaders();
+		//String[][] map_data = featureCollection.getData(map_headers);
+		
+		
+		comboBoxPopulation.removeAllItems();
+		comboBoxPopulation.addItem("");
+		for( int i = 0; i < map_headers.length; i++) {
+			comboBoxPopulation.addItem(map_headers[i]);
+		}
+		if( project.population_column != null && project.population_column.length() > 0) {
+			comboBoxPopulation.setSelectedItem(project.population_column);
+		}
+		comboBoxPrimaryKey.removeAllItems();
+		comboBoxPrimaryKey.addItem("");
+		for( int i = 0; i < map_headers.length; i++) {
+			comboBoxPrimaryKey.addItem(map_headers[i]);
+		}
+		if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
+			comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
+		}
+		//comboBoxPopulation.setSelectedIndex(0);
+		
 	}
 
 	class OpenGeoJsonFileThread extends FileThread {
@@ -93,71 +118,80 @@ public class MainFrame extends JFrame implements iChangeListener {
 				ex.printStackTrace();
 			}
 			for( Feature fe : fc.features) {
+				featureCollection.features.add(fe);
 				//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
+				/*
 				if( suppress_duplicates) {
 					hmFeatures.put(fe.properties.DISTRICT, fe);
 				} else {
 					featureCollection.features.add(fe);
 				}
+				*/
 				//}
 			}
+			
 			
 		    dlbl.setText("Initializing wards...");
 
 			for( Feature fe : hmFeatures.values()) {
 				featureCollection.features.add(fe);
 			}
-			Vector<Feature> features = featureCollection.features;
-			System.out.println(features.size()+" precincts loaded.");
-			System.out.println("Initializing wards...");
-			featureCollection.initwards();
-		    dlbl.setText("Setting min and max coordinates...");
-
-			minx = features.get(0).geometry.coordinates[0][0][0];
-			maxx = features.get(0).geometry.coordinates[0][0][0];
-			miny = features.get(0).geometry.coordinates[0][0][1];
-			maxy = features.get(0).geometry.coordinates[0][0][1];
-			HashSet<String> types = new HashSet<String>();
-			for( Feature f : features) {
-				double[][][] coordinates2 = f.geometry.coordinates;
-				for( int j = 0; j < coordinates2.length; j++) {
-					double[][] coordinates = coordinates2[j];
-					for( int i = 0; i < coordinates.length; i++) {
-						if( coordinates[i][0] < minx) {
-							minx = coordinates[i][0];
-						}
-						if( coordinates[i][0] > maxx) {
-							maxx = coordinates[i][0];
-						}
-						if( coordinates[i][1] < miny) {
-							miny = coordinates[i][1];
-						}
-						if( coordinates[i][1] > maxy) {
-							maxy = coordinates[i][1];
-						}
-					}
-				}					
-			}
-			System.out.println(""+minx+","+miny);
-			System.out.println(""+maxx+","+maxy);
-			resetZoom();
-			
-			mapPanel.featureCollection = featureCollection;
-			mapPanel.invalidate();
-			mapPanel.repaint();
-			featureCollection.ecology.mapPanel = mapPanel;
-			featureCollection.ecology.statsPanel = panelStats;
-		    dlbl.setText("Initializing ecology...");
-
-			featureCollection.initEcology();
-			
-			dlg.setVisible(false);
-			System.out.println("Ready.");
-			
-			geo_loaded = true;
-			setEnableds();
+			finishLoadingGeography();
     	}
 	}
+	public void finishLoadingGeography() {
+		Vector<Feature> features = featureCollection.features;
+		System.out.println(features.size()+" precincts loaded.");
+		System.out.println("Initializing wards...");
+		featureCollection.initwards();
+	    dlbl.setText("Setting min and max coordinates...");
+	
+		minx = features.get(0).geometry.coordinates[0][0][0];
+		maxx = features.get(0).geometry.coordinates[0][0][0];
+		miny = features.get(0).geometry.coordinates[0][0][1];
+		maxy = features.get(0).geometry.coordinates[0][0][1];
+		HashSet<String> types = new HashSet<String>();
+		for( Feature f : features) {
+			double[][][] coordinates2 = f.geometry.coordinates;
+			for( int j = 0; j < coordinates2.length; j++) {
+				double[][] coordinates = coordinates2[j];
+				for( int i = 0; i < coordinates.length; i++) {
+					if( coordinates[i][0] < minx) {
+						minx = coordinates[i][0];
+					}
+					if( coordinates[i][0] > maxx) {
+						maxx = coordinates[i][0];
+					}
+					if( coordinates[i][1] < miny) {
+						miny = coordinates[i][1];
+					}
+					if( coordinates[i][1] > maxy) {
+						maxy = coordinates[i][1];
+					}
+				}
+			}					
+		}
+		System.out.println(""+minx+","+miny);
+		System.out.println(""+maxx+","+maxy);
+		resetZoom();
+		
+		mapPanel.featureCollection = featureCollection;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		featureCollection.ecology.mapPanel = mapPanel;
+		featureCollection.ecology.statsPanel = panelStats;
+	    dlbl.setText("Initializing ecology...");
+	
+		featureCollection.initEcology();
+		fillComboBoxes();
+		
+		dlg.setVisible(false);
+		System.out.println("Ready.");
+		
+		geo_loaded = true;
+		setEnableds();
+	}
+	
 	public void openShapeFile(File f,boolean synchronous) {
 		Thread t = new OpenShapeFileThread(f);
 		t.start();
@@ -219,55 +253,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				for( Feature fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
-				Vector<Feature> features = featureCollection.features;
-				System.out.println(features.size()+" precincts loaded.");
-				System.out.println("Initializing wards...");
-				featureCollection.initwards();
-			    dlbl.setText("Setting min and max coordinates..");
-	
-				minx = features.get(0).geometry.coordinates[0][0][0];
-				maxx = features.get(0).geometry.coordinates[0][0][0];
-				miny = features.get(0).geometry.coordinates[0][0][1];
-				maxy = features.get(0).geometry.coordinates[0][0][1];
-				HashSet<String> types = new HashSet<String>();
-				for( Feature f : features) {
-					double[][][] coordinates2 = f.geometry.coordinates;
-					for( int j = 0; j < coordinates2.length; j++) {
-						double[][] coordinates = coordinates2[j];
-						for( int i = 0; i < coordinates.length; i++) {
-							if( coordinates[i][0] < minx) {
-								minx = coordinates[i][0];
-							}
-							if( coordinates[i][0] > maxx) {
-								maxx = coordinates[i][0];
-							}
-							if( coordinates[i][1] < miny) {
-								miny = coordinates[i][1];
-							}
-							if( coordinates[i][1] > maxy) {
-								maxy = coordinates[i][1];
-							}
-						}
-					}					
-				}
-				System.out.println(""+minx+","+miny);
-				System.out.println(""+maxx+","+maxy);
-				resetZoom();
-				
-				mapPanel.featureCollection = featureCollection;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-				featureCollection.ecology.mapPanel = mapPanel;
-				featureCollection.ecology.statsPanel = panelStats;
-				
-			    dlbl.setText("Initializing ecology...");
-	
-				featureCollection.initEcology();
-				
-				System.out.println("Ready.");
-	    		dlg.setVisible(false);
-				geo_loaded = true;
-				setEnableds();
+				finishLoadingGeography();
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -389,8 +375,13 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.invalidate();
 		mapPanel.repaint();
 	}
+	
+	public void setPrimaryKeyColumn(String pkey) {
+		project.primary_key_column = pkey;
+	}
 
 	public void setPopulationColumn(String pop_col) {
+		project.population_column = pop_col;
 		for( Feature f : featureCollection.features) {
 			String pop = f.properties.get(pop_col).toString();
 			if( f.ward != null) {
@@ -448,13 +439,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		if( !dlg.ok)
 			return;
 		try {
-			if( dlg.lblLoadPopulationFrom.isSelected() ) {
-				setPopulationColumn((String)dlg.comboBoxFilePopulationColumn.getSelectedItem());
-			}
-			
-			if( dlg.lblSelectDemographicelectionResult.isSelected() ) {
-				setDemographicColumns(dlg.in);
-			}
+			setDemographicColumns(dlg.in);
 			
 			Vector<String> candidate_cols = dlg.in;
 		} catch (Exception ex) {
@@ -559,7 +544,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		          featureCollection.features.add(feature);
 		          feature.properties = new Properties();
 		          feature.geometry = new Geometry();
-		          feature.properties.ID = rec_num;
+		          feature.properties.esri_rec_num = rec_num;
+		          feature.properties.from_shape_file = true;
 		          for( int i = 0; i < cols.length; i++) {
 		        	  feature.properties.put(cols[i],aobj[i].toString());
 		        	  //System.out.print(aobj[i].toString()+" ");
@@ -625,8 +611,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 			Vector<String> not_found_in_census = new Vector<String>();
 			for( Ward b : featureCollection.wards) {
 				if( b.has_election_results == false) {
-					not_found_in_census.add(b.name);
-					System.out.println("not in election: |"+b.name+"|");
+					//not_found_in_census.add(b.name);
+					//System.out.println("not in election: |"+b.name+"|");
 
 				}
 			}
@@ -1039,7 +1025,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					Vector<String> not_found_in_census = new Vector<String>();
 					for( Ward b : featureCollection.wards) {
 						if( b.has_census_results == false) {
-							not_found_in_census.add(b.name);
+							//not_found_in_census.add(b.name);
 						}
 					}
 					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
@@ -1249,7 +1235,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					for( int i = 0; i < dm.ward_districts.length; i++) {
 						Ward b = featureCollection.ecology.wards.get(i);
 						//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
-						fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
+						//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 					}
 					
 					//fis.write(sb.toString().getBytes());
@@ -1313,7 +1299,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				Vector<String> not_found_in_census = new Vector<String>();
 				for( Ward b : featureCollection.wards) {
 					if( b.temp < 0) {
-						not_found_in_census.add(b.name);
+						//not_found_in_census.add(b.name);
 					}
 				}
 				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
@@ -1386,7 +1372,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 						for( int i = 0; i < dm.ward_districts.length; i++) {
 							Ward b = featureCollection.ecology.wards.get(i);
 							//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
-							fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
+							//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 						}
 						
 						//fis.write(sb.toString().getBytes());
@@ -1648,6 +1634,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		comboBoxPrimaryKey.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
+				setPrimaryKeyColumn((String)comboBoxPrimaryKey.getSelectedItem());
 			}
 		});
 		comboBoxPrimaryKey.setBounds(10, 141, 178, 20);
@@ -1655,6 +1642,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		comboBoxPopulation.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
+				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
 		comboBoxPopulation.setBounds(10, 192, 178, 20);

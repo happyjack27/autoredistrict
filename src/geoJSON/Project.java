@@ -84,8 +84,13 @@ public class Project extends ReflectionJSONObject<Project> {
 		} else { System.out.println("elections_simulated not found"); }
 
 		if( containsKey("population_column")) {
-			MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
+			MainFrame.mainframe.comboBoxPopulation.setSelectedItem(getString("population_column").trim());
+			//MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
 		} else { System.out.println("population_column not found"); }
+		if( containsKey("primary_key_column")) {
+			MainFrame.mainframe.comboBoxPrimaryKey.setSelectedItem(getString("primary_key_column").trim());
+			//MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
+		} else { System.out.println("primary_key_column not found"); }
 		
 		if( containsKey("demographic_columns")) {
 			Vector v = getVector("demographic_columns");

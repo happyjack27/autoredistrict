@@ -10,7 +10,7 @@ public class Ward extends ReflectionJSONObject<Ward> {
 	public int temp = -1;
 	public double area = 0;
 	
-	public String name = "";
+	//public String name = "";
 
 
     public Vector<Edge> edges = new Vector<Edge>();

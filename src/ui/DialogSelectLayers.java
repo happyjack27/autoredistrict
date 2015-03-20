@@ -8,9 +8,6 @@ import java.awt.event.ActionEvent;
 import java.util.*;
 
 public class DialogSelectLayers extends JDialog {
-	JCheckBox lblSelectDemographicelectionResult = new JCheckBox("Select demographic / election result columns");
-	JCheckBox lblLoadPopulationFrom = new JCheckBox("Load population from");
-	JComboBox comboBoxFilePopulationColumn = new JComboBox();
 	JList list = new JList();
 	JList list_1 = new JList();
 	public boolean ok = false;
@@ -37,12 +34,6 @@ public class DialogSelectLayers extends JDialog {
 		list.setListData(not_in);
 		list_1.setListData(in);
 		
-		comboBoxFilePopulationColumn.removeAllItems();
-		for( int i = 0; i < map_headers.length; i++) {
-			comboBoxFilePopulationColumn.addItem(map_headers[i]);
-		}
-		comboBoxFilePopulationColumn.setSelectedIndex(0);
-		
 	}
 	
 	public DialogSelectLayers() {
@@ -51,26 +42,6 @@ public class DialogSelectLayers extends JDialog {
 		getContentPane().setLayout(null);
 		this.setSize(new Dimension(500,600));
 		getContentPane().setPreferredSize(new Dimension(500,600));
-		
-		comboBoxFilePopulationColumn.setBounds(10, 27, 137, 20);
-		lblLoadPopulationFrom.setSelected(true);
-		getContentPane().add(comboBoxFilePopulationColumn);
-		lblLoadPopulationFrom.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				comboBoxFilePopulationColumn.setEnabled(lblLoadPopulationFrom.isSelected());
-			}
-		});
-		
-		lblLoadPopulationFrom.setBounds(10, 6, 182, 14);
-		lblSelectDemographicelectionResult.setSelected(true);
-		getContentPane().add(lblLoadPopulationFrom);
-		lblSelectDemographicelectionResult.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		
-		lblSelectDemographicelectionResult.setBounds(150, 62, 318, 14);
-		getContentPane().add(lblSelectDemographicelectionResult);
 		
 		JButton btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener() {

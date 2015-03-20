@@ -159,13 +159,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		Ward.id_enumerator = 0;
 		for( Feature f : features) {
 			f.ward = new Ward();
-			f.ward.name = f.properties.DISTRICT;
+			//f.ward.name = f.properties.DISTRICT;
 			if( f.properties.POPULATION > 0) {
 				f.ward.population = f.properties.POPULATION;
 				f.ward.has_census_results = true;
 			}
 			wards.add(f.ward);
-			precinctHash.put(f.ward.name,f.ward);
+			//precinctHash.put(f.ward.name,f.ward);
 		}
 		collectVertexes();
 		collectEdges();

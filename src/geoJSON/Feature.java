@@ -76,10 +76,12 @@ public class Feature extends ReflectionJSONObject<Feature> {
 		if( containsKey("geometry")) {
 			geometry = (Geometry) getObject("geometry");
 		}
+		/*
 		if( properties.DISTRICT == null || properties.DISTRICT.toLowerCase().equals("null")) {
 			geometry.outlineColor = Color.BLUE;
 			geometry.isDistrict = false;
 		}
+		*/
 		// TODO Auto-generated method stub
 		
 	}
@@ -167,6 +169,7 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				}
 				
 				double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
+				/*
 				if( showPrecinctLabels) {
 					FontMetrics fm = g.getFontMetrics();
 					String name = this.properties.DISTRICT;
@@ -174,8 +177,10 @@ public class Feature extends ReflectionJSONObject<Feature> {
 					centroid[1] += fm.getHeight()/2.0;
 					g.drawString(name, (int)centroid[0],(int)centroid[1]);
 				}
+				*/
 			}
 		}
+		/*
 		if( showPrecinctLabels) {
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
@@ -186,5 +191,6 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				g.drawString(name, (int)centroid[0],(int)centroid[1]);
 			}
 		}
+		*/
 	}
 }
