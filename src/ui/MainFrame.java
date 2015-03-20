@@ -31,6 +31,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	TODO: pre/post serialize to get district #?
 			-- need to make data exporter, and make it so that it imports district when applicable.
+			need to be able to customize district column name and save in project file, so can load districts.
 	
 	
 	public static MainFrame mainframe;
@@ -50,7 +51,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 	class FileThread extends Thread {
     	public File f = null;
-    	FileThread() { super(); }
+    	FileThread() { super(); } 
     	FileThread(File f) {
     		super();
     		this.f = f;
