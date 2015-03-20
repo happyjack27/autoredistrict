@@ -29,6 +29,9 @@ import com.hexiong.jdbf.JDBFException;
 
 public class MainFrame extends JFrame implements iChangeListener {
 	
+	TODO: pre/post serialize to get district #?
+			-- need to make data exporter, and make it so that it imports district when applicable.
+	
 	
 	public static MainFrame mainframe;
 	 
