@@ -24,14 +24,17 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import com.hexiong.jdbf.DBFReader;
+import com.hexiong.jdbf.DBFWriter;
 import com.hexiong.jdbf.JDBFException;
+import com.hexiong.jdbf.JDBField;
 
 
 public class MainFrame extends JFrame implements iChangeListener {
-	
+	/*
 	TODO: pre/post serialize to get district #?
 			-- need to make data exporter, and make it so that it imports district when applicable.
 			need to be able to customize district column name and save in project file, so can load districts.
+			*/
 	
 	
 	public static MainFrame mainframe;
@@ -496,6 +499,41 @@ public class MainFrame extends JFrame implements iChangeListener {
 		}
 		return dh;
 	}
+	public void writeDBF(String filename, String[] headers, String[][] data) {
+        JDBField[] fields = new JDBField[headers.length];
+        
+		for( int i = 0; i < headers.length; i++) {
+			try {
+				fields[i] = new JDBField(headers[i], 'C', 32, 0);
+			} catch (JDBFException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		DBFWriter dbfwriter;
+		try {
+			dbfwriter = new DBFWriter(filename, fields);
+		} catch (JDBFException e1) {
+			e1.printStackTrace();
+			return;
+		}
+		for( int i = 0; i < data.length; i++) {
+			try {
+				dbfwriter.addRecord(data[i]);
+			} catch (JDBFException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		try {
+			dbfwriter.close();
+		} catch (JDBFException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public DataAndHeader readDBF(String dbfname) {
 		DBFReader dbfreader;
 		try {
@@ -904,6 +942,74 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mntmExportData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
+				if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
+					options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (in separate dbase file)",".dbf (in original shapefile)"};
+				}
+				int opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
+				if( opt < 0) {
+					return;
+				}
+				String[] headers = featureCollection.getHeaders();
+				String[][] data = featureCollection.getData(headers);
+				
+				if( opt == 3 || opt == 2) {
+					String filename = "";
+					File f = null;
+					if( opt == 3) {
+						filename = project.source_file.substring(0,project.source_file.length()-3)+"dbf";
+						f = new File(filename);
+						if( f == null)  {
+							return;
+						}
+					} else if( opt == 2) {
+						JFileChooser jfc = new JFileChooser();
+						jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbase file","dbf"));
+						jfc.showOpenDialog(null);
+						f = jfc.getSelectedFile();
+						if( f == null)  {
+							return;
+						}
+						filename = f.getName();
+					}
+					writeDBF(filename,headers,data);					
+				} else {
+					JFileChooser jfc = new JFileChooser();
+					String delimiter = ",";
+					if( opt == 0) { 
+						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
+					} else if( opt == 1) {
+						delimiter = "\t";
+						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+					}
+					jfc.showOpenDialog(null);
+					File f = jfc.getSelectedFile();
+					if( f == null)  {
+						return;
+					}
+					try {
+						FileOutputStream fos = new FileOutputStream(f);
+						StringBuffer sb = new StringBuffer();
+						for(int i = 0; i < headers.length; i++) {
+							sb.append((i>0?delimiter:"")+headers[i]);
+						}
+						sb.append("\n");
+						
+						for(int j = 0; j < data.length; j++) {
+							for(int i = 0; i < headers.length; i++) {
+								sb.append((i>0?delimiter:"")+data[j][i]);
+							}
+							sb.append("\n");
+						}
+						
+						fos.flush();
+						fos.close();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+					
+				}
 			}
 		});
 		mnFile.add(mntmExportData);
