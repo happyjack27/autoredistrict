@@ -1008,8 +1008,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} 
-					
 				}
+				JOptionPane.showMessageDialog(mainframe,"File saved.");
 			}
 		});
 		mnFile.add(mntmExportData);
