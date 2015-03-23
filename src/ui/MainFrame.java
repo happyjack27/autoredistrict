@@ -1068,10 +1068,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		mnFile.add(mntmSelectLayers);
 
-		mnFile.add(new JSeparator());
+		//mnFile.add(new JSeparator());
 
-		mnFile.add(mntmImportcsv);
-		mnFile.add(mntmExportcsv);
+		//mnFile.add(mntmImportcsv);
+		//mnFile.add(mntmExportcsv);
 
 		
 		//mnFile.add(new JSeparator());
