@@ -22,6 +22,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	
 	public String primary_key_column = "";
 	public String population_column = "";
+	public String district_column = "";
 	
 	public Vector<String> demographic_columns = new Vector<String>();
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
@@ -95,8 +96,15 @@ public class Project extends ReflectionJSONObject<Project> {
 
 		if( containsKey("population_column")) {
 			MainFrame.mainframe.comboBoxPopulation.setSelectedItem(getString("population_column").trim());
-			//MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
 		} else { System.out.println("population_column not found"); }
+		
+		if( containsKey("district_column")) {
+			MainFrame.mainframe.comboBoxDistrictColumn.setSelectedItem(getString("district_column").trim());
+		} else {
+			System.out.println("district_column not found");
+			MainFrame.mainframe.comboBoxDistrictColumn.setSelectedItem("AUTOREDISTRICT_RESULT");
+		}
+		
 		if( containsKey("primary_key_column")) {
 			MainFrame.mainframe.comboBoxPrimaryKey.setSelectedItem(getString("primary_key_column").trim());
 			//MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());

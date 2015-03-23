@@ -62,6 +62,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	}
 	public boolean hushcomboBoxPopulation = false;
 	public boolean hushcomboBoxPrimaryKey = false;
+	public boolean hushcomboBoxDistrict = false;
 	public void fillComboBoxes() {
 		String[] map_headers = featureCollection.getHeaders();
 		//String[][] map_data = featureCollection.getData(map_headers);
@@ -99,6 +100,24 @@ public class MainFrame extends JFrame implements iChangeListener {
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
 		}
+
+		try {
+			hushcomboBoxDistrict = true;
+			comboBoxDistrictColumn.removeAllItems();
+			comboBoxDistrictColumn.addItem("");
+			comboBoxDistrictColumn.addItem("AUTOREDISTRICT_RESULT");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxDistrictColumn.addItem(map_headers[i]);
+			}
+			hushcomboBoxDistrict = false;
+			if( project.district_column != null && project.district_column.length() > 0) {
+				comboBoxDistrictColumn.setSelectedItem(project.district_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+
 		//comboBoxPopulation.setSelectedIndex(0);
 		
 	}
@@ -373,6 +392,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
 	public JTextField textFieldMembersPerDistrict;
+	public JLabel lblDistrictColumn;
+	public JComboBox comboBoxDistrictColumn;
 	
 	public void setEnableds() {
 		
@@ -407,6 +428,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	public void setPrimaryKeyColumn(String pkey) {
 		project.primary_key_column = pkey;
+	}
+
+	public void setDistrictColumn(String district) {
+		project.district_column = district;
 	}
 
 	public void setPopulationColumn(String pop_col) {
@@ -1536,7 +1561,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 400, 200, 386);
+		panel_2.setBounds(0, 449, 200, 386);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1616,7 +1641,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 223, 200, 166);
+		panel_3.setBounds(0, 272, 200, 166);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1694,11 +1719,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 		});
 		textFieldNumDistricts.setColumns(10);
-		textFieldNumDistricts.setBounds(132, 52, 56, 28);
+		textFieldNumDistricts.setBounds(132, 51, 52, 28);
 		panel.add(textFieldNumDistricts);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
-		lblNumOfDistricts.setBounds(6, 58, 124, 16);
+		lblNumOfDistricts.setBounds(6, 57, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
 		JButton button = new JButton("<|");
@@ -1712,7 +1737,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 			}
 		});
-		button.setBounds(26, 17, 46, 29);
+		button.setBounds(22, 11, 46, 29);
 		panel.add(button);
 		
 		JButton btnX = new JButton("| |");
@@ -1724,7 +1749,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 			}
 		});
-		btnX.setBounds(84, 17, 46, 29);
+		btnX.setBounds(80, 11, 46, 29);
 		panel.add(btnX);
 		
 		JButton button_2 = new JButton("|>");
@@ -1737,7 +1762,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 
 			}
 		});
-		button_2.setBounds(142, 17, 46, 29);
+		button_2.setBounds(138, 11, 46, 29);
 		panel.add(button_2);
 		
 		textFieldMembersPerDistrict = new JTextField();
@@ -1756,11 +1781,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		textFieldMembersPerDistrict.setText("1");
 		textFieldMembersPerDistrict.setColumns(10);
-		textFieldMembersPerDistrict.setBounds(132, 89, 56, 28);
+		textFieldMembersPerDistrict.setBounds(132, 88, 52, 28);
 		panel.add(textFieldMembersPerDistrict);
 		
 		JLabel lblMembersPerDistrict = new JLabel("Members per district");
-		lblMembersPerDistrict.setBounds(6, 95, 124, 16);
+		lblMembersPerDistrict.setBounds(6, 94, 124, 16);
 		panel.add(lblMembersPerDistrict);
 		
 		comboBoxPrimaryKey.addItemListener(new ItemListener() {
@@ -1769,7 +1794,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 				setPrimaryKeyColumn((String)comboBoxPrimaryKey.getSelectedItem());
 			}
 		});
-		comboBoxPrimaryKey.setBounds(10, 141, 178, 20);
+		comboBoxPrimaryKey.setBounds(6, 140, 178, 20);
 		panel.add(comboBoxPrimaryKey);
 		
 		comboBoxPopulation.addItemListener(new ItemListener() {
@@ -1778,16 +1803,30 @@ public class MainFrame extends JFrame implements iChangeListener {
 				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
-		comboBoxPopulation.setBounds(10, 192, 178, 20);
+		comboBoxPopulation.setBounds(6, 191, 178, 20);
 		panel.add(comboBoxPopulation);
 		
 		JLabel lblPrimaryKeyColumn = new JLabel("Primary key column");
-		lblPrimaryKeyColumn.setBounds(6, 122, 182, 16);
+		lblPrimaryKeyColumn.setBounds(6, 121, 182, 16);
 		panel.add(lblPrimaryKeyColumn);
 		
 		JLabel lblPopulationColumn = new JLabel("Population column");
-		lblPopulationColumn.setBounds(6, 172, 182, 16);
+		lblPopulationColumn.setBounds(6, 171, 182, 16);
 		panel.add(lblPopulationColumn);
+		
+		lblDistrictColumn = new JLabel("District column");
+		lblDistrictColumn.setBounds(6, 222, 182, 16);
+		panel.add(lblDistrictColumn);
+		
+		comboBoxDistrictColumn = new JComboBox();
+		comboBoxDistrictColumn.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				if( hushcomboBoxDistrict) return;
+				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
+			}
+		});
+		comboBoxDistrictColumn.setBounds(6, 241, 178, 20);
+		panel.add(comboBoxDistrictColumn);
 		slider_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
