@@ -33,7 +33,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				has_districts = false;
 				ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
 			} else {
-				ward_districts[i] = (int)f.properties.getDouble(column_name);
+				ward_districts[i] = ((int)f.properties.getDouble(column_name))-1;
 			}
 		}
 		setGenome(ward_districts);
@@ -44,7 +44,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public void storeDistrictsToProperties(FeatureCollection collection, String column_name) {
 		for( int i = 0; i < collection.features.size(); i++) {
 			Feature f = collection.features.get(i);
-			f.properties.put(column_name, ward_districts[i]);
+			f.properties.put(column_name, ward_districts[i]+1);
 		}
 	}
 	

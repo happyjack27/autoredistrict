@@ -491,6 +491,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		setEnableds();	
 	}
 	public void selectLayers() {
+		featureCollection.loadDistrictsFromProperties(project.district_column);
 		DialogSelectLayers dlg = new DialogSelectLayers();
 		dlg.setData(featureCollection,project.demographic_columns);
 		dlg.show();
@@ -533,7 +534,7 @@ public class MainFrame extends JFrame implements iChangeListener {
         
 		for( int i = 0; i < headers.length; i++) {
 			try {
-				fields[i] = new JDBField(headers[i], 'C', 32, 0);
+				fields[i] = new JDBField(headers[i], 'C', 64, 0);
 			} catch (JDBFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -548,6 +549,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 			return;
 		}
 		for( int i = 0; i < data.length; i++) {
+			for( int j = 0; j < data[i].length; j++) {
+				if( data[i][j].length() > 64) {
+					data[i][j] = data[i][j].substring(0,64);
+				}
+			}
 			try {
 				dbfwriter.addRecord(data[i]);
 			} catch (JDBFException e) {
@@ -977,11 +983,15 @@ public class MainFrame extends JFrame implements iChangeListener {
 				}
 				int opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
 				if( opt < 0) {
+					System.out.println("aborted.");
 					return;
 				}
 				
+				System.out.println("collection districts...");
 				featureCollection.storeDistrictsToProperties(project.district_column);
+				System.out.println("getting headers...");
 				String[] headers = featureCollection.getHeaders();
+				System.out.println("getting data...");
 				String[][] data = featureCollection.getData(headers);
 				
 				if( opt == 3 || opt == 2) {
@@ -1003,7 +1013,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 						}
 						filename = f.getName();
 					}
+					System.out.println("writedbf start.");
 					writeDBF(filename,headers,data);					
+					System.out.println("writedbf done.");
 				} else {
 					JFileChooser jfc = new JFileChooser();
 					String delimiter = ",";
@@ -1016,9 +1028,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 					jfc.showOpenDialog(null);
 					File f = jfc.getSelectedFile();
 					if( f == null)  {
+						System.out.println("f is null.");
 						return;
 					}
 					try {
+						System.out.println("creating...");
 						FileOutputStream fos = new FileOutputStream(f);
 						StringBuffer sb = new StringBuffer();
 						for(int i = 0; i < headers.length; i++) {
@@ -1032,12 +1046,17 @@ public class MainFrame extends JFrame implements iChangeListener {
 							}
 							sb.append("\n");
 						}
+						System.out.println("writing...");
+						fos.write(sb.toString().getBytes());
 						
 						fos.flush();
+						System.out.println("closing...");
 						fos.close();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+						return;
 					} 
 				}
 				JOptionPane.showMessageDialog(mainframe,"File saved.");
