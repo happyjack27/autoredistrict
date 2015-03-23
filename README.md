@@ -1,15 +1,18 @@
 
 
 TODO:
+* add multiple demographics and elections
+* change back arrow to total reset ( |<<)
+* get graphics for arrow buttons
+
+DONE:
 * save project
 * import result column
 * export all columns to .txt. or .csv - likewise, import
 * export all columns, including new district, to .dbf.
 * move population column selection on to main view (and remember it) (and remember from layer selection)
 * remember demographics columns and show on layer selection
-* add multiple demographics and elections
-* change back arrow to total reset ( |<<)
-* get graphics for arror buttons
+
 
 --------------
 
