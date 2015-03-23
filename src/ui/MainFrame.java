@@ -435,7 +435,18 @@ public class MainFrame extends JFrame implements iChangeListener {
 	}
 
 	public void setDistrictColumn(String district) {
+		boolean changed = !district.equals(project.district_column);
 		project.district_column = district;
+		if( changed) {
+			if( featureCollection.features == null || featureCollection.features.size() == 0) {
+				
+			} else {
+				boolean is_in = featureCollection.features.get(0).properties.containsKey(district);
+				if( is_in) {
+					featureCollection.loadDistrictsFromProperties(district);
+				}
+			}
+		}
 	}
 
 	public void setPopulationColumn(String pop_col) {
