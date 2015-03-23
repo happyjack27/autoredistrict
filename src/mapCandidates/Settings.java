@@ -93,5 +93,5 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			c.valueChanged();
 		}
 	}
-	public static boolean adjust_vote_to_population = true;
+	public static boolean adjust_vote_to_population = false;
 }
