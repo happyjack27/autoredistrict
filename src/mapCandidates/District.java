@@ -31,6 +31,7 @@ public class District extends JSONObject {
     public double[][] getElectionResults() {
         double[] tot_popular_vote = new double[Candidate.candidates.size()];
         double[] tot_elected_vote = new double[Candidate.candidates.size()];
+        double[] residual_popular_vote = new double[Candidate.candidates.size()];
    		for( int i = 0; i < outcomes.length; i++) {
    	       	try {
    	            double[] popular_vote = new double[Candidate.candidates.size()];
@@ -49,6 +50,7 @@ public class District extends JSONObject {
    	            for( int j = 0; j < district_vote.length; j++) {
    	            	prop_rep[j] = multiplier*(double)district_vote[j];
    	            	double residue = prop_rep[j] - Math.floor(prop_rep[j]);
+   	            	residual_popular_vote[j] = residue;
    	            	prop_rep[j] = Math.floor(prop_rep[j]);
    	            	if( residue > max_res || max_res_ind < 0) {
    	            		max_res = residue;
@@ -66,8 +68,9 @@ public class District extends JSONObject {
    		for( int j = 0; j < tot_popular_vote.length; j++) {
         	tot_elected_vote[j] /= (double)outcomes.length;
         	tot_popular_vote[j] /= (double)outcomes.length;
+        	residual_popular_vote[j] /= (double)outcomes.length;
         }
-       	return new double[][]{tot_popular_vote,tot_elected_vote};
+       	return new double[][]{tot_popular_vote,tot_elected_vote,residual_popular_vote};
     }
 
     public double getSelfEntropy(double[] result) {

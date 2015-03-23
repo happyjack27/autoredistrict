@@ -81,10 +81,10 @@ public class Project extends ReflectionJSONObject<Project> {
 			MainFrame.mainframe.textField.postActionEvent();
 		} else { System.out.println("initial_population not found"); }
 
-		if( containsKey("elections_simulated")) {
-			MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("elections_simulated").trim());
+		if( containsKey("simulated_elections")) {
+			MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("simulated_elections").trim());
 			MainFrame.mainframe.textFieldElectionsSimulated.postActionEvent();
-		} else { System.out.println("elections_simulated not found"); }
+		} else { System.out.println("simulated_elections not found"); }
 		
 		if( !containsKey("primary_key_column")) {
 			if( isEsriSapefile()) {

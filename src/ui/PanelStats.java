@@ -103,7 +103,7 @@ public class PanelStats extends JPanel {
 				total_population += d.getPopulation();
 				//String population = ""+(int)d.getPopulation();
 				double[][] result = d.getElectionResults();
-				double self_entropy = d.getSelfEntropy(result[Settings.self_entropy_use_votecount?0:1]);
+				double self_entropy = d.getSelfEntropy(result[Settings.self_entropy_use_votecount?2:1]);
 				//String edge_length = ""+d.getEdgeLength();
 				//double [] dd = d.getVotes();
 				double total = 0;
@@ -111,7 +111,7 @@ public class PanelStats extends JPanel {
 				//int iwinner  = -1;
 				String winner = "";
 				for( int j = 0; j < result[0].length; j++) {
-					winner += ""+result[1][j]+",";
+					winner += ""+((int)result[1][j])+",";
 					elec_counts[j] += result[1][j];
 					vote_counts[j] += result[0][j];
 					total += result[0][j];

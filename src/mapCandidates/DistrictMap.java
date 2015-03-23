@@ -652,7 +652,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
             for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
-                voting_power[i] = district.getSelfEntropy(district.getElectionResults()[Settings.self_entropy_use_votecount?0:1]);
+                voting_power[i] = district.getSelfEntropy(district.getElectionResults()[Settings.self_entropy_use_votecount?2:1]);
                 total_voting_power += voting_power[i];
             }
 
