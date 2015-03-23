@@ -242,6 +242,7 @@ public class District extends JSONObject {
         return district_vote;
     }
     public double[][] getAnOutcomePair() {
+    	try {
         double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
         double[] pop_district_vote = new double[Candidate.candidates.size()]; //inited to 0
         if( wards.size() == 0) {
@@ -270,6 +271,11 @@ public class District extends JSONObject {
             }
         }
         return new double[][]{district_vote,pop_district_vote};
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		this.generateOutcomes(Settings.num_elections_simulated);
+    		return getAnOutcomePair();
+    	}
     }
 
 

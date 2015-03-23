@@ -22,6 +22,11 @@ public class Ward extends ReflectionJSONObject<Ward> {
     public boolean has_census_results = false;
     public boolean has_election_results = false;
     public double population=1;
+    
+    public void resetOutcomes() {
+    	outcomes = null;    	
+    }
+    
     public void recalcMuSigmaN() {
     	try {
    		double[] successes = new double[Candidate.candidates.size()];

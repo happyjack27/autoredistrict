@@ -469,6 +469,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		
 		for( Feature f : featureCollection.features) {
 			Ward b = f.ward;
+			b.resetOutcomes();
 			double[] dd = new double[num_candidates];
 			for( int i = 0; i < candidate_cols.size(); i++) {
 				dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
@@ -499,15 +500,21 @@ public class MainFrame extends JFrame implements iChangeListener {
 		}
 		featureCollection.ecology.reset();
 		election_loaded = true;
+		
 		setEnableds();	
 	}
 	public void selectLayers() {
+		boolean is_evolving = this.evolving;
+		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
 		featureCollection.loadDistrictsFromProperties(project.district_column);
 		DialogSelectLayers dlg = new DialogSelectLayers();
 		dlg.setData(featureCollection,project.demographic_columns);
 		dlg.show();
-		if( !dlg.ok)
+		if( !dlg.ok) {
+			if( is_evolving) { featureCollection.ecology.startEvolving(); }
 			return;
+		}
+
 		try {
 			project.demographic_columns = dlg.in;
 			setDemographicColumns(dlg.in);
@@ -518,6 +525,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 		Feature.display_mode = 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
+		
+		if( is_evolving) { featureCollection.ecology.startEvolving(); }
 	}
 	
 	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
