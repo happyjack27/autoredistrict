@@ -218,11 +218,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		System.out.println(""+maxx+","+maxy);
 		resetZoom();
 		
-		mapPanel.featureCollection = featureCollection;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		featureCollection.ecology.mapPanel = mapPanel;
-		featureCollection.ecology.statsPanel = panelStats;
 	    dlbl.setText("Initializing ecology...");
 	    try {
 	    	featureCollection.initEcology();
@@ -233,8 +228,17 @@ public class MainFrame extends JFrame implements iChangeListener {
 		System.out.println("filling combo boxes...");
 		fillComboBoxes();
 		
+		featureCollection.loadDistrictsFromProperties(project.district_column);
+		
+		mapPanel.featureCollection = featureCollection;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		featureCollection.ecology.mapPanel = mapPanel;
+		featureCollection.ecology.statsPanel = panelStats;
+		
 		dlg.setVisible(false);
 		System.out.println("Ready.");
+
 		
 		geo_loaded = true;
 		setEnableds();
@@ -687,7 +691,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
 				String district = ss[0].trim();
-				Ward b = featureCollection.precinctHash.get(district);
+				Ward b = featureCollection.wardHash.get(district);
 				if( b == null) {
 					not_found_in_geo.add(district);
 					System.out.println("not in geo: "+district);
@@ -741,7 +745,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			}
 			
 			for( Entry<String, double[]> es : votes.entrySet()) {
-				Ward b = featureCollection.precinctHash.get(es.getKey());
+				Ward b = featureCollection.wardHash.get(es.getKey());
 				double[] dd = es.getValue();
 				for( int j = 0; j < num_candidates; j++) {
 					Demographic d = new Demographic();
@@ -975,6 +979,8 @@ public class MainFrame extends JFrame implements iChangeListener {
 				if( opt < 0) {
 					return;
 				}
+				
+				featureCollection.storeDistrictsToProperties(project.district_column);
 				String[] headers = featureCollection.getHeaders();
 				String[][] data = featureCollection.getData(headers);
 				
@@ -1171,7 +1177,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Ward b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -1199,7 +1205,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Ward b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.wardHash.get(district);
 						b.has_census_results = true;
 						b.population = Double.parseDouble(ss[1].replaceAll(",",""));
 						System.out.println("ward "+b.id+" added census "+b.population);
@@ -1442,7 +1448,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 					try {
 						String[] ss = lines[i].split(",");
 						String district = ss[0].trim();
-						Ward b = featureCollection.precinctHash.get(district);
+						Ward b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {

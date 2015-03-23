@@ -1,6 +1,7 @@
 package geoJSON;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.util.*;
 import java.io.*;
@@ -21,7 +22,6 @@ import mapCandidates.Ecology;
 import mapCandidates.Edge;
 import mapCandidates.Settings;
 import mapCandidates.Vertex;
-
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 
@@ -29,14 +29,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
 	public Vector<Ward> wards;
-	public HashMap<String,Ward> precinctHash;
+	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 1000000.0;
 	
 	static int max_hues = 9;
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
-	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
+	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();	
 	
 	public String[] getHeaders() {
 		String[] headers;
@@ -155,7 +155,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	public void initwards() {
 		wards = new Vector<Ward>();
-		precinctHash = new HashMap<String,Ward>();
+		wardHash = new HashMap<String,Ward>();
 		Ward.id_enumerator = 0;
 		for( Feature f : features) {
 			f.ward = new Ward();
@@ -278,6 +278,34 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		ecology.wards = wards;
 		//ecology.edges = edgeHash.values();
 		//ecology.vertexes = vertexes;
+	}
+	public void storeDistrictsToProperties(String column_name) {
+		if( ecology.population == null) {
+			ecology.population = new Vector<DistrictMap>();
+		}
+		if( ecology.population.size() < 1) {
+			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+		}
+		ecology.population.get(0).storeDistrictsToProperties(this, column_name);
+	}
+
+	public void loadDistrictsFromProperties(String column_name) {
+		if( ecology.population == null) {
+			ecology.population = new Vector<DistrictMap>();
+		}
+		if( ecology.population.size() < 1) {
+			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+		}
+		while( ecology.population.size() < Settings.population) {
+			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+		}
+		for( DistrictMap dm : ecology.population) {
+			dm.loadDistrictsFromProperties(this, column_name);
+			//dm.setGenome(new_ward_districts);
+			//dm.fillDistrictwards();
+		
+		}
+		
 	}
 	
 	public void recalcEdgeLengths() {

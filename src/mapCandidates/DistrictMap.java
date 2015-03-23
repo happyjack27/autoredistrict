@@ -1,5 +1,7 @@
 package mapCandidates;
 
+import geoJSON.*;
+
 import java.util.*;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
@@ -20,6 +22,41 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     double[] dist_pops;
     double[] dist_pop_frac;
     double[] perfect_dists;
+    
+    
+	
+	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
+		boolean has_districts = true;
+		for( int i = 0; i < collection.features.size(); i++) {
+			Feature f = collection.features.get(i);
+			if( !f.properties.containsKey(column_name)) {
+				has_districts = false;
+				ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
+			} else {
+				ward_districts[i] = (int)f.properties.getDouble(column_name);
+			}
+		}
+		setGenome(ward_districts);
+		fillDistrictwards();
+		return has_districts;
+	}
+	
+	public void storeDistrictsToProperties(FeatureCollection collection, String column_name) {
+		for( int i = 0; i < collection.features.size(); i++) {
+			Feature f = collection.features.get(i);
+			f.properties.put(column_name, ward_districts[i]);
+		}
+	}
+	
+	public void randomizeDistricts() {
+		resize_districts(Settings.num_districts);
+		for( int i = 0; i < ward_districts.length; i++) {
+			ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
+		}
+		setGenome(ward_districts);
+		fillDistrictwards();
+	}
+
 	
 
     //makeLike
