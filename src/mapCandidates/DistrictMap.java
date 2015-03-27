@@ -736,7 +736,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	int d1 = ward_districts[b.id];
         	areas[d1] += b.area;
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
-        		int b2id = b.neighbors.get(i).id;
+        		int b2id = b.neighbors.get(i).id; 
             	int d2 = ward_districts[b2id];
             	if( d1 != d2) {
             		lengths[d1] += b.neighbor_lengths[i];
@@ -747,7 +747,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         
         double weighted_sum = 0;
         for( int i = 0; i < lengths.length; i++) {
-        	weighted_sum += lengths[i] / areas[i];
+        	weighted_sum += lengths[i] / Math.sqrt(areas[i]);
         }
         return weighted_sum;
     }
