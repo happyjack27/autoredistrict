@@ -610,6 +610,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 		elected_vote[j] += res[1][j];
                 	}
                 }
+                
                 double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.members_per_district*Settings.num_districts);
                 double[] ideal_vote = prop_rep_results[0];
                 int max_diff = -1, min_diff = -1;
