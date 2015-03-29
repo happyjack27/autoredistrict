@@ -138,7 +138,8 @@ public class Project extends ReflectionJSONObject<Project> {
 			MainFrame.mainframe.sliderRepresentation.setValue((int)(100.0*Double.parseDouble(getString("representation_weight").trim())));
 		}
 		if( containsKey("area_weighted")) {
-			MainFrame.mainframe.chckbxAreaWeighted.setSelected(getString("area_weighted").trim().toLowerCase().equals("true"));
+			Settings.border_length_area_weighted = getString("area_weighted").trim().toLowerCase().equals("true");
+			//MainFrame.mainframe.chckbxAreaWeighted.setSelected(getString("area_weighted").trim().toLowerCase().equals("true"));
 		}
 
 		

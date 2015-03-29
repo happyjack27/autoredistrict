@@ -325,9 +325,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 	    openedProjectFilePath = f0.getAbsolutePath();
 	    new OpenProjectFileThread(f0).start();
 	}
-	
-	
-	public JCheckBox chckbxAreaWeighted = new JCheckBox("Area weighted");
 	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
@@ -1673,15 +1670,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		textField_3.setColumns(10);
 		textField_3.setBounds(138, 347, 58, 28);
 		panel_2.add(textField_3);
-		chckbxAreaWeighted.setSelected(true);
-		
-		chckbxAreaWeighted.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.border_length_area_weighted = chckbxAreaWeighted.isSelected();
-			}
-		});
-		chckbxAreaWeighted.setBounds(99, 33, 97, 23);
-		panel_2.add(chckbxAreaWeighted);
 		
 		
 		JPanel panel_3 = new JPanel();
