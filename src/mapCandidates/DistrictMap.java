@@ -598,40 +598,48 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
                 double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
-                
-                for(District district : districts) {
+                double[][] residues = new double[districts.size()][];
+                double[] pops = new double[districts.size()];
+                for(int k = 0; k < districts.size(); k++) {
+                	District district = districts.get(k);
                 	double[][] res = district.getElectionResults();
+                	pops[k] = res[4][0];
+                	residues[k] = res[3];
                 	for( int j = 0; j < popular_vote.length; j++) {
                 		popular_vote[j] += res[0][j];
                 		elected_vote[j] += res[1][j];
                 	}
                 }
-      /* old way - single member 
-                
-                for(District district : districts) {
-                	try {
-                		int n = (int)Math.floor(Math.random()*(double)district.outcomes.length);
-                        double[] district_vote = district.outcomes[n];
-                        double[] pop_district_vote = district.pop_balanced_outcomes[n];
-                        int winner_num = -1;
-                        double winner_vote_count = -1;
-                        for( int j = 0; j < district_vote.length; j++) {
-                            popular_vote[j] += pop_district_vote[j];
-                        	if( district_vote[j] > winner_vote_count) {
-                        		winner_vote_count = district_vote[j];
-                        		winner_num = j;
-                        	}
-                        }
-                        if( winner_num >= 0) {
-                        	elected_vote[winner_num]++;
-                        }
-                	} catch (Exception ex) {
-                		break;
-                	}
-                }
-                */
-                //double[][] results = new double[][]{popular_vote,elected_vote};
+                double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.members_per_district*Settings.num_districts);
+                double[] ideal_vote = prop_rep_results[0];
+                int max_diff = -1, min_diff = -1;
+                double max_diff_amt = -1, min_diff_amt = 1;
+            	for( int j = 0; j < popular_vote.length; j++) {
+            		ideal_vote[j] -= elected_vote[j];
+            		if( ideal_vote[j] < min_diff_amt || min_diff < 0) {
+            			min_diff = j;
+            			min_diff_amt = ideal_vote[j];
+            		}
+            		if( ideal_vote[j] > max_diff_amt || max_diff < 0) {
+            			max_diff = j;
+            			max_diff_amt = ideal_vote[j];
+            		}
+            	}
+            	// min = negative = overrepresented
+            	// max = positive = underepresented
+            	double max = -1;
+            	if( max_diff_amt > 0) {
+            		for( int j = 0; j < residues.length; j++) {
+            			double amt = residues[j][max_diff] / pops[j];
+            			if( amt > max) {
+            				amt = max;
+            			}
+            		}
+            		elected_vote[max_diff] += max;
+            		elected_vote[min_diff] -= max;
+            	}
             	
+
                 for( int j = 0; j < Candidate.candidates.size(); j++) {
                     p[j] += popular_vote[j];
                     q[j] += elected_vote[j];

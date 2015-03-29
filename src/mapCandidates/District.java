@@ -27,63 +27,76 @@ public class District extends JSONObject {
         population = pop;
         return pop;
     }
+    public static double[][] getPropRepOutcome(double[] district_vote,int members_per_district) {
+    	double[] prop_rep = new double[members_per_district];
+    	double[] residual_popular_vote = new double[members_per_district];
+    	double[] residual_popular_vote2 = new double[members_per_district];
+	
+		double tot_vote = 0;
+		for( int j = 0; j < district_vote.length; j++) {
+			//popular_vote[j] += pop_district_vote[j];
+			tot_vote += district_vote[j];
+		}
+		double multiplier = ((double)members_per_district) / tot_vote;
+		double votes_per_seat = tot_vote / ((double)members_per_district);
+		double total_votes = 0;
+		for( int j = 0; j < district_vote.length; j++) {
+			prop_rep[j] = multiplier*(double)district_vote[j];
+			residual_popular_vote[j] = prop_rep[j] - Math.floor(prop_rep[j]);
+		   	residual_popular_vote2[j] = prop_rep[j] - Math.round(prop_rep[j]);
+		   	prop_rep[j] = Math.round(prop_rep[j]);
+		   	total_votes += prop_rep[j];
+		}
+		while( total_votes < members_per_district) {
+	        double max_res = 0;
+	        int max_res_ind = -1;
+	        for( int j = 0; j < district_vote.length; j++) {
+	        	if( residual_popular_vote2[j] > max_res || max_res_ind < 0) {
+	        		max_res = residual_popular_vote2[j];
+	        		max_res_ind = j;
+	        	}
+	        }
+	        residual_popular_vote2[max_res_ind] -= votes_per_seat;
+	        prop_rep[max_res_ind]++;
+	        total_votes++;
+		}
+		return new double[][]{prop_rep,residual_popular_vote,residual_popular_vote2, new double[]{votes_per_seat}};
+	}
     
     public double[][] getElectionResults() {
         double[] tot_popular_vote = new double[Candidate.candidates.size()];
         double[] tot_elected_vote = new double[Candidate.candidates.size()];
-        double[] optimal_elected_vote = new double[Candidate.candidates.size()];
         double[] residual_popular_vote = new double[Candidate.candidates.size()];
         double[] residual_popular_vote2 = new double[Candidate.candidates.size()];
-        int target_votes = Settings.members_per_district;
-   		for( int i = 0; i < outcomes.length; i++) {
+        int result = (int)Math.floor(Math.random()*(double)outcomes.length);
+        double total_pop = 0;
+   		//for( int i = 0; i < outcomes.length; i++) {
    	       	try {
-   	            double[] popular_vote = new double[Candidate.candidates.size()];
+   	            //double[] popular_vote = new double[Candidate.candidates.size()];
    	    		//int n = (int)Math.floor(Math.random()*(double)outcomes.length);
-   	            double[] prop_rep = new double[Candidate.candidates.size()];
-   	            double[] district_vote = outcomes[i];
-   	            double[] pop_district_vote = pop_balanced_outcomes[i];
-   	            double tot_vote = 0;
-   	            for( int j = 0; j < district_vote.length; j++) {
-   	                popular_vote[j] += pop_district_vote[j];
-   	                tot_vote += district_vote[j];
-   	            }
-   	            double max_res = 0;
-   	            int max_res_ind = -1;
-   	            double multiplier = ((double)Settings.members_per_district) / tot_vote;
-   	            double total_votes = 0;
-   	            for( int j = 0; j < district_vote.length; j++) {
-   	            	prop_rep[j] = multiplier*(double)district_vote[j];
-   	            	residual_popular_vote[j] = prop_rep[j] - Math.floor(prop_rep[j]);
-   	            	residual_popular_vote2[j] = prop_rep[j] - Math.round(prop_rep[j]);
-   	            	prop_rep[j] = Math.round(prop_rep[j]);
-   	            	total_votes += prop_rep[j];
-   	            	
-   	            	if( residual_popular_vote2[j] > max_res || max_res_ind < 0) {
-   	            		max_res = residual_popular_vote2[j];
-   	            		max_res_ind = j;
-   	            	}
-   	            }
-   	            if( total_votes < Settings.members_per_district) {
-   	            	prop_rep[max_res_ind]++;
-   	            	total_votes++;
-   	            }
-   	            for( int j = 0; j < district_vote.length; j++) {
-   	            	tot_elected_vote[j] += prop_rep[j];
-   	            	tot_popular_vote[j] += popular_vote[j];
+   	            //double[] prop_rep = new double[Candidate.candidates.size()];
+   	            double[] district_vote = outcomes[result];
+   	            double[] pop_district_vote = pop_balanced_outcomes[result];
+   	            
+   	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.members_per_district);
+   	            total_pop = prop_rep_results[4][0];
+		        for( int j = 0; j < district_vote.length; j++) {
+   	            	tot_elected_vote[j] += prop_rep_results[0][j];
+   	            	tot_popular_vote[j] += pop_district_vote[j];
+   	            	residual_popular_vote[j] += prop_rep_results[1][j];
+   	            	residual_popular_vote2[j] += prop_rep_results[2][j];
    	            }
    	    	} catch (Exception ex) {
    	    	}
-    	}
-   		
-   		double total_pop = 0;
+    	//}
+   		/*
    		for( int j = 0; j < tot_popular_vote.length; j++) {
         	tot_elected_vote[j] /= (double)outcomes.length;
         	tot_popular_vote[j] /= (double)outcomes.length;
         	residual_popular_vote[j] /= (double)outcomes.length;
-        	total_pop += tot_popular_vote[j];
-        }
+        }*/
    		
-       	return new double[][]{tot_popular_vote,tot_elected_vote,residual_popular_vote};
+       	return new double[][]{tot_popular_vote,tot_elected_vote,residual_popular_vote,residual_popular_vote2, new double[]{total_pop}};
     }
 
     public double getSelfEntropy(double[] result) {
