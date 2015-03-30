@@ -2,6 +2,7 @@
 
 TODO:
 * make able to run gui-less from the command line
+* means need to have runtime (or generation count), save destination
 * add switch to - equalize voter turnout - change self-entropy method - persist in seetings file - show on gui.
 * if prop. representation is tied, break tie with amount of residue of largest residue district for most under-represented candidate. (where that candidate didn't win the residue) - most being the one that switching reduces kl-div.  - get ideal from total.  then find candidate with most elected representatives short of total.
 - or do most in excess of total, then find district with smallest margin of victory where that candidate was the residual winner. - least short of a win for underrepresented - smallest percent of residue needed to win for most underrepresented candidate that didn't win. - or just add the frac of the vote they got (for the largest frac) to their # elected - and subtr that frac from the one that won that election for that district.
