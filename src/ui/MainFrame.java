@@ -29,7 +29,7 @@ import com.hexiong.jdbf.JDBFException;
 import com.hexiong.jdbf.JDBField;
 
 
-public class MainFrame extends JFrame implements iChangeListener {
+public class MainFrame extends JFrame implements iChangeListener, iDiscreteEventListener {
 	/*
 	TODO: pre/post serialize to get district #?
 			-- need to make data exporter, and make it so that it imports district when applicable.
@@ -276,6 +276,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		}
 		if( !featureCollection.ecology.evolveListeners.contains(panelGraph)) {
 			featureCollection.ecology.evolveListeners.add(panelGraph);
+		}
+		if( !featureCollection.ecology.evolveListeners.contains(this)) {
+			featureCollection.ecology.evolveListeners.add(this);
 		}
 	}
 	public void fillComboBoxes() {
@@ -2009,5 +2012,59 @@ public class MainFrame extends JFrame implements iChangeListener {
 		slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
 		invalidate();
 		repaint();
+	}
+	@Override
+	public void eventOccured() {
+		if( project.num_generations > 0 && featureCollection.ecology.generation >= project.num_generations) {
+			featureCollection.ecology.stopEvolving();
+			System.out.println("collection districts...");
+			featureCollection.storeDistrictsToProperties(project.district_column);
+			System.out.println("getting headers...");
+			String[] headers = featureCollection.getHeaders();
+			System.out.println("getting data...");
+			String[][] data = featureCollection.getData(headers);
+
+			if( project.save_to != null && project.save_to.length() > 0) {
+				String filename = project.save_to;
+				String ext = project.save_to.substring(project.save_to.length()-3).toLowerCase();
+				if( ext.equals("dbf")) {
+					writeDBF(filename,headers,data);					
+					System.out.println("writedbf done.");
+				} else {
+					String delimiter = ",";
+					if( ext.equals("txt")) delimiter = "\t";
+					try {
+						System.out.println("creating...");
+						File f = new File(filename);
+						FileOutputStream fos = new FileOutputStream(f);
+						StringBuffer sb = new StringBuffer();
+						for(int i = 0; i < headers.length; i++) {
+							sb.append((i>0?delimiter:"")+headers[i]);
+						}
+						sb.append("\n");
+						
+						for(int j = 0; j < data.length; j++) {
+							for(int i = 0; i < headers.length; i++) {
+								sb.append((i>0?delimiter:"")+data[j][i]);
+							}
+							sb.append("\n");
+						}
+						System.out.println("writing...");
+						fos.write(sb.toString().getBytes());
+						
+						fos.flush();
+						System.out.println("closing...");
+						fos.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+						return;
+					} 
+				}
+			}
+			if( Applet.no_gui) {
+				System.exit(0);
+			}
+		}
 	}	
 }
