@@ -15,7 +15,21 @@ import mapCandidates.StaticFunctions;
  */
 
 public class Applet extends JApplet {
+	public static boolean no_gui = false;
+	public static String open_project = null;
+	
     public static void main( String[] args ) {
+    	for( int i = 0; i < args.length; i++) {
+    		String arg = args[i];
+    		if( arg.contains("nogui") || arg.contains("headless")) {
+    			no_gui = true;
+    		}
+    		if( arg.contains("project") || arg.contains("file")) {
+    			if( i+1 < args.length) {
+    				open_project = args[i+1];
+    			}
+    		}
+    	}
 		new Applet();
 	}
     public Applet() {
@@ -39,7 +53,10 @@ pct to hide: 0.0
     	 * 
     	 */
 
-    	new MainFrame().show();
+    	MainFrame mainFrame = new MainFrame();
+    	if( !no_gui) {
+    		mainFrame.show();
+    	}
     }
 
 

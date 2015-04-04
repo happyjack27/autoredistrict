@@ -20,6 +20,11 @@ public class Project extends ReflectionJSONObject<Project> {
 	public int initial_population = 128;
 	public int simulated_elections = 4;
 	
+	public int num_generations = -1;
+	
+	public String save_to = "";
+	
+	
 	public String primary_key_column = "";
 	public String population_column = "";
 	public String district_column = "";

@@ -10,7 +10,9 @@ import java.util.*;
 
 import javax.swing.*;
 
-public class MapPanel extends JPanel implements MouseListener, MouseMotionListener {
+import mapCandidates.iDiscreteEventListener;
+
+public class MapPanel extends JPanel implements MouseListener, MouseMotionListener, iDiscreteEventListener {
 	double minx,maxx,miny,maxy;
 	FeatureCollection featureCollection;
 	boolean zooming = false;
@@ -200,5 +202,11 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void eventOccured() {
+		invalidate();
+		repaint();
 	}
 }

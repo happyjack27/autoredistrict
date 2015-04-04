@@ -7,7 +7,9 @@ import java.awt.event.ActionListener;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-public class PanelGraph extends JPanel {
+import mapCandidates.iDiscreteEventListener;
+
+public class PanelGraph extends JPanel implements iDiscreteEventListener {
 	PanelGraphDrawArea drawPanel = new PanelGraphDrawArea();
 	JSlider slider = new JSlider();
 
@@ -64,5 +66,9 @@ public class PanelGraph extends JPanel {
 		slider.setValue(0);
 		add(slider);
 		makeCBs();
+	}
+	@Override
+	public void eventOccured() {
+		update();
 	}
 }

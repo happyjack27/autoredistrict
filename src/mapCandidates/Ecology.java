@@ -11,14 +11,15 @@ import javax.swing.JOptionPane;
 
 import serialization.*;
 import ui.MainFrame;
-import ui.MapPanel;
-import ui.PanelStats;
+//import ui.MapPanel;
+//import ui.PanelStats;
 
 public class Ecology extends ReflectionJSONObject<Ecology> {
 	
+	public Vector<iDiscreteEventListener> evolveListeners = new Vector<iDiscreteEventListener>();
+	
 	public static Vector<double[]> history = new Vector<double[]>();
 
-	static boolean dostats = true;
 	static public DistrictMap bestMap = null;
 	
 	static int verbosity = 0;
@@ -46,8 +47,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public Vector<Ward> wards = new Vector<Ward>();
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
-	public MapPanel mapPanel;
-	public PanelStats statsPanel;
+	//public MapPanel mapPanel;
+	//public PanelStats statsPanel;
 	
 
 	Settings settings = new Settings();
@@ -158,7 +159,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             			System.out.println();
         			}
         			generation++;
-
+        			for( iDiscreteEventListener ev : evolveListeners) {
+        				ev.eventOccured();
+        			}
+        			/*
         			if( mapPanel == null)  {
            				mapPanel = MainFrame.mainframe.mapPanel;
         			}
@@ -168,15 +172,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         			} else {
         				System.out.println("mappanel is null");
         			}
-        			if( dostats) {
-               			if( statsPanel != null) {
-            				statsPanel.getStats();
-            				MainFrame.mainframe.panelGraph.update();
-            			} else {
-            				System.out.println("stats panel is null");
-            			}
-           			}
-        			
+           			if( statsPanel != null) {
+        				statsPanel.getStats();
+        				MainFrame.mainframe.panelGraph.update();
+        			} else {
+        				System.out.println("stats panel is null");
+        			}*/
     			} catch (Exception ex) {
     				System.out.println("ex "+ex);
     				ex.printStackTrace();

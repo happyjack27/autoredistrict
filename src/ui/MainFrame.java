@@ -36,22 +36,109 @@ public class MainFrame extends JFrame implements iChangeListener {
 			need to be able to customize district column name and save in project file, so can load districts.
 			*/
 	
-	
+	//======LOOPBACK
 	public static MainFrame mainframe;
-	 
-	//public String openedGeoFilePath = "";
-	public String openedProjectFilePath = "";
+	
+	
+
+	//public Ecology ecology = new Ecology();
+	//========MODELS
+	public FeatureCollection featureCollection = new FeatureCollection();
 	public Project project = new Project();
 	public DemographicSet activeDemographicSet = new DemographicSet();
-	public JComboBox comboBoxPrimaryKey = new JComboBox();
-	public JComboBox comboBoxPopulation = new JComboBox();
+
+	
+	//========PRIMITIVES
+
+	boolean geo_loaded = false;
+	boolean census_loaded = false;
+	boolean election_loaded = false;
+	boolean evolving = false;
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
+	
+	public boolean hushcomboBoxPopulation = false;
+	public boolean hushcomboBoxPrimaryKey = false;
+	public boolean hushcomboBoxDistrict = false;
+
 	double mutation_rate_multiplier = 0.1;
 	public static double boundary_mutation_rate_multiplier = 0.4;
 	long load_wait = 100;
+	
+	double minx,maxx,miny,maxy;
+	
+	public String openedProjectFilePath = "";	
+	
+	
 
+	
+	//========CONTAINERS
+    final JDialog dlg = new JDialog(mainframe, "Working", true);
+    JProgressBar dpb = new JProgressBar(0, 500);
+    JLabel dlbl = new JLabel();
+	public MapPanel mapPanel = new MapPanel(); 
+	JFrame frameStats = new JFrame();
+	PanelStats panelStats = new PanelStats();
+	JFrame frameGraph = new JFrame();
+	DialogShowProperties df = new DialogShowProperties();
+	public PanelGraph panelGraph = new PanelGraph();
+
+	//===========COMPONENTS - MENU ITEMS
+	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
+	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
+	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
+	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
+	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
+	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
+	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
+	JMenuItem mntmExportData = new JMenuItem("Export data");
+	JMenuItem mntmImportData = new JMenuItem("Import data");
+
+	//JMenu mnGeography = new JMenu("Geography");
+	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
+	//JMenu mnDemographics = new JMenu("Demographics");
+	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
+	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
+	JMenu mnEvolution = new JMenu("Evolution");
+	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
+	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
+	JMenuItem mntmShowStats = new JMenuItem("Show stats");
+
+	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
+	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
+	JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
+	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
+	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
+	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
+	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
+
+	
+	//===========COMPONENTS
+	public JComboBox comboBoxPrimaryKey = new JComboBox();
+	public JComboBox comboBoxPopulation = new JComboBox();
+	public JComboBox comboBoxDistrictColumn;
+
+    public JTextField textField_3 = new JTextField();
+    public JTextField textFieldNumDistricts = new JTextField();
+    public JTextField textFieldElectionsSimulated = new JTextField();
+    public JTextField textField = new JTextField();
+	public JTextField textFieldMembersPerDistrict;
+
+	public JSlider slider_1 = new JSlider();
+	public JSlider sliderDisconnected = new JSlider();
+	public JSlider sliderBorderLength = new JSlider();
+	public JSlider sliderPopulationBalance = new JSlider();
+	public JSlider sliderVotingPowerBalance = new JSlider();
+	public JSlider sliderRepresentation = new JSlider();
+	
+	public JLabel lblDistrictColumn;
+	
+	//=========CLASSES
 	class FileThread extends Thread {
     	public File f = null;
     	FileThread() { super(); } 
@@ -60,67 +147,61 @@ public class MainFrame extends JFrame implements iChangeListener {
     		this.f = f;
     	}
 	}
-	public boolean hushcomboBoxPopulation = false;
-	public boolean hushcomboBoxPrimaryKey = false;
-	public boolean hushcomboBoxDistrict = false;
-	public void fillComboBoxes() {
-		String[] map_headers = featureCollection.getHeaders();
-		//String[][] map_data = featureCollection.getData(map_headers);
-		System.out.println("population..");
-		
-		try {
-			hushcomboBoxPopulation = true;
-			comboBoxPopulation.removeAllItems();
-			comboBoxPopulation.addItem("");
-			for( int i = 0; i < map_headers.length; i++) {
-				comboBoxPopulation.addItem(map_headers[i]);
-			}
-			hushcomboBoxPopulation = false;
-			if( project.population_column != null && project.population_column.length() > 0) {
-				comboBoxPopulation.setSelectedItem(project.population_column);
-			}
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
-		System.out.println("pkey..");
+	
 
-		try {
-			hushcomboBoxPrimaryKey = true;
-			comboBoxPrimaryKey.removeAllItems();
-			comboBoxPrimaryKey.addItem("");
-			for( int i = 0; i < map_headers.length; i++) {
-				comboBoxPrimaryKey.addItem(map_headers[i]);
-			}
-			hushcomboBoxPrimaryKey = false;
-			if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
-				comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
-			}
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
+	class OpenShapeFileThread extends FileThread {
+		OpenShapeFileThread(File f) { super(f); }
+    	public void run() { 
+    		try {
+    		    dlbl.setText("Loading file "+f.getName()+"...");
 
-		try {
-			hushcomboBoxDistrict = true;
-			comboBoxDistrictColumn.removeAllItems();
-			comboBoxDistrictColumn.addItem("");
-			comboBoxDistrictColumn.addItem("AUTOREDISTRICT_RESULT");
-			for( int i = 0; i < map_headers.length; i++) {
-				comboBoxDistrictColumn.addItem(map_headers[i]);
-			}
-			hushcomboBoxDistrict = false;
-			if( project.district_column != null && project.district_column.length() > 0) {
-				comboBoxDistrictColumn.setSelectedItem(project.district_column);
-			}
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
+    		    project.source_file = f.getAbsolutePath();
 
-		//comboBoxPopulation.setSelectedIndex(0);
-		
+	    		dlg.setVisible(true);
+	    		
+				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+	
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+	
+				String s = f.getName().toLowerCase();
+				System.out.println("Processing "+s+"...");
+				StringBuffer sb = getFile(f);
+				
+				featureCollection.ecology.stopEvolving();
+				geo_loaded = false;
+				evolving = false;
+				Feature.display_mode = 0;
+				setEnableds();
+				
+				//FeatureCollection fc = new FeatureCollection();
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+				loadShapeFile(f);
+	
+	
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				finishLoadingGeography();
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+    }
+	
+	class OpenProjectFileThread extends FileThread {
+		OpenProjectFileThread(File f) { super(f); }
+    	public void run() { 
+    	    project.fromJSON(getFile(f).toString());
+    	}
 	}
+
 
 	class OpenGeoJsonFileThread extends FileThread {
 		OpenGeoJsonFileThread(File f) { super(f); }
@@ -182,6 +263,79 @@ public class MainFrame extends JFrame implements iChangeListener {
 			finishLoadingGeography();
     	}
 	}
+
+
+
+	//==========FUNCTIONS
+	public void addEcologyListeners() {
+		if( !featureCollection.ecology.evolveListeners.contains(mapPanel)) {
+			featureCollection.ecology.evolveListeners.add(mapPanel);
+		}
+		if( !featureCollection.ecology.evolveListeners.contains(panelStats)) {
+			featureCollection.ecology.evolveListeners.add(panelStats);
+		}
+		if( !featureCollection.ecology.evolveListeners.contains(panelGraph)) {
+			featureCollection.ecology.evolveListeners.add(panelGraph);
+		}
+	}
+	public void fillComboBoxes() {
+		String[] map_headers = featureCollection.getHeaders();
+		//String[][] map_data = featureCollection.getData(map_headers);
+		System.out.println("population..");
+		
+		try {
+			hushcomboBoxPopulation = true;
+			comboBoxPopulation.removeAllItems();
+			comboBoxPopulation.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxPopulation.addItem(map_headers[i]);
+			}
+			hushcomboBoxPopulation = false;
+			if( project.population_column != null && project.population_column.length() > 0) {
+				comboBoxPopulation.setSelectedItem(project.population_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+		System.out.println("pkey..");
+
+		try {
+			hushcomboBoxPrimaryKey = true;
+			comboBoxPrimaryKey.removeAllItems();
+			comboBoxPrimaryKey.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxPrimaryKey.addItem(map_headers[i]);
+			}
+			hushcomboBoxPrimaryKey = false;
+			if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
+				comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+
+		try {
+			hushcomboBoxDistrict = true;
+			comboBoxDistrictColumn.removeAllItems();
+			comboBoxDistrictColumn.addItem("");
+			comboBoxDistrictColumn.addItem("AUTOREDISTRICT_RESULT");
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxDistrictColumn.addItem(map_headers[i]);
+			}
+			hushcomboBoxDistrict = false;
+			if( project.district_column != null && project.district_column.length() > 0) {
+				comboBoxDistrictColumn.setSelectedItem(project.district_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+
+		//comboBoxPopulation.setSelectedIndex(0);
+		
+	}
 	public void finishLoadingGeography() {
 		Vector<Feature> features = featureCollection.features;
 		System.out.println(features.size()+" precincts loaded.");
@@ -221,6 +375,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 	    dlbl.setText("Initializing ecology...");
 	    try {
 	    	featureCollection.initEcology();
+	    	addEcologyListeners();
 	    } catch (Exception ex) {
 	    	System.out.println("init ecology ex: "+ex);
 	    	ex.printStackTrace();
@@ -233,8 +388,10 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.featureCollection = featureCollection;
 		mapPanel.invalidate();
 		mapPanel.repaint();
-		featureCollection.ecology.mapPanel = mapPanel;
-		featureCollection.ecology.statsPanel = panelStats;
+		//featureCollection.ecology.mapPanel = mapPanel;
+		//featureCollection.ecology.statsPanel = panelStats;
+    	addEcologyListeners();
+
 		
 		dlg.setVisible(false);
 		System.out.println("Ready.");
@@ -266,135 +423,12 @@ public class MainFrame extends JFrame implements iChangeListener {
 			e.printStackTrace();
 		}
 	}
-
-	class OpenShapeFileThread extends FileThread {
-		OpenShapeFileThread(File f) { super(f); }
-    	public void run() { 
-    		try {
-    		    dlbl.setText("Loading file "+f.getName()+"...");
-
-    		    project.source_file = f.getAbsolutePath();
-
-	    		dlg.setVisible(true);
-	    		
-				featureCollection = new FeatureCollection(); 
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-	
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
-	
-				String s = f.getName().toLowerCase();
-				System.out.println("Processing "+s+"...");
-				StringBuffer sb = getFile(f);
-				
-				featureCollection.ecology.stopEvolving();
-				geo_loaded = false;
-				evolving = false;
-				Feature.display_mode = 0;
-				setEnableds();
-				
-				//FeatureCollection fc = new FeatureCollection();
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-				loadShapeFile(f);
-	
-	
-				for( Feature fe : hmFeatures.values()) {
-					featureCollection.features.add(fe);
-				}
-				finishLoadingGeography();
-    		} catch (Exception ex) {
-    			System.out.println("ex "+ex);
-    			ex.printStackTrace();
-    		}
-    	}
-    }
-	
-	class OpenProjectFileThread extends FileThread {
-		OpenProjectFileThread(File f) { super(f); }
-    	public void run() { 
-    	    project.fromJSON(getFile(f).toString());
-    	}
-	}
 	
 	public void openProjectFile(File f0) {
 		project = new Project();
 	    openedProjectFilePath = f0.getAbsolutePath();
 	    new OpenProjectFileThread(f0).start();
 	}
-	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
-	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
-	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
-	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
-	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
-	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
-	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
-	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
-	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
-	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
-	JMenuItem mntmExportData = new JMenuItem("Export data");
-	JMenuItem mntmImportData = new JMenuItem("Import data");
-
-    final JDialog dlg = new JDialog(mainframe, "Working", true);
-    JProgressBar dpb = new JProgressBar(0, 500);
-    JLabel dlbl = new JLabel();
-
-
-
-    public JTextField textField_3 = new JTextField();
-    public JTextField textFieldNumDistricts = new JTextField();
-    public JTextField textFieldElectionsSimulated = new JTextField();
-    public JTextField textField = new JTextField();
-	public JSlider slider_1 = new JSlider();
-	public JSlider sliderDisconnected = new JSlider();
-	public JSlider sliderBorderLength = new JSlider();
-	public JSlider sliderPopulationBalance = new JSlider();
-	public JSlider sliderVotingPowerBalance = new JSlider();
-	public JSlider sliderRepresentation = new JSlider();
-	
-	//JMenu mnGeography = new JMenu("Geography");
-	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
-	//JMenu mnDemographics = new JMenu("Demographics");
-	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
-	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
-	JMenu mnEvolution = new JMenu("Evolution");
-	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
-	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
-	JMenuItem mntmShowStats = new JMenuItem("Show stats");
-
-	
-	double minx,maxx,miny,maxy;
-	
-	public MapPanel mapPanel = new MapPanel(); 
-	
-	JFrame frameStats = new JFrame();
-	PanelStats panelStats = new PanelStats();
-	JFrame frameGraph = new JFrame();
-	DialogShowProperties df = new DialogShowProperties();
-	public PanelGraph panelGraph = new PanelGraph();
-
-
-	//public Ecology ecology = new Ecology();
-	public FeatureCollection featureCollection = new FeatureCollection();
-	
-	boolean geo_loaded = false;
-	boolean census_loaded = false;
-	boolean election_loaded = false;
-	boolean evolving = false;
-	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
-	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
-	JMenuItem mntmResetZoom = new JMenuItem("Reset zoom");
-	JMenuItem mntmZoomIn = new JMenuItem("Zoom in");
-	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
-	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
-	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
-	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
-	public JTextField textFieldMembersPerDistrict;
-	public JLabel lblDistrictColumn;
-	public JComboBox comboBoxDistrictColumn;
 	
 	public void setEnableds() {
 		
@@ -844,9 +878,11 @@ public class MainFrame extends JFrame implements iChangeListener {
 		mapPanel.featureCollection = featureCollection;
 		mapPanel.invalidate();
 		mapPanel.repaint();
-		featureCollection.ecology.mapPanel = mapPanel;
-		featureCollection.ecology.statsPanel = panelStats;
+		//featureCollection.ecology.mapPanel = mapPanel;
+		//featureCollection.ecology.statsPanel = panelStats;
 		featureCollection.initEcology();
+    	addEcologyListeners();
+
 		System.out.println("Ready.");
 		
 		geo_loaded = true;
@@ -855,6 +891,34 @@ public class MainFrame extends JFrame implements iChangeListener {
 	
 	public MainFrame() {
 		mainframe = this;
+		jbInit();
+		
+		Settings.mutation_rate = 0; 
+		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
+		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
+		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
+		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
+		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
+		Settings.mutate_all = true;
+		
+		Settings.mutation_rateChangeListeners.add(this);
+		Settings.populationChangeListeners.add(this);
+
+		setEnableds();
+		
+		if( Applet.open_project != null && Applet.open_project.length() > 0) {
+			File fd = new File(Applet.open_project);
+			if( fd == null || !fd.exists()) {
+				System.out.println("project file not found: "+Applet.open_project);
+				return;
+			}
+			openProjectFile(fd);
+			
+		}
+	}
+	public void jbInit() {
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);
@@ -1764,6 +1828,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = -1;
 				
+		    	addEcologyListeners();
 				featureCollection.ecology.startEvolving();
 				evolving = true;
 				setEnableds();
@@ -1789,6 +1854,7 @@ public class MainFrame extends JFrame implements iChangeListener {
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = 1;
+				addEcologyListeners();
 				featureCollection.ecology.startEvolving();
 				evolving = true;
 				setEnableds();
@@ -1888,18 +1954,9 @@ public class MainFrame extends JFrame implements iChangeListener {
 		});
 		
 		chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
-		
-		Settings.mutation_rate = 0; 
-		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
-		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
-		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
-		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
-		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
-		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 
 		
 		chckbxmntmMutateAll.setSelected(true);
-		Settings.mutate_all = true;
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
@@ -1924,12 +1981,6 @@ public class MainFrame extends JFrame implements iChangeListener {
 		frameStats.move(this.getWidth(), this.getX()+frameGraph.getHeight());
 		frameStats.show();
 		frameGraph.show();
-		
-		Settings.mutation_rateChangeListeners.add(this);
-		Settings.populationChangeListeners.add(this);
-
-		
-		setEnableds();
 	}
 	public StringBuffer getFile(File f) {		
 		StringBuffer sb = new StringBuffer();

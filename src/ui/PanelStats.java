@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class PanelStats extends JPanel {
+public class PanelStats extends JPanel implements iDiscreteEventListener {
 	
 	JLabel lblNewLabel_1 = new JLabel();
 	JLabel label_1 = new JLabel();
@@ -247,4 +247,11 @@ public class PanelStats extends JPanel {
 	public FeatureCollection featureCollection;
 	private JTable table;
 	private JTable table_1;
+
+
+
+	@Override
+	public void eventOccured() {
+		getStats();
+	}
 }
