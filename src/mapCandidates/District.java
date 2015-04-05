@@ -68,6 +68,9 @@ public class District extends JSONObject {
         double[] tot_elected_vote = new double[Candidate.candidates.size()];
         double[] residual_popular_vote = new double[Candidate.candidates.size()];
         double[] residual_popular_vote2 = new double[Candidate.candidates.size()];
+        if( outcomes == null) {
+        	this.generateOutcomes(Settings.num_elections_simulated);
+        }
         int result = (int)Math.floor(Math.random()*(double)outcomes.length);
         double total_pop = 0;
    		//for( int i = 0; i < outcomes.length; i++) {
