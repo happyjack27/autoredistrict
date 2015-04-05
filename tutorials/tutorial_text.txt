@@ -200,3 +200,8 @@ However, I believe it's an essential metric for minimizing injustice due to e.g.
 
 And, when simultaneously coupled together along with proportional representation, compactness, and population balance, in a differential heuristic optimization (specifically, genetic algorithm using ranked partial scores), creates a just, sound, and comprehensive solution to the general problem of fair districting.
 
+------
+
+Q: why are the geographic criteria (the first 3) alone insufficient?
+
+A: Occam'z Razor: "The simplest explanation is most likely correct."  Key word here: "likely".  If we were, for example, to only use the criteria of equal population, and then select a map at random from all the possible permutations, and then if it doesn't meet that throw it out and re-pick, until we get one that meets that, the map that we end up with will, due to the law of large numbers, have most districts be proportioned in about the same way as the entire state.  That is, if the total popular vote is about 60% for one party, then the individual districts will all be about 60% for that party, too. (since as the sample size N gets larger, it regresses towards the population mean, with smaller and smaller variance, and since we're counting people, N is very large.)  So in almost all districts, the majority vote will be for the party that has the majority in the total population.  Which means that party will get almost 100% of the seats.  Even though they only got 60% of the popular vote.
