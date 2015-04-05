@@ -15,6 +15,31 @@ TODO:
 
 * add layer viewer tree view on right
 * add file system explorer on left, with a default workspace
+* ?add aggregation / deaggregation / redistribution?
+* http://www.caliper.com/RedistrictingFeatures.htm
+* advanced global metrics 
+- show population standard deviation, mean, and max deviation,
+- show different compactness scores.
+* show global scores by sliders
+* show global score movement rate by sliders
+* tooltip hints
+
+pct of area - total population - old - normalize to current population
+pct of area - total population - new
+
+import data - different shapefile - "import incongruous data"
+- by population density
+1. align both maps
+0. collect population columns and columns to import.
+2. cut space up into tiny grid (squares)
+3. find population density of each region (divide by area)
+4. allocate population to squares based on area intersecting. ( 
+polygon clipping
+intersecting area polygon
+http://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping#Java
+)
+5. aggregate data into working regions, totaling population
+6. then adjust to match new population. (multiply by working pop / imported pop)
 
 
 DONE:
