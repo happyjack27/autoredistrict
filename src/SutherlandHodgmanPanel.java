@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.*;
 
 class SutherlandHodgmanPanel extends JPanel {
-    List<double[]> subject, clipper, result;
+    ArrayList<double[]> subject, clipper, result;
  
     public SutherlandHodgmanPanel() {
         setPreferredSize(new Dimension(600, 500));
@@ -16,15 +16,15 @@ class SutherlandHodgmanPanel extends JPanel {
  
         double[][] clipPoints = {{100, 100}, {300, 100}, {300, 300}, {100, 300}};
  
-        subject = new ArrayList<>(Arrays.asList(subjPoints));
-        result  = new ArrayList<>(subject);
-        clipper = new ArrayList<>(Arrays.asList(clipPoints));
+        subject = new ArrayList<double[]>(Arrays.asList(subjPoints));
+        clipper = new ArrayList<double[]>(Arrays.asList(clipPoints));
  
-        clipPolygon();
+        result = SutherlandHodgmanPanel.clipPolygon(subject,clipper);
     }
  
-    private void clipPolygon() {
-        int len = clipper.size();
+    public static ArrayList<double[]> clipPolygon(ArrayList<double[]> subject, ArrayList<double[]> clipper) {
+    	ArrayList<double[]> result  = new ArrayList<double[]>();
+    	int len = clipper.size();
         for (int i = 0; i < len; i++) {
  
             int len2 = result.size();
@@ -47,13 +47,14 @@ class SutherlandHodgmanPanel extends JPanel {
                     result.add(intersection(A, B, P, Q));
             }
         }
+        return result;
     }
  
-    private boolean isInside(double[] a, double[] b, double[] c) {
+    public static boolean isInside(double[] a, double[] b, double[] c) {
         return (a[0] - c[0]) * (b[1] - c[1]) > (a[1] - c[1]) * (b[0] - c[0]);
     }
  
-    private double[] intersection(double[] a, double[] b, double[] p, double[] q) {
+    public static double[] intersection(double[] a, double[] b, double[] p, double[] q) {
         double A1 = b[1] - a[1];
         double B1 = a[0] - b[0];
         double C1 = A1 * a[0] + B1 * a[1];
