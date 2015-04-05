@@ -13,6 +13,9 @@ TODO:
 
 * beat or integrate with: http://www.caliper.com/mtrnews/clients.htm
 
+* add layer viewer tree view on right
+* add file system explorer on left, with a default workspace
+
 
 DONE:
 * save project
