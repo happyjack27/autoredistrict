@@ -11,6 +11,8 @@ TODO:
 * change back arrow to total reset ( |<<)
 * get graphics for arrow buttons
 
+* beat or integrate with: http://www.caliper.com/mtrnews/clients.htm
+
 
 DONE:
 * save project
