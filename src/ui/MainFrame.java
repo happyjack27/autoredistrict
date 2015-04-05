@@ -96,7 +96,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
 	JMenuItem mntmExportData = new JMenuItem("Export data");
-	JMenuItem mntmImportData = new JMenuItem("Import data");
+	JMenuItem mntmImportData = new JMenuItem("Merge data");
 
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
@@ -1464,14 +1464,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnView.add(mntmShowStats);
 		mnView.add(mntmShowGraph);
 		
-		JMenuItem mntmShowProperties = new JMenuItem("Show properties");
+		JMenuItem mntmShowProperties = new JMenuItem("Show data");
 		mntmShowProperties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String[] headers = featureCollection.getHeaders();
 				String[][] data = featureCollection.getData(headers);
 
 				df.setTableSource(new DataAndHeader(data,headers));
-				df.setTitle("Map Properties");
+				df.setTitle("Map Data");
 				df.show();//new DialogShowProperties(featureCollection).show();
 			}
 		});

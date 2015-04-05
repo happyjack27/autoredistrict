@@ -20,7 +20,7 @@ public class DialogShowProperties extends JDialog {
 		
 	}
 	public DialogShowProperties() {
-		setTitle("Properties table");
+		setTitle("Data table");
 		//getContentPane().setLayout(null);
 		this.setSize(new Dimension(400,400));
 		getContentPane().setPreferredSize(new Dimension(400,400));
