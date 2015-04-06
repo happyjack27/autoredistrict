@@ -28,9 +28,9 @@ public class District extends JSONObject {
         return pop;
     }
     public static double[][] getPropRepOutcome(double[] district_vote,int members_per_district) {
-    	double[] prop_rep = new double[members_per_district];
-    	double[] residual_popular_vote = new double[members_per_district];
-    	double[] residual_popular_vote2 = new double[members_per_district];
+    	double[] prop_rep = new double[district_vote.length];
+    	double[] residual_popular_vote = new double[district_vote.length];
+    	double[] residual_popular_vote2 = new double[district_vote.length];
 	
 		double tot_vote = 0;
 		for( int j = 0; j < district_vote.length; j++) {
@@ -80,16 +80,20 @@ public class District extends JSONObject {
    	            //double[] prop_rep = new double[Candidate.candidates.size()];
    	            double[] district_vote = outcomes[result];
    	            double[] pop_district_vote = pop_balanced_outcomes[result];
+   	            //System.out.println("candidates "+Candidate.candidates.size()+" outcomes: "+district_vote.length);
    	            
    	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.members_per_district);
-   	            total_pop = prop_rep_results[4][0];
+   	            total_pop = prop_rep_results[3][0];
 		        for( int j = 0; j < district_vote.length; j++) {
+		        	//System.out.println("j: "+j);
    	            	tot_elected_vote[j] += prop_rep_results[0][j];
    	            	tot_popular_vote[j] += pop_district_vote[j];
    	            	residual_popular_vote[j] += prop_rep_results[1][j];
    	            	residual_popular_vote2[j] += prop_rep_results[2][j];
    	            }
    	    	} catch (Exception ex) {
+   	    		System.out.println("ex get election result "+ex);
+   	    		ex.printStackTrace();
    	    	}
     	//}
    		/*
