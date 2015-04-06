@@ -774,9 +774,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         
         double weighted_sum = 0;
         for( int i = 0; i < lengths.length; i++) {
-        	weighted_sum += lengths[i] / Math.sqrt(areas[i]);
+        	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
+        	weighted_sum += 1.0-((4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]));
         }
-        return weighted_sum;
+        return weighted_sum / (double)lengths.length;
     }
     
     double getEdgeLength() {

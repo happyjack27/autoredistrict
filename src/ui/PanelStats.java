@@ -44,7 +44,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		DecimalFormat integer = new DecimalFormat("###,###,###,###,##0");
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
-		lblNewLabel_1.setText(""+dm.fairnessScores[0]);
+		lblNewLabel_1.setText(""+(1.0-dm.fairnessScores[0]));
 		label_1.setText(""+integer.format(dm.fairnessScores[3]));
 		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
 		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
@@ -165,7 +165,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		this.setSize(new Dimension(449, 510));
 		this.setPreferredSize(new Dimension(449, 612));
 		
-		JLabel lblNewLabel = new JLabel("Border length:");
+		JLabel lblNewLabel = new JLabel("Isoperimetric quotent (compactness):");
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNewLabel.setBounds(6, 6, 202, 16);

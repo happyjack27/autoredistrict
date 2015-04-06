@@ -108,7 +108,7 @@ public class Project extends ReflectionJSONObject<Project> {
 
 		} else {
 			System.out.println("district_column not found");
-			MainFrame.mainframe.comboBoxDistrictColumn.setSelectedItem("AUTOREDISTRICT_RESULT");
+			MainFrame.mainframe.comboBoxDistrictColumn.setSelectedItem("AR_RESULT");
 		}
 		
 		if( containsKey("primary_key_column")) {

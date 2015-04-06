@@ -1,3 +1,7 @@
+CONTACTING / MAKING IT USED:
+* http://legis.wisconsin.gov/ltsb/Pages/default.aspx
+* http://legis.wisconsin.gov/ltsb/Pages/Contact.aspx - software development and gis - give samples. ( federal, state senate, state assembly, state assembly 33-3 (mmpd))
+
 
 
 TODO:
@@ -20,12 +24,16 @@ TODO:
 * advanced global metrics 
 - show population standard deviation, mean, and max deviation,
 - show different compactness scores.
+--polsby-popper, schwaretzberg, convex hull, reock, squared length per area
 * show global scores by sliders
 * show global score movement rate by sliders
 * tooltip hints
 
 pct of area - total population - old - normalize to current population
 pct of area - total population - new
+
+load into temporary geography file (each get its own min/max)
+* do by dots? original_geode[][], new_geode[][] 
 
 import data - different shapefile - "import incongruous data"
 - by population density

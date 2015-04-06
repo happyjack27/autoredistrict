@@ -294,6 +294,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     public void reset() {
     	population = new Vector<DistrictMap>();
     	this.generation = 0;
+    	history = new Vector<double[]>();
     	for( Ward b : wards) {
     		b.recalcMuSigmaN();
     	}

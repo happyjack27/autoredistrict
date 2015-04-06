@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.*; 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
@@ -587,7 +587,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
         
 		for( int i = 0; i < headers.length; i++) {
 			try {
-				fields[i] = new JDBField(headers[i], 'C', 64, 0);
+				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 64, 0);
 			} catch (JDBFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
