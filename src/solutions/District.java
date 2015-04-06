@@ -37,6 +37,10 @@ public class District extends JSONObject {
 			//popular_vote[j] += pop_district_vote[j];
 			tot_vote += district_vote[j];
 		}
+		if( tot_vote == 0) {
+			System.out.println("tot_vote = 0!");
+			tot_vote = 1;
+		}
 		double multiplier = ((double)members_per_district) / tot_vote;
 		double votes_per_seat = tot_vote / ((double)members_per_district);
 		double total_votes = 0;
@@ -84,6 +88,7 @@ public class District extends JSONObject {
    	            
    	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.members_per_district);
    	            total_pop = prop_rep_results[3][0];
+   	            if( total_pop == 0 || total_pop != total_pop) total_pop = 1;
 		        for( int j = 0; j < district_vote.length; j++) {
 		        	//System.out.println("j: "+j);
    	            	tot_elected_vote[j] += prop_rep_results[0][j];

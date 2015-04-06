@@ -629,16 +629,30 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             	}
             	// min = negative = overrepresented
             	// max = positive = underepresented
-            	double max = -1;
+            	double max = 0;
+            	double min = 0;
             	if( max_diff_amt > 0) {
             		for( int j = 0; j < residues.length; j++) {
             			double amt = residues[j][max_diff] / (pops[j] == 0 || pops[j] != pops[j] ? 1 : pops[j]);
+            			if( amt != amt || amt > 1) {
+            				System.out.println("bad residue! "+amt);
+            				amt = 0; 
+            			}
             			if( amt > max) {
             				amt = max;
             			}
+            			double amt2 = residues[j][min_diff] / (pops[j] == 0 || pops[j] != pops[j] ? 1 : pops[j]);
+            			if( amt2 != amt2 || amt2 > 1) {
+            				System.out.println("bad residue! "+amt2);
+            				amt2 = 0; 
+            			}
+            			if( amt2 < min) {
+            				amt2 = min;
+            			}
             		}
-            		elected_vote[max_diff] += max;
-            		elected_vote[min_diff] -= max;
+            		double avg = (Math.abs(max)+Math.abs(min))/2;
+            		elected_vote[max_diff] += avg;
+            		elected_vote[min_diff] -= avg;
             	}
             	
 
@@ -649,6 +663,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
             time20 = System.currentTimeMillis();
             disproportional_representation = getKLDiv(p,q,1.2);
+            if( disproportional_representation != disproportional_representation) {
+            	System.out.println("disproportional_representation not a number");
+            }
     	}
 
     	long time3 = System.currentTimeMillis();
