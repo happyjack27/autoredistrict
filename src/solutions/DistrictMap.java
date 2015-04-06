@@ -775,7 +775,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double weighted_sum = 0;
         for( int i = 0; i < lengths.length; i++) {
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
-        	weighted_sum += 1.0-((4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]));
+        	double isop = ((4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]));
+        	weighted_sum += 1.0 - (Settings.square_root_compactness ? Math.sqrt(isop) : isop);
         }
         return weighted_sum / (double)lengths.length;
     }
