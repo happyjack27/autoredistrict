@@ -21,7 +21,6 @@ import org.nocrala.tools.gis.data.esri.shapefile.header.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
-
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.DBFWriter;
 import com.hexiong.jdbf.JDBFException;
@@ -1825,22 +1824,27 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNumOfDistricts.setBounds(6, 57, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
-		JButton button = new JButton("<|");
+		JButton button = new JButton("Reset");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = -1;
 				
 		    	addEcologyListeners();
-				featureCollection.ecology.startEvolving();
-				evolving = true;
+				featureCollection.ecology.stopEvolving();
+				evolving = false;
+				featureCollection.ecology.reset();
+				int target = Settings.num_districts;
+				Settings.num_districts = 1;
+				featureCollection.ecology.resize_districts();
+				Settings.num_districts = target;
+				featureCollection.ecology.resize_districts();
 				setEnableds();
-
 			}
 		});
 		button.setBounds(22, 11, 46, 29);
 		panel.add(button);
 		
-		JButton btnX = new JButton("| |");
+		JButton btnX = new JButton("Stop");
 		btnX.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				featureCollection.ecology.stopEvolving();
@@ -1852,7 +1856,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		btnX.setBounds(80, 11, 46, 29);
 		panel.add(btnX);
 		
-		JButton button_2 = new JButton("|>");
+		JButton button_2 = new JButton("Go");
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = 1;
