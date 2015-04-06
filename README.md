@@ -1,6 +1,7 @@
 CONTACTING / MAKING IT USED:
 * http://legis.wisconsin.gov/ltsb/Pages/default.aspx
 * http://legis.wisconsin.gov/ltsb/Pages/Contact.aspx - software development and gis - give samples. ( federal, state senate, state assembly, state assembly 33-3 (mmpd))
+* http://www.apl.wisc.edu/about sarah kemp (kemp[at]wisc[dot]edu) 
 
 
 
