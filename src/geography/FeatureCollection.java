@@ -1,4 +1,4 @@
-package geoJSON;
+package geography;
 
 import javax.swing.*;
 
@@ -16,14 +16,14 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 
 import com.hexiong.jdbf.DBFReader;
 
-import mapCandidates.Ward;
-import mapCandidates.DistrictMap;
-import mapCandidates.Ecology;
-import mapCandidates.Edge;
-import mapCandidates.Settings;
-import mapCandidates.Vertex;
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.DistrictMap;
+import solutions.Ecology;
+import solutions.Edge;
+import solutions.Settings;
+import solutions.Vertex;
+import solutions.Ward;
 
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;

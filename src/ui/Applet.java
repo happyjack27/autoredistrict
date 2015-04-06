@@ -4,8 +4,8 @@ import java.io.InputStream;
 
 import javax.swing.*;
 
-import mapCandidates.Gaussian;
-import mapCandidates.StaticFunctions;
+import solutions.Gaussian;
+import solutions.StaticFunctions;
 
 /*
  * 

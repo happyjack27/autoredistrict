@@ -4,9 +4,10 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 
 import javax.swing.*;
-import java.awt.*;
 
-import mapCandidates.Ecology;
+import solutions.Ecology;
+
+import java.awt.*;
 
 public class PanelGraphDrawArea extends JPanel {
 	public double pctToHide = 0.0;

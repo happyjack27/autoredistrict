@@ -1,6 +1,6 @@
-package mapCandidates;
+package solutions;
 
-import geoJSON.*;
+import geography.*;
 
 import java.util.*;
 
@@ -632,7 +632,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             	double max = -1;
             	if( max_diff_amt > 0) {
             		for( int j = 0; j < residues.length; j++) {
-            			double amt = residues[j][max_diff] / pops[j];
+            			double amt = residues[j][max_diff] / (pops[j] == 0 || pops[j] != pops[j] ? 1 : pops[j]);
             			if( amt > max) {
             				amt = max;
             			}

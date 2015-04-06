@@ -1,4 +1,4 @@
-package geoJSON;
+package geography;
 
 import java.awt.Color;
 import java.io.File;
@@ -6,9 +6,8 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import mapCandidates.Settings;
-
 import serialization.*;
+import solutions.Settings;
 import ui.MainFrame;
 
 

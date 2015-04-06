@@ -1,13 +1,15 @@
 package ui;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-import mapCandidates.iDiscreteEventListener;
+import solutions.iDiscreteEventListener;
 
 public class PanelGraph extends JPanel implements iDiscreteEventListener {
 	PanelGraphDrawArea drawPanel = new PanelGraphDrawArea();

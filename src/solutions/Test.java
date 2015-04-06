@@ -1,4 +1,4 @@
-package mapCandidates;
+package solutions;
 
 import serialization.ReflectionJSONObject;
 import ui.Applet;

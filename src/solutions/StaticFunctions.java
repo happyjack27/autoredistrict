@@ -1,4 +1,4 @@
-package mapCandidates;
+package solutions;
 
 public class StaticFunctions {
     static int[] factorial_cache = null;

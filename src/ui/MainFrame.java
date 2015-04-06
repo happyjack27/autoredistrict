@@ -1,7 +1,8 @@
 package ui;
 
-import geoJSON.*;
-import geoJSON.Properties;
+import geography.*;
+import geography.Properties;
+import solutions.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -11,9 +12,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import javax.swing.*;
-
-import mapCandidates.*;
-
 import javax.swing.event.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
@@ -22,6 +20,7 @@ import org.nocrala.tools.gis.data.esri.shapefile.*;
 import org.nocrala.tools.gis.data.esri.shapefile.header.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
+
 
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.DBFWriter;

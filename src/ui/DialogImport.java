@@ -1,9 +1,10 @@
 package ui;
-import geoJSON.Feature;
-import geoJSON.FeatureCollection;
-import geoJSON.Properties;
+import geography.Feature;
+import geography.FeatureCollection;
+import geography.Properties;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

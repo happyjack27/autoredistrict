@@ -1,6 +1,6 @@
-package mapCandidates;
+package solutions;
 
-import geoJSON.Feature;
+import geography.Feature;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;

@@ -1,4 +1,4 @@
-package mapCandidates;
+package solutions;
 
 import java.util.*;
 

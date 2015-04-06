@@ -1,11 +1,11 @@
 package ui;
 
-import geoJSON.FeatureCollection;
+import geography.FeatureCollection;
 
 import javax.swing.*;
 import javax.swing.table.*;
 
-import mapCandidates.*;
+import solutions.*;
 
 import java.awt.Dimension;
 import java.awt.Font;

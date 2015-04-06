@@ -1,4 +1,4 @@
-package geoJSON;
+package geography;
 
 import serialization.ReflectionJSONObject;
 

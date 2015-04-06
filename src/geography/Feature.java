@@ -1,13 +1,12 @@
-package geoJSON;
+package geography;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 
-import mapCandidates.Ward;
-
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.Ward;
 
 public class Feature extends ReflectionJSONObject<Feature> {
 	public String type;

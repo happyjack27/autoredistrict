@@ -1,8 +1,8 @@
 package ui;
 
-import geoJSON.Feature;
-import geoJSON.FeatureCollection;
-import geoJSON.Geometry;
+import geography.Feature;
+import geography.FeatureCollection;
+import geography.Geometry;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -10,7 +10,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import mapCandidates.iDiscreteEventListener;
+import solutions.iDiscreteEventListener;
 
 public class MapPanel extends JPanel implements MouseListener, MouseMotionListener, iDiscreteEventListener {
 	double minx,maxx,miny,maxy;

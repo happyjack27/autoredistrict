@@ -1,11 +1,10 @@
-package geoJSON;
+package geography;
 
 import java.util.Vector;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
-
-import mapCandidates.Demographic;
+import solutions.Demographic;
 
 public class DemographicSet extends ReflectionJSONObject<DemographicSet> {
 	public String name = "";
