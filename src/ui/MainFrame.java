@@ -135,6 +135,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderRepresentation = new JSlider();
 	
 	public JLabel lblDistrictColumn;
+	public JLabel lblFairnessCriteria;
+	
+	public JButton goButton = new JButton();
+	public JButton resetButton = new JButton();
+	public JButton stopButton = new JButton();
 	
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -1668,41 +1673,41 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 449, 200, 386);
+		panel_2.setBounds(0, 449, 200, 416);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		JLabel lblCompactness = new JLabel("Border length");
+		JLabel lblCompactness = new JLabel("Compactness");
 		lblCompactness.setBounds(6, 36, 90, 16);
 		panel_2.add(lblCompactness);
 		sliderBorderLength.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderBorderLength);
 		
-		JLabel lblContiguency = new JLabel("Representation imbalance");
-		lblContiguency.setBounds(6, 220, 172, 16);
+		JLabel lblContiguency = new JLabel("Proportional representation");
+		lblContiguency.setBounds(6, 285, 172, 16);
 		panel_2.add(lblContiguency);
-		sliderRepresentation.setBounds(6, 245, 190, 29);
+		sliderRepresentation.setBounds(6, 310, 190, 29);
 		panel_2.add(sliderRepresentation);
 		
-		JLabel lblEvolutionaryPressure = new JLabel("Evolutionary pressure");
+		JLabel lblEvolutionaryPressure = new JLabel("Practical criteria");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEvolutionaryPressure.setBounds(6, 9, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
 		
-		JLabel lblProportionalRepresentation = new JLabel("Population imbalance");
+		JLabel lblProportionalRepresentation = new JLabel("Equal population");
 		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
 		panel_2.add(lblProportionalRepresentation);
 		sliderPopulationBalance.setBounds(6, 179, 190, 29);
 		panel_2.add(sliderPopulationBalance);
 		
-		JLabel lblVotingPowerBalance = new JLabel("Voting power imbalance");
-		lblVotingPowerBalance.setBounds(6, 286, 172, 16);
+		JLabel lblVotingPowerBalance = new JLabel("Equal voting power");
+		lblVotingPowerBalance.setBounds(6, 350, 172, 16);
 		panel_2.add(lblVotingPowerBalance);
-		sliderVotingPowerBalance.setBounds(6, 307, 190, 29);
+		sliderVotingPowerBalance.setBounds(6, 371, 190, 29);
 		panel_2.add(sliderVotingPowerBalance);
 		
-		JLabel lblConnectedness = new JLabel("Disconnected population");
+		JLabel lblConnectedness = new JLabel("Contiguency");
 		lblConnectedness.setBounds(6, 97, 172, 16);
 		panel_2.add(lblConnectedness);
 		
@@ -1715,7 +1720,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(sliderDisconnected);
 		
 		JLabel lblMaxPop = new JLabel("Max population % diff ");
-		lblMaxPop.setBounds(6, 353, 134, 16);
+		lblMaxPop.setBounds(6, 225, 134, 16);
 		panel_2.add(lblMaxPop);
 		
 		textField_3.addFocusListener(new FocusAdapter() {
@@ -1733,8 +1738,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		textField_3.setText("9");
 		textField_3.setColumns(10);
-		textField_3.setBounds(138, 347, 58, 28);
+		textField_3.setBounds(138, 219, 58, 28);
 		panel_2.add(textField_3);
+		
+		lblFairnessCriteria = new JLabel("Fairness criteria");
+		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblFairnessCriteria.setBounds(6, 258, 179, 16);
+		panel_2.add(lblFairnessCriteria);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -1824,8 +1834,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNumOfDistricts.setBounds(6, 57, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
-		JButton button = new JButton("Reset");
-		button.addActionListener(new ActionListener() {
+		resetButton.setText("Reset");
+		resetButton.setToolTipText("Re-randomize");
+		resetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = -1;
 				
@@ -1841,11 +1852,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setEnableds();
 			}
 		});
-		button.setBounds(22, 11, 46, 29);
-		panel.add(button);
+		resetButton.setBounds(6, 11, 62, 29);
+		panel.add(resetButton);
 		
-		JButton btnX = new JButton("Stop");
-		btnX.addActionListener(new ActionListener() {
+		stopButton.setText("Stop");
+		stopButton.setToolTipText("Stop evolving a solution.");
+		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				featureCollection.ecology.stopEvolving();
 				evolving = false;
@@ -1853,11 +1865,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			}
 		});
-		btnX.setBounds(80, 11, 46, 29);
-		panel.add(btnX);
+		stopButton.setBounds(80, 11, 64, 29);
+		panel.add(stopButton);
 		
-		JButton button_2 = new JButton("Go");
-		button_2.addActionListener(new ActionListener() {
+		goButton.setText("Go");
+		goButton.setToolTipText("Start evolving a solution.");
+		goButton.setBorder(BorderFactory.createRaisedBevelBorder());
+		stopButton.setBorder(BorderFactory.createRaisedBevelBorder());
+		resetButton.setBorder(BorderFactory.createRaisedBevelBorder());
+		goButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = 1;
 				addEcologyListeners();
@@ -1867,8 +1883,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			}
 		});
-		button_2.setBounds(138, 11, 46, 29);
-		panel.add(button_2);
+		goButton.setBounds(154, 11, 46, 29);
+		panel.add(goButton);
 		
 		textFieldMembersPerDistrict = new JTextField();
 		textFieldMembersPerDistrict.addFocusListener(new FocusAdapter() {
