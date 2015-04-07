@@ -44,10 +44,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		DecimalFormat integer = new DecimalFormat("###,###,###,###,##0");
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
-		lblNewLabel_1.setText(""+(1.0-dm.fairnessScores[0]));
+		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
 		label_1.setText(""+integer.format(dm.fairnessScores[3]));
 		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
-		label_5.setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
+		label_5. setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");		
 		label_4.setText(""+integer.format(featureCollection.ecology.generation));
@@ -67,7 +67,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 				Settings.getAnnealingFloor( featureCollection.ecology.generation),
 
-				(dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333,
+				(
+						Settings.square_root_compactness 
+						? (dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333 
+						: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
+					),
 				(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333,
 				(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits,
 				(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits,

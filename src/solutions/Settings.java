@@ -5,7 +5,7 @@ import java.util.Vector;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
-	public static boolean square_root_compactness = true;
+	public static boolean square_root_compactness = false;
 	public static boolean border_length_area_weighted = true;
 	public static final boolean make_unique = false; //not the cost of this is population times population times precinct count.
 	public static long annealing_starts_at = 0;
