@@ -13,6 +13,7 @@ import solutions.Ward;
 
 public class Feature extends ReflectionJSONObject<Feature> {
 	
+	
 	public Vector<JDBField> dbfFields = new Vector<JDBField>();
 	
 	public String type;
