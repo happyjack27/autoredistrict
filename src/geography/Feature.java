@@ -1,14 +1,20 @@
 package geography;
 
+import java.util.*;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+
+import com.hexiong.jdbf.JDBField;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 import solutions.Ward;
 
 public class Feature extends ReflectionJSONObject<Feature> {
+	
+	public Vector<JDBField> dbfFields = new Vector<JDBField>();
+	
 	public String type;
 	public Properties properties;
 	public Geometry geometry;

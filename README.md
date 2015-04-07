@@ -6,7 +6,7 @@ CONTACTING / MAKING IT USED:
 
 
 TODO:
-* is .dbf save working?  seems to not be
+* is .dbf save working?  seems to not be - need to save column widths and types!
 * make project files load/save other files relative to woring directory of project file. (and make taht the default in file selection dialog)
 * make able to run gui-less from the command line
 * means need to have runtime (or generation count), save destination
