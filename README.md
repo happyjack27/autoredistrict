@@ -6,6 +6,7 @@ CONTACTING / MAKING IT USED:
 
 
 TODO:
+* make project files load/save other files relative to woring directory of project file.
 * make able to run gui-less from the command line
 * means need to have runtime (or generation count), save destination
 * add switch to - equalize voter turnout - change self-entropy method - persist in seetings file - show on gui.
