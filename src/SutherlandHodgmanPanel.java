@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.*;
 
 class SutherlandHodgmanPanel extends JPanel {
+	
     ArrayList<double[]> subject, clipper, result;
  
     public SutherlandHodgmanPanel() {
