@@ -8,6 +8,7 @@ class SutherlandHodgmanPanel extends JPanel {
     ArrayList<double[]> subject, clipper, result;
  
     public SutherlandHodgmanPanel() {
+    	
         setPreferredSize(new Dimension(600, 500));
  
         // these subject and clip points are assumed to be valid
