@@ -144,11 +144,7 @@ public class Project extends ReflectionJSONObject<Project> {
 		if( containsKey("area_weighted")) {
 			Settings.border_length_area_weighted = getString("area_weighted").trim().toLowerCase().equals("true");
 			//MainFrame.mainframe.chckbxAreaWeighted.setSelected(getString("area_weighted").trim().toLowerCase().equals("true"));
-		}
-
-		
-		MainFrame.mainframe.featureCollection.ecology.startEvolving();
-	
+		}		
 	}
 	
 	boolean isEsriSapefile() {

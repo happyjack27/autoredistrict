@@ -140,6 +140,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton goButton = new JButton();
 	public JButton resetButton = new JButton();
 	public JButton stopButton = new JButton();
+	public JMenuItem mntmOpenProjectFile_1;
 	
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -199,9 +200,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     }
 	
 	class OpenProjectFileThread extends FileThread {
-		OpenProjectFileThread(File f) { super(f); }
+		boolean run = false;
+		OpenProjectFileThread(File f, boolean run) { super(f); this.run = run;}
     	public void run() { 
     	    project.fromJSON(getFile(f).toString());
+    	    if( run) {
+				MainFrame.mainframe.featureCollection.ecology.startEvolving();
+    	    }
     	}
 	}
 
@@ -430,10 +435,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 	}
 	
-	public void openProjectFile(File f0) {
+	public void openProjectFile(File f0, boolean run) {
 		project = new Project();
 	    openedProjectFilePath = f0.getAbsolutePath();
-	    new OpenProjectFileThread(f0).start();
+	    new OpenProjectFileThread(f0,run).start();
 	}
 	
 	public void setEnableds() {
@@ -919,7 +924,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println("project file not found: "+Applet.open_project);
 				return;
 			}
-			openProjectFile(fd);
+			openProjectFile(fd,true);
 			
 		}
 	}
@@ -963,7 +968,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( fd == null) {
 					return;
 				}
-				openProjectFile(fd);
+				openProjectFile(fd,false);
 			}
 		});
 		mnFile.add(mntmOpenProjectFile);
@@ -991,6 +996,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				} 
 			}
 		});
+		
+		mntmOpenProjectFile_1 = new JMenuItem("Open project file & run");
+		mntmOpenProjectFile_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}
+				openProjectFile(fd,true);
+			}
+		});
+		mnFile.add(mntmOpenProjectFile_1);
 		mnFile.add(mntmSaveProjectFile);
 		
 		JSeparator separator = new JSeparator();
