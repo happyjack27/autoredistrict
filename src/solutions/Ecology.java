@@ -410,7 +410,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		Settings.geometry_weight*1.2, 
         		Settings.disenfranchise_weight*1.00, 
         		Settings.population_balance_weight*0.8,//*2.0,
-                Settings.disconnected_population_weight*2.2,//1.5,
+                Settings.disconnected_population_weight*2.5,//1.5,
                 Settings.voting_power_balance_weight*0.8,
         };
 
@@ -445,11 +445,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( Settings.auto_anneal) {
 	        int total = 4;
 	        int mutated = 1;
-	       
-	        for(int i = 0; i < cutoff; i++) {
-	            DistrictMap dm = population.get(i);
-	            total += dm.boundaries_tested;
-	            mutated += dm.boundaries_mutated;
+	        if( population.size() > 0) {
+		        for(int i = 0; i < cutoff; i++) {
+		            DistrictMap dm = population.get(i);
+		            total += dm.boundaries_tested;
+		            mutated += dm.boundaries_mutated;
+		        }
 	        }
 	        //minimum 3 mutations
 	        if( mutated < Settings.population*3.0 || mutated != mutated) {
