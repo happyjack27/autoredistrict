@@ -443,8 +443,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			System.out.println();
 		}
         if( Settings.auto_anneal) {
-	        int total = 4;
-	        int mutated = 1;
+	        int total = 2;
+	        int mutated = 0;
 	        if( population.size() > 0) {
 		        for(int i = 0; i < cutoff; i++) {
 		            DistrictMap dm = population.get(i);
@@ -456,7 +456,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        if( mutated < Settings.population*3.0 || mutated != mutated) {
 	        	mutated = (int) (Settings.population*3.0);
 	        }
-        	double new_rate = (double)mutated/(double)total;
+        	double new_rate = ((double)mutated/(double)total)*0.999999;
 	        if( new_rate < 0.25) {
 	        	Settings.startAnnealing(generation);
 	        }
