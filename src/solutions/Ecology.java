@@ -456,7 +456,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        if( mutated < Settings.population*3.0 || mutated != mutated) {
 	        	mutated = (int) (Settings.population*3.0);
 	        }
-        	double new_rate = ((double)mutated/(double)total)*0.999999;
+        	double new_rate = ((double)mutated/(double)total)*0.9995;
 	        if( new_rate < 0.25) {
 	        	Settings.startAnnealing(generation);
 	        }
