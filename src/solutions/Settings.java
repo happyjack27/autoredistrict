@@ -51,7 +51,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean multiThreadScoring = true;
 	public static boolean multiThreadMating = true;
 	public static boolean multiThreadMutatting = true;
-	public static boolean mutate_all = true;
+	public static boolean mutate_all = false;
 
     public static boolean mutate_to_neighbor_only = false;
 

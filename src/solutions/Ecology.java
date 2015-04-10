@@ -32,7 +32,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public ExecutorService matingThreadPool;
 	public CountDownLatch matingLatch;
 
-	static int num_threads = 4;
+	static int num_threads = 8;
 
     int cutoff;
     int speciation_cutoff;
