@@ -1389,7 +1389,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
 			}
 		});
-		chckbxmntmAutoAnneal.setSelected(false);
+		chckbxmntmAutoAnneal.setSelected(true);
 		
 		chckbxmntmAutoAnneal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1999,7 +1999,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
 
 		
-		chckbxmntmMutateAll.setSelected(true);
+		chckbxmntmMutateAll.setSelected(false);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
