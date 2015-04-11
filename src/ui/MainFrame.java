@@ -1114,7 +1114,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					} else if( opt == 2) {
 						JFileChooser jfc = new JFileChooser();
 						jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbase file","dbf"));
-						jfc.showOpenDialog(null);
+						jfc.showSaveDialog(null);
 						f = jfc.getSelectedFile();
 						if( f == null)  {
 							return;
@@ -1133,7 +1133,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						delimiter = "\t";
 						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
 					}
-					jfc.showOpenDialog(null);
+					jfc.showSaveDialog(null);
 					File f = jfc.getSelectedFile();
 					if( f == null)  {
 						System.out.println("f is null.");
