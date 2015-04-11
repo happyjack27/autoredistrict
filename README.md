@@ -3,7 +3,8 @@ CONTACTING / MAKING IT USED:
 * http://legis.wisconsin.gov/ltsb/Pages/Contact.aspx - software development and gis - give samples. ( federal, state senate, state assembly, state assembly 33-3 (mmpd))
 * http://www.apl.wisc.edu/about sarah kemp (kemp[at]wisc[dot]edu) 
 
-
+where to get data:
+ftp://ftp2.census.gov/geo/pvs/tiger2010st/
 
 TODO:
 * is .dbf save working?  seems to not be - need to save column widths and types!
