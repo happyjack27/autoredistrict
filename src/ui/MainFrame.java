@@ -93,7 +93,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
-	JMenuItem mntmExportData = new JMenuItem("Export data");
+	JMenuItem mntmExportData = new JMenuItem("Save data");
 	JMenuItem mntmImportData = new JMenuItem("Merge data");
 
 	//JMenu mnGeography = new JMenu("Geography");
@@ -113,11 +113,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmUndoZoom = new JMenuItem("Undo zoom");
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
-	JMenuItem mntmSelectLayers = new JMenuItem("Select layers");
-
-	
-	//===========COMPONENTS
-	public JComboBox comboBoxPrimaryKey = new JComboBox();
 	public JComboBox comboBoxPopulation = new JComboBox();
 	public JComboBox comboBoxDistrictColumn;
 
@@ -141,6 +136,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton resetButton = new JButton();
 	public JButton stopButton = new JButton();
 	public JMenuItem mntmOpenProjectFile_1;
+	public JPanel panel_4;
+	public JButton btnNewButton;
 	
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -312,6 +309,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		System.out.println("pkey..");
 
 		try {
+			/*
 			hushcomboBoxPrimaryKey = true;
 			comboBoxPrimaryKey.removeAllItems();
 			comboBoxPrimaryKey.addItem("");
@@ -322,6 +320,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( project.primary_key_column != null && project.primary_key_column.length() > 0) {
 				comboBoxPrimaryKey.setSelectedItem(project.primary_key_column);
 			}
+			*/
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
@@ -331,9 +330,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			hushcomboBoxDistrict = true;
 			comboBoxDistrictColumn.removeAllItems();
 			comboBoxDistrictColumn.addItem("");
-			comboBoxDistrictColumn.addItem("AUTOREDISTRICT_RESULT");
+			
+			comboBoxDistrictColumn.addItem("AR_RESULT");
 			for( int i = 0; i < map_headers.length; i++) {
-				comboBoxDistrictColumn.addItem(map_headers[i]);
+				if( !map_headers[i].equals("AR_RESULT")) {
+					comboBoxDistrictColumn.addItem(map_headers[i]);
+				}
 			}
 			hushcomboBoxDistrict = false;
 			if( project.district_column != null && project.district_column.length() > 0) {
@@ -450,7 +452,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
 		mntmImportData.setEnabled(geo_loaded);
-		mntmSelectLayers.setEnabled(geo_loaded);
 		mntmImportcsv.setEnabled(geo_loaded);
 		mntmExportcsv.setEnabled(geo_loaded);
 		mntmExportData.setEnabled(geo_loaded);
@@ -1077,11 +1078,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmImportData);
-		mntmSelectLayers.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectLayers();
-			}
-		});
 		
 		mntmExportData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -1172,22 +1168,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnFile.add(mntmExportData);
 
-		mnFile.add(new JSeparator());
-		
-		mnFile.add(mntmSelectLayers);
-
-		//mnFile.add(new JSeparator());
-
-		//mnFile.add(mntmImportcsv);
-		//mnFile.add(mntmExportcsv);
-
-		
-		//mnFile.add(new JSeparator());
-		
-		//mnFile.add(mntmImportPopulation);
-		//mnFile.add(mntmExportPopulation);
-
-		
 		mnFile.add(new JSeparator());
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -1687,14 +1667,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel = new JPanel();
 		JPanel panel_1 = new JPanel();
-		panel.setPreferredSize(new Dimension(200,100));
+		panel.setPreferredSize(new Dimension(400, 100));
 		panel_1.setPreferredSize(new Dimension(200,100));
 		panel.setLayout(null);
 		panel_1.setLayout(null);
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 449, 200, 416);
+		panel_2.setBounds(200, 49, 200, 258);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1704,12 +1684,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(lblCompactness);
 		sliderBorderLength.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderBorderLength);
-		
-		JLabel lblContiguency = new JLabel("Proportional representation");
-		lblContiguency.setBounds(6, 285, 172, 16);
-		panel_2.add(lblContiguency);
-		sliderRepresentation.setBounds(6, 310, 190, 29);
-		panel_2.add(sliderRepresentation);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Practical criteria");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -1721,12 +1695,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(lblProportionalRepresentation);
 		sliderPopulationBalance.setBounds(6, 179, 190, 29);
 		panel_2.add(sliderPopulationBalance);
-		
-		JLabel lblVotingPowerBalance = new JLabel("Equal voting power");
-		lblVotingPowerBalance.setBounds(6, 350, 172, 16);
-		panel_2.add(lblVotingPowerBalance);
-		sliderVotingPowerBalance.setBounds(6, 371, 190, 29);
-		panel_2.add(sliderVotingPowerBalance);
 		
 		JLabel lblConnectedness = new JLabel("Contiguency");
 		lblConnectedness.setBounds(6, 97, 172, 16);
@@ -1762,15 +1730,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		textField_3.setBounds(138, 219, 58, 28);
 		panel_2.add(textField_3);
 		
-		lblFairnessCriteria = new JLabel("Fairness criteria");
-		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblFairnessCriteria.setBounds(6, 258, 179, 16);
-		panel_2.add(lblFairnessCriteria);
-		
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 272, 200, 166);
+		panel_3.setBounds(0, 318, 200, 166);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -1930,34 +1893,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblMembersPerDistrict.setBounds(6, 94, 124, 16);
 		panel.add(lblMembersPerDistrict);
 		
-		comboBoxPrimaryKey.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent arg0) {
-				if( hushcomboBoxPrimaryKey) return;
-				setPrimaryKeyColumn((String)comboBoxPrimaryKey.getSelectedItem());
-			}
-		});
-		comboBoxPrimaryKey.setBounds(6, 140, 178, 20);
-		panel.add(comboBoxPrimaryKey);
-		
 		comboBoxPopulation.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if( hushcomboBoxPopulation) return;
 				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
-		comboBoxPopulation.setBounds(6, 191, 178, 20);
+		comboBoxPopulation.setBounds(8, 165, 178, 20);
 		panel.add(comboBoxPopulation);
 		
-		JLabel lblPrimaryKeyColumn = new JLabel("Primary key column");
-		lblPrimaryKeyColumn.setBounds(6, 121, 182, 16);
-		panel.add(lblPrimaryKeyColumn);
-		
 		JLabel lblPopulationColumn = new JLabel("Population column");
-		lblPopulationColumn.setBounds(6, 171, 182, 16);
+		lblPopulationColumn.setBounds(8, 145, 182, 16);
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(6, 222, 182, 16);
+		lblDistrictColumn.setBounds(8, 196, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -1967,13 +1917,40 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(6, 241, 178, 20);
+		comboBoxDistrictColumn.setBounds(8, 215, 178, 20);
 		panel.add(comboBoxDistrictColumn);
-		slider_1.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
+		
+		panel_4 = new JPanel();
+		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel_4.setLayout(null);
+		panel_4.setBounds(200, 318, 200, 166);
+		panel.add(panel_4);
+		
+		lblFairnessCriteria = new JLabel("Fairness criteria");
+		lblFairnessCriteria.setBounds(10, 11, 179, 16);
+		panel_4.add(lblFairnessCriteria);
+		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
+		
+		JLabel lblContiguency = new JLabel("Proportionalness");
+		lblContiguency.setBounds(10, 38, 172, 16);
+		panel_4.add(lblContiguency);
+		sliderRepresentation.setBounds(10, 63, 180, 29);
+		panel_4.add(sliderRepresentation);
+		
+		JLabel lblVotingPowerBalance = new JLabel("Competitiveness");
+		lblVotingPowerBalance.setBounds(10, 103, 172, 16);
+		panel_4.add(lblVotingPowerBalance);
+		sliderVotingPowerBalance.setBounds(10, 124, 180, 29);
+		panel_4.add(sliderVotingPowerBalance);
+		
+		btnNewButton = new JButton("Election columns");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				selectLayers();
 			}
 		});
+		btnNewButton.setBounds(12, 246, 174, 23);
+		panel.add(btnNewButton);
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
@@ -1983,6 +1960,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void stateChanged(ChangeEvent e) {
 				Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 
+			}
+		});
+		slider_1.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 			}
 		});
 		sliderPopulationBalance.addChangeListener(new ChangeListener() {

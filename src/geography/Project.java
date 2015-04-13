@@ -112,7 +112,7 @@ public class Project extends ReflectionJSONObject<Project> {
 		}
 		
 		if( containsKey("primary_key_column")) {
-			MainFrame.mainframe.comboBoxPrimaryKey.setSelectedItem(getString("primary_key_column").trim());
+			//MainFrame.mainframe.comboBoxPrimaryKey.setSelectedItem(getString("primary_key_column").trim());
 			//MainFrame.mainframe.setPopulationColumn(getString("population_column").trim());
 		} else { System.out.println("primary_key_column not found"); }
 		
