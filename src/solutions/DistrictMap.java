@@ -409,6 +409,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
+        if( wards == null || wards.size() < genome.length) {
+        	fillDistrictwards();
+        }
         for( int i = 0; i < genome.length; i++)
             districts.get(genome[i]).wards.add(wards.get(i));
     }
