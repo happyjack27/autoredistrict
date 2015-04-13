@@ -1,0 +1,31 @@
+I saw the Links under "Redistricting Software" on this page:
+http://projects.iq.harvard.edu/eda/home and was hoping you could add one:
+particularly to an open-source program i've written at:
+https://github.com/happyjack27/autoredistrict
+
+A brief tutorial on the theory and algorithm is available here:
+https://github.com/happyjack27/autoredistrict/blob/master/tutorials/in_theory.docx?raw=true
+
+and some sample results are available here:
+https://github.com/happyjack27/autoredistrict/tree/master/data%20sources/wisconsin/2010/solutions
+
+(the samples are for 2010 redistricting of wisconsin - my home state.)
+
+My software is unique in that:
+* it removes the human element completely,
+* in addition to contiguous, compact, and equal population criteria, it
+includes 2 fairness criteria: competitiveness and proportional
+representation.
+* it uses heuristic optimization to search for maps that best optimize all 5
+of these criteria.
+
+
+Please contact me with any questions or concerns or feedback.  Or just about
+anything related - I'd happy to hear from you.
+
+I would very much like to see these ideas, if not the program itself (or at
+least the algorithm), have a real impact in making the redistricting process
+more transparent and, most of all, more fair.
+
+Thanks,
+-Kevin
