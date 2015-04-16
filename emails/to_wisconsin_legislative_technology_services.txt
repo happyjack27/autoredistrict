@@ -1,0 +1,21 @@
+I've written a computer program that creates political ( congressional, senate, assembly, etc.) districts fully autonomously.  The goal of the software is to take the human element out completely so that one can't create biased maps.
+
+It is unique from other redistricting software, among other reasons, because it includes 2 criteria of fairness:  competitiveness and proportional representation.  Without these 2 criteria, the result would, due to the law of large numbers, dilute votes for the minority party.
+
+That's just of its strengths.  I've written a brief overview of the algorithm and theory behind it, attached. (the "equal voting power" section is a work in progress).
+
+The software is open source and can be downloaded, along with the source code, from here: https://github.com/happyjack27/autoredistrict 
+
+I've also attached a few samples of the results, as screenshots.  (Particularly, 2 Wisconsin 2010 congressional district recommendations made by the program.)  The program can export the results in a variety of formats, including exporting a comma-delimited table, and integrating it directly in to the ESRI shapefile.
+
+I would very much like to see this method used in the next redistricting (2020?) process.  So much so that, well, i've written open-source software to do it, among other things (such as contacting you).
+
+So... please let me know how I can help, any questions or feedback, etc.
+
+I'd be happy to additional programming to meet any needs or desires - for free - and to answer any questions or document anything better.
+
+Thank you greatly for your consideration,
+And I look forward to hearing from you.
+
+
+-Kevin Baas

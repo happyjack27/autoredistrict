@@ -410,7 +410,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		Settings.geometry_weight*1.2, 
         		Settings.disenfranchise_weight*1.00, 
         		Settings.population_balance_weight*0.8,//*2.0,
-                Settings.disconnected_population_weight*2.5,//1.5,
+                Settings.disconnected_population_weight*2.0,//1.5,
                 Settings.voting_power_balance_weight*0.8,
         };
 
@@ -456,7 +456,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        if( mutated < Settings.population*3.0 || mutated != mutated) {
 	        	mutated = (int) (Settings.population*3.0);
 	        }
-        	double new_rate = ((double)mutated/(double)total)*0.9995;
+        	double new_rate = ((double)mutated/(double)total)*0.995;
 	        if( new_rate < 0.25) {
 	        	Settings.startAnnealing(generation);
 	        }

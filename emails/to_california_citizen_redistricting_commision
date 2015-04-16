@@ -1,0 +1,35 @@
+To: http://wedrawthelines.ca.gov/contact.html (could also submit via votersfirstact@crc.ca.gov  )
+Subject: free and open source software for fully automatic redistricting
+
+I've written a computer program that creates political (congressional, senate, assembly, etc.) districts fully autonomously.  The goal of the software is to take the human element out completely so that one can't create biased maps.
+
+The software is open source and can be downloaded, along with the source code, from here: https://github.com/happyjack27/autoredistrict 
+
+A brief tutorial on the theory and algorithm is available here:
+https://github.com/happyjack27/autoredistrict/blob/master/tutorials/in_theory.docx?raw=true
+
+and some sample results are available here:
+https://github.com/happyjack27/autoredistrict/tree/master/data%20sources/wisconsin/2010/solutions
+
+(the samples are for 2010 redistricting of wisconsin - my home state.)
+
+My software is unique in that:
+* it removes the human element completely,
+* in addition to contiguous, compact, and equal population criteria, it
+includes 2 fairness criteria: competitiveness and proportional representation.
+* it uses heuristic optimization to search for maps that best optimize all 5 of these criteria.
+
+(Without the 2 fairness criteria, the result would, due to the law of large numbers, dilute votes for minority parties.)
+
+
+I would very much like to see these ideas, if not the program itself (or at least the algorithm), have a real impact in making the redistricting process more transparent and, most of all, more fair.
+
+I would very much like to see this method used in the next redistricting (2020?) process.  So much so that, well, I've written open-source software to do it, among other things (such as contacting you).
+
+I'd be happy to additional programming to meet any needs or desires - for free - and to answer any questions or document anything better.
+
+So please contact me with any questions or concerns or feedback.  Or just about anything related - I'd happy to hear from you.  And happy to help.
+
+Thank you greatly for your consideration,
+And I look forward to hearing from you.
+-Kevin Baas
