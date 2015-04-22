@@ -913,7 +913,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
-		Settings.mutate_all = false;
+		Settings.mutate_all = true;
 		
 		Settings.mutation_rateChangeListeners.add(this);
 		Settings.populationChangeListeners.add(this);
@@ -1982,7 +1982,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
 
 		
-		chckbxmntmMutateAll.setSelected(false);
+		chckbxmntmMutateAll.setSelected(Settings.mutate_all);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
