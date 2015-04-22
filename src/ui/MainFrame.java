@@ -672,7 +672,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    try {
 			FileInputStream is = new FileInputStream(f);
 			ValidationPreferences prefs = new ValidationPreferences();
-		    prefs.setMaxNumberOfPointsPerShape(16650);
+		    prefs.setMaxNumberOfPointsPerShape(32650);
+		    //prefs.setMaxNumberOfPointsPerShape(16650);
 		    ShapeFileReader r = new ShapeFileReader(is, prefs);
 		    
 			String dbfname = f.getAbsolutePath();//.getName();

@@ -37,7 +37,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 		}
 		fillDistrictwards();
+		try {
 		setGenome(ward_districts);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			
+		}
 		fillDistrictwards();
 		return has_districts;
 	}
