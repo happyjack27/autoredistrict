@@ -1,3 +1,11 @@
+FULLY AUTOMATED REDISTICTING SOFTWARE
+written in java, open source.
+
+for theory of how it works, see:https://github.com/happyjack27/autoredistrict/blob/master/tutorials/in_theory.docx?raw=true
+for a sample screenshot, see: https://github.com/happyjack27/autoredistrict/blob/master/screenshots/screen_shot_WI_ASM_parital.png
+
+
+
 CONTACTING / MAKING IT USED:
 * http://legis.wisconsin.gov/ltsb/Pages/default.aspx
 * http://legis.wisconsin.gov/ltsb/Pages/Contact.aspx - software development and gis - give samples. ( federal, state senate, state assembly, state assembly 33-3 (mmpd))
