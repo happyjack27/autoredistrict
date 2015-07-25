@@ -92,6 +92,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
+	JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
 	JMenuItem mntmExportData = new JMenuItem("Save data");
 	JMenuItem mntmImportData = new JMenuItem("Merge data");
@@ -1407,10 +1408,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnView.add(new JSeparator());
 		mnView.add(chckbxmntmShowPrecinctLabels);
-		JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null,"Not implemented");
+				Feature.showDistrictLabels = chckbxmntmShowDistrictLabels.isSelected();
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				//JOptionPane.showMessageDialog(null,"Not implemented");
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);

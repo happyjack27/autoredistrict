@@ -74,6 +74,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		if( features == null) {
 			return;
 		}
+		double[] dxs = new double[Settings.num_districts];
+		double[] dys = new double[Settings.num_districts];
+		double[] dcs = new double[Settings.num_districts];
+		for( int i = 0; i < Settings.num_districts; i++) {
+			dxs[i] = 0;
+			dys[i] = 0;
+			dcs[i] = 0;
+		}
 		if( ecology.population != null && ecology.population.size() > 0) {
 			DistrictMap dm  = ecology.population.get(0);
 			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.ward_districts.length);
@@ -107,14 +115,32 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 				for( int i = 0; i < features.size(); i++) {
-					Ward b = features.get(i).ward;
+					Feature f = features.get(i);
+					Ward b = f.ward;
 					Geometry geo = features.get(i).geometry;
+					int di = dm.ward_districts[b.id];
 					try {
-						int color = dm.ward_districts[b.id];
+				       	f.geometry.makePolys();
+						double area = features.get(i).ward.area;
+				       	for( int p = 0; p < f.geometry.polygons.length; p++) {
+					       	double[] centroid = f.geometry.compute2DPolygonCentroid(f.geometry.polygons[p]);
+							dxs[di] += centroid[0]*area;
+							dys[di] += centroid[1]*area;
+							dcs[di] += area;
+						}
+					} catch (Exception ex) {
+						System.out.println("ex d "+ex);
+						ex.printStackTrace();
+					}
+					try {
+						int color = di;
 						if( color < c.length) {
 							geo.fillColor = c[color];
 						}
-					} catch (Exception ex) {}
+					} catch (Exception ex) {
+						System.out.println("ex e "+ex);
+						ex.printStackTrace();
+					}
 					
 				}
 			}
@@ -122,7 +148,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         for( Feature f : features) {
         	f.geometry.makePolys();
         	f.draw(g);
-        }		
+        }
+		if( ecology.population != null && ecology.population.size() > 0) {
+	        if( Feature.showDistrictLabels) {
+				g.setColor(Color.BLACK);
+				g.setFont(new Font("Arial",Font.BOLD,12));
+				for( int i = 0; i < Settings.num_districts; i++) {
+					dxs[i] /= dcs[i];
+					dys[i] /= dcs[i];
+					FontMetrics fm = g.getFontMetrics();
+					String name =""+i;
+					dxs[0] -= fm.stringWidth(name)/2.0;
+					dys[1] += fm.getHeight()/2.0;
+
+					g.drawString(name, (int)dxs[i], (int)dys[i]);
+					//System.out.println("name "+name+" x "+(int)dxs[i]+" y "+(int)dys[i]+" size "+dcs[i]);
+				}
+	
+	        }
+		}
 	}
 
 	@Override
@@ -219,7 +263,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		//vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		//edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
-	public double[] getAvgCentroid(Feature f) {
+	public static double[] getAvgCentroid(Feature f) {
 		double[] source = new double[]{0,0};
 		if( f.geometry == null || f.geometry.polygons == null) {
 			f.geometry.makePolys();

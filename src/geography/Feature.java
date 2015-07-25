@@ -22,8 +22,10 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public Ward ward = null;
 	
 	public static boolean showPrecinctLabels = false;
+	public static boolean showDistrictLabels = false;
 	public static int display_mode = 0;
 	public static boolean draw_lines = true;
+	
 	
 	public double calcArea() {
 		double tot_area = 0;
@@ -175,15 +177,15 @@ public class Feature extends ReflectionJSONObject<Feature> {
 				}
 				
 				double[] centroid = geometry.compute2DPolygonCentroid(geometry.polygons[i]);
-				/*
+				
 				if( showPrecinctLabels) {
 					FontMetrics fm = g.getFontMetrics();
-					String name = this.properties.DISTRICT;
+					String name = this.properties.getString("NAME");//.DISTRICT;
 					centroid[0] -= fm.stringWidth(name)/2.0;
 					centroid[1] += fm.getHeight()/2.0;
 					g.drawString(name, (int)centroid[0],(int)centroid[1]);
 				}
-				*/
+				
 			}
 		}
 		/*
