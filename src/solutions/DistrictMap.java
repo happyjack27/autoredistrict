@@ -717,7 +717,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time5 = System.currentTimeMillis();
     	
         
-        fairnessScores = new double[]{length,disproportional_representation,getPopVariance()/*population_imbalance*2.0*/,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
+        fairnessScores = new double[]{
+        		length
+        		,disproportional_representation
+        		,getPopVariance()/*population_imbalance*2.0*/
+        		,disconnected_pops
+        		,power_fairness
+        		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
     	metrics[1] += time2-time1;
@@ -784,7 +790,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < lengths.length; i++) {
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
         	double isop = (lengths[i]*lengths[i]) / (4.0*Math.PI*areas[i]);
-        	weighted_sum += Settings.square_root_compactness ? Math.sqrt(isop) : isop;
+        	weighted_sum += Settings.squared_compactness ? isop*isop : Settings.square_root_compactness ? Math.sqrt(isop) : isop;
         }
         return (weighted_sum / (double)lengths.length);
     }
