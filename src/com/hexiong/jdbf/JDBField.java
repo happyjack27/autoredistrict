@@ -1,6 +1,4 @@
 /**
- * <p>Title: java访问DBF文件的接口</p>
- * <p>Description: 这个类用于表示DBF文件中的字段</p>
  * <p>Copyright: Copyright (c) 2004~2012~2012</p>
  * <p>Company: iihero.com</p>
  * @author : He Xiong
@@ -13,8 +11,6 @@ import java.text.*;
 import java.util.Date;
 
 /**
- * <p>Title: java访问DBF文件的接口</p>
- * <p>Description: 这个类用于表示DBF文件中的字段</p>
  * <p>Copyright: Copyright (c) 2004~2012~2012</p>
  * <p>Company: iihero.com</p>
  * @author : He Xiong
@@ -22,16 +18,6 @@ import java.util.Date;
  */
 public class JDBField {
   /**
-   * 构造函数
-   * @param s 字段名
-   * @param c 字段类型，使用一个字符来描述
-   *   'C' 字符串类型
-   *   'N' 数值类型
-   *   'D'
-   *   'F' 浮点类型
-   * @param i 长度
-   * @param j 小数位数
-   * @throws JDBFException 如果与字段类型定义不合，则会抛出异常
    */
   public JDBField(String s, char c, int i, int j) throws JDBFException {
     if (s.length() > 10) {
@@ -45,6 +31,7 @@ public class JDBField {
       throw new JDBFException(
           "The field length should be a positive integer. Got: " + i);
     }
+    /*
     if (c == 'C' && i >= 255) {
       throw new JDBFException("The field length should be less than 255 characters for character fields. Got: " +
                               i);
@@ -79,7 +66,7 @@ public class JDBField {
       throw new JDBFException(
           "The field decimal count should be less than the length - 1. Got: " +
           j);
-    }
+    }*/
     else {
       name = s;
       type = c;
@@ -90,42 +77,42 @@ public class JDBField {
   }
 
   /**
-   * 获取字段名
-   * @return 字段名
+   * èŽ·å�–å­—æ®µå��
+   * @return å­—æ®µå��
    */
   public String getName() {
     return name;
   }
 
   /**
-   * 获取字段类型
-   * @return 字段类型
+   * èŽ·å�–å­—æ®µç±»åž‹
+   * @return å­—æ®µç±»åž‹
    */
   public char getType() {
     return type;
   }
 
   /**
-   * 获取字段长度
-   * @return 字段长度
+   * èŽ·å�–å­—æ®µé•¿åº¦
+   * @return å­—æ®µé•¿åº¦
    */
   public int getLength() {
     return length;
   }
 
   /**
-   * 获取字段的小数位数
-   * @return 字段小数位数
+   * èŽ·å�–å­—æ®µçš„å°�æ•°ä½�æ•°
+   * @return å­—æ®µå°�æ•°ä½�æ•°
    */
   public int getDecimalCount() {
     return decimalCount;
   }
 
   /**
-   * 将对象格式化为一个字符串
-   * @param obj 流中的对象
-   * @return 用于表示字段值的对象
-   * @throws JDBFException 当读取时发生错误时，抛出异常
+   * å°†å¯¹è±¡æ ¼å¼�åŒ–ä¸ºä¸€ä¸ªå­—ç¬¦ä¸²
+   * @param obj æµ�ä¸­çš„å¯¹è±¡
+   * @return ç”¨äºŽè¡¨ç¤ºå­—æ®µå€¼çš„å¯¹è±¡
+   * @throws JDBFException å½“è¯»å�–æ—¶å�‘ç”Ÿé”™è¯¯æ—¶ï¼ŒæŠ›å‡ºå¼‚å¸¸
    */
   public String format(Object obj) throws JDBFException {
     if (type == 'N' || type == 'F') {
@@ -216,10 +203,10 @@ public class JDBField {
   }
 
   /**
-   * 将一个字符串解析为对应的字段值类型对象
-   * @param s 表示字段值的字符串
-   * @return 对应的字段值类型对象
-   * @throws JDBFException 解析出错时抛出
+   * å°†ä¸€ä¸ªå­—ç¬¦ä¸²è§£æž�ä¸ºå¯¹åº”çš„å­—æ®µå€¼ç±»åž‹å¯¹è±¡
+   * @param s è¡¨ç¤ºå­—æ®µå€¼çš„å­—ç¬¦ä¸²
+   * @return å¯¹åº”çš„å­—æ®µå€¼ç±»åž‹å¯¹è±¡
+   * @throws JDBFException è§£æž�å‡ºé”™æ—¶æŠ›å‡º
    */
   public Object parse(String s) throws JDBFException {
     s = s.trim();
@@ -273,27 +260,27 @@ public class JDBField {
   }
 
   /**
-   * 获取字段名
-   * @return 字段名
+   * èŽ·å�–å­—æ®µå��
+   * @return å­—æ®µå��
    */
   public String toString() {
     return name;
   }
 
   /**
-   * 字段名
+   * å­—æ®µå��
    */
   private String name;
   /**
-   * 字段类型
+   * å­—æ®µç±»åž‹
    */
   private char type;
   /**
-   * 字段长度
+   * å­—æ®µé•¿åº¦
    */
   private int length;
   /**
-   * 字段的小数位数
+   * å­—æ®µçš„å°�æ•°ä½�æ•°
    */
   private int decimalCount;
 }
