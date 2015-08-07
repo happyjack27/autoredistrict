@@ -289,6 +289,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		}
 			    		if( count % (100*100) == 0) {
 			    			System.out.println(""+count);
+				    		dlbl.setText("Doing hit tests... "+count);
+
 							try {
 								fos.flush();
 							} catch (Exception e) {
@@ -416,6 +418,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		}
 			    		if( count % (100*100) == 0) {
 			    			System.out.println(""+count);
+				    		dlbl.setText("Doing hit tests... "+count);
 			    		}
 					} catch (Exception e) {
 						// TODO Auto-generated catch ward
