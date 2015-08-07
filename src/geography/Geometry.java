@@ -16,11 +16,14 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public int[] xpolys;
 	public int[] ypolys;
 	public Polygon[] polygons;
+	public Polygon[] polygons_full;
 	public Color outlineColor = Color.BLACK;
 	public Color fillColor = null;
 	public boolean isDistrict = true;
 	
 	public static boolean isLatLon = false; 
+	public static double SCALELATLON = 100000;
+
 	
 	public static double shiftx=0,shifty=0,scalex=1,scaley=1;
 	public void makePolys() {
@@ -40,6 +43,21 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 				ypolys[j] = (int)((coordinates[i][j][1]-shifty)*scaley);
 			}
 			polygons[i] = new Polygon(xpolys, ypolys, xpolys.length);
+		}
+
+	}
+	public void makePolysFull() {
+		polygons_full = new Polygon[coordinates.length];
+		for( int i = 0; i < coordinates.length; i++) {
+			xpolys = new int[coordinates[i].length];
+			ypolys = new int[coordinates[i].length];
+			for( int j = 0; j < coordinates[i].length; j++) {
+				xpolys[j] = (int)((coordinates[i][j][0])*SCALELATLON);
+			}
+			for( int j = 0; j < coordinates[i].length; j++) {
+				ypolys[j] = (int)((coordinates[i][j][1])*SCALELATLON);
+			}
+			polygons_full[i] = new Polygon(xpolys, ypolys, xpolys.length);
 		}
 
 	}

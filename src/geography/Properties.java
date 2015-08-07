@@ -14,6 +14,9 @@ public class Properties extends ReflectionJSONObject<Properties> {
 			from_shape_file = true;
 		}
 		if( !containsKey("POPULATION")) {
+			if( containsKey("POP18")) {
+				POPULATION = (int) getDouble("POP18");
+			} else
 			if( containsKey("PERSONS")) {
 				POPULATION = (int) getDouble("PERSONS");
 			}
