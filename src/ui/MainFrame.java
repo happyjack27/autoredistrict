@@ -87,7 +87,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
-	JCheckBoxMenuItem chckbxmntmLatitudeLongitude = new JCheckBoxMenuItem("Latitude / Longitude?");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
@@ -141,6 +140,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton btnNewButton;
 	public JMenuItem mntmImportCensusData;
 	public JMenuItem mntmExportToBlock;
+	public final JSeparator separator_1 = new JSeparator();
+	public final JSeparator separator_2 = new JSeparator();
+	public final JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
+	public final JMenuItem mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
 	
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -199,7 +202,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				DataAndHeader dh = new DataAndHeader();
 				
-				int col_pop18 = -1;
 				int col_lat = -1;
 				int col_lon = -1;
 				int col_geoid = -1;
@@ -212,9 +214,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid = i;
 					}
-					if( dh.header[i].toUpperCase().trim().equals("POP18")) {
-						col_pop18 = i;
-					}
 					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
 						col_lat = i;
 					}
@@ -222,7 +221,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						col_lon = i;
 					}
 				}
-				if( col_pop18 < 0 || col_lat < 0 || col_lon < 0) {
+				if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
 					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
 					return;
 				}
@@ -246,7 +245,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		for( int i = 0; i < oo.length; i++) {
 			    			ss[i] = oo[i].toString();
 			    		}
-			    		int pop18 = Integer.parseInt(ss[col_pop18]);
 			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 			    		String geoid = ss[col_geoid];
@@ -325,10 +323,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
 	}
 
-	class LoadCensusFileThread extends FileThread {
-		LoadCensusFileThread(File f) { super(f); }
+	class LoadCensusFileThread extends Thread {
+		LoadCensusFileThread() { super(); }
     	public void run() { 
     		try {
+    			JFileChooser jfc = new JFileChooser();
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				String fn = f.getName();
+				String ext = fn.substring(fn.length()-3).toLowerCase();
+				if( !ext.equals("dbf")) {
+					JOptionPane.showMessageDialog(null, "File format not recognized.");
+					return;
+				}
+	
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading file...");
 
@@ -440,6 +452,166 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		
 	    		dlg.setVisible(false);
 	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.");
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+	}
+
+	// ask what file type
+	//ask whether to accumulate or use first match
+	//if first match, ask whether to convert from 0 to 1 indexed, vice-versa, or none.
+	//or just do it anyways?
+	class ImportAggregateCustom extends Thread {
+		ImportAggregateCustom() { super(); }
+    	public void run() { 
+    		try {
+    			JFileChooser jfc = new JFileChooser();
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				String fn = f.getName();
+				String ext = fn.substring(fn.length()-3).toLowerCase();
+				DataAndHeader dh = null;
+				if( ext.equals("csv") || ext.equals("txt")) {
+		    		dlg.setVisible(true);
+		    		dlbl.setText("Loading file...");
+
+					String delimiter = ",";
+					if( ext.equals("csv")) {
+						delimiter = ",";
+					} else
+					if( ext.equals("txt")) {
+						delimiter = "\t";
+					}
+					
+					//TODO: CONVERT TO IMPORT CUSTOM
+					String s = getFile(f).toString();
+					dh = readDelimited(s,delimiter,true);
+				} else
+				if( ext.equals("dbf")) {
+					//TODO: CONVERT TO IMPORT CUSTOM
+		    		dlg.setVisible(true);
+		    		dlbl.setText("Loading file...");
+
+					String s = getFile(f).toString();
+					dh = readDBF(f.getAbsolutePath());
+					
+					String dbfname = f.getAbsolutePath();
+					
+					DBFReader dbfreader;
+					try {
+						dbfreader = new DBFReader(dbfname);
+					} catch (JDBFException e1) {
+						e1.printStackTrace();
+						return;
+					}
+					DataAndHeader dh = new DataAndHeader();
+					
+					int col_pop18 = -1;
+					int col_lat = -1;
+					int col_lon = -1;
+					
+		    		dlbl.setText("Reading header...");
+
+					dh.header = new String[dbfreader.getFieldCount()];
+					for( int i = 0; i < dh.header.length; i++) {
+						dh.header[i] = dbfreader.getField(i).getName();
+						if( dh.header[i].toUpperCase().trim().equals("POP18")) {
+							col_pop18 = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+							col_lat = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+							col_lon = i;
+						}
+					}
+					if( col_pop18 < 0 || col_lat < 0 || col_lon < 0) {
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+						return;
+					}
+
+		    		dlbl.setText("Making polygons...");
+
+					
+					int count = 0;
+		    		for( Feature feat : featureCollection.features) {
+		    			feat.geometry.makePolysFull();
+						feat.ward.population = 0;
+		    		}
+		    		
+		    		dlbl.setText("Doing hit tests...");
+
+				    while (dbfreader.hasNextRecord()) {
+				    	try {
+				    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+				    		String[] ss = new String[oo.length];
+				    		for( int i = 0; i < oo.length; i++) {
+				    			ss[i] = oo[i].toString();
+				    		}
+				    		int pop18 = Integer.parseInt(ss[col_pop18]);
+				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+				    		
+			    			boolean found = false;
+				    		for( Feature feat : featureCollection.features) {
+				    			Polygon[] polys = feat.geometry.polygons_full;
+				    			for( int i = 0; i < polys.length; i++) {
+				    				if( polys[i].contains(ilon,ilat)) {
+				    					feat.ward.population += pop18;
+				    					feat.ward.has_census_results = true;
+				    					
+				    					found = true;
+				    					break;
+				    				}
+				    				if( found) {
+				    					break;
+				    				}
+				    			}
+				    		}
+				    		if( !found) {
+				    			System.out.print("x");
+				    		}
+				    		
+				    		count++; 
+				    		if( count % 100 == 0) {
+				    			System.out.print(".");
+				    		}
+				    		if( count % (100*100) == 0) {
+				    			System.out.println(""+count);
+					    		dlbl.setText("Doing hit tests... "+count);
+				    		}
+						} catch (Exception e) {
+							// TODO Auto-generated catch ward
+							e.printStackTrace();
+						}
+				    }
+				    
+		    		dlbl.setText("Finalizing...");
+
+		    		for( Feature feat : featureCollection.features) {
+					    feat.properties.put("POP18",feat.ward.population);
+					    feat.properties.POPULATION = (int) feat.ward.population;
+		    		}
+		    		
+		    		dlg.setVisible(false);
+		    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.");
+
+					return;
+				} else {
+					JOptionPane.showMessageDialog(null, "File format not recognized.");
+					return;
+				}
+
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -1336,25 +1508,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportCensusData = new JMenuItem("Import Census Data");
 		mntmImportCensusData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser jfc = new JFileChooser();
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				if( f == null)  {
-					return;
-				}
-				String fn = f.getName();
-				String ext = fn.substring(fn.length()-3).toLowerCase();
-				if( !ext.equals("dbf")) {
-					JOptionPane.showMessageDialog(null, "File format not recognized.");
-					return;
-				}
-				new LoadCensusFileThread(f).start();
+				new LoadCensusFileThread().start();
 				
 				
 				
 			}
 		});
+		
+		mnFile.add(separator_1);
 		mnFile.add(mntmImportCensusData);
 		
 		mntmExportToBlock = new JMenuItem("Export to block level");
@@ -1363,8 +1524,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				new ExportToBlockLevelThread().start();
 			}
 		});
+		
+		mnFile.add(mntmImportAggregate);
+		
+		mnFile.add(separator_2);
 		mnFile.add(mntmExportToBlock);
-		mnFile.add(chckbxmntmLatitudeLongitude);
+		
+		mnFile.add(mntmExportAndDeaggregate);
 		
 		mnFile.add(new JSeparator());
 		
@@ -1560,15 +1726,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				loadElection(sb.toString());
 
-			}
-		});
-		
-		//menuBar.add(mnGeography);
-		
-		chckbxmntmLatitudeLongitude.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Edge.isLatLon = chckbxmntmLatitudeLongitude.isSelected();
-				featureCollection.recalcEdgeLengths();
 			}
 		});
 		

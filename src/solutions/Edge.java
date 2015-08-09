@@ -15,7 +15,7 @@ public class Edge extends ReflectionJSONObject<Edge> {
 	public Vertex vertex1;
 	public Vertex vertex2;
 	
-	public static boolean isLatLon = false;
+	public static boolean isLatLon = true;
 	
     boolean areBothSidesSameDistrict(int[] ward_districts) {
     	if( ward1 == null || ward2 == null) {
