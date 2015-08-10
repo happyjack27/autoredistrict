@@ -59,10 +59,10 @@ public class DialogMultiColumnSelect extends JDialog {
 		JButton button = new JButton(">");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] selected = (String[]) list.getSelectedValues();
-				for( String s : selected) {
-					in.add(s);
-					not_in.remove(s);
+				Object[] selected = (Object[]) list.getSelectedValues();
+				for( Object s : selected) {
+					in.add((String)s);
+					not_in.remove((String)s);
 				}
 				list.setListData(not_in);
 				list_1.setListData(in);
@@ -74,10 +74,10 @@ public class DialogMultiColumnSelect extends JDialog {
 		JButton button_1 = new JButton("<");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] selected = (String[]) list_1.getSelectedValues();
-				for( String s : selected) {
-					not_in.add(s);
-					in.remove(s);
+				Object[] selected = (Object[]) list_1.getSelectedValues();
+				for( Object s : selected) {
+					not_in.add((String)s);
+					in.remove((String)s);
 				}
 				list.setListData(not_in);
 				list_1.setListData(in);

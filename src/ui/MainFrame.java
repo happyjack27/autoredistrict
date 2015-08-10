@@ -284,10 +284,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		count++; 
 			    		if( count % 100 == 0) {
 			    			System.out.print(".");
+				    		dlbl.setText("Doing hit tests... "+count);
 			    		}
 			    		if( count % (100*100) == 0) {
 			    			System.out.println(""+count);
-				    		dlbl.setText("Doing hit tests... "+count);
 
 							try {
 								fos.flush();
@@ -427,10 +427,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		count++; 
 			    		if( count % 100 == 0) {
 			    			System.out.print(".");
+				    		dlbl.setText("Doing hit tests... "+count);
 			    		}
 			    		if( count % (100*100) == 0) {
 			    			System.out.println(""+count);
-				    		dlbl.setText("Doing hit tests... "+count);
 			    		}
 					} catch (Exception e) {
 						// TODO Auto-generated catch ward
@@ -478,9 +478,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				String fn = f.getName();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
-				DataAndHeader dh = null;
+				DataAndHeader dh = new DataAndHeader();
+
+	    		dlg.setVisible(true);
+	    		dlbl.setText("Making polygons...");
+				int count = 0;
+	    		for( Feature feat : featureCollection.features) {
+	    			feat.geometry.makePolysFull();
+					feat.ward.population = 0;
+	    		}
+
 				if( ext.equals("csv") || ext.equals("txt")) {
-		    		dlg.setVisible(true);
 		    		dlbl.setText("Loading file...");
 
 					String delimiter = ",";
@@ -492,8 +500,127 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					
 					//TODO: CONVERT TO IMPORT CUSTOM
-					String s = getFile(f).toString();
-					dh = readDelimited(s,delimiter,true);
+					FileReader fr = new FileReader(f);
+					BufferedReader br = new BufferedReader(fr);
+					dh.header = br.readLine().split(delimiter);
+					
+					//now select the columns
+					int col_lat = -1;
+					int col_lon = -1;
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+							col_lat = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+							col_lon = i;
+						}
+					}
+		    		dlg.setVisible(false);
+					DialogMultiColumnSelect dsc = new DialogMultiColumnSelect("Select columns to import",dh.header,new String[]{});
+					if( !dsc.ok) {
+						return;
+					}
+					
+					String[] options = new String[]{"Accumulate","Overwrite"};
+					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate or overwrite values?", "Select option", 0,0,null,options,options[0]);
+					if( opt < 0) {
+						System.out.println("aborted.");
+						return;
+					}
+					
+		    		dlg.setVisible(true);
+					Object[] col_names = dsc.in.toArray();
+					int[] col_indexes = new int[dsc.in.size()]; 
+					for( int i = 0; i < col_indexes.length; i++) {
+						String test = ((String)col_names[i]).toUpperCase().trim();
+						for( int j = 0; j < dh.header.length; j++) {
+							if( dh.header[j].toUpperCase().trim().equals(test)) {
+								col_indexes[i] = j;
+								break;
+							}
+						}
+					}
+					if( col_lat < 0 || col_lon < 0) {
+						dlg.setVisible(false);
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+						return;
+					}
+
+		    		dlbl.setText("Doing hit tests...");
+		    		
+					//and finally process the rows
+		    		try {
+					    String line;
+					    while ((line = br.readLine()) != null) {
+					    	try {
+						    	String[] ss = line.split(delimiter);
+						    	
+					    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+					    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+					    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+					    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+					    		
+				    			boolean found = false;
+					    		for( Feature feat : featureCollection.features) {
+					    			Polygon[] polys = feat.geometry.polygons_full;
+					    			for( int i = 0; i < polys.length; i++) {
+					    				if( polys[i].contains(ilon,ilat)) {
+					    					if( opt == 1) { //overwrite
+						    					for( int j = 0; j < col_indexes.length; j++) {
+						    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
+						    					}
+					    					} else if (opt == 0) { //accumulate
+						    					for( int j = 0; j < col_indexes.length; j++) {
+						    						String key = (String)col_names[j];
+						    						double initial = 0;
+						    						if( feat.properties.containsKey(key)) {
+						    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
+						    						}
+						    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
+						    						feat.properties.put(key,""+initial);
+						    					}
+					    					}
+					    					found = true;
+					    					break;
+					    				}
+					    				if( found) {
+					    					break;
+					    				}
+					    			}
+					    		}
+					    		if( !found) {
+					    			System.out.print("x");
+					    		}
+					    		
+					    		count++; 
+					    		if( count % 100 == 0) {
+					    			System.out.print(".");
+						    		dlbl.setText("Doing hit tests... "+count);
+					    		}
+					    		if( count % (100*100) == 0) {
+					    			System.out.println(""+count);
+					    		}
+							} catch (Exception e) {
+								// TODO Auto-generated catch ward
+								e.printStackTrace();
+							}
+					    }
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					try {
+						br.close();
+						fr.close();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+		    		dlbl.setText("Finalizing...");
+
+		    		dlg.setVisible(false);
+		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
+
+					return;
+					
 				} else
 				if( ext.equals("dbf")) {
 					//TODO: CONVERT TO IMPORT CUSTOM
@@ -512,20 +639,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						e1.printStackTrace();
 						return;
 					}
-					DataAndHeader dh = new DataAndHeader();
 					
-					int col_pop18 = -1;
-					int col_lat = -1;
-					int col_lon = -1;
 					
 		    		dlbl.setText("Reading header...");
 
 					dh.header = new String[dbfreader.getFieldCount()];
 					for( int i = 0; i < dh.header.length; i++) {
 						dh.header[i] = dbfreader.getField(i).getName();
-						if( dh.header[i].toUpperCase().trim().equals("POP18")) {
-							col_pop18 = i;
-						}
+					}
+
+					//now select the columns
+					int col_lat = -1;
+					int col_lon = -1;
+					for( int i = 0; i < dh.header.length; i++) {
 						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
 							col_lat = i;
 						}
@@ -533,22 +659,40 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							col_lon = i;
 						}
 					}
-					if( col_pop18 < 0 || col_lat < 0 || col_lon < 0) {
+		    		dlg.setVisible(false);
+					DialogMultiColumnSelect dsc = new DialogMultiColumnSelect("Select columns to import",dh.header,new String[]{});
+					if( !dsc.ok) {
+						return;
+					}
+					
+					String[] options = new String[]{"Accumulate","Overwrite"};
+					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate or overwrite values?", "Select option", 0,0,null,options,options[0]);
+					if( opt < 0) {
+						System.out.println("aborted.");
+						return;
+					}
+					
+		    		dlg.setVisible(true);
+					Object[] col_names = dsc.in.toArray();
+					int[] col_indexes = new int[dsc.in.size()]; 
+					for( int i = 0; i < col_indexes.length; i++) {
+						String test = ((String)col_names[i]).toUpperCase().trim();
+						for( int j = 0; j < dh.header.length; j++) {
+							if( dh.header[j].toUpperCase().trim().equals(test)) {
+								col_indexes[i] = j;
+								break;
+							}
+						}
+					}
+					if( col_lat < 0 || col_lon < 0) {
+						dlg.setVisible(false);
 						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
 						return;
 					}
 
-		    		dlbl.setText("Making polygons...");
-
-					
-					int count = 0;
-		    		for( Feature feat : featureCollection.features) {
-		    			feat.geometry.makePolysFull();
-						feat.ward.population = 0;
-		    		}
-		    		
 		    		dlbl.setText("Doing hit tests...");
-
+		    		
+		    		//and finally process each row
 				    while (dbfreader.hasNextRecord()) {
 				    	try {
 				    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
@@ -556,7 +700,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		for( int i = 0; i < oo.length; i++) {
 				    			ss[i] = oo[i].toString();
 				    		}
-				    		int pop18 = Integer.parseInt(ss[col_pop18]);
 				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -567,9 +710,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    			Polygon[] polys = feat.geometry.polygons_full;
 				    			for( int i = 0; i < polys.length; i++) {
 				    				if( polys[i].contains(ilon,ilat)) {
-				    					feat.ward.population += pop18;
-				    					feat.ward.has_census_results = true;
-				    					
+				    					if( opt == 1) { //overwrite
+					    					for( int j = 0; j < col_indexes.length; j++) {
+					    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
+					    					}
+				    					} else if (opt == 0) { //accumulate
+					    					for( int j = 0; j < col_indexes.length; j++) {
+					    						String key = (String)col_names[j];
+					    						double initial = 0;
+					    						if( feat.properties.containsKey(key)) {
+					    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
+					    						}
+					    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
+					    						feat.properties.put(key,""+initial);
+					    					}
+				    					}
 				    					found = true;
 				    					break;
 				    				}
@@ -585,10 +740,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		count++; 
 				    		if( count % 100 == 0) {
 				    			System.out.print(".");
+					    		dlbl.setText("Doing hit tests... "+count);
 				    		}
 				    		if( count % (100*100) == 0) {
 				    			System.out.println(""+count);
-					    		dlbl.setText("Doing hit tests... "+count);
 				    		}
 						} catch (Exception e) {
 							// TODO Auto-generated catch ward
@@ -598,16 +753,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    
 		    		dlbl.setText("Finalizing...");
 
-		    		for( Feature feat : featureCollection.features) {
-					    feat.properties.put("POP18",feat.ward.population);
-					    feat.properties.POPULATION = (int) feat.ward.population;
-		    		}
-		    		
 		    		dlg.setVisible(false);
-		    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.");
+		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
 
 					return;
 				} else {
+		    		dlg.setVisible(false);
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
 				}
