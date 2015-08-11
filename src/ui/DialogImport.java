@@ -134,29 +134,51 @@ public class DialogImport extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				int map_index = comboBoxMapLayer.getSelectedIndex();
 				int file_index = comboBoxFileLinkColumn.getSelectedIndex();
+				
+				System.out.println("map_data.length "+map_data.length);
+				System.out.println("data.length "+data.length);
 
 				HashMap<String,Feature> hmmap = new HashMap<String,Feature>();
 				for( int i = 0; i < map_data.length; i++) {
 					hmmap.put(map_data[i][map_index], fc.features.get(i));
 				}
+				System.out.println("hmap.size "+hmmap.size());
+				System.out.println("data_headers.length "+data_headers.length);
 				
-				for( int i = 0; i < data.length; i++) {		
-					if( hmmap.containsKey(data[i][file_index])) {
-						Feature f = hmmap.get(data[i][file_index]);
-						/*
-						try {
-							if( load_pop) {
-								if( f.ward != null) {
-									f.ward.has_census_results = true;
-									f.ward.population = Double.parseDouble(data[i][pop_index].replaceAll(",",""));
-								}
-								f.properties.POPULATION = (int) Double.parseDouble(data[i][pop_index]);
-							}
-						} catch (Exception ex) { }
-						*/
-						for( int j = 0; j < data_headers.length; j++) {
-							f.properties.put(data_headers[j], data[i][j]);
+				for( int i = 0; i < data.length; i++) {
+					try {
+						if( i % 10 == 0) {
+							System.out.print(".");
 						}
+						if( i % (100 * 10) == 0) {
+							System.out.println(""+i);
+						}
+						if( hmmap.containsKey(data[i][file_index])) {
+							Feature f = hmmap.get(data[i][file_index]);
+							if( f == null) {
+								System.out.println("f is null!");
+							}
+							/*
+							try {
+								if( load_pop) {
+									if( f.ward != null) {
+										f.ward.has_census_results = true;
+										f.ward.population = Double.parseDouble(data[i][pop_index].replaceAll(",",""));
+									}
+									f.properties.POPULATION = (int) Double.parseDouble(data[i][pop_index]);
+								}
+							} catch (Exception ex) { }
+							*/
+							for( int j = 0; j < data_headers.length; j++) {
+								f.properties.put(data_headers[j], data[i][j]);
+							}
+						} else {
+							System.out.println("key not found "+data[i][file_index]);
+							
+						}
+					} catch (Exception ex) {
+						System.out.println("ex "+ex);
+						ex.printStackTrace();
 					}
 				}
 	

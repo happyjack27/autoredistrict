@@ -172,6 +172,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
 				}
+				
     			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
 				JFileChooser jfc2 = new JFileChooser();
 				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
@@ -183,8 +184,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				FileOutputStream fos = null;
 				try {
 					System.out.println("creating...");
-					fos = new FileOutputStream(f);
+					fos = new FileOutputStream(foutput);
 				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
     			
     			
