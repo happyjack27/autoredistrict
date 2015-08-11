@@ -183,7 +183,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				FileOutputStream fos = null;
 				try {
-					System.out.println("creating...");
+					System.out.println("creating..."+foutput.getAbsolutePath());
 					fos = new FileOutputStream(foutput);
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -317,7 +317,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    		
 	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.");
+	    		JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -484,6 +484,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Making polygons...");
+	    		System.out.println("making polygons");
 				int count = 0;
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
@@ -491,6 +492,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 
 				if( ext.equals("csv") || ext.equals("txt")) {
+		    		System.out.println("loading delimited");
 		    		dlbl.setText("Loading file...");
 
 					String delimiter = ",";
@@ -507,6 +509,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					dh.header = br.readLine().split(delimiter);
 					
 					//now select the columns
+		    		System.out.println("reading columns");
 					int col_lat = -1;
 					int col_lon = -1;
 					for( int i = 0; i < dh.header.length; i++) {
@@ -519,6 +522,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 		    		dlg.setVisible(false);
 					DialogMultiColumnSelect dsc = new DialogMultiColumnSelect("Select columns to import",dh.header,new String[]{});
+					dsc.show();
 					if( !dsc.ok) {
 						return;
 					}
@@ -544,9 +548,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					if( col_lat < 0 || col_lon < 0) {
 						dlg.setVisible(false);
+			    		System.out.println("Required columns not found.");
 						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
 						return;
 					}
+		    		System.out.println("doing hit tests");
 
 		    		dlbl.setText("Doing hit tests...");
 		    		
@@ -620,12 +626,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		    		dlg.setVisible(false);
 		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
+		    		System.out.println("done");
 
 					return;
 					
 				} else
 				if( ext.equals("dbf")) {
 					//TODO: CONVERT TO IMPORT CUSTOM
+		    		System.out.println("loading dbf");
 		    		dlg.setVisible(true);
 		    		dlbl.setText("Loading file...");
 
@@ -1662,9 +1670,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportCensusData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new LoadCensusFileThread().start();
-				
-				
-				
 			}
 		});
 		
@@ -1675,6 +1680,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmExportToBlock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new ExportToBlockLevelThread().start();
+			}
+		});
+		mntmImportAggregate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new ImportAggregateCustom().start();
 			}
 		});
 		
