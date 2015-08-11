@@ -11,7 +11,7 @@ import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 import solutions.Ward;
 
-public class Feature extends ReflectionJSONObject<Feature> {
+public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
 	
 	
 	public Vector<JDBField> dbfFields = new Vector<JDBField>();
@@ -25,6 +25,15 @@ public class Feature extends ReflectionJSONObject<Feature> {
 	public static boolean showDistrictLabels = false;
 	public static int display_mode = 0;
 	public static boolean draw_lines = true;
+	
+	@Override
+	public int compareTo(Feature o) {
+		return this.geometry.full_centroid[0] > o.geometry.full_centroid[0] ? 1 : 
+			 this.geometry.full_centroid[0] < o.geometry.full_centroid[0]  ? -1 :
+				 0
+				 ;
+	}
+
 	
 	
 	public double calcArea() {

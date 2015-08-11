@@ -465,9 +465,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	//ask whether to accumulate or use first match
 	//if first match, ask whether to convert from 0 to 1 indexed, vice-versa, or none.
 	//or just do it anyways?
+	
+	Feature getHit(double dlat, double dlon) {
+		int ilat = (int)(dlat*Geometry.SCALELATLON);
+		int ilon = (int)(dlon*Geometry.SCALELATLON);
+		for( Feature feat : featureCollection.features) {
+			Polygon[] polys = feat.geometry.polygons_full;
+			for( int i = 0; i < polys.length; i++) {
+				if( polys[i].contains(ilon,ilat)) {
+					return feat;
+				}
+			}
+		}
+		return null;
+	}
+
 	class ImportAggregateCustom extends Thread {
 		ImportAggregateCustom() { super(); }
-    	public void run() { 
+    	public void run() {
     		try {
     			JFileChooser jfc = new JFileChooser();
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
@@ -486,6 +501,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlbl.setText("Making polygons...");
 	    		System.out.println("making polygons");
 				int count = 0;
+				
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 					feat.ward.population = 0;
@@ -555,9 +571,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		System.out.println("doing hit tests");
 
 		    		dlbl.setText("Doing hit tests...");
+		    		Collections.sort(featureCollection.features);
 		    		
 					//and finally process the rows
 		    		try {
+
 					    String line;
 					    while ((line = br.readLine()) != null) {
 					    	try {
@@ -565,40 +583,27 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						    	
 					    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 					    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-					    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-					    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 					    		
-				    			boolean found = false;
-					    		for( Feature feat : featureCollection.features) {
-					    			Polygon[] polys = feat.geometry.polygons_full;
-					    			for( int i = 0; i < polys.length; i++) {
-					    				if( polys[i].contains(ilon,ilat)) {
-					    					if( opt == 1) { //overwrite
-						    					for( int j = 0; j < col_indexes.length; j++) {
-						    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
-						    					}
-					    					} else if (opt == 0) { //accumulate
-						    					for( int j = 0; j < col_indexes.length; j++) {
-						    						String key = (String)col_names[j];
-						    						double initial = 0;
-						    						if( feat.properties.containsKey(key)) {
-						    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
-						    						}
-						    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
-						    						feat.properties.put(key,""+initial);
-						    					}
-					    					}
-					    					found = true;
-					    					break;
-					    				}
-					    				if( found) {
-					    					break;
-					    				}
-					    			}
-					    		}
-					    		if( !found) {
-					    			System.out.print("x");
-					    		}
+				    			Feature feat = getHit(dlat,dlon);
+						    	if( feat == null) {
+						    		System.out.print("x");
+						    	} else {
+			    					if( opt == 1) { //overwrite
+				    					for( int j = 0; j < col_indexes.length; j++) {
+				    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
+				    					}
+			    					} else if (opt == 0) { //accumulate
+				    					for( int j = 0; j < col_indexes.length; j++) {
+				    						String key = (String)col_names[j];
+				    						double initial = 0;
+				    						if( feat.properties.containsKey(key)) {
+				    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
+				    						}
+				    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
+				    						feat.properties.put(key,""+initial);
+				    					}
+			    					}
+						    	}
 					    		
 					    		count++; 
 					    		if( count % 100 == 0) {
@@ -707,6 +712,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 
 		    		dlbl.setText("Doing hit tests...");
+		    		Collections.sort(featureCollection.features);
+
 		    		
 		    		//and finally process each row
 				    while (dbfreader.hasNextRecord()) {
@@ -718,39 +725,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		}
 				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
-				    		
-			    			boolean found = false;
-				    		for( Feature feat : featureCollection.features) {
-				    			Polygon[] polys = feat.geometry.polygons_full;
-				    			for( int i = 0; i < polys.length; i++) {
-				    				if( polys[i].contains(ilon,ilat)) {
-				    					if( opt == 1) { //overwrite
-					    					for( int j = 0; j < col_indexes.length; j++) {
-					    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
-					    					}
-				    					} else if (opt == 0) { //accumulate
-					    					for( int j = 0; j < col_indexes.length; j++) {
-					    						String key = (String)col_names[j];
-					    						double initial = 0;
-					    						if( feat.properties.containsKey(key)) {
-					    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
-					    						}
-					    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
-					    						feat.properties.put(key,""+initial);
-					    					}
-				    					}
-				    					found = true;
-				    					break;
-				    				}
-				    				if( found) {
-				    					break;
-				    				}
-				    			}
-				    		}
-				    		if( !found) {
-				    			System.out.print("x");
+	
+			    			Feature feat = getHit(dlat,dlon);
+					    	if( feat == null) {
+					    		System.out.print("x");
+					    	} else {
+		    					if( opt == 1) { //overwrite
+			    					for( int j = 0; j < col_indexes.length; j++) {
+			    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
+			    					}
+		    					} else if (opt == 0) { //accumulate
+			    					for( int j = 0; j < col_indexes.length; j++) {
+			    						String key = (String)col_names[j];
+			    						double initial = 0;
+			    						if( feat.properties.containsKey(key)) {
+			    							initial = Double.parseDouble(((String)feat.properties.get(key)).replaceAll(",","").replaceAll("\\+",""));
+			    						}
+			    						initial += Double.parseDouble(ss[col_indexes[j]].trim().replaceAll(",","").replaceAll("\\+",""));
+			    						feat.properties.put(key,""+initial);
+			    					}
+		    					}
 				    		}
 				    		
 				    		count++; 
