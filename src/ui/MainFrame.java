@@ -625,6 +625,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		dlbl.setText("Finalizing...");
 
 		    		dlg.setVisible(false);
+					
+					project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
+					project.population_column = (String) comboBoxPopulation.getSelectedItem();
+					fillComboBoxes();
 		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
 		    		System.out.println("done");
 
