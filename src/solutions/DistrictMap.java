@@ -306,6 +306,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public void fillDistrictwards() {
+    	System.out.println("4.1");
     	for( District d : districts) {
     		d.wards = new Vector<Ward>();
     	}
@@ -313,6 +314,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			districts.add(new District());
 		}
 
+    	System.out.println("4.2");
     	for( int i = 0; i < ward_districts.length; i++) {
     		int district = ward_districts[i];
     		if( district >= Settings.num_districts) {
@@ -326,6 +328,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		}
     		districts.get(district).wards.add(wards.get(i));
     	}
+    	System.out.println("4.3");
     	//make sure each district always has at least 1 ward.
     	for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
     		District d = districts.get(i);
@@ -342,12 +345,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     		}
     	}
+    	System.out.println("4.4");
     	for( int i = 0; i < districts.size(); i++) {
     		districts.get(i).resetPopulation();
     	}
+    	System.out.println("4.5");
 		while( Settings.num_districts < districts.size()) {
 			districts.remove(Settings.num_districts);
 		}
+    	System.out.println("4.1");
 
     }
     public DistrictMap(Vector<Ward> wards, int num_districts) {
@@ -363,9 +369,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
     public void resize_districts(int target) {
+    	System.out.println("1");
         dist_pops = new double[Settings.num_districts];
         dist_pop_frac = new double[Settings.num_districts];
         perfect_dists = new double[Settings.num_districts];
+    	System.out.println("2");
     	
     	if( num_districts == target) {
     		return;
@@ -377,6 +385,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			District d = new District();
 			districts.add(d);
 		}
+    	System.out.println("3");
 		
     	if( num_districts > target) {
     		double d = target;
@@ -393,7 +402,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     		}
     	}
+    	System.out.println("4");
         fillDistrictwards();
+    	System.out.println("5");
     	if( num_districts < target) {
     	}
     	num_districts = target;

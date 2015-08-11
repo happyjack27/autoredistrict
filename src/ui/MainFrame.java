@@ -629,6 +629,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
 					project.population_column = (String) comboBoxPopulation.getSelectedItem();
 					fillComboBoxes();
+					mapPanel.invalidate();
+					mapPanel.repaint();
 		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
 		    		System.out.println("done");
 
@@ -1029,6 +1031,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    }
 		System.out.println("filling combo boxes...");
 		fillComboBoxes();
+		mapPanel.invalidate();
+		mapPanel.repaint();
 		
 		featureCollection.loadDistrictsFromProperties(project.district_column);
 		
@@ -2077,6 +2081,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.draw_lines = !chckbxmntmHideMapLines.isSelected();
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		mnView.add(chckbxmntmHideMapLines);
