@@ -114,7 +114,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmShowGraph = new JMenuItem("Show graph");
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	public JComboBox comboBoxPopulation = new JComboBox();
-	public JComboBox comboBoxDistrictColumn;
+	public JComboBox comboBoxDistrictColumn = new JComboBox();
 
     public JTextField textField_3 = new JTextField();
     public JTextField textFieldNumDistricts = new JTextField();
@@ -261,7 +261,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
 			    					
 			    					try {
-			    						System.out.println("writing...");
+			    						//System.out.println("writing...");
 			    						fos.write((""+geoid+","+district+"\n").getBytes());
 			    					} catch (Exception e) {
 			    						// TODO Auto-generated catch block
@@ -1724,6 +1724,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				DialogImport di = new DialogImport();
 				di.setData(featureCollection, dh.header, dh.data);
 				di.show();
+				
+				project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
+				project.population_column = (String) comboBoxPopulation.getSelectedItem();
+				fillComboBoxes();
 			}
 		});
 		mnFile.add(mntmImportData);

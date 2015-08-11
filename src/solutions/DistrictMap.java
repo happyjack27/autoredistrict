@@ -409,11 +409,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         return ward_districts;
     }
     public void setGenome(int[] genome) {
+    	if( num_districts < genome.length) {
+    		num_districts = genome.length;
+    	}
         ward_districts = genome;
         //System.out.println("setgenome districts "+num_districts);
         districts = new Vector<District>();
-        for( int i = 0; i < num_districts; i++)
+        for( int i = 0; i < num_districts; i++) {
             districts.add(new District());
+        }
         if( wards == null || wards.size() < genome.length) {
         	fillDistrictwards();
         }
