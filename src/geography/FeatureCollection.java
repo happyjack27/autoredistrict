@@ -28,7 +28,7 @@ import solutions.Ward;
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
-	public Vector<Ward> wards;
+	public Vector<Ward> precincts;
 	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 1000000.0;
@@ -198,7 +198,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	
 	public void initwards() {
-		wards = new Vector<Ward>();
+		precincts = new Vector<Ward>();
 		wardHash = new HashMap<String,Ward>();
 		Ward.id_enumerator = 0;
 		for( Feature f : features) {
@@ -208,7 +208,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				f.ward.population = f.properties.POPULATION;
 				f.ward.has_census_results = true;
 			}
-			wards.add(f.ward);
+			precincts.add(f.ward);
 			//precinctHash.put(f.ward.name,f.ward);
 		}
 		collectVertexes();
@@ -319,7 +319,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	
 	public void initEcology() {
-		ecology.wards = wards;
+		ecology.wards = precincts;
 		//ecology.edges = edgeHash.values();
 		//ecology.vertexes = vertexes;
 	}
@@ -328,7 +328,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			ecology.population = new Vector<DistrictMap>();
 		}
 		if( ecology.population.size() < 1) {
-			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+			ecology.population.add(new DistrictMap(precincts,Settings.num_districts));
 		}
 		ecology.population.get(0).storeDistrictsToProperties(this, column_name);
 	}
@@ -338,10 +338,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			ecology.population = new Vector<DistrictMap>();
 		}
 		if( ecology.population.size() < 1) {
-			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+			ecology.population.add(new DistrictMap(precincts,Settings.num_districts));
 		}
 		while( ecology.population.size() < Settings.population) {
-			ecology.population.add(new DistrictMap(wards,Settings.num_districts));
+			ecology.population.add(new DistrictMap(precincts,Settings.num_districts));
 		}
 		for( DistrictMap dm : ecology.population) {
 			dm.loadDistrictsFromProperties(this, column_name);

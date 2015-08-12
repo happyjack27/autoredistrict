@@ -500,13 +500,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		for( int i = 0; i < featureCollection.features.size(); i++ ) {
 			if(  itestx+i < featureCollection.features.size()) {
 				if( featureCollection.features.get(itestx+i).geometry.polygons_full[0].contains(ilon,ilat)) {
-					//System.out.println("i: "+i);
+					//System.out.println("i+: "+i);
 					return featureCollection.features.get(itestx+i);
 				}
 			}
 			if( itestx-i >= 0) {
 				if( featureCollection.features.get(itestx-i).geometry.polygons_full[0].contains(ilon,ilat)) {
-					//System.out.println("i: "+i);
+					//System.out.println("i-: "+i);
 					return featureCollection.features.get(itestx-i);
 				}
 			}
@@ -1184,7 +1184,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void setDemographicColumns(Vector<String> candidate_cols) {
 		int num_candidates = candidate_cols.size();
 		
-		for( Ward b : featureCollection.wards) {
+		for( Ward b : featureCollection.precincts) {
 			b.has_election_results = true;
 		}
 		
@@ -1433,7 +1433,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int num_candidates = lines[0].split("\t").length - 1;
 			
 			Vector<String> not_found_in_geo = new Vector<String>();
-			for( Ward b : featureCollection.wards) {
+			for( Ward b : featureCollection.precincts) {
 				b.has_election_results = false;
 			}
 			for( int i = 0; i < lines.length; i++) {
@@ -1449,7 +1449,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			Vector<String> not_found_in_census = new Vector<String>();
-			for( Ward b : featureCollection.wards) {
+			for( Ward b : featureCollection.precincts) {
 				if( b.has_election_results == false) {
 					//not_found_in_census.add(b.name);
 					//System.out.println("not in election: |"+b.name+"|");
@@ -1457,7 +1457,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-				for( Ward b : featureCollection.wards) {
+				for( Ward b : featureCollection.precincts) {
 					b.has_election_results = false;
 				}
 				JOptionPane.showMessageDialog(null,""
@@ -1980,7 +1980,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String[] lines = s.split("\n");
 					
 					Vector<String> not_found_in_geo = new Vector<String>();
-					for( Ward b : featureCollection.wards) {
+					for( Ward b : featureCollection.precincts) {
 						b.has_census_results = false;
 					}
 					for( int i = 0; i < lines.length; i++) {
@@ -1994,13 +1994,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 					Vector<String> not_found_in_census = new Vector<String>();
-					for( Ward b : featureCollection.wards) {
+					for( Ward b : featureCollection.precincts) {
 						if( b.has_census_results == false) {
 							//not_found_in_census.add(b.name);
 						}
 					}
 					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-						for( Ward b : featureCollection.wards) {
+						for( Ward b : featureCollection.precincts) {
 							b.has_census_results = false;
 						}
 						JOptionPane.showMessageDialog(null,""
@@ -2254,7 +2254,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String[] lines = s.split("\n");
 				
 				Vector<String> not_found_in_geo = new Vector<String>();
-				for( Ward b : featureCollection.wards) {
+				for( Ward b : featureCollection.precincts) {
 					b.temp = -1;
 				}
 				for( int i = 0; i < lines.length; i++) {
@@ -2272,13 +2272,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 				}
 				Vector<String> not_found_in_census = new Vector<String>();
-				for( Ward b : featureCollection.wards) {
+				for( Ward b : featureCollection.precincts) {
 					if( b.temp < 0) {
 						//not_found_in_census.add(b.name);
 					}
 				}
 				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-					for( Ward b : featureCollection.wards) {
+					for( Ward b : featureCollection.precincts) {
 						b.temp = -1;
 					}
 					JOptionPane.showMessageDialog(null,""
@@ -2289,10 +2289,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							, 0);
 					return;
 				}
-				int[] new_ward_districts = new int[featureCollection.wards.size()];
+				int[] new_ward_districts = new int[featureCollection.precincts.size()];
 				int num_districts = 0;
 				for( int i = 0; i < new_ward_districts.length; i++) {
-					int d = featureCollection.wards.get(i).temp;
+					int d = featureCollection.precincts.get(i).temp;
 					if( num_districts < d) {
 						num_districts = d;
 					}
@@ -2305,10 +2305,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					featureCollection.ecology.population = new Vector<DistrictMap>();
 				}
 				if( featureCollection.ecology.population.size() < 1) {
-					featureCollection.ecology.population.add(new DistrictMap(featureCollection.wards,Settings.num_districts,new_ward_districts));
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.precincts,Settings.num_districts,new_ward_districts));
 				}
 				while( featureCollection.ecology.population.size() < Settings.population) {
-					featureCollection.ecology.population.add(new DistrictMap(featureCollection.wards,Settings.num_districts,new_ward_districts));
+					featureCollection.ecology.population.add(new DistrictMap(featureCollection.precincts,Settings.num_districts,new_ward_districts));
 				}
 				for( DistrictMap dm : featureCollection.ecology.population) {
 					dm.setGenome(new_ward_districts);

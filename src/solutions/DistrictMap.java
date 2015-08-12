@@ -27,13 +27,23 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
 		boolean has_districts = true;
+		boolean zero_indexed = false;
+		for( int i = 0; i < collection.features.size(); i++) {
+			Feature f = collection.features.get(i);
+			if( !f.properties.containsKey(column_name)) {
+			} else {
+				if( ((int)f.properties.getDouble(column_name)) == 0) {
+					zero_indexed = true;
+				}
+			}
+		}
 		for( int i = 0; i < collection.features.size(); i++) {
 			Feature f = collection.features.get(i);
 			if( !f.properties.containsKey(column_name)) {
 				has_districts = false;
 				ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
 			} else {
-				ward_districts[i] = ((int)f.properties.getDouble(column_name))-1;
+				ward_districts[i] = ((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
 			}
 		}
 		fillDistrictwards();
