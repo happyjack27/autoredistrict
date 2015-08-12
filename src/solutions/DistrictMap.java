@@ -29,12 +29,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		boolean has_districts = true;
 		boolean zero_indexed = false;
 		for( int i = 0; i < collection.features.size(); i++) {
-			Feature f = collection.features.get(i);
-			if( !f.properties.containsKey(column_name)) {
-			} else {
-				if( ((int)f.properties.getDouble(column_name)) == 0) {
-					zero_indexed = true;
+			try {
+				Feature f = collection.features.get(i);
+				if( !f.properties.containsKey(column_name)) {
+				} else {
+					if( ((int)f.properties.getDouble(column_name)) == 0) {
+						zero_indexed = true;
+					}
 				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 		for( int i = 0; i < collection.features.size(); i++) {

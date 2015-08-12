@@ -1082,7 +1082,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mapPanel.invalidate();
 		mapPanel.repaint();
 		
-		featureCollection.loadDistrictsFromProperties(project.district_column);
+		
+		setDistrictColumn(project.district_column);
+		//featureCollection.loadDistrictsFromProperties(project.district_column);
 		
 		mapPanel.featureCollection = featureCollection;
 		mapPanel.invalidate();
@@ -1171,10 +1173,38 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 			} else {
 				boolean is_in = featureCollection.features.get(0).properties.containsKey(district);
+				
+				int min = 999999999;
+				int max = -1;
+				for( Feature feat : featureCollection.features) {
+					int d = 0;
+					try {
+						d = Integer.parseInt((String)feat.properties.get(district) );
+					} catch (Exception ex) {
+						d = 0;
+						feat.properties.put(district,"0");
+						System.out.println("missing district ");
+						try {
+							System.out.println((String)feat.properties.get("GEOID10"));
+						} catch (Exception ex2) {
+							
+						}
+						//ex.printStackTrace();
+						continue;
+					}
+					if( d < min) { min = d; }
+					if( d > max) { max = d; }
+				}
+				System.out.println("min: "+min+" max: "+max);
+				Settings.num_districts = (max-min)+1;
+				textFieldNumDistricts.setText(""+Settings.num_districts);
+				
 				if( is_in) {
 					featureCollection.loadDistrictsFromProperties(district);
 				}
 			}
+			mapPanel.invalidate();
+			mapPanel.repaint();
 		}
 	}
 
@@ -1235,7 +1265,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void selectLayers() {
 		boolean is_evolving = this.evolving;
 		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
-		featureCollection.loadDistrictsFromProperties(project.district_column);
+		setDistrictColumn(project.district_column);
+		//featureCollection.loadDistrictsFromProperties(project.district_column);
 		DialogSelectLayers dlg = new DialogSelectLayers();
 		dlg.setData(featureCollection,project.demographic_columns);
 		dlg.show();

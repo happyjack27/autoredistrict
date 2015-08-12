@@ -338,6 +338,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 
 	public void loadDistrictsFromProperties(String column_name) {
+		
 		if( ecology.population == null) {
 			ecology.population = new Vector<DistrictMap>();
 		}
