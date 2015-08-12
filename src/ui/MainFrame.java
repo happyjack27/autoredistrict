@@ -469,6 +469,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	Feature getHit(double dlat, double dlon) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
+		double min_x = 0;
+		double max_x = featureCollection.features.size()-1;
+		double min_lon = featureCollection.features.get((int)min_x).geometry.full_centroid[0];
+		double max_lon = featureCollection.features.get((int)max_x).geometry.full_centroid[0];
+		
+		for( int i = 0; i < 20; i++) {
+			double test_x = min_x + (dlon-min_lon)*(max_x-min_x)/(max_lon-min_lon);
+			double test_lon = featureCollection.features.get((int)(Math.round(test_x)+0.00000000000001)).geometry.full_centroid[0];
+			if( test_lon > dlon) {
+				max_lon = test_lon;
+				max_x = test_x;
+			} else {
+				min_lon = test_lon;
+				min_x = test_x;
+			}
+			if( max_x-min_x < 2) {
+				break;
+			}
+		}
+		//old way
 		for( Feature feat : featureCollection.features) {
 			Polygon[] polys = feat.geometry.polygons_full;
 			for( int i = 0; i < polys.length; i++) {
