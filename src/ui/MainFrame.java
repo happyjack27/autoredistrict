@@ -621,11 +621,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		
 					//and finally process the rows
 		    		try {
+    					if( opt == 1) { //overwrite
+	    					for( int j = 0; j < col_indexes.length; j++) {
+	    						featureCollection.features.get(0).properties.put((String)col_names[j]," ");		
+	    					}
+    					}
 
 					    String line;
 					    while ((line = br.readLine()) != null) {
 					    	try {
 						    	String[] ss = line.split(delimiter);
+						    	if( ss.length > dh.header.length) {
+						    		System.out.print("+"+(ss.length - dh.header.length));
+						    	}
 						    	
 					    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 					    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));

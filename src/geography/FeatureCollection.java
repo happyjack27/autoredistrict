@@ -64,7 +64,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( int j = 0; j < features.size(); j++) {
 			Feature f = features.get(j);
 			for( int k = 0; k < headers.length; k++) {
-				data[j][k] = f.properties.get(headers[k]).toString();
+				try {
+					data[j][k] = f.properties.get(headers[k]).toString();
+				} catch (Exception ex) {
+					data[j][k] = "<null>";
+				}
 			}
 		}
 		return data;
