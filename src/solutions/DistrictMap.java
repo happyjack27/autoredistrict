@@ -33,8 +33,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				Feature f = collection.features.get(i);
 				if( !f.properties.containsKey(column_name)) {
 				} else {
-					if( ((int)f.properties.getDouble(column_name)) == 0) {
-						zero_indexed = true;
+					try {
+						if( Integer.parseInt((String)f.properties.get(column_name)) == 0) {
+							zero_indexed = true;
+						}
+					} catch (Exception ex) {
+						System.out.println("parse error "+ex);
 					}
 				}
 			} catch (Exception ex) {
@@ -42,17 +46,21 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 		}
 		for( int i = 0; i < collection.features.size(); i++) {
-			Feature f = collection.features.get(i);
-			if( !f.properties.containsKey(column_name)) {
-				has_districts = false;
-				ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
-			} else {
-				ward_districts[i] = ((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
+			try {
+				Feature f = collection.features.get(i);
+				if( !f.properties.containsKey(column_name)) {
+					has_districts = false;
+					ward_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
+				} else {
+					ward_districts[i] = Integer.parseInt((String)f.properties.get(column_name))-(zero_indexed ? 0 : 1);//((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
+				}
+			} catch (Exception ex) {
+				System.out.println("parse error2 "+ex);
 			}
 		}
 		fillDistrictwards();
 		try {
-		setGenome(ward_districts);
+			setGenome(ward_districts);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			
