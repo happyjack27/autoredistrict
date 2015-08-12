@@ -445,44 +445,75 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	//if first match, ask whether to convert from 0 to 1 indexed, vice-versa, or none.
 	//or just do it anyways?
 	
-	Feature getHit(double dlat, double dlon) {
+	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
+		dlon *= Geometry.SCALELATLON;
+		
 		double min_x = 0;
 		double max_x = featureCollection.features.size()-1;
 		double min_lon = featureCollection.features.get((int)min_x).geometry.full_centroid[0];
 		double max_lon = featureCollection.features.get((int)max_x).geometry.full_centroid[0];
+		//System.out.println("min_lon "+min_lon);
+		//System.out.println("dlon "+dlon);
+		//System.out.println("max_lon "+max_lon);
 		
 		int itestx = 0;
-		for( int i = 0; i < 20; i++) {
+		for( int i = 0; i < 100; i++) {
+			if( i == 99) {
+				//System.out.println("i0: "+i);
+			}
+			if( dlon < min_lon || dlon > max_lon) {
+				//System.out.println("i1: "+i);
+				break;
+			}
 			double test_x = min_x + (dlon-min_lon)*(max_x-min_x)/(max_lon-min_lon);
 			itestx = (int)(Math.round(test_x)+0.00000000000001);
+			if( itestx <= min_x+0.00000000000001) {
+				itestx++;
+			}
+			if( itestx >= max_x-0.00000000000001) {
+				itestx--;
+			}
+			if( itestx >= featureCollection.features.size()) {
+				itestx = featureCollection.features.size()-1;
+			}
+			if( itestx < 0) {
+				itestx = 0;
+			}
 			double test_lon = featureCollection.features.get(itestx).geometry.full_centroid[0];
 			if( test_lon > dlon) {
 				max_lon = test_lon;
-				max_x = test_x;
-			} else {
+				max_x = itestx;
+			} else if( test_lon < dlon) {
 				min_lon = test_lon;
-				min_x = test_x;
+				min_x = itestx;
+			} else {
+				//System.out.println("i2: "+i);
+				break;
 			}
-			if( max_x-min_x < 2) {
+			if( max_x-min_x < 5) {
+				//System.out.println("i5: "+i);
 				break;
 			}
 		}
 		for( int i = 0; i < featureCollection.features.size(); i++ ) {
 			if(  itestx+i < featureCollection.features.size()) {
 				if( featureCollection.features.get(itestx+i).geometry.polygons_full[0].contains(ilon,ilat)) {
+					//System.out.println("i: "+i);
 					return featureCollection.features.get(itestx+i);
 				}
 			}
 			if( itestx-i >= 0) {
-				if( featureCollection.features.get(itestx+i).geometry.polygons_full[0].contains(ilon,ilat)) {
+				if( featureCollection.features.get(itestx-i).geometry.polygons_full[0].contains(ilon,ilat)) {
+					//System.out.println("i: "+i);
 					return featureCollection.features.get(itestx-i);
 				}
 			}
 			
 		}
 		//old way
+		System.out.print("n");
 		for( Feature feat : featureCollection.features) {
 			Polygon[] polys = feat.geometry.polygons_full;
 			for( int i = 0; i < polys.length; i++) {
@@ -491,6 +522,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		}
+		System.out.print("o");
 		return null;
 	}
 
@@ -598,7 +630,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 					    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 					    		
-				    			Feature feat = getHit(dlat,dlon);
+				    			Feature feat = getHit(dlon,dlat);
 						    	if( feat == null) {
 						    		System.out.print("x");
 						    	} else {
@@ -740,7 +772,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 	
-			    			Feature feat = getHit(dlat,dlon);
+			    			Feature feat = getHit(dlon,dlat);
 					    	if( feat == null) {
 					    		System.out.print("x");
 					    	} else {

@@ -50,7 +50,6 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	}
 	public void makePolysFull() {
 		polygons_full = new Polygon[coordinates.length];
-		full_centroid = compute2DPolygonCentroid(polygons[0]);
 		for( int i = 0; i < coordinates.length; i++) {
 			xpolys = new int[coordinates[i].length];
 			ypolys = new int[coordinates[i].length];
@@ -62,6 +61,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 			}
 			polygons_full[i] = new Polygon(xpolys, ypolys, xpolys.length);
 		}
+		full_centroid = compute2DPolygonCentroid(polygons_full[0]);
 
 	}
 	public Geometry() {
