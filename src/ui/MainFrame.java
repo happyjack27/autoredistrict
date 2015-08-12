@@ -234,10 +234,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int count = 0;
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
-					feat.ward.population = 0;
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
+	    		Collections.sort(featureCollection.features);
 
 
 			    while (dbfreader.hasNextRecord()) {
@@ -253,34 +253,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-		    			boolean found = false;
-			    		for( Feature feat : featureCollection.features) {
-			    			Polygon[] polys = feat.geometry.polygons_full;
-			    			for( int i = 0; i < polys.length; i++) {
-			    				if( polys[i].contains(ilon,ilat)) {
-			    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
-			    					
-			    					try {
-			    						//System.out.println("writing...");
-			    						fos.write((""+geoid+","+district+"\n").getBytes());
-			    					} catch (Exception e) {
-			    						// TODO Auto-generated catch block
-			    						e.printStackTrace();
-			    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-			    						return;
-			    					}
-			    					
-			    					
-			    					found = true;
-			    					break;
-			    				}
-			    				if( found) {
-			    					break;
-			    				}
-			    			}
-			    		}
-			    		if( !found) {
+			    		Feature feat = getHit(dlon,dlat);
+			    		
+			    		if( feat == null) {
 			    			System.out.print("x");
+			    		} else {
+	    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+	    					
+	    					try {
+	    						//System.out.println("writing...");
+	    						fos.write((""+geoid+","+district+"\n").getBytes());
+	    					} catch (Exception e) {
+	    						// TODO Auto-generated catch block
+	    						e.printStackTrace();
+	    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+	    						return;
+	    					}
+			    			
 			    		}
 			    		
 			    		count++; 
@@ -391,6 +380,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
+	    		Collections.sort(featureCollection.features);
 
 
 			    while (dbfreader.hasNextRecord()) {
@@ -406,24 +396,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-		    			boolean found = false;
-			    		for( Feature feat : featureCollection.features) {
-			    			Polygon[] polys = feat.geometry.polygons_full;
-			    			for( int i = 0; i < polys.length; i++) {
-			    				if( polys[i].contains(ilon,ilat)) {
-			    					feat.ward.population += pop18;
-			    					feat.ward.has_census_results = true;
-			    					
-			    					found = true;
-			    					break;
-			    				}
-			    				if( found) {
-			    					break;
-			    				}
-			    			}
-			    		}
-			    		if( !found) {
+			    		Feature feat = getHit(dlon,dlat);
+			    		if( feat == null) {
 			    			System.out.print("x");
+			    		} else {
+	    					feat.ward.population += pop18;
+	    					feat.ward.has_census_results = true;
+			    			
 			    		}
 			    		
 			    		count++; 
