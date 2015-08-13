@@ -144,6 +144,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JSeparator separator_2 = new JSeparator();
 	public final JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
 	public final JMenuItem mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
+	public final JMenuItem mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 	
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -880,6 +881,136 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
     }
 	
+	class OpenWKTFileThread extends Thread {
+		OpenWKTFileThread() { super(); }
+    	public void run() { 
+        		try {
+        			JFileChooser jfc = new JFileChooser();
+    				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+    				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
+    				jfc.showOpenDialog(null);
+    				File f = jfc.getSelectedFile();
+    				if( f == null)  {
+    					return;
+    				}
+    				String fn = f.getName();
+    				String ext = fn.substring(fn.length()-3).toLowerCase();
+    				DataAndHeader dh = new DataAndHeader();
+
+    				if( !ext.equals("tsv") && !ext.equals("txt")) {
+    					JOptionPane.showMessageDialog(mainframe,"Unrecognized file extension");
+    					return;
+    				}
+					String delimiter = "\t";
+    					
+					//TODO: CONVERT TO IMPORT CUSTOM
+					FileReader fr = new FileReader(f);
+					BufferedReader br = new BufferedReader(fr);
+					dh.header = br.readLine().split(delimiter);
+					String initialSelectionValue = dh.header[0];
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].trim().toUpperCase().equals("MAPOBJECT")) {
+							initialSelectionValue = dh.header[i];
+							break;
+						}
+					}
+					
+					//now get the map column
+					String opt = (String)JOptionPane.showInputDialog(mainframe, "Select the column with the map shapes in it.", "Select map object column.", 0, null, dh.header, initialSelectionValue);
+					if( opt == null)
+						return;
+					opt = opt.trim().toUpperCase();
+					int map_col = -1;
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].trim().toUpperCase().equals(opt)) {
+							map_col = i;
+							break;
+						}
+					}
+    	    		dlg.setVisible(true);
+    	    		dlbl.setText("Reading file...");
+
+    		    project.source_file = f.getAbsolutePath();
+    		    
+				featureCollection = new FeatureCollection(); 
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+	
+				featureCollection.features = new Vector<Feature>();
+				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				
+				featureCollection.ecology.stopEvolving();
+				geo_loaded = false;
+				evolving = false;
+				Feature.display_mode = 0;
+				setEnableds();
+
+				if( panelStats != null) {
+					panelStats.featureCollection = featureCollection;
+				}
+
+				//now process the rows
+				String line;
+			    while ((line = br.readLine()) != null) {
+			    	try {
+				    	String[] ss = line.split(delimiter);
+				    	String mapline = ss[map_col].trim();
+				    	if( mapline.length() < "MULTIPOLYGON(((".length()) {
+				    		continue;
+				    	}
+				    	mapline = mapline.substring("MULTIPOLYGON(((".length()).split("\\)")[0];
+				    	String[] coords = mapline.split(",");
+				    	
+						Feature feature = new Feature();
+						featureCollection.features.add(feature);
+						feature.properties = new Properties();
+						feature.geometry = new Geometry();
+						for( int i = 0; i < ss.length; i++) {
+							feature.properties.put(dh.header[i],ss[i].toString());
+						}
+						feature.properties.post_deserialize();
+						feature.geometry.coordinates = new double[1][][];
+						
+						  //PointData[] points = aPolygon.getPointsOfPart(i);
+						  feature.geometry.coordinates[0] = new double[coords.length][2];
+							//for (int j = 0; j < coords.length-1; j+=2) {
+						  /*
+						  for( int k = 0; k < coords[0].length(); k++ ) {
+							  System.out.println(""+((int)coords[0].charAt(k))+" "+coords[0].charAt(k));
+						  }
+						  */
+						  for( int j = 0; j < feature.geometry.coordinates[0].length; j++) {
+							  
+							  //System.exit(0);
+							  String[] cc = coords[j].trim().split("\\s+");//(" ");
+						  	feature.geometry.coordinates[0][j][0] = Double.parseDouble(cc[0]);
+						  	feature.geometry.coordinates[0][j][1] = Double.parseDouble(cc[1]);
+						  }
+						feature.geometry.post_deserialize();
+						feature.post_deserialize();
+				    	
+				    	
+						//loadShapeFile(f);
+
+			    	} catch (Exception ex) {
+			    		ex.printStackTrace();
+			    	}
+			    }
+
+	    		dlg.setVisible(false);
+	    		
+				for( Feature fe : hmFeatures.values()) {
+					featureCollection.features.add(fe);
+				}
+				finishLoadingGeography();
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+    }
+	
 	class OpenProjectFileThread extends FileThread {
 		boolean run = false;
 		OpenProjectFileThread(File f, boolean run) { super(f); this.run = run;}
@@ -1231,7 +1362,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			b.resetOutcomes();
 			double[] dd = new double[num_candidates];
 			for( int i = 0; i < candidate_cols.size(); i++) {
-				dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+				try {
+					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+				} catch (Exception ex) {
+					
+					dd[i] = 0;
+					f.properties.put(candidate_cols.get(i),"0");
+				}
 			}
 		
 			b.demographics.clear();
@@ -1759,6 +1896,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				new LoadCensusFileThread().start();
 			}
 		});
+		mntmOpenWktTabdelimited.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new OpenWKTFileThread().start();
+			}
+		});
+		
+		mnFile.add(mntmOpenWktTabdelimited);
 		
 		mnFile.add(separator_1);
 		mnFile.add(mntmImportCensusData);
@@ -1794,6 +1938,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JFileChooser jfc = new JFileChooser();
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
 				jfc.showOpenDialog(null);
 				File f = jfc.getSelectedFile();
@@ -1807,7 +1952,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String s = getFile(f).toString();
 					dh = readDelimited(s,",",true);
 				} else
-				if( ext.equals("txt")) {
+				if( ext.equals("txt") || ext.equals("tsv")) {
 					String s = getFile(f).toString();
 					dh = readDelimited(s,"\t",true);
 				} else
