@@ -384,6 +384,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		Collections.sort(featureCollection.features);
 
 
+	    		hits = 0;
+	    		misses = 0;
 			    while (dbfreader.hasNextRecord()) {
 			    	try {
 			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
@@ -433,7 +435,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    setPopulationColumn("POP18");
 	    		
 	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.");
+	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -446,6 +448,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	//if first match, ask whether to convert from 0 to 1 indexed, vice-versa, or none.
 	//or just do it anyways?
 	
+	public int hits = 0;
+	public int misses = 0;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -500,15 +504,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		for( int i = 0; i < featureCollection.features.size(); i++ ) {
 			if(  itestx+i < featureCollection.features.size()) {
-				if( featureCollection.features.get(itestx+i).geometry.polygons_full[0].contains(ilon,ilat)) {
-					//System.out.println("i+: "+i);
-					return featureCollection.features.get(itestx+i);
+				Feature testfeat = featureCollection.features.get(itestx+i);
+				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
+					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
+						hits++;
+						return testfeat;
+					}
 				}
 			}
 			if( itestx-i >= 0) {
-				if( featureCollection.features.get(itestx-i).geometry.polygons_full[0].contains(ilon,ilat)) {
-					//System.out.println("i-: "+i);
-					return featureCollection.features.get(itestx-i);
+				Feature testfeat = featureCollection.features.get(itestx-i);
+				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
+					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
+						hits++;
+						return testfeat;
+					}
 				}
 			}
 			
@@ -519,11 +529,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Polygon[] polys = feat.geometry.polygons_full;
 			for( int i = 0; i < polys.length; i++) {
 				if( polys[i].contains(ilon,ilat)) {
+					hits++;
 					return feat;
 				}
 			}
 		}
 		System.out.print("o");
+		misses++;
 		return null;
 	}
 
@@ -959,34 +971,50 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    	if( mapline.length() < "MULTIPOLYGON(((".length()) {
 				    		continue;
 				    	}
-				    	mapline = mapline.substring("MULTIPOLYGON(((".length()).split("\\)")[0];
-				    	String[] coords = mapline.split(",");
+				    	mapline = mapline.substring("MULTIPOLYGON(((".length());
+				    	//mapline = mapline.substring(0,mapline.length()-1);
+				    	String[] polygons = mapline.split("\\(\\(");
+				    	if( polygons.length > 1) {
+				    		System.out.println("found "+polygons.length+" polys");
+				    	}
 				    	
 						Feature feature = new Feature();
 						featureCollection.features.add(feature);
 						feature.properties = new Properties();
 						feature.geometry = new Geometry();
 						for( int i = 0; i < ss.length; i++) {
+							if( i == map_col)
+								continue;
 							feature.properties.put(dh.header[i],ss[i].toString());
 						}
 						feature.properties.post_deserialize();
-						feature.geometry.coordinates = new double[1][][];
+
+						feature.geometry.coordinates = new double[polygons.length][][];
 						
 						  //PointData[] points = aPolygon.getPointsOfPart(i);
-						  feature.geometry.coordinates[0] = new double[coords.length][2];
+						for( int i = 0; i < polygons.length; i++) {
+					    	String poly = polygons[i].split("\\)")[0];
+					    	if(polygons[i].split("\\)").length > 1) {
+					    		System.out.println("found "+polygons[i].split("\\)").length + " )'s");
+					    	}
+					    	while( poly.charAt(0) == '(') {
+					    		poly = poly.substring(1);
+					    	}
+					    	String[] coords = poly.split(",");
+					    	feature.geometry.coordinates[i] = new double[coords.length][2];
+						  
+							for( int j = 0; j < feature.geometry.coordinates[i].length; j++) {
+								String[] cc = coords[j].trim().split("\\s+");//(" ");
+								feature.geometry.coordinates[i][j][0] = Double.parseDouble(cc[0]);
+								feature.geometry.coordinates[i][j][1] = Double.parseDouble(cc[1]);
+							}
+						}
 							//for (int j = 0; j < coords.length-1; j+=2) {
 						  /*
 						  for( int k = 0; k < coords[0].length(); k++ ) {
 							  System.out.println(""+((int)coords[0].charAt(k))+" "+coords[0].charAt(k));
 						  }
 						  */
-						  for( int j = 0; j < feature.geometry.coordinates[0].length; j++) {
-							  
-							  //System.exit(0);
-							  String[] cc = coords[j].trim().split("\\s+");//(" ");
-						  	feature.geometry.coordinates[0][j][0] = Double.parseDouble(cc[0]);
-						  	feature.geometry.coordinates[0][j][1] = Double.parseDouble(cc[1]);
-						  }
 						feature.geometry.post_deserialize();
 						feature.post_deserialize();
 				    	
@@ -1325,6 +1353,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					if( d < min) { min = d; }
 					if( d > max) { max = d; }
+				}
+				if( min < max || max-min > 200) {
+					return;
 				}
 				System.out.println("min: "+min+" max: "+max);
 				Settings.num_districts = (max-min)+1;
