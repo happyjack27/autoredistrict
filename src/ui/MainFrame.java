@@ -1354,7 +1354,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					if( d < min) { min = d; }
 					if( d > max) { max = d; }
 				}
-				if( min < max || max-min > 200) {
+				if( min > max || max-min > 200) {
 					return;
 				}
 				System.out.println("min: "+min+" max: "+max);

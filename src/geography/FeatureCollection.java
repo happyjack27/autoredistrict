@@ -3,6 +3,7 @@ package geography;
 import javax.swing.*;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -31,7 +32,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Ward> precincts;
 	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
-	double snap_to_grid_resolution = 1000000.0;
+	double snap_to_grid_resolution = 10000.0;
 	
 	static int max_hues = 9;
 	
@@ -427,6 +428,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		System.out.println("unpaired edges: "+unpaired_edges);
 		System.out.println("paired edges: "+paired_edges);
+		double pct = 100.0*((double)paired_edges)/((double)(paired_edges+unpaired_edges));
+		System.out.println("percent: "+new DecimalFormat("##0.000").format(pct)+"%");
 	}
 	
 	void collectVertexes() {
