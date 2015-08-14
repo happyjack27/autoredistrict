@@ -633,6 +633,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		    		dlbl.setText("Doing hit tests...");
 		    		Collections.sort(featureCollection.features);
+		    		hits = 0;
+		    		misses = 0;
 		    		
 					 //and finally process the rows
 		    		try {
@@ -698,12 +700,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							}
 					    }
     					if( opt == OVERWRITE) { //overwrite
-    						String key = (String)col_names[0];
+    						String key = ((String)col_names[0]).trim().toUpperCase();
     						for( Feature feat : featureCollection.features) {
-    							Vector<Integer> coll = new Vector<Integer>();
-    							coll.addAll(feat.properties.temp_hash.values());
-    							Collections.sort(coll);
-	    						feat.properties.put(key,coll.get(coll.size()-1));
+    							if( feat.properties.temp_hash.size() == 0) {
+    								System.out.println("no values");
+    								feat.properties.put(key,"1");
+    								continue;
+    							}
+    							String max = "";
+    							int max_count = 0;
+    							for( Entry<String,Integer> entry : feat.properties.temp_hash.entrySet()) {
+    								if( entry.getValue() > max_count) {
+    									max_count = entry.getValue();
+    									max = entry.getKey();
+    								}
+    							}
+	    						feat.properties.put(key,max);
     						}
     					}
 
@@ -725,7 +737,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					fillComboBoxes();
 					mapPanel.invalidate();
 					mapPanel.repaint();
-		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.");
+		    		JOptionPane.showMessageDialog(mainframe,"Done importing data.\nHits: "+hits+"\nMisses: "+misses);
 		    		System.out.println("done");
 
 					return;
