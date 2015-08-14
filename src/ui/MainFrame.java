@@ -603,6 +603,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					
 					String[] options = new String[]{"Accumulate","Overwrite"};
+					int ACCUMULATE = 0;
+					int OVERWRITE = 1;
 					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate or overwrite values?", "Select option", 0,0,null,options,options[0]);
 					if( opt < 0) {
 						System.out.println("aborted.");
@@ -634,7 +636,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		
 					 //and finally process the rows
 		    		try {
-    					if( opt == 1) { //overwrite
+    					if( opt == OVERWRITE) { //overwrite
 	    					for( int j = 0; j < col_indexes.length; j++) {
 	    						featureCollection.features.get(0).properties.put((String)col_names[j]," ");		
 	    					}
@@ -658,7 +660,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						    	if( feat == null) {
 						    		System.out.print("x");
 						    	} else {
-			    					if( opt == 1) { //overwrite
+			    					if( opt == OVERWRITE) { //overwrite
 			    						Integer integer = feat.properties.temp_hash.get(ss[col_indexes[0]]);
 			    						if( integer == null) {
 			    							integer = 0;
@@ -669,7 +671,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    					for( int j = 0; j < col_indexes.length; j++) {
 				    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
 				    					}*/
-			    					} else if (opt == 0) { //accumulate
+			    					} else if (opt == ACCUMULATE) { //accumulate
 				    					for( int j = 0; j < col_indexes.length; j++) {
 				    						String key = (String)col_names[j];
 				    						double initial = 0;
@@ -695,7 +697,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 								e.printStackTrace();
 							}
 					    }
-    					if( opt == 1) { //overwrite
+    					if( opt == OVERWRITE) { //overwrite
     						String key = (String)col_names[0];
     						for( Feature feat : featureCollection.features) {
     							Vector<Integer> coll = new Vector<Integer>();
