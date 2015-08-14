@@ -632,11 +632,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		dlbl.setText("Doing hit tests...");
 		    		Collections.sort(featureCollection.features);
 		    		
-					//and finally process the rows
+					 //and finally process the rows
 		    		try {
     					if( opt == 1) { //overwrite
 	    					for( int j = 0; j < col_indexes.length; j++) {
 	    						featureCollection.features.get(0).properties.put((String)col_names[j]," ");		
+	    					}
+	    					for( Feature feat : featureCollection.features) {
+	    						feat.properties.temp_hash.clear();
 	    					}
     					}
 
@@ -656,9 +659,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						    		System.out.print("x");
 						    	} else {
 			    					if( opt == 1) { //overwrite
+			    						Integer integer = feat.properties.temp_hash.get(ss[col_indexes[0]]);
+			    						if( integer == null) {
+			    							integer = 0;
+			    						}
+			    						integer++;
+			    						feat.properties.temp_hash.put(ss[col_indexes[0]],integer);
+			    						/*
 				    					for( int j = 0; j < col_indexes.length; j++) {
 				    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
-				    					}
+				    					}*/
 			    					} else if (opt == 0) { //accumulate
 				    					for( int j = 0; j < col_indexes.length; j++) {
 				    						String key = (String)col_names[j];
@@ -685,6 +695,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 								e.printStackTrace();
 							}
 					    }
+    					if( opt == 1) { //overwrite
+    						String key = (String)col_names[0];
+    						for( Feature feat : featureCollection.features) {
+    							Vector<Integer> coll = new Vector<Integer>();
+    							coll.addAll(feat.properties.temp_hash.values());
+    							Collections.sort(coll);
+	    						feat.properties.put(key,coll.get(coll.size()-1));
+    						}
+    					}
+
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}

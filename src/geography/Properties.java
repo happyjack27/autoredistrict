@@ -1,5 +1,7 @@
 package geography;
 
+import java.util.Hashtable;
+
 import serialization.ReflectionJSONObject;
 
 public class Properties extends ReflectionJSONObject<Properties> {
@@ -7,6 +9,7 @@ public class Properties extends ReflectionJSONObject<Properties> {
 	public int esri_rec_num = -1;
 	public double AREA;
 	public int POPULATION;
+	public  Hashtable<String,Integer> temp_hash = new Hashtable<String,Integer>();
 	
 	public void post_deserialize() {
 		super.post_deserialize();
