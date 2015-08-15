@@ -128,7 +128,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 		}
 		for( Feature f : featureCollection.features) {
 			for( Polygon p : f.geometry.polygons) {
-				if( pnpoly(p,x,y)) {
+				if( pnpoly(p,x*FSAA,y*FSAA)) {
 					return f;
 				}
 			}
