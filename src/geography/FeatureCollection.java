@@ -32,7 +32,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Ward> precincts;
 	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
-	double snap_to_grid_resolution = 10000.0;
+	double snap_to_grid_resolution = 10000.0*10.0;
 	
 	static int max_hues = 9;
 	

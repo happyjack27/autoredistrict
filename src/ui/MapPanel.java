@@ -6,6 +6,7 @@ import geography.Geometry;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 import javax.swing.*;
@@ -18,6 +19,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	boolean zooming = false;
 	Rectangle selection = null;
 	Stack<double[]> zoomStack = new Stack<double[]>();
+	
+	static int FSAA = 2;
 
 	MapPanel() {
         // set a preferred size for the custom panel.
@@ -27,11 +30,32 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
     }
 
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void paintComponent(Graphics graphics0) {
+    	try {
+    	Graphics2D graphics = (Graphics2D)graphics0;
+        super.paintComponent(graphics);
         Dimension d = this.getSize();
-        double scalex = ((double)d.getWidth())/(maxx-minx);
-        double scaley = ((double)d.getHeight())/(maxy-miny);
+        //graphics.setComposite(AlphaComposite.Src);
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
+        BufferedImage off_Image =
+        		  new BufferedImage(
+        				  (int) (d.getWidth()*FSAA), 
+        				  (int) (d.getHeight()*FSAA), 
+        		          BufferedImage.TYPE_INT_ARGB
+        		          );
+        Graphics2D g = off_Image.createGraphics();
+        
+        //g.setComposite(AlphaComposite.Src);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        
+        double scalex = ((double)d.getWidth()*FSAA)/(maxx-minx);
+        double scaley = ((double)d.getHeight()*FSAA)/(maxy-miny);
         Geometry.shiftx = minx;
         Geometry.shifty = miny;
         Geometry.scalex = scalex;
@@ -43,11 +67,21 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         	if( selection != null) {
         		//Color c = new Color();
         		g.setColor(new Color(128,128,128,128));
-        		g.fillRect(selection.x, selection.y, selection.width, selection.height);
+        		g.fillRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
            		g.setColor(new Color(255,255,255,255));
-           		g.drawRect(selection.x, selection.y, selection.width, selection.height);
+           		g.drawRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
         	}
         }
+        //System.out.println(".");
+        g.dispose();
+        //System.out.println("x");
+        graphics.drawImage(off_Image, 
+        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
+        		null);
+        //System.out.println("o");
+    } catch (Exception ex) {
+    	ex.printStackTrace();
+    }
     }
 
 	@Override
