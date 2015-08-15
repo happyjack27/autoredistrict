@@ -1260,6 +1260,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		System.out.println(""+minx+","+miny);
 		System.out.println(""+maxx+","+maxy);
+		featureCollection.recalcDlonlat();
 		resetZoom();
 		
 	    dlbl.setText("Initializing ecology...");

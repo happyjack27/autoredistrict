@@ -43,7 +43,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 			double[][] coords = geometry.coordinates[i]; 
 			int k = coords.length-1;
 			for( int j = 0; j < coords.length; j++) {
-				area += (coords[k][0]+coords[j][0])*(coords[k][1]-coords[j][1]);
+				area += FeatureCollection.dlonlat*(coords[k][0]+coords[j][0])*(coords[k][1]-coords[j][1]);
 				k = j;
 			}
 			tot_area += Math.abs(area)/2.0;

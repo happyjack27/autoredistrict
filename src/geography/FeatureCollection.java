@@ -35,6 +35,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 10000.0*10.0;
+	public static double xy = 1;
+	public static double dlonlat = 1;
 	
 	static int max_hues = 9;
 	
@@ -76,26 +78,34 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		return data;
 	}
+	public void recalcDlonlat() {
+		//lock aspect ratio
+		double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
+		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
+		
+		dlonlat = Math.cos((lat0+lat1)/2);
+	}
 		
 	public void draw(Graphics g) {
 		if( features == null) {
 			return;
 		}
 		
+		//lock aspect ratio
+		double lon0 = MapPanel.minx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
+		double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
+		double lon1 = MapPanel.maxx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
+		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
+		
+		dlonlat = Math.cos((lat0+lat1)/2);
+		double x0 = lon0 * dlonlat;
+		double y0 = lat0;
+		double x1 = lon1 * dlonlat;
+		double y1 = lat1;
+		xy = Math.abs((x1-x0)/(y1-y0));
+		//System.out.println(lon0+" "+lat1+" "+x0+" "+y1+" "+xy);
+		
 		if( MapPanel.zoomStack.empty()) {
-			//lock aspect ratio
-			double lon0 = MapPanel.minx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
-			double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
-			double lon1 = MapPanel.maxx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
-			double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
-			
-			double x0 = lon0 * Math.cos((lat0+lat1)/2);
-			double y0 = lat0;
-			double x1 = lon1 * Math.cos((lat0+lat1)/2);
-			double y1 = lat1;
-			double xy = Math.abs((x1-x0)/(y1-y0));
-			//System.out.println(lon0+" "+lat1+" "+x0+" "+y1+" "+xy);
-			
 			//System.out.println(Geometry.scalex +" "+Geometry.scaley );
 			double sign = Geometry.scaley*Geometry.scalex > 0 ? 1 : -1;
 			if( Math.abs(xy*Geometry.scaley) > Math.abs(Geometry.scalex)) {
