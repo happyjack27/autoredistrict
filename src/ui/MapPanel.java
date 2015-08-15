@@ -18,7 +18,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	FeatureCollection featureCollection;
 	boolean zooming = false;
 	Rectangle selection = null;
-	Stack<double[]> zoomStack = new Stack<double[]>();
+	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
 	static int FSAA = 2;
 

@@ -25,6 +25,7 @@ import solutions.Edge;
 import solutions.Settings;
 import solutions.Vertex;
 import solutions.Ward;
+import ui.MainFrame;
 import ui.MapPanel;
 
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
@@ -81,26 +82,29 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			return;
 		}
 		
-		//lock aspect ratio
-		double lon0 = MapPanel.minx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
-		double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
-		double lon1 = MapPanel.maxx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
-		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
-		
-		double x0 = lon0 * Math.cos((lat0+lat1)/2);
-		double y0 = lat0;
-		double x1 = lon1 * Math.cos((lat0+lat1)/2);
-		double y1 = lat1;
-		double xy = Math.abs((x1-x0)/(y1-y0));
-		//System.out.println(lon0+" "+lat1+" "+x0+" "+y1+" "+xy);
-		
-		//System.out.println(Geometry.scalex +" "+Geometry.scaley );
-		double sign = Geometry.scaley*Geometry.scalex > 0 ? 1 : -1;
-		if( Math.abs(xy*Geometry.scaley) > Math.abs(Geometry.scalex)) {
-			Geometry.scaley = sign * Geometry.scalex/xy;
-		} else if( Math.abs(xy*Geometry.scaley) < Math.abs(Geometry.scalex)) {
-			Geometry.scalex = sign * xy*Geometry.scaley;
+		if( MapPanel.zoomStack.empty()) {
+			//lock aspect ratio
+			double lon0 = MapPanel.minx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
+			double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
+			double lon1 = MapPanel.maxx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
+			double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
+			
+			double x0 = lon0 * Math.cos((lat0+lat1)/2);
+			double y0 = lat0;
+			double x1 = lon1 * Math.cos((lat0+lat1)/2);
+			double y1 = lat1;
+			double xy = Math.abs((x1-x0)/(y1-y0));
+			//System.out.println(lon0+" "+lat1+" "+x0+" "+y1+" "+xy);
+			
+			//System.out.println(Geometry.scalex +" "+Geometry.scaley );
+			double sign = Geometry.scaley*Geometry.scalex > 0 ? 1 : -1;
+			if( Math.abs(xy*Geometry.scaley) > Math.abs(Geometry.scalex)) {
+				Geometry.scaley = sign * Geometry.scalex/xy;
+			} else if( Math.abs(xy*Geometry.scaley) < Math.abs(Geometry.scalex)) {
+				Geometry.scalex = sign * xy*Geometry.scaley;
+			}
 		}
+	
 		//System.out.println(Geometry.scalex +" "+Geometry.scaley );
 		
 
