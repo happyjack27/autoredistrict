@@ -14,7 +14,7 @@ import javax.swing.*;
 import solutions.iDiscreteEventListener;
 
 public class MapPanel extends JPanel implements MouseListener, MouseMotionListener, iDiscreteEventListener {
-	double minx,maxx,miny,maxy;
+	public static double minx,maxx,miny,maxy;
 	FeatureCollection featureCollection;
 	boolean zooming = false;
 	Rectangle selection = null;

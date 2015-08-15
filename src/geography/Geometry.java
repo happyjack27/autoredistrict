@@ -23,7 +23,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public double[] full_centroid;
 
 	
-	public static boolean isLatLon = false; 
+	public static boolean isLatLon = true; 
 	public static double SCALELATLON = 100000;
 
 	
