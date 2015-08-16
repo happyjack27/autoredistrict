@@ -1621,35 +1621,69 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    while ((s = r.next()) != null) {
 		    	Object aobj[] = dbfreader.nextRecord(Charset.defaultCharset());
 		      switch (s.getShapeType()) {
+		      case POLYGON_Z:
+			      {
+			    	  int rec_num = s.getHeader().getRecordNumber();
+			    	  //System.out.println("record number: "+rec_num);
+			          PolygonZShape aPolygon = (PolygonZShape) s;
+			          
+			          Feature feature = new Feature();
+			          featureCollection.features.add(feature);
+			          feature.properties = new Properties();
+			          feature.geometry = new Geometry();
+			          feature.properties.esri_rec_num = rec_num;
+			          feature.properties.from_shape_file = true;
+			          for( int i = 0; i < cols.length; i++) {
+			        	  feature.properties.put(cols[i],aobj[i].toString());
+			        	  //System.out.print(aobj[i].toString()+" ");
+			          }
+			          //System.out.println();
+			          feature.properties.post_deserialize();
+			          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+			          
+			          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+			            PointData[] points = aPolygon.getPointsOfPart(i);
+			            feature.geometry.coordinates[i] = new double[points.length][2];
+			            for( int j = 0; j < points.length; j++) {
+			            	feature.geometry.coordinates[i][j][0] = points[j].getX();
+			            	feature.geometry.coordinates[i][j][1] = points[j].getY();
+			            }
+			          }
+			          feature.geometry.post_deserialize();
+			          feature.post_deserialize();
+			      }
+		          break;
 		      case POLYGON:
-		    	  int rec_num = s.getHeader().getRecordNumber();
-		    	  //System.out.println("record number: "+rec_num);
-		          PolygonShape aPolygon = (PolygonShape) s;
-		          
-		          Feature feature = new Feature();
-		          featureCollection.features.add(feature);
-		          feature.properties = new Properties();
-		          feature.geometry = new Geometry();
-		          feature.properties.esri_rec_num = rec_num;
-		          feature.properties.from_shape_file = true;
-		          for( int i = 0; i < cols.length; i++) {
-		        	  feature.properties.put(cols[i],aobj[i].toString());
-		        	  //System.out.print(aobj[i].toString()+" ");
-		          }
-		          //System.out.println();
-		          feature.properties.post_deserialize();
-		          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
-		          
-		          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
-		            PointData[] points = aPolygon.getPointsOfPart(i);
-		            feature.geometry.coordinates[i] = new double[points.length][2];
-		            for( int j = 0; j < points.length; j++) {
-		            	feature.geometry.coordinates[i][j][0] = points[j].getX();
-		            	feature.geometry.coordinates[i][j][1] = points[j].getY();
-		            }
-		          }
-		          feature.geometry.post_deserialize();
-		          feature.post_deserialize();
+			      {
+			    	  int rec_num = s.getHeader().getRecordNumber();
+			    	  //System.out.println("record number: "+rec_num);
+			          PolygonShape aPolygon = (PolygonShape) s;
+			          
+			          Feature feature = new Feature();
+			          featureCollection.features.add(feature);
+			          feature.properties = new Properties();
+			          feature.geometry = new Geometry();
+			          feature.properties.esri_rec_num = rec_num;
+			          feature.properties.from_shape_file = true;
+			          for( int i = 0; i < cols.length; i++) {
+			        	  feature.properties.put(cols[i],aobj[i].toString());
+			        	  //System.out.print(aobj[i].toString()+" ");
+			          }
+			          //System.out.println();
+			          feature.properties.post_deserialize();
+			          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+			          
+			          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+			            PointData[] points = aPolygon.getPointsOfPart(i);
+			            feature.geometry.coordinates[i] = new double[points.length][2];
+			            for( int j = 0; j < points.length; j++) {
+			            	feature.geometry.coordinates[i][j][0] = points[j].getX();
+			            	feature.geometry.coordinates[i][j][1] = points[j].getY();
+			            }
+			          }
+			          feature.geometry.post_deserialize();
+			          feature.post_deserialize();
+			      }
 		          break;
 		      default:
 		        System.out.println("Read other type of shape.");
