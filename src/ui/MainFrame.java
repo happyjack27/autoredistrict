@@ -450,6 +450,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 	public int hits = 0;
 	public int misses = 0;
+	public final JSeparator separator_3 = new JSeparator();
+	public final JMenuItem mntmAntialiasingOff = new JMenuItem("Antialiasing off");
+	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
+	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2436,6 +2440,36 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(mntmShowProperties);
+		
+		mnView.add(separator_3);
+		mntmAntialiasingOff.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MapPanel.FSAA = 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		
+		mnView.add(mntmAntialiasingOff);
+		mntmxAntialiasing.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MapPanel.FSAA = 2;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		
+		mnView.add(mntmxAntialiasing);
+		mntmxAntialiasing_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MapPanel.FSAA = 4;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mntmxAntialiasing_1.setSelected(true);
+		
+		mnView.add(mntmxAntialiasing_1);
 
 		
 		//JMenu mnResults = new JMenu("Results");

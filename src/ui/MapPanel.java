@@ -35,20 +35,26 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
     public void paintComponent(Graphics graphics0) {
     	try {
     	Graphics2D graphics = (Graphics2D)graphics0;
+    	Graphics2D g = null;
         super.paintComponent(graphics);
         Dimension d = this.getSize();
+        BufferedImage off_Image = null;
         //graphics.setComposite(AlphaComposite.Src);
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
-        BufferedImage off_Image =
-        		  new BufferedImage(
-        				  (int) (d.getWidth()*FSAA), 
-        				  (int) (d.getHeight()*FSAA), 
-        		          BufferedImage.TYPE_INT_ARGB
-        		          );
-        Graphics2D g = off_Image.createGraphics();
+        if( FSAA > 1) {
+	        off_Image =
+	        		  new BufferedImage(
+	        				  (int) (d.getWidth()*FSAA), 
+	        				  (int) (d.getHeight()*FSAA), 
+	        		          BufferedImage.TYPE_INT_ARGB
+	        		          );
+	        g = off_Image.createGraphics();
+        } else {
+        	g = graphics;
+        }
         
         //g.setComposite(AlphaComposite.Src);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
@@ -75,7 +81,9 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         	}
         }
         //System.out.println(".");
-        g.dispose();
+        if( FSAA > 1) {
+        	g.dispose();
+        }
         //System.out.println("x");
         if( FSAA == 4) {
             //Dimension d = this.getSize();
@@ -102,7 +110,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
 	        		null);
 
-        } else {
+        } else if( FSAA == 2) {
 	        graphics.drawImage(off_Image, 
 	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
 	        		null);
@@ -230,6 +238,20 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         Dimension d = this.getSize();
         double scalex = ((double)d.getWidth())/(maxx-minx);
         double scaley = ((double)d.getHeight())/(maxy-miny);
+		if( MapPanel.zoomStack.empty()) {
+			//System.out.println(Geometry.scalex +" "+Geometry.scaley );
+			double sign = scaley*scalex > 0 ? 1 : -1;
+			if( Math.abs(FeatureCollection.xy*scaley) > Math.abs(scalex)) {
+				scaley = sign * scalex/FeatureCollection.xy;
+			} else if( Math.abs(FeatureCollection.xy*scaley) < Math.abs(scalex)) {
+				scalex = sign * FeatureCollection.xy*scaley;
+			}
+		}
+/*
+        if( MapPanel.zoomStack.empty()) {
+        	scalex = Geometry.scalex;
+        	scaley = Geometry.scaley;
+        }*/
         double x0 = minx+r.x/scalex;
         double y0 = miny+r.y/scaley;
         double x1 = minx+(r.x+r.width)/scalex;
