@@ -196,7 +196,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
 				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.BOLD,12));
+				g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
 				for( int i = 0; i < Settings.num_districts; i++) {
 					dxs[i] /= dcs[i];
 					dys[i] /= dcs[i];

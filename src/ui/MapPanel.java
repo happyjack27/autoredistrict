@@ -20,7 +20,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	Rectangle selection = null;
 	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
-	static int FSAA = 2;
+	public static int FSAA = 2;
+	
 
 	MapPanel() {
         // set a preferred size for the custom panel.
