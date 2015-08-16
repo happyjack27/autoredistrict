@@ -2721,7 +2721,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
-		JLabel lblBorderMutation = new JLabel("% border mutation");
+		JLabel lblBorderMutation = new JLabel("% mutation");
 		lblBorderMutation.setBounds(6, 103, 172, 16);
 		panel_3.add(lblBorderMutation);
 		slider_1.setBounds(6, 130, 190, 29);
@@ -2887,7 +2887,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(lblFairnessCriteria);
 		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
-		JLabel lblContiguency = new JLabel("Proportionalness");
+		JLabel lblContiguency = new JLabel("Representativeness");
 		lblContiguency.setBounds(10, 38, 172, 16);
 		panel_4.add(lblContiguency);
 		sliderRepresentation.setBounds(10, 63, 180, 29);
