@@ -228,7 +228,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		table_1 = new JTable();
 		scrollPane_1.setViewportView(table_1);
 		
-		JLabel lblBorderMutationRate = new JLabel("Border mutation rate:");
+		JLabel lblBorderMutationRate = new JLabel("Mutation rate:");
 		lblBorderMutationRate.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblBorderMutationRate.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblBorderMutationRate.setBounds(6, 146, 202, 16);
