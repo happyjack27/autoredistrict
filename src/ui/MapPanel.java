@@ -20,7 +20,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	Rectangle selection = null;
 	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
-	public static int FSAA = 2;
+	public static int FSAA = 4;
+	public static Object RENDERING_INTERPOLATION = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
 	
 
 	MapPanel() {
@@ -37,7 +38,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         super.paintComponent(graphics);
         Dimension d = this.getSize();
         //graphics.setComposite(AlphaComposite.Src);
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -50,7 +51,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         Graphics2D g = off_Image.createGraphics();
         
         //g.setComposite(AlphaComposite.Src);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
         g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         
@@ -76,9 +77,36 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         //System.out.println(".");
         g.dispose();
         //System.out.println("x");
-        graphics.drawImage(off_Image, 
-        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
-        		null);
+        if( FSAA == 4) {
+            //Dimension d = this.getSize();
+            //graphics.setComposite(AlphaComposite.Src);
+
+            BufferedImage off_Image2 =
+            		  new BufferedImage(
+            				  (int) (d.getWidth()*2), 
+            				  (int) (d.getHeight()*2), 
+            		          BufferedImage.TYPE_INT_ARGB
+            		          );
+            Graphics2D g2 = off_Image2.createGraphics();
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
+	        g2.drawImage(off_Image, 
+	        		0, 0, (int)d.getWidth()*2, (int)d.getHeight()*2, 
+	        		null);
+	        
+	        g2.dispose();
+
+	        graphics.drawImage(off_Image2, 
+	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
+	        		null);
+
+        } else {
+	        graphics.drawImage(off_Image, 
+	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
+	        		null);
+        }
         //System.out.println("o");
     } catch (Exception ex) {
     	ex.printStackTrace();
