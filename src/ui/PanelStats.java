@@ -56,13 +56,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				featureCollection.ecology.generation,
 				featureCollection.ecology.population.size(),
 				Settings.num_districts,
+				
 				Settings.mutation_boundary_rate,
 				
-				Settings.geometry_weight,
-				Settings.disconnected_population_weight,
-				Settings.population_balance_weight,
-				Settings.disenfranchise_weight,
-				Settings.voting_power_balance_weight,
+				(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits, //REP IMBALANCE
+				(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333, //POWER IMBALANCE
+				(dm.fairnessScores[5]+dm2.fairnessScores[5]+dm3.fairnessScores[5])*0.3333333, //WASTED VOTES TOTAL
+				(dm.fairnessScores[6]+dm2.fairnessScores[6]+dm3.fairnessScores[6])*0.3333333, //WASTED VOTES IMBALANCE
+				0,
 				
 
 				Settings.getAnnealingFloor( featureCollection.ecology.generation),
@@ -71,14 +72,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						Settings.square_root_compactness 
 						? (dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333 
 						: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
-					),
-				(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333,
-				(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits,
-				(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits,
-				(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333,
-				(dm.fairnessScores[5]+dm2.fairnessScores[5]+dm3.fairnessScores[5])*0.3333333,
-				(dm.fairnessScores[6]+dm2.fairnessScores[6]+dm3.fairnessScores[6])*0.3333333,
-				Settings.wasted_votes_weight,
+					), //BORDER LENGTH
+				(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333, //DISCONNECTED POP
+				(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits, //POP IMBALANCE
+				0,
+				0,
+				
 		});
 		
 		try {

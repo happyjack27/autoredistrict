@@ -412,8 +412,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		Settings.population_balance_weight*0.9,//*2.0,
                 Settings.disconnected_population_weight*1.5,//1.5,
                 Settings.voting_power_balance_weight*0.9,
-                Settings.wasted_votes_weight*1.0,
-                0,
+                Settings.wasted_votes_total_weight*1.0,
+                Settings.wasted_votes_imbalance_weight*1.0,
         };
 
         for( int j = 0; j < population.size(); j++) {

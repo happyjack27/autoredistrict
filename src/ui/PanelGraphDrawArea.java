@@ -16,14 +16,15 @@ public class PanelGraphDrawArea extends JPanel {
     		"Generation",
     		"Population size",
     		"Num. of districts",
+    		
     		"Mutation rate",
     		
     		//4
-    		"Border length weight",
-    		"Disconnected population weight",
-    		"Population imbalance weight",
-    		"Representation imbalance weight",
-    		"Voting power imbalance weight",
+    		"Representation imbalance",
+    		"Voting power imbalance",
+    		"Wasted votes (total)",
+    		"Wasted votes (imbalance)",
+    		"",
 
     		//9
     		"Annealing floor",
@@ -32,17 +33,17 @@ public class PanelGraphDrawArea extends JPanel {
     		"Border length",
     		"Disconnected population",
     		"Population imbalance",
-    		"Representation imbalance",
-    		"Voting power imbalance",
+    		"",
+    		"",
     };
 
 
     public boolean[] b_draw = new boolean[]{
     		false,true,false,true,
-    		false,false,false,false,false,
+    		true,true,true,true,false,
     		true,
-    		true,true,true,true,true,
-    		true,true,
+    		true,true,true,false,false,
+    		//true,true,
     };
     
     

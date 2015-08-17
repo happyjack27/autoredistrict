@@ -347,7 +347,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				DataAndHeader dh = new DataAndHeader();
 				
-				int col_pop18 = -1;
+				int col_pop = -1;
 				int col_lat = -1;
 				int col_lon = -1;
 				
@@ -356,8 +356,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
 					dh.header[i] = dbfreader.getField(i).getName();
-					if( dh.header[i].toUpperCase().trim().equals("POP18")) {
-						col_pop18 = i;
+					if( dh.header[i].toUpperCase().trim().equals("POP2010") && col_pop < 0) {
+						col_pop = i;
+					}
+					if( dh.header[i].toUpperCase().trim().equals("POP")) {
+						col_pop = i;
+					}
+					if( dh.header[i].toUpperCase().trim().equals("POP2020")) {
+						col_pop = i;
+					}
+					if( dh.header[i].toUpperCase().trim().equals("PERSONS")) {
+						col_pop = i;
+					}
+					if( dh.header[i].toUpperCase().trim().equals("POPULATION")) {
+						col_pop = i;
 					}
 					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
 						col_lat = i;
@@ -366,7 +378,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						col_lon = i;
 					}
 				}
-				if( col_pop18 < 0 || col_lat < 0 || col_lon < 0) {
+				String opt = (String)JOptionPane.showInputDialog(mainframe, "Select the column with the population in it.", "Select population column.", 0, null, dh.header, dh.header[col_pop]);
+				if( opt == null)
+					return;
+				opt = opt.trim().toUpperCase();
+				col_pop = -1;
+				for( int i = 0; i < dh.header.length; i++) {
+					if( dh.header[i].trim().toUpperCase().equals(opt)) {
+						col_pop = i;
+						break;
+					}
+				}
+				if( col_pop < 0 || col_lat < 0 || col_lon < 0) {
 					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
 					return;
 				}
@@ -393,7 +416,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		for( int i = 0; i < oo.length; i++) {
 			    			ss[i] = oo[i].toString();
 			    		}
-			    		int pop18 = Integer.parseInt(ss[col_pop18]);
+			    		int pop18 = Integer.parseInt(ss[col_pop]);
 			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -426,13 +449,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			    
 	    		for( Feature feat : featureCollection.features) {
-				    feat.properties.put("POP18",feat.ward.population);
+				    feat.properties.put("POPULATION",feat.ward.population);
 				    feat.properties.POPULATION = (int) feat.ward.population;
 	    		}
 	    		System.out.println("setting pop column");
 	    		
-	    		comboBoxPopulation.addItem("POP18");
-			    setPopulationColumn("POP18");
+	    		comboBoxPopulation.addItem("POPULATION");
+			    setPopulationColumn("POPULATION");
 	    		
 	    		dlg.setVisible(false);
 	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
@@ -454,8 +477,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmAntialiasingOff = new JMenuItem("Antialiasing off");
 	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
 	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
-	public final JSlider sliderWastedVotes = new JSlider();
+	public final JSlider sliderWastedVotesTotal = new JSlider();
 	public final JLabel lblWastedVotes = new JLabel("Wasted votes (total)");
+	public JLabel lblWastedVotesimbalance;
+	public JSlider sliderWastedVotesImbalance;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1869,7 +1894,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
-		Settings.wasted_votes_weight = sliderWastedVotes.getValue()/100.0;
+		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
+		Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
 		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
@@ -2950,7 +2976,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(200, 318, 200, 234);
+		panel_4.setBounds(200, 318, 200, 290);
 		panel.add(panel_4);
 		
 		lblFairnessCriteria = new JLabel("Fairness criteria");
@@ -2964,22 +2990,35 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderRepresentation.setBounds(10, 63, 180, 29);
 		panel_4.add(sliderRepresentation);
 		
-		JLabel lblVotingPowerBalance = new JLabel("Competitiveness");
-		lblVotingPowerBalance.setBounds(10, 103, 172, 16);
+		JLabel lblVotingPowerBalance = new JLabel("Voting power balance");
+		lblVotingPowerBalance.setBounds(10, 104, 172, 16);
 		panel_4.add(lblVotingPowerBalance);
-		sliderVotingPowerBalance.setBounds(10, 124, 180, 29);
+		sliderVotingPowerBalance.setBounds(10, 125, 180, 29);
 		panel_4.add(sliderVotingPowerBalance);
-		sliderWastedVotes.addChangeListener(new ChangeListener() {
+		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.wasted_votes_weight = sliderWastedVotes.getValue()/100.0;
+				Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 			}
 		});
-		sliderWastedVotes.setBounds(10, 186, 180, 29);
+		sliderWastedVotesTotal.setBounds(10, 186, 180, 29);
 		
-		panel_4.add(sliderWastedVotes);
+		panel_4.add(sliderWastedVotesTotal);
 		lblWastedVotes.setBounds(10, 165, 172, 16);
 		
 		panel_4.add(lblWastedVotes);
+		
+		lblWastedVotesimbalance = new JLabel("Wasted votes (imbalance)");
+		lblWastedVotesimbalance.setBounds(10, 226, 172, 16);
+		panel_4.add(lblWastedVotesimbalance);
+		
+		sliderWastedVotesImbalance = new JSlider();
+		sliderWastedVotesImbalance.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
+			}
+		});
+		sliderWastedVotesImbalance.setBounds(10, 247, 180, 29);
+		panel_4.add(sliderWastedVotesImbalance);
 		
 		btnNewButton = new JButton("Election columns");
 		btnNewButton.addActionListener(new ActionListener() {
