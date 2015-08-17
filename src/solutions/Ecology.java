@@ -409,11 +409,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	System.out.println("  weighing fairness...");
 
         double[] weights = new double[]{
-        		Settings.geometry_weight*1.1, 
+        		Settings.geometry_weight*3.0, 
         		Settings.disenfranchise_weight*1.00, 
-        		Settings.population_balance_weight*0.9,//*2.0,
-                Settings.disconnected_population_weight*1.5,//1.5,
-                Settings.voting_power_balance_weight*0.9,
+        		Settings.population_balance_weight*1.0,//*2.0,
+                Settings.disconnected_population_weight*3.0,//1.5,
+                Settings.voting_power_balance_weight*1.0,
                 Settings.wasted_votes_total_weight*1.0,
                 Settings.wasted_votes_imbalance_weight*1.0,
         };
