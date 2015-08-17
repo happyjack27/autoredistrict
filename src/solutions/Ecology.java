@@ -383,7 +383,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	
         if( verbosity > 1)
         	System.out.println("  renormalizing fairness...");
-        for( int i = 0; i < 6; i++) {
+        for( int i = 0; i < 7; i++) {
         	//pre-randomize so that ties are treated unbiased.
             for( DistrictMap map : population) {
                 map.fitness_score = Math.random();
@@ -413,12 +413,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 Settings.disconnected_population_weight*1.5,//1.5,
                 Settings.voting_power_balance_weight*0.9,
                 Settings.wasted_votes_weight*1.0,
+                0,
         };
 
         for( int j = 0; j < population.size(); j++) {
             DistrictMap map = population.get(j);
             map.fitness_score = 0;
-            for( int i = 0; i < 6; i++) {
+            for( int i = 0; i < 7; i++) {
             	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
             		map.fairnessScores[i] = 0;
             	}

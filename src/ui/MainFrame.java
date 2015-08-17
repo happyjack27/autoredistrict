@@ -455,7 +455,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
 	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
 	public final JSlider sliderWastedVotes = new JSlider();
-	public final JLabel lblWastedVotes = new JLabel("Wasted votes");
+	public final JLabel lblWastedVotes = new JLabel("Wasted votes (total)");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);

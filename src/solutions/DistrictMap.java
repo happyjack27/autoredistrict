@@ -14,7 +14,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public Vector<District> districts = new Vector<District>();
     
     public int[] ward_districts = new int[]{};
-    public double[] fairnessScores = new double[5];
+    public double[] fairnessScores = new double[7];
     public double fitness_score = 0;
     
     public static double[] metrics = new double[10];
@@ -23,6 +23,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     double[] dist_pop_frac;
     double[] perfect_dists;
     
+    public int[] wasted_votes_by_party;
+    public int[] wasted_votes_by_district;
     
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
@@ -625,6 +627,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double[] p = new double[Candidate.candidates.size()];
         double[] q = new double[Candidate.candidates.size()];
         double disproportional_representation = 0;
+        double wasted_vote_imbalance = 0;
     	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0) {
     		for(District d : districts) {
     			d.generateOutcomes(Settings.num_elections_simulated);
@@ -634,7 +637,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( Settings.disenfranchise_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
-    		
+    		wasted_votes_by_party = new int[Candidate.candidates.size()];
+    	    wasted_votes_by_district = new int[districts.size()];
+    	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
+    	    	wasted_votes_by_party[i] = 0;
+    	    }
+    	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
+    	    	wasted_votes_by_district[i] = 0;
+    	    }
+ 
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
                 double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
@@ -671,6 +682,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	}
 
                     	wasted_votes += amt;
+                    	wasted_votes_by_party[j] += amt;
+                    	wasted_votes_by_district[k] += amt;
                     }
  
                 }
@@ -724,6 +737,26 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     q[j] += elected_vote[j];
                 }
             }
+            
+    	    double total_by_party = 0;
+    	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
+    	    	wasted_votes_by_party[i] /= Settings.num_elections_simulated;;
+    	    	total_by_party += wasted_votes_by_district[i];
+    	    }
+    	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
+    	    	wasted_votes_by_district[i] /= Settings.num_elections_simulated;
+    	    }
+    	    
+    	    double[] target_wasted = new double[wasted_votes_by_party.length];
+    	    double[] actual_wasted = new double[wasted_votes_by_party.length];
+    	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
+    	    	actual_wasted[i] = ((double)wasted_votes_by_party[i])/total_by_party;
+    	    }
+    	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
+    	    	target_wasted[i] = 1.0/((double)wasted_votes_by_party.length);
+    	    }
+    	    wasted_vote_imbalance = getKLDiv(target_wasted,actual_wasted,1.2);
+
             time20 = System.currentTimeMillis();
             disproportional_representation = getKLDiv(p,q,1.2);
             if( disproportional_representation != disproportional_representation) {
@@ -779,6 +812,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,disconnected_pops
         		,power_fairness
         		,wasted_votes
+        		,wasted_vote_imbalance
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
