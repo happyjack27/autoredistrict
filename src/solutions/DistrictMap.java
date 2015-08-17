@@ -570,7 +570,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //all measures should be minimized.
     public void calcFairnessScores() {//border_length_area_weighted
     	
-    	long time0 = System.currentTimeMillis();    	
+    	long time0 = System.currentTimeMillis();    
+    	long wasted_votes = 0;
     	//===fairness score: compactness
         double length = Settings.border_length_area_weighted ? getWeightedEdgeLength() : getEdgeLength();
         
@@ -648,6 +649,30 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 		popular_vote[j] += res[0][j];
                 		elected_vote[j] += res[1][j];
                 	}
+ 
+                	//now count wasted votes
+                    int tot = 0;
+                    for(int j = 0; j < tot; j++) {
+                    	tot += res[0][j];
+                    }
+                    int unit = tot/Settings.members_per_district;
+                    for(int j = 0; j < popular_vote.length; j++) {
+                    	//make amt as if there was one vote w/pop 0 to unit
+                    	double amt = res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+                    	/*
+                    	if( amt < unit/4) {
+                    		amt = amt; // if less than1/4, all votes are wasted.
+                    	} else 
+                    		*/
+                    	if (amt > unit/2){
+                    		amt -= unit/2; //overvote
+                    	} else {
+                    		amt = unit/2-amt; //votes short
+                    	}
+
+                    	wasted_votes += amt;
+                    }
+ 
                 }
                 
                 double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.members_per_district*Settings.num_districts);
@@ -753,6 +778,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,getPopVariance()/*population_imbalance*2.0*/
         		,disconnected_pops
         		,power_fairness
+        		,wasted_votes
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
