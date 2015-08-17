@@ -454,6 +454,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmAntialiasingOff = new JMenuItem("Antialiasing off");
 	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
 	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
+	public final JSlider sliderWastedVotes = new JSlider();
+	public final JLabel lblWastedVotes = new JLabel("Wasted votes");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1867,6 +1869,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
+		Settings.wasted_votes_weight = sliderWastedVotes.getValue()/100.0;
 		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
@@ -2947,7 +2950,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(200, 318, 200, 166);
+		panel_4.setBounds(200, 318, 200, 234);
 		panel.add(panel_4);
 		
 		lblFairnessCriteria = new JLabel("Fairness criteria");
@@ -2966,6 +2969,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(lblVotingPowerBalance);
 		sliderVotingPowerBalance.setBounds(10, 124, 180, 29);
 		panel_4.add(sliderVotingPowerBalance);
+		sliderWastedVotes.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.wasted_votes_weight = sliderWastedVotes.getValue()/100.0;
+			}
+		});
+		sliderWastedVotes.setBounds(10, 186, 180, 29);
+		
+		panel_4.add(sliderWastedVotes);
+		lblWastedVotes.setBounds(10, 165, 172, 16);
+		
+		panel_4.add(lblWastedVotes);
 		
 		btnNewButton = new JButton("Election columns");
 		btnNewButton.addActionListener(new ActionListener() {

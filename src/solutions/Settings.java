@@ -65,7 +65,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double max_pop_diff = 9;
     public static double disenfranchise_weight = 1;
     public static double voting_power_balance_weight = 1;
-    public static double wasted_vote_weight = 1;
+    public static double wasted_votes_weight = 1;
     
     //public static double replace_fraction = 0.5;
     public static int getCutoff() {
