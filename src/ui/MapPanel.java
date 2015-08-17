@@ -20,7 +20,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	Rectangle selection = null;
 	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
-	public static int FSAA = 4;
+	public static int FSAA = 2;
 	public static Object RENDERING_INTERPOLATION = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
 	
 
