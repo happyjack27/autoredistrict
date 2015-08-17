@@ -49,7 +49,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
 		label_5. setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
-		label_2.setText(""+decimal.format(Settings.mutation_boundary_rate)+" pct");		
+		label_2.setText(""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct");		
 		label_4.setText(""+integer.format(featureCollection.ecology.generation));
 		
 		Ecology.history.add(new double[]{

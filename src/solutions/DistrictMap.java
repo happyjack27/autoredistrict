@@ -9,7 +9,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static int sorting_polarity = 1;
     public static boolean use_border_length_on_mutate_boundary = true;
     
-    public static boolean mutate_disconnected = true;
+    public static boolean mutate_disconnected = false;
 
     public static int num_districts = 0;
 	public Vector<Ward> wards = new Vector<Ward>();
@@ -194,35 +194,49 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
         if( mutate_disconnected && prob >= 0) {
-        	mutate_all_disconnected();
+        	mutate_all_disconnected(prob > 0.05  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }
-    public void mutate_all_disconnected() {
-        boolean[] ward_connected = new boolean[ward_districts.length];
-        for( int i = 0; i < ward_districts.length; i++) {
-        	ward_connected[i] = false;
-        }
-        for( int i = 0; i < districts.size(); i++) {
-        	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(ward_districts);
-        	if( vw == null || vw.size() == 0) {
-        		//System.out.println("null or zero vw "+vw);
-        		return;
-        	}
-        	for( Ward w : vw) {
-        		ward_connected[w.id] = true;
-        	}
-        }
+    public void mutate_all_disconnected(double prob) {
         int connected = 0;
         int disconnected = 0;
-        for( int i = 0; i < ward_districts.length; i++) {
-        	if( ward_connected[i] == false) {
-        		disconnected++;
-        		mutate_ward_boundary(i,0.25);
-        	} else {
-        		connected++;
-        	}
-        }
-        System.out.println("connected: "+connected+" disconnected: "+disconnected);
+    	try {
+	        boolean[] ward_connected = new boolean[ward_districts.length];
+	        for( int i = 0; i < ward_districts.length; i++) {
+	        	ward_connected[i] = false;
+	        }
+	        for( int i = 0; i < districts.size(); i++) {
+	        	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(ward_districts);
+	        	if( vw == null || vw.size() < 5) {
+	        		//System.out.println("null or zero top population region "+vw);
+	        		return;
+	        	}
+	        	for( Ward w : vw) {
+	        		ward_connected[w.id] = true;
+	        	}
+	        }
+	        for( int i = 0; i < ward_districts.length; i++) {
+	        	if( ward_connected[i] == false) {
+	        		disconnected++;
+	        	} else {
+	        		connected++;
+	        	}
+	        }
+	        if( disconnected > connected) {
+        		//System.out.println("disconnected exceeds connected!");
+	        	return;
+	        }
+	        for( int i = 0; i < ward_districts.length; i++) {
+	        	if( ward_connected[i] == false) {
+	        		mutate_ward_boundary(i,prob);
+	        	} else {
+	        	}
+	        }
+	    } catch (Exception ex) {
+	    	System.out.println("ex mac "+ex);
+	    	ex.printStackTrace();
+	    }
+        //System.out.println("connected: "+connected+" disconnected: "+disconnected);
     }    
     
     int boundaries_tested = 2;
@@ -268,6 +282,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	boundaries_mutated = 0;
         for( int i = 0; i < ward_districts.length; i++) {
         	mutate_ward_boundary(i,prob);
+        }
+        if( mutate_disconnected && prob >= 0) {
+        	mutate_all_disconnected(prob > 0.05 ? prob : 0.05);
         }
         if( boundaries_tested == 0) {
         	boundaries_tested++;
