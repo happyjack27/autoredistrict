@@ -481,6 +481,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JLabel lblWastedVotes = new JLabel("Wasted votes (total)");
 	public JLabel lblWastedVotesimbalance;
 	public JSlider sliderWastedVotesImbalance;
+	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2812,7 +2813,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textField.setText("64");
+		textField.setText("128");
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");
@@ -2846,7 +2847,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textFieldElectionsSimulated.setText("4");
+		textFieldElectionsSimulated.setText("3");
 		textFieldElectionsSimulated.setColumns(10);
 		textFieldNumDistricts.setText("10");
 		
@@ -3060,6 +3061,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		chckbxmntmMutateAll.setSelected(Settings.mutate_all);
+		
+		chckbxmntmMutateDisconnected = new JCheckBoxMenuItem("Mutate disconnected");
+		chckbxmntmMutateDisconnected.setSelected(true);
+		chckbxmntmMutateDisconnected.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				DistrictMap.mutate_disconnected = chckbxmntmMutateDisconnected.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateDisconnected);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 

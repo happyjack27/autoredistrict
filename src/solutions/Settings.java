@@ -52,7 +52,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean multiThreadScoring = true;
 	public static boolean multiThreadMating = true;
 	public static boolean multiThreadMutatting = true;
-	public static boolean mutate_all = false;
+	public static boolean mutate_all = true;
 
     public static boolean mutate_to_neighbor_only = false;
 
@@ -76,8 +76,8 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     }
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
-    public static int num_elections_simulated = 2;
-    public static int population = 64;
+    public static int num_elections_simulated = 3;
+    public static int population = 128;
     public static int num_districts = 3;
 	//geometry
 	//demographics

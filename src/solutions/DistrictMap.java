@@ -8,6 +8,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
     public static int sorting_polarity = 1;
     public static boolean use_border_length_on_mutate_boundary = true;
+    
+    public static boolean mutate_disconnected = true;
 
     public static int num_districts = 0;
 	public Vector<Ward> wards = new Vector<Ward>();
@@ -191,48 +193,71 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 }
             }
         }
+        if( mutate_disconnected) {
+        	mutate_all_disconnected();
+        }
     }
+    public void mutate_all_disconnected() {
+        boolean[] ward_connected = new boolean[ward_districts.length];
+        for( int i = 0; i < ward_districts.length; i++) {
+        	ward_connected[i] = false;
+        }
+        for( int i = 0; i < districts.size(); i++) {
+        	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(ward_districts);
+        	for( Ward w : vw) {
+        		ward_connected[w.id] = true;
+        	}
+        }
+        for( int i = 0; i < ward_districts.length; i++) {
+        	if( ward_connected[i] == false) {
+        		mutate_ward_boundary(i,0.25);
+        	}
+        }
+    }    
     
     int boundaries_tested = 2;
     int boundaries_mutated = 1;
+    public void mutate_ward_boundary(int i, double prob) {
+    	Ward ward = wards.get(i);
+    	boolean border = false;
+        for( Ward bn : ward.neighbors) {
+        	if( ward_districts[bn.id] != ward_districts[i]) {
+        		border = true;
+        		break;
+        	}
+        }
+        if( border == false) {
+        	return;
+        }
+        boundaries_tested++;
+        if( prob >= 1 || Math.random() < prob) {
+        	boundaries_mutated++;
+        	try {
+      			double total_length = 0;
+    			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+    				total_length += ward.neighbor_lengths[j];
+    			}
+    			double mutate_to = Math.random()*total_length;
+       			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
+    				mutate_to -= ward.neighbor_lengths[j];
+    				if( mutate_to < 0) {
+    					Ward b = ward.neighbors.get(j);
+    					ward_districts[i] = ward_districts[b.id];
+    					break;
+    				}
+    			}
+        	} catch (Exception ex) {
+        		ex.printStackTrace();
+        	}
+        }
+    }
 
     public void mutate_boundary(double prob) {
     	//start at 1 for regularization
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
         for( int i = 0; i < ward_districts.length; i++) {
-        	Ward ward = wards.get(i);
-        	boolean border = false;
-            for( Ward bn : ward.neighbors) {
-            	if( ward_districts[bn.id] != ward_districts[i]) {
-            		border = true;
-            		break;
-            	}
-            }
-            if( border == false) {
-            	continue;
-            }
-            boundaries_tested++;
-            if( Math.random() < prob) {
-            	boundaries_mutated++;
-            	try {
-          			double total_length = 0;
-        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
-        				total_length += ward.neighbor_lengths[j];
-        			}
-        			double mutate_to = Math.random()*total_length;
-           			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
-        				mutate_to -= ward.neighbor_lengths[j];
-        				if( mutate_to < 0) {
-        					Ward b = ward.neighbors.get(j);
-        					ward_districts[i] = ward_districts[b.id];
-        					break;
-        				}
-        			}
-            	} catch (Exception ex) {
-            		ex.printStackTrace();
-            	}
-            }
+        	mutate_ward_boundary(i,prob);
         }
         if( boundaries_tested == 0) {
         	boundaries_tested++;
@@ -634,7 +659,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		}
     		
     	}
-    	if( Settings.disenfranchise_weight > 0) {
+    	if( Settings.disenfranchise_weight > 0 || Settings.wasted_votes_total_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
     		wasted_votes_by_party = new int[Candidate.candidates.size()];
