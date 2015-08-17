@@ -386,11 +386,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
     public void resize_districts(int target) {
-    	System.out.println("1");
+    	//System.out.println("1");
         dist_pops = new double[Settings.num_districts];
         dist_pop_frac = new double[Settings.num_districts];
         perfect_dists = new double[Settings.num_districts];
-    	System.out.println("2");
+    	//System.out.println("2");
     	
     	if( num_districts == target) {
     		return;
@@ -402,7 +402,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			District d = new District();
 			districts.add(d);
 		}
-    	System.out.println("3");
+    	//System.out.println("3");
 		
     	if( num_districts > target) {
     		double d = target;
@@ -419,9 +419,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     		}
     	}
-    	System.out.println("4");
+    	//System.out.println("4");
         fillDistrictwards();
-    	System.out.println("5");
+    	//System.out.println("5");
     	if( num_districts < target) {
     	}
     	num_districts = target;
@@ -660,16 +660,20 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 		popular_vote[j] += res[0][j];
                 		elected_vote[j] += res[1][j];
                 	}
+                	try {
  
                 	//now count wasted votes
                     int tot = 0;
-                    for(int j = 0; j < tot; j++) {
+                    for(int j = 0; j < popular_vote.length; j++) {
                     	tot += res[0][j];
                     }
                     int unit = tot/Settings.members_per_district;
                     for(int j = 0; j < popular_vote.length; j++) {
                     	//make amt as if there was one vote w/pop 0 to unit
-                    	double amt = res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+                    	if( res[0][j] < 0) {
+                    		System.out.println("res < 0");
+                    	}
+                    	double amt = res[0][j] % unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
                     	/*
                     	if( amt < unit/4) {
                     		amt = amt; // if less than1/4, all votes are wasted.
@@ -678,13 +682,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	if (amt > unit/2){
                     		amt -= unit/2; //overvote
                     	} else {
-                    		amt = unit/2-amt; //votes short
+                    		if( amt > unit/4) {
+                        		amt = unit/2 - amt; //votes short
+                    		}
                     	}
 
                     	wasted_votes += amt;
                     	wasted_votes_by_party[j] += amt;
                     	wasted_votes_by_district[k] += amt;
                     }
+                	} catch (Exception ex) {
+                		System.out.println("ex aa "+ex);
+                		ex.printStackTrace();
+                	}
  
                 }
                 
@@ -804,6 +814,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         
     	long time5 = System.currentTimeMillis();
     	
+        //System.out.println(""+wasted_votes+", "+wasted_vote_imbalance);
         
         fairnessScores = new double[]{
         		length

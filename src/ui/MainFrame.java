@@ -1516,7 +1516,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
 		}
-		Feature.display_mode = 1;
+		//mntmShowDemographics.setSelected(true);
+		//Feature.display_mode = 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
 		
@@ -2811,7 +2812,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textField.setText("128");
+		textField.setText("64");
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Population dynamics");

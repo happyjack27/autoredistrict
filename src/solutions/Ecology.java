@@ -187,6 +187,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     }
     
 	public void startEvolving() {
+		resize_population();
 		if( !evolve_paused) {
 			return;
 		}
@@ -199,7 +200,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 				evolveThread = null;
 			} catch (Exception ex) { }
 		}
-		evolve_paused= false;
+		resize_population();
+		evolve_paused = false;
 		evolveThread = new EvolveThread();
 		evolveThread.start();
 	}
