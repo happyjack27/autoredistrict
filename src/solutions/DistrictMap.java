@@ -193,7 +193,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 }
             }
         }
-        if( mutate_disconnected) {
+        if( mutate_disconnected && prob >= 0) {
         	mutate_all_disconnected();
         }
     }
@@ -204,15 +204,25 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         for( int i = 0; i < districts.size(); i++) {
         	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(ward_districts);
+        	if( vw == null || vw.size() == 0) {
+        		//System.out.println("null or zero vw "+vw);
+        		return;
+        	}
         	for( Ward w : vw) {
         		ward_connected[w.id] = true;
         	}
         }
+        int connected = 0;
+        int disconnected = 0;
         for( int i = 0; i < ward_districts.length; i++) {
         	if( ward_connected[i] == false) {
+        		disconnected++;
         		mutate_ward_boundary(i,0.25);
+        	} else {
+        		connected++;
         	}
         }
+        System.out.println("connected: "+connected+" disconnected: "+disconnected);
     }    
     
     int boundaries_tested = 2;
