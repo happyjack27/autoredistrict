@@ -194,7 +194,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
         if( mutate_disconnected && prob >= 0) {
-        	mutate_all_disconnected(prob > 0.05  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
+        	mutate_all_disconnected(0.2);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }
     public void mutate_all_disconnected(double prob) {
@@ -284,9 +284,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	boundaries_mutated = 0;
         for( int i = 0; i < ward_districts.length; i++) {
         	mutate_ward_boundary(i,prob,true);
-        }
-        if( mutate_disconnected && prob >= 0) {
-        	mutate_all_disconnected(prob > 0.05 ? prob : 0.05);
         }
         if( boundaries_tested == 0) {
         	boundaries_tested++;

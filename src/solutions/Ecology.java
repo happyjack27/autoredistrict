@@ -436,9 +436,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             		map.fairnessScores[i] = 0;
             	}
                 map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
-                if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.98) {
+                if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.99) {
                     map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.0;
-                	map.fitness_score += 5;
+                	map.fitness_score += 10;
                 }
             }
         }
@@ -588,6 +588,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	dm.mutate_boundary(Settings.mutation_boundary_rate);
             }
             dm.fillDistrictwards();
+        }
+        if( DistrictMap.mutate_disconnected) {
+	        for(int i =  0; i < population.size(); i++) {
+	            DistrictMap dm = population.get(i);
+	        	dm.mutate_all_disconnected(Settings.mutation_boundary_rate);
+	        }
         }
         if( Settings.make_unique) {
         	make_unique();
