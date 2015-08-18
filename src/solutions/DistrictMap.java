@@ -207,12 +207,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        }
 	        for( int i = 0; i < districts.size(); i++) {
 	        	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(ward_districts);
-	        	if( vw == null || vw.size() < 5) {
-	        		//System.out.println("null or zero top population region "+vw);
-	        		return;
-	        	}
-	        	for( Ward w : vw) {
-	        		ward_connected[w.id] = true;
+	        	double pop = districts.get(i).getRegionPopulation(vw);
+	        	if( pop < 25000 || vw == null || vw.size() < 5) {
+	        		for(int j = 0; j < ward_districts.length; j++) {
+	        			ward_connected[j] |=  ward_districts[j] == i;
+	        		}
+	        	} else {
+		        	for( Ward w : vw) {
+		        		ward_connected[w.id] = true;
+		        	}
 	        	}
 	        }
 	        for( int i = 0; i < ward_districts.length; i++) {
@@ -222,7 +225,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        		connected++;
 	        	}
 	        }
-	        if( disconnected > connected) {
+	        if( disconnected > (disconnected+connected)/10) {
         		//System.out.println("disconnected exceeds connected!");
 	        	return;
 	        }

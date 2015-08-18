@@ -593,6 +593,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        for(int i =  0; i < population.size(); i++) {
 	            DistrictMap dm = population.get(i);
 	        	dm.mutate_all_disconnected(Settings.mutation_boundary_rate);
+	            dm.fillDistrictwards();
 	        }
         }
         if( Settings.make_unique) {
