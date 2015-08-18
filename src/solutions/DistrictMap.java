@@ -228,7 +228,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        }
 	        for( int i = 0; i < ward_districts.length; i++) {
 	        	if( ward_connected[i] == false) {
-	        		mutate_ward_boundary(i,prob);
+	        		mutate_ward_boundary(i,prob,false);
 	        	} else {
 	        	}
 	        }
@@ -241,7 +241,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     int boundaries_tested = 2;
     int boundaries_mutated = 1;
-    public void mutate_ward_boundary(int i, double prob) {
+    public void mutate_ward_boundary(int i, double prob, boolean count) {
     	Ward ward = wards.get(i);
     	boolean border = false;
         for( Ward bn : ward.neighbors) {
@@ -253,9 +253,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         if( border == false) {
         	return;
         }
-        boundaries_tested++;
+        if( count)
+        	boundaries_tested++;
         if( prob >= 1 || Math.random() < prob) {
-        	boundaries_mutated++;
+            if( count)
+            	boundaries_mutated++;
         	try {
       			double total_length = 0;
     			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
@@ -281,7 +283,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
         for( int i = 0; i < ward_districts.length; i++) {
-        	mutate_ward_boundary(i,prob);
+        	mutate_ward_boundary(i,prob,true);
         }
         if( mutate_disconnected && prob >= 0) {
         	mutate_all_disconnected(prob > 0.05 ? prob : 0.05);
