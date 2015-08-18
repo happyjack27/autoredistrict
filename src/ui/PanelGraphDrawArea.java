@@ -92,6 +92,9 @@ public class PanelGraphDrawArea extends JPanel {
         if( Ecology.history != null && Ecology.history.size() > 0) {
         	int start = (int)(pctToHide*(double)Ecology.history.size());
             double scalex = ((double)d.getWidth())/(double)(Ecology.history.size()-start);
+            if( start >= Ecology.history.size()) {
+            	return;
+            }
             double[] maxys = new double[Ecology.history.get(start).length];
             for( int i = start; i < Ecology.history.size(); i++) {
             	double[] vals = Ecology.history.get(i);

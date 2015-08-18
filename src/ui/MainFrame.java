@@ -59,6 +59,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public boolean hushcomboBoxPopulation = false;
 	public boolean hushcomboBoxPrimaryKey = false;
 	public boolean hushcomboBoxDistrict = false;
+	public boolean hushcomboBoxCounty = false;
 
 	double mutation_rate_multiplier = 0.1;
 	public static double boundary_mutation_rate_multiplier = 0.4;
@@ -482,6 +483,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JLabel lblWastedVotesimbalance;
 	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
+	public JMenu mnConstraints;
+	public JMenuItem mntmWholeCounties;
+	public JComboBox comboBoxCounty;
+	public JLabel lblCountyColumn;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1255,6 +1260,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			ex.printStackTrace();
 		}
 
+		try {
+			String selected = (String)comboBoxCounty.getSelectedItem();
+			hushcomboBoxCounty = true;
+			comboBoxCounty.removeAllItems();
+			comboBoxCounty.addItem("");
+			
+			for( int i = 0; i < map_headers.length; i++) {
+				comboBoxCounty.addItem(map_headers[i]);
+			}
+			comboBoxCounty.setSelectedItem(selected);
+			hushcomboBoxCounty = false;
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+
 		//comboBoxPopulation.setSelectedIndex(0);
 		
 	}
@@ -1962,7 +1983,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				openProjectFile(fd,false);
 			}
 		});
-		mnFile.add(mntmOpenProjectFile);
+		//mnFile.add(mntmOpenProjectFile);
 		
 		mntmSaveProjectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -2002,11 +2023,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				openProjectFile(fd,true);
 			}
 		});
-		mnFile.add(mntmOpenProjectFile_1);
-		mnFile.add(mntmSaveProjectFile);
+		//mnFile.add(mntmOpenProjectFile_1);
+		//mnFile.add(mntmSaveProjectFile);
 		
 		JSeparator separator = new JSeparator();
-		mnFile.add(separator);
+		//mnFile.add(separator);
 		
 		mnFile.add(mntmOpenGeojson);
 		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
@@ -2113,7 +2134,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent arg0) {
 				String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
 				if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
-					options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (in separate dbase file)",".dbf (in original shapefile)"};
+					options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)"};//,".dbf (in separate dbase file)",".dbf (in original shapefile)"};
 				}
 				int opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
 				if( opt < 0) {
@@ -2400,6 +2421,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnEvolution.add(chckbxmntmAutoAnneal);
 		mnEvolution.add(chckbxmntmReplaceAll);
 		mnEvolution.add(chckbxmntmMutateAll);
+		
+		mnConstraints = new JMenu("Constraints");
+		menuBar.add(mnConstraints);
+		
+		mntmWholeCounties = new JMenuItem("Whole counties");
+		mntmWholeCounties.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(mainframe,"Not implemented.");
+			}
+		});
+		mnConstraints.add(mntmWholeCounties);
 		
 		JMenu mnView = new JMenu("View");
 		menuBar.add(mnView);
@@ -2788,7 +2820,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 318, 200, 166);
+		panel_3.setBounds(0, 360, 200, 166);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -3030,6 +3062,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		btnNewButton.setBounds(12, 246, 174, 23);
 		panel.add(btnNewButton);
+		
+		comboBoxCounty = new JComboBox();
+		comboBoxCounty.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if( hushcomboBoxCounty) {
+					return;
+				}
+				project.county_column = (String)comboBoxCounty.getSelectedItem();
+				
+			}
+		});
+		comboBoxCounty.setBounds(8, 299, 178, 20);
+		panel.add(comboBoxCounty);
+		
+		lblCountyColumn = new JLabel("County column");
+		lblCountyColumn.setBounds(8, 280, 182, 16);
+		panel.add(lblCountyColumn);
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;

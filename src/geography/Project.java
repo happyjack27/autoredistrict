@@ -27,6 +27,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	public String primary_key_column = "";
 	public String population_column = "";
 	public String district_column = "";
+	public String county_column = "";
 	
 	public Vector<String> demographic_columns = new Vector<String>();
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
@@ -38,6 +39,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	public double voting_power_weight = 0.5;
 	public double representation_weight = 0.5;
 	public boolean equalize_turnout = false;
+	
 
 	public void post_deserialize() {
 		super.post_deserialize();

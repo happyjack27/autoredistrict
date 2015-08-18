@@ -43,6 +43,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();	
 	
+	Vector<String> locked_counties = new Vector<String>();
+	
 	public String[] getHeaders() {
 		String[] headers;
 		if( features == null || features.size() < 1) {
