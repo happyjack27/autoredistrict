@@ -193,7 +193,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 }
             }
         }
-        if( mutate_disconnected && prob >= 0) {
+        if( mutate_disconnected && prob >= 0) { 
         	mutate_all_disconnected(0.2);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }
