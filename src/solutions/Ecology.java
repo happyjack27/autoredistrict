@@ -430,8 +430,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         double geo_total = weights[0]+weights[2]+weights[3];
         double fair_total = weights[1]+weights[4]+weights[5]+weights[6];
         
-        double geometric_mult = geometry_weight_multiplier*Settings.geo_or_fair_balance_weight/geo_total;
-        double fairness_mult = fairness_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/fair_total;
+        double geometric_mult = geometry_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/geo_total;
+        double fairness_mult = fairness_weight_multiplier*(Settings.geo_or_fair_balance_weight)/fair_total;
         
         weights = new double[]{
         		weights[0]*geometric_mult, 

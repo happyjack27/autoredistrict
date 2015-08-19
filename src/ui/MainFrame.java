@@ -3129,6 +3129,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmMutateAll.setSelected(Settings.mutate_all);
 		
 		chckbxmntmMutateDisconnected = new JCheckBoxMenuItem("Mutate disconnected");
+		chckbxmntmMutateDisconnected.setSelected(true);
 		chckbxmntmMutateDisconnected.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				DistrictMap.mutate_disconnected = chckbxmntmMutateDisconnected.isSelected();
