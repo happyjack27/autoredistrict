@@ -415,17 +415,32 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("  weighing fairness...");
         
-        double fairness_weight_multiplier = 0.5;
-        double geometry_weight_multiplier = 1;
+        double fairness_weight_multiplier = 1;//0.5;
+        double geometry_weight_multiplier = 2;
 
         double[] weights = new double[]{
-        		Settings.geometry_weight                *2.0*geometry_weight_multiplier, 
-        		Settings.disenfranchise_weight          *1.0*fairness_weight_multiplier, 
-        		Settings.population_balance_weight      *1.0*geometry_weight_multiplier,//*2.0,
-                Settings.disconnected_population_weight *2.0*geometry_weight_multiplier,//1.5,
-                Settings.voting_power_balance_weight    *1.0*fairness_weight_multiplier,
-                Settings.wasted_votes_total_weight      *1.0*fairness_weight_multiplier,
-                Settings.wasted_votes_imbalance_weight  *1.0*fairness_weight_multiplier,
+        		Settings.geometry_weight                *1.0, 
+        		Settings.disenfranchise_weight          *2.0, 
+        		Settings.population_balance_weight      *0.5,
+                Settings.disconnected_population_weight *1.0,
+                Settings.voting_power_balance_weight    *1.0,
+                Settings.wasted_votes_total_weight      *1.0,
+                Settings.wasted_votes_imbalance_weight  *1.0,
+        };
+        double geo_total = weights[0]+weights[2]+weights[3];
+        double fair_total = weights[1]+weights[4]+weights[5]+weights[6];
+        
+        double geometric_mult = geometry_weight_multiplier*Settings.geo_or_fair_balance_weight/geo_total;
+        double fairness_mult = fairness_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/fair_total;
+        
+        weights = new double[]{
+        		weights[0]*geometric_mult, 
+        		weights[1]*fairness_mult, 
+        		weights[2]*geometric_mult,
+        		weights[3]*geometric_mult,
+        		weights[4]*fairness_mult,
+        		weights[5]*fairness_mult,
+        		weights[6]*fairness_mult,
         };
 
         for( int j = 0; j < population.size(); j++) {

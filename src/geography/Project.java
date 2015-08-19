@@ -37,6 +37,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	public double population_balance_weight = 0.5;
 	public double border_length_weight = 0.5;
 	public double voting_power_weight = 0.5;
+	public double geo_or_fair_balance_weight = 0.5;
 	public double representation_weight = 0.5;
 	public boolean equalize_turnout = false;
 	
@@ -161,6 +162,7 @@ public class Project extends ReflectionJSONObject<Project> {
 
 	@Override
 	public void pre_serialize() {
+		geo_or_fair_balance_weight = Settings.geo_or_fair_balance_weight;
 		voting_power_weight = Settings.voting_power_balance_weight;
 		disconnected_weight = Settings.disconnected_population_weight;
 		population_balance_weight = Settings.population_balance_weight;

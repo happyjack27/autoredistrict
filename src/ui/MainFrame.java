@@ -487,6 +487,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmWholeCounties;
 	public JComboBox comboBoxCounty;
 	public JLabel lblCountyColumn;
+	public JLabel lblGeometricFairness;
+	public JSlider sliderBalance;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1917,6 +1919,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
+		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
 		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
@@ -2761,7 +2764,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(200, 49, 200, 258);
+		panel_2.setBounds(200, 61, 200, 258);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -2772,7 +2775,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderBorderLength.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderBorderLength);
 		
-		JLabel lblEvolutionaryPressure = new JLabel("Practical criteria");
+		JLabel lblEvolutionaryPressure = new JLabel("Geometric criteria");
 		lblEvolutionaryPressure.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblEvolutionaryPressure.setBounds(6, 9, 179, 16);
 		panel_2.add(lblEvolutionaryPressure);
@@ -3079,6 +3082,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblCountyColumn = new JLabel("County column");
 		lblCountyColumn.setBounds(8, 280, 182, 16);
 		panel.add(lblCountyColumn);
+		
+		lblGeometricFairness = new JLabel("Geometric <====> Fairness");
+		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
+		lblGeometricFairness.setBounds(210, 17, 180, 16);
+		panel.add(lblGeometricFairness);
+		
+		sliderBalance = new JSlider();
+		sliderBalance.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
+			}
+		});
+		sliderBalance.setBounds(208, 32, 182, 29);
+		panel.add(sliderBalance);
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
