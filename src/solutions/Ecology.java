@@ -587,7 +587,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             if(Settings.mutation_boundary_rate > 0) {
             	dm.mutate_boundary(Settings.mutation_boundary_rate);
             }
-            dm.fillDistrictwards();
         }
         if( DistrictMap.mutate_disconnected) {
 	        for(int i =  0; i < population.size(); i++) {
@@ -595,6 +594,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        	dm.mutate_all_disconnected(0.25);
 	            dm.fillDistrictwards();
 	        }
+        } else {
+	        for(int i =  0; i < population.size(); i++) {
+	            DistrictMap dm = population.get(i);
+	            dm.fillDistrictwards();
+	        }
+        	
         }
         if( Settings.make_unique) {
         	make_unique();
