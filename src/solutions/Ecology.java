@@ -419,11 +419,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         double geometry_weight_multiplier = 1;
 
         double[] weights = new double[]{
-        		Settings.geometry_weight                *1.5*geometry_weight_multiplier, 
-        		Settings.disenfranchise_weight          *0.5*fairness_weight_multiplier, 
+        		Settings.geometry_weight                *2.0*geometry_weight_multiplier, 
+        		Settings.disenfranchise_weight          *1.0*fairness_weight_multiplier, 
         		Settings.population_balance_weight      *1.0*geometry_weight_multiplier,//*2.0,
                 Settings.disconnected_population_weight *2.0*geometry_weight_multiplier,//1.5,
-                Settings.voting_power_balance_weight    *0.5*fairness_weight_multiplier,
+                Settings.voting_power_balance_weight    *1.0*fairness_weight_multiplier,
                 Settings.wasted_votes_total_weight      *1.0*fairness_weight_multiplier,
                 Settings.wasted_votes_imbalance_weight  *1.0*fairness_weight_multiplier,
         };

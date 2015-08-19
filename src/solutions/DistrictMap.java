@@ -806,7 +806,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	    double total_by_party = 0;
     	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
     	    	wasted_votes_by_party[i] /= Settings.num_elections_simulated;;
-    	    	total_by_party += wasted_votes_by_district[i];
+    	    	total_by_party += wasted_votes_by_party[i];
     	    }
     	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
     	    	wasted_votes_by_district[i] /= Settings.num_elections_simulated;
