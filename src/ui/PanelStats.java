@@ -44,6 +44,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		DecimalFormat integer = new DecimalFormat("###,###,###,###,##0");
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
+		try {
 		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
 		label_1.setText(""+integer.format(dm.fairnessScores[3]));
 		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
@@ -79,6 +80,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				0,
 				
 		});
+		} catch (Exception ex) {
+			System.out.println("ex ad "+ex);
+			ex.printStackTrace();
+		}
+
 		
 		try {
 			
@@ -157,12 +163,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			TableModel tm2 = new DefaultTableModel(cdata,ccolumns);
 			table_1.setModel(tm2);
 		} catch (Exception ex) {
+			System.out.println("ex ad "+ex);
 			ex.printStackTrace();
 		}
 		
 		this.invalidate();
 		this.repaint();
 		} catch (Exception ex) {
+			System.out.println("ex af "+ex);
 			ex.printStackTrace();
 		}
 	}

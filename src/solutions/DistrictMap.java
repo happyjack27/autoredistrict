@@ -625,6 +625,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
     //all measures should be minimized.
     public void calcFairnessScores() {//border_length_area_weighted
+    	try {
     	
     	long time0 = System.currentTimeMillis();    
     	long wasted_votes = 0;
@@ -891,6 +892,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	metrics[7] += 0;//time11-time10; //
     	metrics[8] += 0;//time12-time11;
     	metrics[9] += 0;//time2-time12;
+    	} catch (Exception ex) {
+    		System.out.println("ex ab "+ex);
+    		ex.printStackTrace();
+    	}
     }
     public double getMaxPopDiff() {
     	double min = -1;

@@ -131,7 +131,7 @@ public class PanelGraphDrawArea extends JPanel {
             }
 
         } else {
-        	System.out.println("no history found!");
+        	System.out.println("no history found! "+Ecology.history);
         }
     }
 
