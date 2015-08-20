@@ -157,58 +157,61 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
 	}
 
-	class ExportCustomThread extends FileThread {
-		ExportCustomThread(File f) { super(f); }
+	class ExportCustomThread extends Thread {
+		ExportCustomThread() { super(); }
+		public void init() {
+			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
+			JFileChooser jfc = new JFileChooser();
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+			jfc.showOpenDialog(null);
+			f = jfc.getSelectedFile();
+			if( f == null)  {
+				return;
+			}
+			String fn = f.getName();
+			String ext = fn.substring(fn.length()-3).toLowerCase();
+			if( !ext.equals("dbf")) {
+				JOptionPane.showMessageDialog(null, "File format not recognized.");
+				return;
+			}
+			
+			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
+			JFileChooser jfc2 = new JFileChooser();
+			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
+			jfc2.showSaveDialog(null);
+			foutput = jfc2.getSelectedFile();
+			if( foutput == null)  {
+				return;
+			}
+			try {
+				System.out.println("creating..."+foutput.getAbsolutePath());
+				fos = new FileOutputStream(foutput);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			
+			//select columns to deaggregate
+			dlg = new DialogSelectLayers();
+			dlg.setData(featureCollection,new Vector<String>());
+			dlg.show();
+			if( !dlg.ok) {
+				//if( is_evolving) { featureCollection.ecology.startEvolving(); }
+				return;
+			}
+			//(select wether to put number as is or divide by points
+			bdivide = JOptionPane.showConfirmDialog(mainframe, "Divide values by number of points?") == JOptionPane.YES_OPTION;
+			
+			this.start();
+		}
+		File f;
+		File foutput;
+		boolean bdivide;
+		DialogSelectLayers dlg;
+		FileOutputStream fos = null;
+		
+
     	public void run() { 
     		try {
-    			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
-				JFileChooser jfc = new JFileChooser();
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				if( f == null)  {
-					return;
-				}
-				String fn = f.getName();
-				String ext = fn.substring(fn.length()-3).toLowerCase();
-				if( !ext.equals("dbf")) {
-					JOptionPane.showMessageDialog(null, "File format not recognized.");
-					return;
-				}
-				
-    			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
-				JFileChooser jfc2 = new JFileChooser();
-				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
-				jfc2.showSaveDialog(null);
-				File foutput = jfc2.getSelectedFile();
-				if( foutput == null)  {
-					return;
-				}
-				FileOutputStream fos = null;
-				try {
-					System.out.println("creating..."+foutput.getAbsolutePath());
-					fos = new FileOutputStream(foutput);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				
-				
-				
-				//select columns to deaggregate
-				DialogSelectLayers dlg = new DialogSelectLayers();
-				dlg.setData(featureCollection,new Vector<String>());
-				dlg.show();
-				if( !dlg.ok) {
-					//if( is_evolving) { featureCollection.ecology.startEvolving(); }
-					return;
-				}
-				//(select wether to put number as is or divide by points
-				boolean bdivide = JOptionPane.showConfirmDialog(mainframe, "Divide values by number of points?") == JOptionPane.YES_OPTION;
-
-
-				//do it
-    			
-    			
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading file...");
 	    		
@@ -632,16 +635,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class LoadCensusFileThread extends Thread {
+		File f;
 		LoadCensusFileThread() { super(); }
+		public void init() {
+			JFileChooser jfc = new JFileChooser();
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+			jfc.showOpenDialog(null);
+			f = jfc.getSelectedFile();
+			if( f == null)  {
+				return;
+			}
+			start();
+		}
     	public void run() { 
     		try {
-    			JFileChooser jfc = new JFileChooser();
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				if( f == null)  {
-					return;
-				}
 				String fn = f.getName();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
 				if( !ext.equals("dbf")) {
@@ -694,6 +701,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						col_lon = i;
 					}
 				}
+				if( col_pop < 0) {
+					col_pop = 0;
+				}
 				String opt = (String)JOptionPane.showInputDialog(mainframe, "Select the column with the population in it.", "Select population column.", 0, null, dh.header, dh.header[col_pop]);
 				if( opt == null)
 					return;
@@ -707,6 +717,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				if( col_pop < 0 || col_lat < 0 || col_lon < 0) {
 					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+					dlg.setVisible(false);
 					return;
 				}
 
@@ -894,18 +905,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ImportAggregateCustom extends Thread {
+		File f;
 		ImportAggregateCustom() { super(); }
+		public void init() {
+			JFileChooser jfc = new JFileChooser();
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+			jfc.showOpenDialog(null);
+			f = jfc.getSelectedFile();
+			if( f == null)  {
+				return;
+			}
+			
+			start();
+		}
     	public void run() {
     		try {
-    			JFileChooser jfc = new JFileChooser();
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				if( f == null)  {
-					return;
-				}
 				String fn = f.getName();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
 				DataAndHeader dh = new DataAndHeader();
@@ -2367,7 +2383,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportCensusData = new JMenuItem("Import Census Data");
 		mntmImportCensusData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new LoadCensusFileThread().start();
+				new LoadCensusFileThread().init();
 			}
 		});
 		mntmOpenWktTabdelimited.addActionListener(new ActionListener() {
@@ -2409,7 +2425,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( fd == null) {
 					return;
 				}*/
-				new ExportCustomThread(null).start();
+				new ExportCustomThread().init();
 			}				
 		});
 		
