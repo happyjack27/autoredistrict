@@ -156,6 +156,321 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		this.f = f;
     	}
 	}
+
+	class ExportCustomThread extends FileThread {
+		ExportCustomThread(File f) { super(f); }
+    	public void run() { 
+    		try {
+    			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
+				JFileChooser jfc = new JFileChooser();
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				String fn = f.getName();
+				String ext = fn.substring(fn.length()-3).toLowerCase();
+				if( !ext.equals("dbf")) {
+					JOptionPane.showMessageDialog(null, "File format not recognized.");
+					return;
+				}
+				
+    			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
+				JFileChooser jfc2 = new JFileChooser();
+				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
+				jfc2.showSaveDialog(null);
+				File foutput = jfc2.getSelectedFile();
+				if( foutput == null)  {
+					return;
+				}
+				FileOutputStream fos = null;
+				try {
+					System.out.println("creating..."+foutput.getAbsolutePath());
+					fos = new FileOutputStream(foutput);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				
+				
+				
+				//select columns to deaggregate
+				DialogSelectLayers dlg = new DialogSelectLayers();
+				dlg.setData(featureCollection,new Vector<String>());
+				dlg.show();
+				if( !dlg.ok) {
+					//if( is_evolving) { featureCollection.ecology.startEvolving(); }
+					return;
+				}
+				//(select wether to put number as is or divide by points
+				boolean bdivide = JOptionPane.showConfirmDialog(mainframe, "Divide values by number of points?") == JOptionPane.YES_OPTION;
+
+
+				//do it
+    			
+    			
+	    		dlg.setVisible(true);
+	    		dlbl.setText("Loading file...");
+	    		
+
+				String dbfname = f.getAbsolutePath();
+				//count number of points in each precinct
+	    		double[] points = getCounts(dbfname,bdivide);
+ 
+	
+				DBFReader dbfreader;
+				try {
+					dbfreader = new DBFReader(dbfname);
+				} catch (JDBFException e1) {
+					e1.printStackTrace();
+					return;
+				}
+				DataAndHeader dh = new DataAndHeader();
+				
+				int col_lat = -1;
+				int col_lon = -1;
+				int col_geoid = -1;
+				
+	    		dlbl.setText("Reading header...");
+
+				dh.header = new String[dbfreader.getFieldCount()];
+				for( int i = 0; i < dh.header.length; i++) {
+					dh.header[i] = dbfreader.getField(i).getName();
+					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+						col_geoid = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+						col_lat = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+						col_lon = i;
+					}
+				}
+				if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
+					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+					return;
+				}
+
+	    		dlbl.setText("Making polygons...");
+
+				
+				int count = 0;
+	    		for( Feature feat : featureCollection.features) {
+	    			feat.geometry.makePolysFull();
+	    		}
+	    		
+	    		dlbl.setText("Doing hit tests...");
+	    		Collections.sort(featureCollection.features);
+	    		
+    			String s0 = "GEOID";
+    			for(int i = 0; i < dlg.in.size(); i++) {
+    				s0 += ","+dlg.in.get(i);
+    			}
+				try {
+					//System.out.println("writing...");
+					fos.write((s0+"\n").getBytes());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+					return;
+				}
+
+
+
+			    while (dbfreader.hasNextRecord()) {
+			    	try {
+			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+			    		String[] ss = new String[oo.length];
+			    		for( int i = 0; i < oo.length; i++) {
+			    			ss[i] = oo[i].toString();
+			    		}
+			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+			    		String geoid = ss[col_geoid];
+			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+			    		
+			    		Feature feat = getHit(dlon,dlat);
+			    		
+			    		if( feat == null) {
+			    			System.out.print("x");
+			    		} else {
+			    			String s = ""+geoid;
+			    			for(int i = 0; i < dlg.in.size(); i++) {
+			    				String str = feat.properties.getString(dlg.in.get(i));
+	    						if( !bdivide) {
+				    				s += ","+str;
+	    						} else {
+	    							double d = Double.parseDouble(str)/points[feat.ward.id];
+	    							s += ","+d;
+	    						}
+			    			}
+
+	    					
+	    					try {
+	    						//System.out.println("writing...");
+	    						fos.write((s+"\n").getBytes());
+	    					} catch (Exception e) {
+	    						// TODO Auto-generated catch block
+	    						e.printStackTrace();
+	    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+	    						return;
+	    					}
+			    			
+			    		}
+			    		
+			    		count++; 
+			    		if( count % 100 == 0) {
+			    			System.out.print(".");
+				    		dlbl.setText("Doing hit tests... "+count);
+			    		}
+			    		if( count % (100*100) == 0) {
+			    			System.out.println(""+count);
+
+							try {
+								fos.flush();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+			    		}
+					} catch (Exception e) {
+						// TODO Auto-generated catch ward
+						e.printStackTrace();
+					}
+			    }
+			    
+	    		dlbl.setText("Finalizing...");
+				try {
+					fos.flush();
+					System.out.println("closing...");
+					fos.close();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+					return;
+				} 
+
+	    		
+	    		dlg.setVisible(false);
+	    		JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+
+	    double[] getCounts(String dbfname, boolean bdivide) {
+			double[] points = new double[featureCollection.features.size()];
+			for(int i = 0; i < points.length; i++) {
+				points[i] = bdivide ? 0.0 : 1.0;
+			}
+			if( !bdivide) {
+				return points;
+			}
+	
+			DBFReader dbfreader;
+			try {
+				dbfreader = new DBFReader(dbfname);
+			} catch (JDBFException e1) {
+				e1.printStackTrace();
+				return points;
+			}
+			DataAndHeader dh = new DataAndHeader();
+			
+			int col_lat = -1;
+			int col_lon = -1;
+			int col_geoid = -1;
+			
+			dlbl.setText("Reading header...");
+	
+			dh.header = new String[dbfreader.getFieldCount()];
+			for( int i = 0; i < dh.header.length; i++) {
+				dh.header[i] = dbfreader.getField(i).getName();
+				if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+					col_geoid = i;
+				}
+				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+					col_lat = i;
+				}
+				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+					col_lon = i;
+				}
+			}
+			if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
+				JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+				return points;
+			}
+	
+			dlbl.setText("Making polygons...");
+	
+			
+			int count = 0;
+			for( Feature feat : featureCollection.features) {
+				feat.geometry.makePolysFull();
+			}
+			
+			dlbl.setText("Doing hit tests...");
+			Collections.sort(featureCollection.features);
+	
+	
+		    while (dbfreader.hasNextRecord()) {
+		    	try {
+		    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+		    		String[] ss = new String[oo.length];
+		    		for( int i = 0; i < oo.length; i++) {
+		    			ss[i] = oo[i].toString();
+		    		}
+		    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+		    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+		    		String geoid = ss[col_geoid];
+		    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+		    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+		    		
+		    		Feature feat = getHit(dlon,dlat);
+		    		
+		    		if( feat == null) {
+		    			System.out.print("x");
+		    		} else {
+		    			points[feat.ward.id]++;
+						//String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+						
+						try {
+							//System.out.println("writing...");
+							//fos.write((""+geoid+","+district+"\n").getBytes());
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+							return points;
+						}
+		    			
+		    		}
+		    		
+		    		count++; 
+		    		if( count % 100 == 0) {
+		    			System.out.print(".");
+			    		dlbl.setText("Doing hit tests... "+count);
+		    		}
+		    		if( count % (100*100) == 0) {
+		    			System.out.println(""+count);
+	
+						try {
+							//fos.flush();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+		    		}
+				} catch (Exception e) {
+					// TODO Auto-generated catch ward
+					e.printStackTrace();
+				}
+		    }
+		    return points;
+	    }
+	}
+
 	class ExportToBlockLevelThread extends Thread {
 		ExportToBlockLevelThread() { super(); }
     	public void run() { 
@@ -2082,6 +2397,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnFile.add(separator_2);
 		mnFile.add(mntmExportToBlock);
+		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				/*
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Dbase file", "dbf");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}*/
+				new ExportCustomThread(null).start();
+			}				
+		});
 		
 		mnFile.add(mntmExportAndDeaggregate);
 		
