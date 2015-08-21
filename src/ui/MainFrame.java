@@ -160,6 +160,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ExportCustomThread extends Thread {
+		File f;
+		File foutput;
+		boolean bdivide;
+		DialogSelectLayers dlgselect;
+		FileOutputStream fos = null;
+		String delimiter = "\t";
+
 		ExportCustomThread() { super(); }
 		public void init() {
 			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
@@ -185,6 +192,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( foutput == null)  {
 				return;
 			}
+			String fullname = foutput.getPath();
+			String extension = fullname.substring(fullname.length()-4).toLowerCase();
+			if( extension.equals(".txt") || extension.equals(".tsv")) {
+				delimiter = "\t";
+			} else 
+			if( extension.equals(".csv")) {
+				delimiter = ",";
+			}
 			try {
 				System.out.println("creating..."+foutput.getAbsolutePath());
 				fos = new FileOutputStream(foutput);
@@ -193,10 +208,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			
 			//select columns to deaggregate
-			dlg = new DialogSelectLayers();
-			dlg.setData(featureCollection,new Vector<String>());
-			dlg.show();
-			if( !dlg.ok) {
+			dlgselect = new DialogSelectLayers();
+			dlgselect.setData(featureCollection,new Vector<String>());
+			dlgselect.show();
+			if( !dlgselect.ok) {
 				//if( is_evolving) { featureCollection.ecology.startEvolving(); }
 				return;
 			}
@@ -205,11 +220,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			this.start();
 		}
-		File f;
-		File foutput;
-		boolean bdivide;
-		DialogSelectLayers dlg;
-		FileOutputStream fos = null;
+
 		
 
     	public void run() { 
@@ -267,9 +278,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlbl.setText("Doing hit tests...");
 	    		Collections.sort(featureCollection.features);
 	    		
-    			String s0 = "GEOID";
-    			for(int i = 0; i < dlg.in.size(); i++) {
-    				s0 += ","+dlg.in.get(i);
+
+    			String s0 = "GEOID"+delimiter+"INTPTLAT"+delimiter+"INTPTLON";
+    			for(int i = 0; i < dlgselect.in.size(); i++) {
+    				s0 += delimiter+dlgselect.in.get(i);
     			}
 				try {
 					//System.out.println("writing...");
@@ -298,18 +310,44 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		
 			    		Feature feat = getHit(dlon,dlat);
 			    		
+			    		
 			    		if( feat == null) {
 			    			System.out.print("x");
 			    		} else {
-			    			String s = ""+geoid;
-			    			for(int i = 0; i < dlg.in.size(); i++) {
-			    				String str = feat.properties.getString(dlg.in.get(i));
-	    						if( !bdivide) {
-				    				s += ","+str;
-	    						} else {
-	    							double d = Double.parseDouble(str)/points[feat.ward.id];
-	    							s += ","+d;
-	    						}
+			    			String s = ""+geoid+delimiter+dlat+delimiter+dlon;
+			    			for(int i = 0; i < dlgselect.in.size(); i++) {
+			    				try {
+			    					String key = dlgselect.in.get(i);
+		    						if( !bdivide) {
+		    							try {
+						    				Object str = feat.properties.get(key);
+						    				if( str instanceof Double) {
+						    					s += delimiter+((Double)str);
+						    					
+						    				} else {
+						    					s += delimiter+str;
+						    				}
+		    							} catch (Exception ex) {
+		    								ex.printStackTrace();
+		    							}
+		    						} else {
+		    							try {
+						    				Object str = feat.properties.get(key);
+						    				if( str instanceof Double) {
+						    					s += delimiter+(((Double)str)/points[feat.ward.id]);
+						    				} else {
+				    							double d = Double.parseDouble(str.toString())/points[feat.ward.id];
+				    							s += delimiter+d;
+						    				}
+		    							} catch (Exception ex) {
+		    								ex.printStackTrace();
+		    							}
+		    						}
+			    				} catch (Exception ex) {
+			    					System.out.println("ex aa: "+ex);
+			    					ex.printStackTrace();
+			    					System.exit(0);
+			    				}
 			    			}
 
 	    					
@@ -367,111 +405,120 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
 
 	    double[] getCounts(String dbfname, boolean bdivide) {
+	    	System.out.println("getting counts...");
 			double[] points = new double[featureCollection.features.size()];
-			for(int i = 0; i < points.length; i++) {
-				points[i] = bdivide ? 0.0 : 1.0;
-			}
-			if( !bdivide) {
-				return points;
-			}
-	
-			DBFReader dbfreader;
-			try {
-				dbfreader = new DBFReader(dbfname);
-			} catch (JDBFException e1) {
-				e1.printStackTrace();
-				return points;
-			}
-			DataAndHeader dh = new DataAndHeader();
-			
-			int col_lat = -1;
-			int col_lon = -1;
-			int col_geoid = -1;
-			
-			dlbl.setText("Reading header...");
-	
-			dh.header = new String[dbfreader.getFieldCount()];
-			for( int i = 0; i < dh.header.length; i++) {
-				dh.header[i] = dbfreader.getField(i).getName();
-				if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
-					col_geoid = i;
+	    	try {
+				for(int i = 0; i < points.length; i++) {
+					points[i] = bdivide ? 0.0 : 1.0;
 				}
-				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
-					col_lat = i;
+				if( !bdivide) {
+					return points;
 				}
-				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
-					col_lon = i;
+		
+				DBFReader dbfreader;
+				try {
+					dbfreader = new DBFReader(dbfname);
+				} catch (JDBFException e1) {
+					e1.printStackTrace();
+					return points;
 				}
-			}
-			if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
-				JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
-				return points;
-			}
-	
-			dlbl.setText("Making polygons...");
-	
-			
-			int count = 0;
-			for( Feature feat : featureCollection.features) {
-				feat.geometry.makePolysFull();
-			}
-			
-			dlbl.setText("Doing hit tests...");
-			Collections.sort(featureCollection.features);
-	
-	
-		    while (dbfreader.hasNextRecord()) {
-		    	try {
-		    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
-		    		String[] ss = new String[oo.length];
-		    		for( int i = 0; i < oo.length; i++) {
-		    			ss[i] = oo[i].toString();
-		    		}
-		    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
-		    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-		    		String geoid = ss[col_geoid];
-		    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-		    		int ilon = (int)(dlon*Geometry.SCALELATLON);
-		    		
-		    		Feature feat = getHit(dlon,dlat);
-		    		
-		    		if( feat == null) {
-		    			System.out.print("x");
-		    		} else {
-		    			points[feat.ward.id]++;
-						//String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
-						
-						try {
-							//System.out.println("writing...");
-							//fos.write((""+geoid+","+district+"\n").getBytes());
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-							return points;
-						}
-		    			
-		    		}
-		    		
-		    		count++; 
-		    		if( count % 100 == 0) {
-		    			System.out.print(".");
-			    		dlbl.setText("Doing hit tests... "+count);
-		    		}
-		    		if( count % (100*100) == 0) {
-		    			System.out.println(""+count);
-	
-						try {
-							//fos.flush();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-		    		}
-				} catch (Exception e) {
-					// TODO Auto-generated catch ward
-					e.printStackTrace();
+				DataAndHeader dh = new DataAndHeader();
+				
+				int col_lat = -1;
+				int col_lon = -1;
+				int col_geoid = -1;
+				
+				dlbl.setText("Reading header...");
+		
+				dh.header = new String[dbfreader.getFieldCount()];
+				for( int i = 0; i < dh.header.length; i++) {
+					dh.header[i] = dbfreader.getField(i).getName();
+					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+						col_geoid = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+						col_lat = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+						col_lon = i;
+					}
 				}
-		    }
+				if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
+					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+					return points;
+				}
+		
+				dlbl.setText("Making polygons...");
+		
+				
+				int count = 0;
+				for( Feature feat : featureCollection.features) {
+					feat.geometry.makePolysFull();
+				}
+				
+				dlbl.setText("Doing hit tests...");
+				Collections.sort(featureCollection.features);
+		
+		
+			    while (dbfreader.hasNextRecord()) {
+			    	try {
+			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+			    		String[] ss = new String[oo.length];
+			    		for( int i = 0; i < oo.length; i++) {
+			    			ss[i] = oo[i].toString();
+			    		}
+			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+			    		String geoid = ss[col_geoid];
+			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+			    		
+			    		Feature feat = getHit(dlon,dlat);
+			    		
+			    		if( feat == null) {
+			    			System.out.print("x");
+			    		} else {
+			    			points[feat.ward.id]++;
+							//String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+							
+							try {
+								//System.out.println("writing...");
+								//fos.write((""+geoid+","+district+"\n").getBytes());
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+								JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+								return points;
+							}
+			    			
+			    		}
+			    		
+			    		count++; 
+			    		if( count % 100 == 0) {
+			    			System.out.print(".");
+				    		dlbl.setText("Doing hit tests... "+count);
+			    		}
+			    		if( count % (100*100) == 0) {
+			    			System.out.println(""+count);
+		
+							try {
+								//fos.flush();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+			    		}
+					} catch (Exception e) {
+						// TODO Auto-generated catch ward
+						e.printStackTrace();
+					}
+			    }
+			} catch (Exception ex) {
+				System.out.println("ex ac: "+ex);
+				ex.printStackTrace();
+				System.exit(0);
+			}
+			System.out.println("got counts.");
+		    
 		    return points;
 	    }
 	}
@@ -813,8 +860,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
-	public JComboBox comboBoxCounty;
-	public JLabel lblCountyColumn;
 	public JLabel lblGeometricFairness;
 	public JSlider sliderBalance;
 	Feature getHit(double dlon, double dlat) {
@@ -1595,6 +1640,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			ex.printStackTrace();
 		}
 
+		/*
 		try {
 			String selected = (String)comboBoxCounty.getSelectedItem();
 			hushcomboBoxCounty = true;
@@ -1610,6 +1656,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
 		}
+		*/
 
 		//comboBoxPopulation.setSelectedIndex(0);
 		
@@ -2399,7 +2446,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(separator_1);
 		mnFile.add(mntmImportCensusData);
 		
-		mntmExportToBlock = new JMenuItem("Export to block level");
+		mntmExportToBlock = new JMenuItem("Export districts to block level");
 		mntmExportToBlock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new ExportToBlockLevelThread().start();
@@ -2407,7 +2454,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mntmImportAggregate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new ImportAggregateCustom().start();
+				new ImportAggregateCustom().init();
 			}
 		});
 		
@@ -3345,7 +3392,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(8, 196, 182, 16);
+		lblDistrictColumn.setBounds(8, 230, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -3355,7 +3402,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(8, 215, 178, 20);
+		comboBoxDistrictColumn.setBounds(8, 249, 178, 20);
 		panel.add(comboBoxDistrictColumn);
 		
 		panel_4 = new JPanel();
@@ -3411,25 +3458,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				selectLayers();
 			}
 		});
-		btnNewButton.setBounds(12, 246, 174, 23);
+		btnNewButton.setBounds(6, 196, 174, 23);
 		panel.add(btnNewButton);
-		
-		comboBoxCounty = new JComboBox();
-		comboBoxCounty.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if( hushcomboBoxCounty) {
-					return;
-				}
-				project.county_column = (String)comboBoxCounty.getSelectedItem();
-				
-			}
-		});
-		comboBoxCounty.setBounds(8, 299, 178, 20);
-		panel.add(comboBoxCounty);
-		
-		lblCountyColumn = new JLabel("County column");
-		lblCountyColumn.setBounds(8, 280, 182, 16);
-		panel.add(lblCountyColumn);
 		
 		lblGeometricFairness = new JLabel("Geometric <====> Fairness");
 		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
