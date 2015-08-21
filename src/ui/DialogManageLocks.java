@@ -59,6 +59,24 @@ public class DialogManageLocks extends JDialog {
 				String[] ss = new String[feat.properties.keySet().size()];
 				feat.properties.keySet().toArray(ss);
 				
+				
+				String[] options = new String[]{"Current value","Majority vote"};
+				int ACCUMULATE = 0;
+				int OVERWRITE = 1;
+				int opt = JOptionPane.showOptionDialog(MainFrame.mainframe, "Lock to current values or makority vote?", "Select option", 0,0,null,options,options[0]);
+				if( opt < 0) {
+					System.out.println("aborted.");
+					return;
+				}
+
+				if(opt == OVERWRITE) {
+						
+				}
+				
+				resetLocks();
+				
+				//MainFrame.mainframe.featureCollection.locked_wards
+				
 				//"lock to current"," lock to majority vote'
 			}
 		});
@@ -67,8 +85,12 @@ public class DialogManageLocks extends JDialog {
 		getContentPane().add(btnAddLock);
 		btnRemoveLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if( list.getSelectedIndex() < 0) {
+					return;
+				}
 				locks.remove(list.getSelectedIndex());
 				list.setListData(locks);
+				resetLocks();
 			}
 		});
 		btnRemoveLock.setBounds(153, 6, 140, 29);
@@ -76,4 +98,9 @@ public class DialogManageLocks extends JDialog {
 		getContentPane().add(btnRemoveLock);
 
 	}
+	public void resetLocks() {
+		
+	}
+	
+
 }

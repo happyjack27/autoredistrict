@@ -38,6 +38,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static double xy = 1;
 	public static double dlonlat = 1;
 	
+	public boolean[] locked_wards = null;
+	
 	static int max_hues = 9;
 	
 	HashMap<Double,HashMap<Double,Vertex>> vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
