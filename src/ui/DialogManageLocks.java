@@ -15,8 +15,8 @@ public class DialogManageLocks extends JDialog {
 	public final JButton btnRemoveLock = new JButton("Remove lock");
 	//public String[] right_side = null;
 	
-	public DialogManageLocks(String title, String[] all, String[] right_side) {
-		setTitle(title);
+	public DialogManageLocks() {
+		setTitle("Manage Locks");
 		setModal(true);
 				
 		

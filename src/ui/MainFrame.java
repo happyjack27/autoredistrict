@@ -36,6 +36,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 	//======LOOPBACK
 	public static MainFrame mainframe;
+	public DialogManageLocks manageLocks = new DialogManageLocks();
+
 	
 	
 
