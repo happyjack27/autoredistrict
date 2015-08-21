@@ -974,7 +974,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						return;
 					}
 					
-					String[] options = new String[]{"Accumulate","Overwrite"};
+					String[] options = new String[]{"Accumulate","Majority vote"};
 					int ACCUMULATE = 0;
 					int OVERWRITE = 1;
 					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate or overwrite values?", "Select option", 0,0,null,options,options[0]);

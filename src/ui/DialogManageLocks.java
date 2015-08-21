@@ -8,6 +8,7 @@ import java.awt.event.*;
 import java.util.*;
 
 public class DialogManageLocks extends JDialog {
+	public Vector<String> locks = new Vector<String>();
 	public JList<String> list = new JList<String>();
 	public boolean ok = false;
 
@@ -37,6 +38,7 @@ public class DialogManageLocks extends JDialog {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				ok = false;
 				hide();
 			}
 		});
@@ -53,6 +55,11 @@ public class DialogManageLocks extends JDialog {
 
 		btnAddLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Feature feat = MainFrame.mainframe.featureCollection.features.get(0);
+				String[] ss = new String[feat.properties.keySet().size()];
+				feat.properties.keySet().toArray(ss);
+				
+				//"lock to current"," lock to majority vote'
 			}
 		});
 		btnAddLock.setBounds(10, 6, 140, 29);
@@ -60,6 +67,8 @@ public class DialogManageLocks extends JDialog {
 		getContentPane().add(btnAddLock);
 		btnRemoveLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				locks.remove(list.getSelectedIndex());
+				list.setListData(locks);
 			}
 		});
 		btnRemoveLock.setBounds(153, 6, 140, 29);
