@@ -98,6 +98,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
 	JMenuItem mntmExportData = new JMenuItem("Save data");
 	JMenuItem mntmImportData = new JMenuItem("Merge data");
+	JMenuItem mntmRenumber = new JMenuItem("Renumber districts");
 
 	//JMenu mnGeography = new JMenu("Geography");
 	JMenuItem mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
@@ -1344,6 +1345,39 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
     }
 	
+	public void renumber() {
+		boolean[] used = new boolean[Settings.num_districts];
+		for( int i = 0; i < used.length; i++) {
+			used[i] = false;
+		}
+		int[] renumbering = new int[Settings.num_districts];
+		for( int i = 0; i < renumbering.length; i++) {
+			String s = JOptionPane.showInputDialog("Enter new district number for district "+i+" (0-"+(Settings.num_districts-1)+"):");
+			if( s == null) {
+				return;
+			}
+			int newdist = Integer.parseInt(s);
+			while( newdist >= used.length || newdist < 0 || used[newdist]) {
+				s = JOptionPane.showInputDialog("That number has already been used or is out of range.\nEnter new district number for district "+i+" (0-"+(Settings.num_districts-1)+"):");
+				if( s == null) {
+					return;
+				}
+				newdist = Integer.parseInt(s);
+			}
+			used[newdist] = true;
+			renumbering[i] = newdist;
+ 		}
+		System.out.println("renumbering...");
+		for( DistrictMap dm : featureCollection.ecology.population) {
+			System.out.print(".");
+			for( int i = 0; i < dm.ward_districts.length; i++) {
+				dm.ward_districts[i] = renumbering[dm.ward_districts[i]];
+			}
+		}
+		System.out.println();
+		System.out.println("done.");
+	}
+	
 	class OpenWKTFileThread extends Thread {
 		OpenWKTFileThread() { super(); }
     	public void run() { 
@@ -1772,6 +1806,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportcsv.setEnabled(geo_loaded);
 		mntmExportcsv.setEnabled(geo_loaded);
 		mntmExportData.setEnabled(geo_loaded);
+		mntmRenumber.setEnabled(geo_loaded);
 		mntmSaveProjectFile.setEnabled(geo_loaded);
 
 		
@@ -2028,7 +2063,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    try {
 			FileInputStream is = new FileInputStream(f);
 			ValidationPreferences prefs = new ValidationPreferences();
-		    prefs.setMaxNumberOfPointsPerShape(32650);
+		    prefs.setMaxNumberOfPointsPerShape(32650*4);
+		    prefs.setAllowUnlimitedNumberOfPointsPerShape(true);
 		    //prefs.setMaxNumberOfPointsPerShape(16650);
 		    ShapeFileReader r = new ShapeFileReader(is, prefs);
 		    
@@ -2487,6 +2523,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//mnFile.add(mntmOpenElectionResults);
 		
 		
+		mntmRenumber.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				renumber();
+			}
+		});
+		mnFile.add(mntmRenumber);
 		mntmImportData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
@@ -2823,10 +2865,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnConstraints = new JMenu("Constraints");
 		menuBar.add(mnConstraints);
 		
-		mntmWholeCounties = new JMenuItem("Whole counties");
+		mntmWholeCounties = new JMenuItem("Manage Locks");
 		mntmWholeCounties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(mainframe,"Not implemented.");
+				manageLocks.show();
+				//JOptionPane.showMessageDialog(mainframe,"Not implemented.");
 			}
 		});
 		mnConstraints.add(mntmWholeCounties);

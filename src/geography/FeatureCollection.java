@@ -38,7 +38,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static double xy = 1;
 	public static double dlonlat = 1;
 	
-	public boolean[] locked_wards = null;
+	public static boolean[] locked_wards = null;
 	
 	static int max_hues = 9;
 	
@@ -302,6 +302,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				f.ward.neighbor_lengths = new double[]{total_length};
 			}
 		}
+		locked_wards = new boolean[precincts.size()];
+		for( int i = 0; i < locked_wards.length; i++) {
+			locked_wards[i] = false;
+		}
 		
 		/*
 		for( Feature f : features) {
@@ -368,6 +372,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	public void initEcology() {
 		ecology.wards = precincts;
+		locked_wards = new boolean[precincts.size()];
+		for( int i = 0; i < locked_wards.length; i++) {
+			locked_wards[i] = false;
+		}
+
 		//ecology.edges = edgeHash.values();
 		//ecology.vertexes = vertexes;
 	}

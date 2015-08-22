@@ -245,6 +245,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     int boundaries_tested = 2;
     int boundaries_mutated = 1;
     public void mutate_ward_boundary(int i, double prob, boolean count) {
+    	if( FeatureCollection.locked_wards[i]) {
+    		return;
+    	}
     	Ward ward = wards.get(i);
     	boolean border = false;
         for( Ward bn : ward.neighbors) {

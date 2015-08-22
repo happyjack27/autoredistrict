@@ -95,7 +95,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dcolumns[2] = "Winner";
 			dcolumns[3] = "Self-entropy";
 			
-			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
+			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Candidate.candidates.size()][];
 			
 			double[] elec_counts = new double[Candidate.candidates.size()];
@@ -152,6 +152,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						""+i,
 						""+integer.format(elec_counts[i]),
 						""+integer.format(vote_counts[i]*total_population/tot_votes),
+						""+(dm.wasted_votes_by_party[i]),
 						""+(elec_counts[i]/((double)(dm.districts.size()*Settings.members_per_district))),
 						""+(vote_counts[i]/tot_votes)
 				};
