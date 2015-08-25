@@ -314,6 +314,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		
 			    		if( feat == null) {
 			    			System.out.print("x");
+				    		System.out.println();
+				    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 			    		} else {
 			    			String s = ""+geoid+delimiter+dlat+delimiter+dlon;
 			    			for(int i = 0; i < dlgselect.in.size(); i++) {
@@ -478,6 +480,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		
 			    		if( feat == null) {
 			    			System.out.print("x");
+				    		System.out.println();
+				    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
+
 			    		} else {
 			    			points[feat.ward.id]++;
 							//String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
@@ -635,6 +640,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		
 				    		if( feat == null) {
 				    			System.out.print("x");
+					    		System.out.println();
+					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
 		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
 		    					
@@ -735,6 +742,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		
 				    		if( feat == null) {
 				    			System.out.print("x");
+					    		System.out.println();
+					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
 		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
 		    					
@@ -913,6 +922,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		Feature feat = getHit(dlon,dlat);
 			    		if( feat == null) {
 			    			System.out.print("x");
+				    		System.out.println("miss "+dlon+","+dlat+" ");
 			    		} else {
 	    					feat.ward.population += pop18;
 	    					feat.ward.has_census_results = true;
@@ -1191,7 +1201,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		
 				    			Feature feat = getHit(dlon,dlat);
 						    	if( feat == null) {
-						    		System.out.print("x");
+						    		System.out.println();
+						    		System.out.println("miss "+dlon+","+dlat+" ");
 						    	} else {
 			    					if( opt == OVERWRITE) { //overwrite
 			    						Integer integer = feat.properties.temp_hash.get(ss[col_indexes[0]]);
@@ -1745,10 +1756,37 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    	String[] coords = poly.split(",");
 					    	feature.geometry.coordinates[i] = new double[coords.length][2];
 						  
+					    	double lastx = 0;
+					    	double lasty = 0;
+					    	double firstx = 0;
+					    	double firsty = 0;
 							for( int j = 0; j < feature.geometry.coordinates[i].length; j++) {
 								String[] cc = coords[j].trim().split("\\s+");//(" ");
+								if( cc.length < 2) {
+									if( j == feature.geometry.coordinates[i].length-1) {
+										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using first");
+										feature.geometry.coordinates[i][j][0] = firstx;
+										feature.geometry.coordinates[i][j][1] = firsty;
+									} else {
+										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using last");
+										feature.geometry.coordinates[i][j][0] = lastx;
+										feature.geometry.coordinates[i][j][1] = lasty;
+										if( j == 0) {
+											firstx = feature.geometry.coordinates[i][j][0]; 
+											firsty = feature.geometry.coordinates[i][j][1]; 
+										}
+									}
+									continue;
+									
+								}
 								feature.geometry.coordinates[i][j][0] = Double.parseDouble(cc[0]);
 								feature.geometry.coordinates[i][j][1] = Double.parseDouble(cc[1]);
+								if( j == 0) {
+									firstx = feature.geometry.coordinates[i][j][0]; 
+									firsty = feature.geometry.coordinates[i][j][1]; 
+								}
+								lastx = feature.geometry.coordinates[i][j][0]; 
+								lastx = feature.geometry.coordinates[i][j][1]; 
 							}
 						}
 						feature.geometry.makePolysFull();
