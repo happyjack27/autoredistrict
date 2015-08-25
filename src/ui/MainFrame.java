@@ -608,6 +608,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		
 	    		dlbl.setText("Doing hit tests...");
 	    		Collections.sort(featureCollection.features);
+	    		
+	    		Hashtable<String,String> used = new Hashtable<String,String>(); 
 
 
 			    while (dbfreader.hasNextRecord()) {
@@ -620,6 +622,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 			    		String geoid = ss[col_geoid];
+			    		if( used.get(geoid) != null) {
+			    			System.out.println("duplicate geoid!: "+geoid);
+			    		}
+			    		used.put(geoid, geoid);
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
@@ -658,6 +664,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		}
 					} catch (Exception e) {
 						// TODO Auto-generated catch ward
+						System.out.println("ex x " +e);
 						e.printStackTrace();
 					}
 			    }
