@@ -528,9 +528,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ExportToBlockLevelThread() { super(); }
     	public void run() { 
     		try {
-    			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
+    			JOptionPane.showMessageDialog(mainframe, "Select the .dbf or .txt file with census block-level data.\n");
 				JFileChooser jfc = new JFileChooser();
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
 				jfc.showOpenDialog(null);
 				File f = jfc.getSelectedFile();
 				if( f == null)  {
@@ -538,7 +539,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				String fn = f.getName();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
-				if( !ext.equals("dbf")) {
+				if( !ext.equals("dbf") && !ext.equals("txt")) {
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
 				}
@@ -562,112 +563,215 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading file...");
+				if( ext.equals("dbf")) {
+	
+					String dbfname = f.getAbsolutePath();
+					
+					DBFReader dbfreader;
+					try {
+						dbfreader = new DBFReader(dbfname);
+					} catch (JDBFException e1) {
+						e1.printStackTrace();
+						return;
+					}
+					DataAndHeader dh = new DataAndHeader();
+					
+					int col_lat = -1;
+					int col_lon = -1;
+					int col_geoid = -1;
+					
+		    		dlbl.setText("Reading header...");
+	
+					dh.header = new String[dbfreader.getFieldCount()];
+					for( int i = 0; i < dh.header.length; i++) {
+						dh.header[i] = dbfreader.getField(i).getName();
+						if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+							col_geoid = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+							col_lat = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+							col_lon = i;
+						}
+					}
+					if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+						return;
+					}
+	
+		    		dlbl.setText("Making polygons...");
+	
+					
+					int count = 0;
+		    		for( Feature feat : featureCollection.features) {
+		    			feat.geometry.makePolysFull();
+		    		}
+		    		
+		    		dlbl.setText("Doing hit tests...");
+		    		Collections.sort(featureCollection.features);
+		    		
+		    		Hashtable<String,String> used = new Hashtable<String,String>(); 
+	
+	
+				    while (dbfreader.hasNextRecord()) {
+				    	try {
+				    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+				    		String[] ss = new String[oo.length];
+				    		for( int i = 0; i < oo.length; i++) {
+				    			ss[i] = oo[i].toString();
+				    		}
+				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+				    		String geoid = ss[col_geoid];
+				    		if( used.get(geoid) != null) {
+				    			System.out.println("duplicate geoid!: "+geoid);
+				    		}
+				    		used.put(geoid, geoid);
+				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+				    		
+				    		Feature feat = getHit(dlon,dlat);
+				    		
+				    		if( feat == null) {
+				    			System.out.print("x");
+				    		} else {
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+		    					
+		    					try {
+		    						//System.out.println("writing...");
+		    						fos.write((""+geoid+","+district+"\n").getBytes());
+		    					} catch (Exception e) {
+		    						// TODO Auto-generated catch block
+		    						e.printStackTrace();
+		    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+		    						return;
+		    					}
+				    			
+				    		}
+				    		
+				    		count++; 
+				    		if( count % 100 == 0) {
+				    			System.out.print(".");
+					    		dlbl.setText("Doing hit tests... "+count);
+				    		}
+				    		if( count % (100*100) == 0) {
+				    			System.out.println(""+count);
+	
+								try {
+									fos.flush();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+				    		}
+						} catch (Exception e) {
+							// TODO Auto-generated catch ward
+							System.out.println("ex x " +e);
+							e.printStackTrace();
+						}
+				    }
+				} else {
+					String delimiter = "\t";
+					FileReader fr = new FileReader(f);
+					BufferedReader br = new BufferedReader(fr);
+					DataAndHeader dh = new DataAndHeader();
+					dh.header = br.readLine().split(delimiter);
+					
+					//now select the columns
+		    		System.out.println("reading columns");
+					int col_lat = -1;
+					int col_lon = -1;
+					int col_geoid = -1;
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+							col_geoid = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+							col_lat = i;
+						}
+						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+							col_lon = i;
+						}
+					}
+					if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+						return;
+					}
+	
+		    		System.out.println("doing hit tests");
 
-				String dbfname = f.getAbsolutePath();
-				
-				DBFReader dbfreader;
-				try {
-					dbfreader = new DBFReader(dbfname);
-				} catch (JDBFException e1) {
-					e1.printStackTrace();
-					return;
+		    		dlbl.setText("Making polygons...");
+	
+					
+					int count = 0;
+		    		for( Feature feat : featureCollection.features) {
+		    			feat.geometry.makePolysFull();
+		    		}
+		    		
+		    		dlbl.setText("Doing hit tests...");
+		    		Collections.sort(featureCollection.features);
+		    		hits = 0;
+		    		misses = 0;
+		    		
+		    		Hashtable<String,String> used = new Hashtable<String,String>(); 
+	
+	
+		    		
+				    String line;
+				    while ((line = br.readLine()) != null) {
+				    	try {
+					    	String[] ss = line.split(delimiter);
+				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+				    		String geoid = ss[col_geoid];
+				    		if( used.get(geoid) != null) {
+				    			System.out.println("duplicate geoid!: "+geoid);
+				    		}
+				    		used.put(geoid, geoid);
+				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+				    		
+				    		Feature feat = getHit(dlon,dlat);
+				    		
+				    		if( feat == null) {
+				    			System.out.print("x");
+				    		} else {
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+		    					
+		    					try {
+		    						//System.out.println("writing...");
+		    						fos.write((""+geoid+","+district+"\n").getBytes());
+		    					} catch (Exception e) {
+		    						// TODO Auto-generated catch block
+		    						e.printStackTrace();
+		    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+		    						return;
+		    					}
+				    			
+				    		}
+				    		
+				    		count++; 
+				    		if( count % 100 == 0) {
+				    			System.out.print(".");
+					    		dlbl.setText("Doing hit tests... "+count);
+				    		}
+				    		if( count % (100*100) == 0) {
+				    			System.out.println(""+count);
+	
+								try {
+									fos.flush();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+				    		}
+						} catch (Exception e) {
+							// TODO Auto-generated catch ward
+							System.out.println("ex x " +e);
+							e.printStackTrace();
+						}
+				    }
+					
 				}
-				DataAndHeader dh = new DataAndHeader();
-				
-				int col_lat = -1;
-				int col_lon = -1;
-				int col_geoid = -1;
-				
-	    		dlbl.setText("Reading header...");
-
-				dh.header = new String[dbfreader.getFieldCount()];
-				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
-					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
-						col_geoid = i;
-					}
-					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
-						col_lat = i;
-					}
-					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
-						col_lon = i;
-					}
-				}
-				if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
-					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
-					return;
-				}
-
-	    		dlbl.setText("Making polygons...");
-
-				
-				int count = 0;
-	    		for( Feature feat : featureCollection.features) {
-	    			feat.geometry.makePolysFull();
-	    		}
-	    		
-	    		dlbl.setText("Doing hit tests...");
-	    		Collections.sort(featureCollection.features);
-	    		
-	    		Hashtable<String,String> used = new Hashtable<String,String>(); 
-
-
-			    while (dbfreader.hasNextRecord()) {
-			    	try {
-			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
-			    		String[] ss = new String[oo.length];
-			    		for( int i = 0; i < oo.length; i++) {
-			    			ss[i] = oo[i].toString();
-			    		}
-			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
-			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-			    		String geoid = ss[col_geoid];
-			    		if( used.get(geoid) != null) {
-			    			System.out.println("duplicate geoid!: "+geoid);
-			    		}
-			    		used.put(geoid, geoid);
-			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
-			    		
-			    		Feature feat = getHit(dlon,dlat);
-			    		
-			    		if( feat == null) {
-			    			System.out.print("x");
-			    		} else {
-	    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
-	    					
-	    					try {
-	    						//System.out.println("writing...");
-	    						fos.write((""+geoid+","+district+"\n").getBytes());
-	    					} catch (Exception e) {
-	    						// TODO Auto-generated catch block
-	    						e.printStackTrace();
-	    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-	    						return;
-	    					}
-			    			
-			    		}
-			    		
-			    		count++; 
-			    		if( count % 100 == 0) {
-			    			System.out.print(".");
-				    		dlbl.setText("Doing hit tests... "+count);
-			    		}
-			    		if( count % (100*100) == 0) {
-			    			System.out.println(""+count);
-
-							try {
-								fos.flush();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-			    		}
-					} catch (Exception e) {
-						// TODO Auto-generated catch ward
-						System.out.println("ex x " +e);
-						e.printStackTrace();
-					}
-			    }
 			    
 	    		dlbl.setText("Finalizing...");
 				try {
@@ -1469,7 +1573,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    	//mapline = mapline.substring(0,mapline.length()-1);
 				    	String[] polygons = mapline.split("\\(\\(");
 				    	if( polygons.length > 1) {
-				    		System.out.println("found "+polygons.length+" polys");
+				    		//System.out.println("found "+polygons.length+" polys");
 				    	}
 				    	
 						Feature feature = new Feature();
@@ -1489,7 +1593,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						for( int i = 0; i < polygons.length; i++) {
 					    	String poly = polygons[i].split("\\)")[0];
 					    	if(polygons[i].split("\\)").length > 1) {
-					    		System.out.println("found "+polygons[i].split("\\)").length + " )'s");
+					    		//System.out.println("found "+polygons[i].split("\\)").length + " )'s");
 					    	}
 					    	while( poly.charAt(0) == '(') {
 					    		poly = poly.substring(1);
@@ -1621,7 +1725,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    	//mapline = mapline.substring(0,mapline.length()-1);
 				    	String[] polygons = mapline.split("\\(\\(");
 				    	if( polygons.length > 1) {
-				    		System.out.println("found "+polygons.length+" polys");
+				    		//System.out.println("found "+polygons.length+" polys");
 				    	}
 				    	
 						Feature feature = new Feature();
@@ -1633,7 +1737,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						for( int i = 0; i < polygons.length; i++) {
 					    	String poly = polygons[i].split("\\)")[0];
 					    	if(polygons[i].split("\\)").length > 1) {
-					    		System.out.println("found "+polygons[i].split("\\)").length + " )'s");
+					    		//System.out.println("found "+polygons[i].split("\\)").length + " )'s");
 					    	}
 					    	while( poly.charAt(0) == '(') {
 					    		poly = poly.substring(1);
