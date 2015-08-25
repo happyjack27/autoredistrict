@@ -870,6 +870,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
 	public JSlider sliderBalance;
+	public JMenuItem mntmConvertWktTo;
+	public JSeparator separator_4;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1524,6 +1526,148 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					featureCollection.features.add(fe);
 				}
 				finishLoadingGeography();
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+    }
+	
+	class WKTFileToCoordsThread extends Thread {
+		WKTFileToCoordsThread() { super(); }
+		File f;
+		File fout;
+		public void init() {
+			JOptionPane.showMessageDialog(mainframe,"Select source file\n(first column = geoid, second column = mapobject, no header)");
+			JFileChooser jfc = new JFileChooser();
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
+			jfc.showOpenDialog(null);
+			f = jfc.getSelectedFile();
+			if( f == null)  {
+				return;
+			}
+			JOptionPane.showMessageDialog(mainframe,"Select output file");
+			JFileChooser jfc2 = new JFileChooser();
+			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
+			jfc2.showSaveDialog(null);
+			fout = jfc2.getSelectedFile();
+			if( fout == null)  {
+				return;
+			}
+			start();
+		}
+    	public void run() { 
+        		try {
+    				String fn = f.getName();
+    				String ext = fn.substring(fn.length()-3).toLowerCase();
+    				DataAndHeader dh = new DataAndHeader();
+
+    				if( !ext.equals("tsv") && !ext.equals("txt")) {
+    					JOptionPane.showMessageDialog(mainframe,"Unrecognized file extension");
+    					return;
+    				}
+					String delimiter = "\t";
+    					
+					//TODO: CONVERT TO IMPORT CUSTOM
+					FileWriter fw = new FileWriter(fout);
+					FileReader fr = new FileReader(f);
+					BufferedReader br = new BufferedReader(fr);
+					BufferedWriter bw = new BufferedWriter(fw);
+					int geoid_col = 0;
+					int map_col = 1;
+					
+					/*
+					 * dh.header = br.readLine().split(delimiter);
+					String initialSelectionValue = dh.header[0];
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].trim().toUpperCase().equals("MAPOBJECT")) {
+							initialSelectionValue = dh.header[i];
+							break;
+						}
+					}
+					
+					//now get the map column
+					String opt = (String)JOptionPane.showInputDialog(mainframe, "Select the column with the map shapes in it.", "Select map object column.", 0, null, dh.header, initialSelectionValue);
+					if( opt == null)
+						return;
+					opt = opt.trim().toUpperCase();
+					int map_col = -1;
+					for( int i = 0; i < dh.header.length; i++) {
+						if( dh.header[i].trim().toUpperCase().equals(opt)) {
+							map_col = i;
+							break;
+						}
+					}
+					 */
+    	    		dlg.setVisible(true);
+    	    		dlbl.setText("Reading file...");
+
+
+					bw.write("GEOID"+delimiter+"INTPTLON"+delimiter+"INTPTLAT"+"\n");
+
+				//now process the rows
+				String line;
+			    while ((line = br.readLine()) != null) {
+			    	try {
+				    	String[] ss = line.split(delimiter);
+				    	String mapline = ss[map_col].trim();
+				    	String geoid = ss[geoid_col].trim();
+				    	if( mapline.length() < "MULTIPOLYGON(((".length()) {
+				    		continue;
+				    	}
+				    	mapline = mapline.substring("MULTIPOLYGON(((".length());
+				    	//mapline = mapline.substring(0,mapline.length()-1);
+				    	String[] polygons = mapline.split("\\(\\(");
+				    	if( polygons.length > 1) {
+				    		System.out.println("found "+polygons.length+" polys");
+				    	}
+				    	
+						Feature feature = new Feature();
+						feature.geometry = new Geometry();
+
+						feature.geometry.coordinates = new double[polygons.length][][];
+						
+						  //PointData[] points = aPolygon.getPointsOfPart(i);
+						for( int i = 0; i < polygons.length; i++) {
+					    	String poly = polygons[i].split("\\)")[0];
+					    	if(polygons[i].split("\\)").length > 1) {
+					    		System.out.println("found "+polygons[i].split("\\)").length + " )'s");
+					    	}
+					    	while( poly.charAt(0) == '(') {
+					    		poly = poly.substring(1);
+					    	}
+					    	String[] coords = poly.split(",");
+					    	feature.geometry.coordinates[i] = new double[coords.length][2];
+						  
+							for( int j = 0; j < feature.geometry.coordinates[i].length; j++) {
+								String[] cc = coords[j].trim().split("\\s+");//(" ");
+								feature.geometry.coordinates[i][j][0] = Double.parseDouble(cc[0]);
+								feature.geometry.coordinates[i][j][1] = Double.parseDouble(cc[1]);
+							}
+						}
+						feature.geometry.makePolysFull();
+						double[] centroid = feature.geometry.full_centroid;
+						centroid[0] /= Geometry.SCALELATLON;
+						centroid[1] /= Geometry.SCALELATLON;
+						
+						bw.write(geoid+delimiter+centroid[0]+delimiter+centroid[1]+"\n");
+				    	
+				    	
+						//loadShapeFile(f);
+
+			    	} catch (Exception ex) {
+			    		ex.printStackTrace();
+			    	}
+			    }
+
+	    		dlg.setVisible(false);
+	    		bw.flush();
+	    		fw.flush();
+	    		bw.close();
+	    		fw.close();
+	    		
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -2665,6 +2809,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmExportData);
+		
+		separator_4 = new JSeparator();
+		mnFile.add(separator_4);
+		
+		mntmConvertWktTo = new JMenuItem("Convert WKT to lat/lon");
+		mntmConvertWktTo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				new WKTFileToCoordsThread().init();
+			}
+		});
+		mnFile.add(mntmConvertWktTo);
 
 		mnFile.add(new JSeparator());
 		
