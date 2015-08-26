@@ -1729,6 +1729,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    	String[] ss = line.split(delimiter);
 				    	String mapline = ss[map_col].trim();
 				    	String geoid = ss[geoid_col].trim();
+				    	if( geoid.length() < "120890503011000".length()) {
+				    		continue;
+				    	}
 				    	String original = ""+mapline;
 				    	if( mapline.length() < "MULTIPOLYGON(((".length()) {
 				    		continue;
@@ -1764,7 +1767,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    	double firsty = 0;
 							for( int j = 0; j < feature.geometry.coordinates[i].length; j++) {
 								String[] cc = coords[j].trim().split("\\s+");//(" ");
-								if( cc.length < 2 || cc[1].length() < 5) {
+								if( cc.length < 2 || (cc[1].length() < 4 && j == feature.geometry.coordinates[i].length-1) || cc[1].length() < 2) {
 									if( j == feature.geometry.coordinates[i].length-1) {
 										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using first "+cc.length+" "+j);
 										feature.geometry.coordinates[i][j][0] = firstx;
@@ -1800,7 +1803,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						double[] avg = feature.geometry.getAvg();
 						if( broken) {
 							System.out.println("broken: "+geoid+" "+centroid[0]+" "+avg[0]+" "+centroid[1]+" "+avg[1]);
-							centroid = avg;
+							//centroid = avg;
 						} else {
 							
 						}
@@ -1820,6 +1823,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		fw.flush();
 	    		bw.close();
 	    		fw.close();
+	    		System.out.println("done");
 	    		
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
