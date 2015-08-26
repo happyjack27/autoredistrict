@@ -2163,6 +2163,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					featureCollection.loadDistrictsFromProperties(district);
 				}
 			}
+			if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
+				featureCollection.ecology.population.get(0).calcFairnessScores();
+				panelStats.getStats();
+			}
 			mapPanel.invalidate();
 			mapPanel.repaint();
 		}

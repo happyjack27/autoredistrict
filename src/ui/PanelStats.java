@@ -52,34 +52,66 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		label_2.setText(""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct");		
 		label_4.setText(""+integer.format(featureCollection.ecology.generation));
+		if( false) {
+			Ecology.history.add(new double[]{
+					featureCollection.ecology.generation,
+					featureCollection.ecology.population.size(),
+					Settings.num_districts,
+					
+					Settings.mutation_boundary_rate,
+					
+					(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits, //REP IMBALANCE
+					(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333, //POWER IMBALANCE
+					(dm.fairnessScores[5]+dm2.fairnessScores[5]+dm3.fairnessScores[5])*0.3333333, //WASTED VOTES TOTAL
+					(dm.fairnessScores[6]+dm2.fairnessScores[6]+dm3.fairnessScores[6])*0.3333333, //WASTED VOTES IMBALANCE
+					0,
+					
+
+					Settings.getAnnealingFloor( featureCollection.ecology.generation),
+
+					(
+							//Settings.square_root_compactness 
+							(dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333 
+							//: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
+						), //BORDER LENGTH
+					(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333, //DISCONNECTED POP
+					(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits, //POP IMBALANCE
+					0,
+					0,
+					
+			});
+			
+		} else {
+			Ecology.history.add(new double[]{
+					featureCollection.ecology.generation,
+					featureCollection.ecology.population.size(),
+					Settings.num_districts,
+					
+					Settings.mutation_boundary_rate,
+					
+					dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
+					dm.fairnessScores[4], //POWER IMBALANCE
+					dm.fairnessScores[5], //WASTED VOTES TOTAL
+					dm.fairnessScores[6], //WASTED VOTES IMBALANCE
+					0,
+					
+
+					Settings.getAnnealingFloor( featureCollection.ecology.generation),
+
+					(
+							//Settings.square_root_compactness 
+							dm.fairnessScores[0]
+							//: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
+						), //BORDER LENGTH
+					dm.fairnessScores[3], //DISCONNECTED POP
+					dm.fairnessScores[2]*conversion_to_bits, //POP IMBALANCE
+					0,
+					0,
+					
+			});
+			
+		}
 		
-		Ecology.history.add(new double[]{
-				featureCollection.ecology.generation,
-				featureCollection.ecology.population.size(),
-				Settings.num_districts,
-				
-				Settings.mutation_boundary_rate,
-				
-				(dm.fairnessScores[1]+dm2.fairnessScores[1]+dm3.fairnessScores[1])*0.3333333*conversion_to_bits, //REP IMBALANCE
-				(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333, //POWER IMBALANCE
-				(dm.fairnessScores[5]+dm2.fairnessScores[5]+dm3.fairnessScores[5])*0.3333333, //WASTED VOTES TOTAL
-				(dm.fairnessScores[6]+dm2.fairnessScores[6]+dm3.fairnessScores[6])*0.3333333, //WASTED VOTES IMBALANCE
-				0,
-				
-
-				Settings.getAnnealingFloor( featureCollection.ecology.generation),
-
-				(
-						Settings.square_root_compactness 
-						? (dm.fairnessScores[0]+dm2.fairnessScores[0]+dm3.fairnessScores[0])*0.3333333 
-						: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
-					), //BORDER LENGTH
-				(dm.fairnessScores[3]+dm2.fairnessScores[3]+dm3.fairnessScores[3])*0.3333333, //DISCONNECTED POP
-				(dm.fairnessScores[2]+dm2.fairnessScores[2]+dm3.fairnessScores[2])*0.3333333*conversion_to_bits, //POP IMBALANCE
-				0,
-				0,
-				
-		});
 		} catch (Exception ex) {
 			System.out.println("ex ad "+ex);
 			ex.printStackTrace();
