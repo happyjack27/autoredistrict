@@ -190,6 +190,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				if( showPrecinctLabels) {
 					FontMetrics fm = g.getFontMetrics();
 					String name = this.properties.getString("NAME");//.DISTRICT;
+					if( name == null) {
+						continue;
+					}
 					centroid[0] -= fm.stringWidth(name)/2.0;
 					centroid[1] += fm.getHeight()/2.0;
 					g.drawString(name, (int)centroid[0],(int)centroid[1]);
