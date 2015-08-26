@@ -48,6 +48,23 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		}
 
 	}
+	public double[] getAvg() {
+		double count = 0;
+		double[] dd = new double[]{0,0};
+		for( int i = 0; i < coordinates.length; i++) {
+			xpolys = new int[coordinates[i].length];
+			ypolys = new int[coordinates[i].length];
+			for( int j = 0; j < coordinates[i].length; j++) {
+				dd[0] += (coordinates[i][j][0]);
+			}
+			for( int j = 0; j < coordinates[i].length; j++) {
+				dd[1] += (coordinates[i][j][1]);
+			}
+			count += coordinates[i].length;
+		}
+		return new double[]{dd[0]/count,dd[1]/count};
+		
+	}
 	public void makePolysFull() {
 		polygons_full = new Polygon[coordinates.length];
 		for( int i = 0; i < coordinates.length; i++) {
@@ -61,7 +78,14 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 			}
 			polygons_full[i] = new Polygon(xpolys, ypolys, xpolys.length);
 		}
-		full_centroid = compute2DPolygonCentroid(polygons_full[0]);
+		double[] dd = new double[]{0,0};
+		double div = 1.0/((double)polygons_full.length);
+		for( int  i= 0; i < polygons_full.length; i++) {
+			double[] d = compute2DPolygonCentroid(polygons_full[i]);
+			dd[0] += d[0]*div;
+			dd[1] += d[1]*div;
+		}
+		full_centroid = dd;//compute2DPolygonCentroid(polygons_full[0]);
 
 	}
 	public Geometry() {

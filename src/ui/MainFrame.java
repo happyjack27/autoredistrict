@@ -1729,6 +1729,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    	String[] ss = line.split(delimiter);
 				    	String mapline = ss[map_col].trim();
 				    	String geoid = ss[geoid_col].trim();
+				    	String original = ""+mapline;
 				    	if( mapline.length() < "MULTIPOLYGON(((".length()) {
 				    		continue;
 				    	}
@@ -1745,6 +1746,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						feature.geometry.coordinates = new double[polygons.length][][];
 						
 						  //PointData[] points = aPolygon.getPointsOfPart(i);
+				    	boolean broken = false;
 						for( int i = 0; i < polygons.length; i++) {
 					    	String poly = polygons[i].split("\\)")[0];
 					    	if(polygons[i].split("\\)").length > 1) {
@@ -1762,19 +1764,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    	double firsty = 0;
 							for( int j = 0; j < feature.geometry.coordinates[i].length; j++) {
 								String[] cc = coords[j].trim().split("\\s+");//(" ");
-								if( cc.length < 2) {
+								if( cc.length < 2 || cc[1].length() < 5) {
 									if( j == feature.geometry.coordinates[i].length-1) {
-										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using first");
+										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using first "+cc.length+" "+j);
 										feature.geometry.coordinates[i][j][0] = firstx;
 										feature.geometry.coordinates[i][j][1] = firsty;
+										broken = true;
 									} else {
-										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using last");
+										System.out.println("bad data "+geoid+" "+j+" "+coords[j]+"  using last "+cc.length+" "+j);
 										feature.geometry.coordinates[i][j][0] = lastx;
 										feature.geometry.coordinates[i][j][1] = lasty;
 										if( j == 0) {
 											firstx = feature.geometry.coordinates[i][j][0]; 
 											firsty = feature.geometry.coordinates[i][j][1]; 
 										}
+										broken = true;
 									}
 									continue;
 									
@@ -1786,13 +1790,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 									firsty = feature.geometry.coordinates[i][j][1]; 
 								}
 								lastx = feature.geometry.coordinates[i][j][0]; 
-								lastx = feature.geometry.coordinates[i][j][1]; 
+								lasty = feature.geometry.coordinates[i][j][1]; 
 							}
 						}
 						feature.geometry.makePolysFull();
 						double[] centroid = feature.geometry.full_centroid;
 						centroid[0] /= Geometry.SCALELATLON;
 						centroid[1] /= Geometry.SCALELATLON;
+						double[] avg = feature.geometry.getAvg();
+						if( broken) {
+							System.out.println("broken: "+geoid+" "+centroid[0]+" "+avg[0]+" "+centroid[1]+" "+avg[1]);
+							centroid = avg;
+						} else {
+							
+						}
 						
 						bw.write(geoid+delimiter+centroid[0]+delimiter+centroid[1]+"\n");
 				    	
