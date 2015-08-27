@@ -742,6 +742,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	} else {
                     		if( amt > unit/4) {
                         		amt = unit/2 - amt; //votes short
+                        		amt = 0; //or just not count these...
                     		}
                     	}
 
