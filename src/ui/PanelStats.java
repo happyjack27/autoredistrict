@@ -183,7 +183,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				cdata[i] = new String[]{
 						""+i,
 						""+integer.format(elec_counts[i]),
-						""+integer.format(vote_counts[i]*total_population/tot_votes),
+						""+integer.format(vote_counts[i]),//*total_population/tot_votes),
 						""+(dm.wasted_votes_by_party[i]),
 						""+(elec_counts[i]/((double)(dm.districts.size()*Settings.members_per_district))),
 						""+(vote_counts[i]/tot_votes)

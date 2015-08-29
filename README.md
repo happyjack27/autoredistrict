@@ -5,27 +5,24 @@ for theory of how it works, see:https://github.com/happyjack27/autoredistrict/bl
 for a sample screenshot, see: https://github.com/happyjack27/autoredistrict/blob/master/screenshots/screen_shot_WI_ASM_parital.png
 
 
+HOW TO RUN:
 
-CONTACTING / MAKING IT USED:
-* http://legis.wisconsin.gov/ltsb/Pages/default.aspx
-* http://legis.wisconsin.gov/ltsb/Pages/Contact.aspx - software development and gis - give samples. ( federal, state senate, state assembly, state assembly 33-3 (mmpd))
-* http://www.apl.wisc.edu/about sarah kemp (kemp[at]wisc[dot]edu) 
+requires java runtime environment (if you don't have it, just google "java")
 
-where to get data:
-ftp://ftp2.census.gov/geo/pvs/tiger2010st/
+java -jar autoredistrict.jar -Xmx4096M -Xms1024M
+
+where, of course, autoredistrict.jar is in the present working directory.
+autoredistrict.jar is in the "jar" folder along with a script file for windows and one for linux/mac.
+the -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
+
 
 TODO:
 * is .dbf save working?  seems to not be - need to save column widths and types!
 * make project files load/save other files relative to woring directory of project file. (and make taht the default in file selection dialog)
 * make able to run gui-less from the command line
 * means need to have runtime (or generation count), save destination
-* add switch to - equalize voter turnout - change self-entropy method - persist in seetings file - show on gui.
-* if prop. representation is tied, break tie with amount of residue of largest residue district for most under-represented candidate. (where that candidate didn't win the residue) - most being the one that switching reduces kl-div.  - get ideal from total.  then find candidate with most elected representatives short of total.
-- or do most in excess of total, then find district with smallest margin of victory where that candidate was the residual winner. - least short of a win for underrepresented - smallest percent of residue needed to win for most underrepresented candidate that didn't win. - or just add the frac of the vote they got (for the largest frac) to their # elected - and subtr that frac from the one that won that election for that district.
 
 * add multiple demographics and elections
-* change back arrow to total reset ( |<<)
-* get graphics for arrow buttons
 
 * beat or integrate with: http://www.caliper.com/mtrnews/clients.htm
 
