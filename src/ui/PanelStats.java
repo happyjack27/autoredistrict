@@ -104,7 +104,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 							//: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
 						), //BORDER LENGTH
 					dm.fairnessScores[3], //DISCONNECTED POP
-					dm.fairnessScores[2]*conversion_to_bits, //POP IMBALANCE
+					dm.fairnessScores[2], //POP IMBALANCE
 					0,
 					0,
 					
