@@ -20,6 +20,9 @@ import solutions.StaticFunctions;
  * add option to show google map in background, and set transparency
  * add toolbar (zoom, view options) (zoom in, out, reset ("0"); force mutate, alias level, # maps, district labels; open / merge / save / export
  * 
+ * add map color by population excess/deficit ( DISPLAY_MODE_DIST_POP ) add to menu - also add disp mode ("color by district") to menu, remove reset from demographcs checkbox, add separator
+ * add map color by demographic ( DISPLAY_MODE_DIST_DEMO ) add to menu
+ * 
  * 
  * FEATURE
  * add button to force mutate on toolbar

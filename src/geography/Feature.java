@@ -120,19 +120,26 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		}
 		return super.instantiateObject(key);
 	}
+
+	public static int DISPLAY_MODE_NORMAL = 0;
+	public static int DISPLAY_MODE_TEST1 = 1;
+	public static int DISPLAY_MODE_TEST2 = 2;
+	public static int DISPLAY_MODE_DEMOGRAPHICS = 3;
+	public static int DISPLAY_MODE_DIST_POP = 4;
+	public static int DISPLAY_MODE_DIST_DEMO = 5;
 	
 	
 	public void draw(Graphics g) {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null || ward.state != 0 || display_mode != 0) {
+		if( geometry.fillColor != null || ward.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);
-			if( display_mode == 1) {
+			if( display_mode == DISPLAY_MODE_TEST1) {
 				g.setColor(ward.demographics != null && ward.demographics.size() > 0 ? Color.white :  Color.black);
-			} else if( display_mode == 2) {
+			} else if( display_mode == DISPLAY_MODE_TEST2) {
 				g.setColor(ward.has_census_results ? Color.white :  Color.black);
-			} else if( display_mode == 3) {
+			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
 				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 				int max_col = -1;
 				int max_num = 0;
@@ -151,18 +158,6 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				green /= tot;
 				blue /= tot;
 				g.setColor(new Color((int)red,(int)green,(int)blue));
-			} else if( display_mode == 4) {
-				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
-				int max_col = -1;
-				int max_num = 0;
-				for( int i = 0; i < ward.demographics.size() && i < colors.length; i++) {
-					int pop = ward.demographics.get(i).population;
-					if( pop > max_num || max_col < 0) {
-						max_num = pop;
-						max_col = i;
-					}
-				}
-				g.setColor(colors[max_col]);
 			} else {
 				if( ward.state == 1) {
 					g.setColor(Color.blue);

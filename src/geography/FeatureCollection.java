@@ -194,20 +194,93 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		DistrictMap dm  = ecology.population.get(shown_map);
+		int total = 0;
+		for( int i = 0; i < Settings.num_districts; i++) {
+			total += dm.districts.get(i).getPopulation();
+		}
+		total /= Settings.num_districts;
+
+		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_POP) {
+			int max = -1000000000; 
+			int min = +1000000000; 
+			for( int i = 0; i < Settings.num_districts; i++) {
+				if( dm.districts.get(i).getPopulation() > max) {
+					max = (int)dm.districts.get(i).getPopulation()-total;
+				}
+				if( dm.districts.get(i).getPopulation() < min) {
+					min = (int)dm.districts.get(i).getPopulation()-total;
+				}
+			}
+			Color[] district_colors = new Color[Settings.num_districts];
+			for( int i = 0; i < Settings.num_districts; i++) {
+				double amt = dm.districts.get(i).getPopulation()-total;
+				if( amt < 0) {
+					amt /= min;
+					int shade = (int)(255.0*amt); 
+					district_colors[i] = new Color(255,255-shade,255-shade);
+				} else if (amt > 0) {
+					amt /= max;
+					int shade = (int)(255.0*amt); 
+					district_colors[i] = new Color(255-shade,255,255-shade);
+				} else {
+					district_colors[i] = Color.WHITE;
+				}
+			}
+			for( int i = 0; i < features.size(); i++) {
+				Feature f = features.get(i);
+				Ward b = f.ward;
+				Geometry geo = features.get(i).geometry;
+				int di = dm.ward_districts[b.id];
+				geo.fillColor = district_colors[di];
+			}
+		}
+		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_DEMO) {
+			Color[] district_colors = new Color[Settings.num_districts];
+			Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+			//double[] district_colors = new Color[Settings.num_districts];
+			double[] tot = new double[Settings.num_districts];
+			double[] red = new double[Settings.num_districts];
+			double[] green = new double[Settings.num_districts];
+			double[] blue = new double[Settings.num_districts];
+			
+			for( int i = 0; i < features.size(); i++) {
+				Feature f = features.get(i);
+				Ward b = f.ward;
+				Geometry geo = features.get(i).geometry;
+				int di = dm.ward_districts[b.id];
+				
+				for( int j = 0; j < b.demographics.size() && j < colors.length; j++) {
+					int pop = b.demographics.get(i).population;
+					tot[di] += pop;
+					red[di] += colors[j].getRed()*pop;
+					green[di] += colors[j].getGreen()*pop;
+					blue[di] += colors[j].getBlue()*pop;
+				}
+			}
+			for( int i = 0; i < Settings.num_districts; i++) {
+				district_colors[i] = new Color(
+						(int)(red[i] / tot[i]),
+						(int)(green[i] / tot[i]),
+						(int)(blue[i] / tot[i])
+				);
+			}			
+			for( int i = 0; i < features.size(); i++) {
+				Feature f = features.get(i);
+				Ward b = f.ward;
+				Geometry geo = features.get(i).geometry;
+				int di = dm.ward_districts[b.id];
+				geo.fillColor = district_colors[di];
+			}
+		}
         for( Feature f : features) {
         	f.geometry.makePolys();
         	f.draw(g);
         }
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
-				DistrictMap dm  = ecology.population.get(shown_map);
 				g.setColor(Color.BLACK);
 				g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
-				int total = 0;
-				for( int i = 0; i < Settings.num_districts; i++) {
-					total += dm.districts.get(i).getPopulation();
-				}
-				total /= Settings.num_districts;
 				for( int i = 0; i < Settings.num_districts; i++) {
 					//dm.districts.get(i).getPopulation();
 					dxs[i] /= dcs[i];

@@ -223,7 +223,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        		connected++;
 	        	}
 	        }
-	        if( disconnected > (disconnected+connected)/10) {
+	        if( disconnected > (disconnected+connected)*Settings.mutate_disconnected_threshold) {
         		//System.out.println("disconnected exceeds connected!");
 	        	return;
 	        }
