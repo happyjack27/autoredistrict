@@ -9,8 +9,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static int sorting_polarity = 1;
     public static boolean use_border_length_on_mutate_boundary = true;
     
-    public static boolean mutate_disconnected = true;
-
     public static int num_districts = 0;
 	public Vector<Ward> wards = new Vector<Ward>();
 	public Vector<District> districts = new Vector<District>();
@@ -193,7 +191,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 }
             }
         }
-        if( mutate_disconnected && prob >= 0) { 
+        if( Settings.mutate_disconnected && prob >= 0) { 
         	mutate_all_disconnected(0.2);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }

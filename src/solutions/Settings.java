@@ -10,6 +10,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int RANK = 0;
 	public static int EMA = 1;
 	public static int LINEARIZE_MODE = EMA;
+    public static boolean mutate_disconnected = false;
+
+	
 	
 	public static boolean square_root_compactness = false;
 	public static boolean squared_compactness = false;
