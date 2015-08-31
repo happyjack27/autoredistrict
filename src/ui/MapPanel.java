@@ -11,6 +11,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import solutions.Settings;
 import solutions.iDiscreteEventListener;
 
 public class MapPanel extends JPanel implements MouseListener, MouseMotionListener, iDiscreteEventListener {
@@ -37,83 +38,97 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
     	Graphics2D graphics = (Graphics2D)graphics0;
     	Graphics2D g = null;
         super.paintComponent(graphics);
+        if( Settings.num_maps_to_draw == 0) {
+        	return;
+        }
+        FeatureCollection.shown_map = 0;
         Dimension d = this.getSize();
-        BufferedImage off_Image = null;
-        //graphics.setComposite(AlphaComposite.Src);
-        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
-        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
-        if( FSAA > 1) {
-	        off_Image =
-	        		  new BufferedImage(
-	        				  (int) (d.getWidth()*FSAA), 
-	        				  (int) (d.getHeight()*FSAA), 
-	        		          BufferedImage.TYPE_INT_ARGB
-	        		          );
-	        g = off_Image.createGraphics();
-        } else {
-        	g = graphics;
+        if( Settings.num_maps_to_draw == 4) {
+        	d.setSize(d.width/2, d.height/2);
         }
-        
-        //g.setComposite(AlphaComposite.Src);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        
-        double scalex = ((double)d.getWidth()*FSAA)/(maxx-minx);
-        double scaley = ((double)d.getHeight()*FSAA)/(maxy-miny);
-        Geometry.shiftx = minx;
-        Geometry.shifty = miny;
-        Geometry.scalex = scalex;
-        Geometry.scaley = scaley;
-        if( featureCollection != null) {
-        	featureCollection.draw(g);
-        }
-        if( zooming) {
-        	if( selection != null) {
-        		//Color c = new Color();
-        		g.setColor(new Color(128,128,128,128));
-        		g.fillRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
-           		g.setColor(new Color(255,255,255,255));
-           		g.drawRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
-        	}
-        }
-        //System.out.println(".");
-        if( FSAA > 1) {
-        	g.dispose();
-        }
-        //System.out.println("x");
-        if( FSAA == 4) {
-            //Dimension d = this.getSize();
-            //graphics.setComposite(AlphaComposite.Src);
-
-            BufferedImage off_Image2 =
-            		  new BufferedImage(
-            				  (int) (d.getWidth()*2), 
-            				  (int) (d.getHeight()*2), 
-            		          BufferedImage.TYPE_INT_ARGB
-            		          );
-            Graphics2D g2 = off_Image2.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
-	        g2.drawImage(off_Image, 
-	        		0, 0, (int)d.getWidth()*2, (int)d.getHeight()*2, 
-	        		null);
+        for( int i = 0; i < Settings.num_maps_to_draw; i++) {
+            FeatureCollection.shown_map = i;
+            BufferedImage off_Image = null;
+	        //graphics.setComposite(AlphaComposite.Src);
+	        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
+	        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+	        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+	
+	        if( FSAA > 0) {
+		        off_Image =
+		        		  new BufferedImage(
+		        				  (int) (d.getWidth()*FSAA), 
+		        				  (int) (d.getHeight()*FSAA), 
+		        		          BufferedImage.TYPE_INT_ARGB
+		        		          );
+		        g = off_Image.createGraphics();
+	        } else {
+	        	//g = graphics;
+	        }
 	        
-	        g2.dispose();
-
-	        graphics.drawImage(off_Image2, 
-	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
-	        		null);
-
-        } else if( FSAA == 2) {
-	        graphics.drawImage(off_Image, 
-	        		0, 0, (int)d.getWidth(), (int)d.getHeight(), 
-	        		null);
+	        //g.setComposite(AlphaComposite.Src);
+	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
+	        g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+	        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+	        
+	        
+	        double scalex = ((double)d.getWidth()*FSAA)/(maxx-minx);
+	        double scaley = ((double)d.getHeight()*FSAA)/(maxy-miny);
+	        Geometry.shiftx = minx;
+	        Geometry.shifty = miny;
+	        Geometry.scalex = scalex;
+	        Geometry.scaley = scaley;
+	        if( featureCollection != null) {
+	        	featureCollection.draw(g);
+	        }
+	        if( zooming) {
+	        	if( selection != null) {
+	        		//Color c = new Color();
+	        		g.setColor(new Color(128,128,128,128));
+	        		g.fillRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
+	           		g.setColor(new Color(255,255,255,255));
+	           		g.drawRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
+	        	}
+	        }
+	        //System.out.println(".");
+	        if( FSAA > 0) {
+	        	g.dispose();
+	        }
+	        //System.out.println("x");
+	        if( FSAA == 4) {
+	            //Dimension d = this.getSize();
+	            //graphics.setComposite(AlphaComposite.Src);
+	
+	            BufferedImage off_Image2 =
+	            		  new BufferedImage(
+	            				  (int) (d.getWidth()*2), 
+	            				  (int) (d.getHeight()*2), 
+	            		          BufferedImage.TYPE_INT_ARGB
+	            		          );
+	            Graphics2D g2 = off_Image2.createGraphics();
+	            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RENDERING_INTERPOLATION);
+	            g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+	            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+	
+		        g2.drawImage(off_Image, 
+		        		0, 0, (int)d.getWidth()*2, (int)d.getHeight()*2, 
+		        		null);
+		        
+		        g2.dispose();
+	
+		        graphics.drawImage(off_Image2, 
+		                (i%2)*d.width,
+		                ((i-i%2)/2)*d.height,
+		        		(int)d.getWidth(), (int)d.getHeight(), 
+		        		null);
+	
+	        } else if( FSAA == 2 || true) {
+		        graphics.drawImage(off_Image,
+		                (i%2)*d.width,
+		                ((i-i%2)/2)*d.height,
+		        		(int)d.getWidth(), (int)d.getHeight(), 
+		        		null);
+	        }
         }
         //System.out.println("o");
     } catch (Exception ex) {

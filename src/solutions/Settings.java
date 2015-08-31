@@ -5,6 +5,12 @@ import java.util.Vector;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
+	public static int num_maps_to_draw = 1;
+	public static boolean use_annealing_floor = true;
+	public static int RANK = 0;
+	public static int EMA = 1;
+	public static int LINEARIZE_MODE = EMA;
+	
 	public static boolean square_root_compactness = false;
 	public static boolean squared_compactness = false;
 	public static boolean border_length_area_weighted = true;
@@ -15,6 +21,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static void resetAnnealing() { annealing_has_started = false; }
 	public static void startAnnealing(long generation) { if( annealing_has_started) { return; } annealing_starts_at = generation; annealing_has_started = true; }
 	public static double getAnnealingFloor(long generation) {
+		if( !use_annealing_floor) {
+			return 0;
+		}
 		if( !annealing_has_started) {
 			return 0.25;
 		}
@@ -78,7 +87,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
     public static int num_elections_simulated = 3;
-    public static int population = 128;
+    public static int population = 64;
     public static int num_districts = 3;
 	//geometry
 	//demographics

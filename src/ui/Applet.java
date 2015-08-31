@@ -13,6 +13,28 @@ import solutions.StaticFunctions;
  * for %f in (*.shp) do ogr2ogr -f "GeoJSON" "%~dpnf.json" "%f"
 
  */
+/*
+ * 
+ * TODO: 
+ * 
+ * VISUAL
+ * CHECK add option to show 4 maps simultaneously
+ * CHECK show population imbalance in showing precinct labels
+ * add option to show google map in background, and set transparency
+ * add toolbar (zoom, view options)
+ * 
+ * 
+ * FEATURE
+ * change ranking to exponential moving average scaling (20 generations)
+ * add button to force mutate on toolbar
+ * CHECK add option to turn on/off annealing floor 
+ * add option to lock together a set of districts together (under constraints)
+ * 
+ * 
+ * MEASURE
+ * check compactness measure
+ * 
+ */
 
 public class Applet extends JApplet {
 	public static boolean no_gui = false;

@@ -986,6 +986,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderBalance;
 	public JMenuItem mntmConvertWktTo;
 	public JSeparator separator_4;
+	public JMenuItem mntmNoMap;
+	public JMenuItem mntmOneMap;
+	public JMenuItem mntmFourMaps;
+	public JSeparator separator_5;
+	public JCheckBoxMenuItem chckbxmntmUseAnnealFloor;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3182,6 +3187,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmAutoAnneal);
+		
+		chckbxmntmUseAnnealFloor = new JCheckBoxMenuItem("Use anneal floor");
+		chckbxmntmUseAnnealFloor.setSelected(true);
+		chckbxmntmUseAnnealFloor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.use_annealing_floor = chckbxmntmUseAnnealFloor.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmUseAnnealFloor);
 		mnEvolution.add(chckbxmntmReplaceAll);
 		mnEvolution.add(chckbxmntmMutateAll);
 		
@@ -3331,6 +3345,39 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmxAntialiasing_1.setSelected(true);
 		
 		mnView.add(mntmxAntialiasing_1);
+		
+		separator_5 = new JSeparator();
+		mnView.add(separator_5);
+		
+		mntmNoMap = new JMenuItem("No map");
+		mntmNoMap.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.num_maps_to_draw = 0;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmNoMap);
+		
+		mntmOneMap = new JMenuItem("One map");
+		mntmOneMap.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.num_maps_to_draw = 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmOneMap);
+		
+		mntmFourMaps = new JMenuItem("Four maps");
+		mntmFourMaps.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.num_maps_to_draw = 4;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmFourMaps);
 
 		
 		//JMenu mnResults = new JMenu("Results");

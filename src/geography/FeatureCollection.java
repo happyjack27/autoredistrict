@@ -39,6 +39,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static double dlonlat = 1;
 	
 	public static boolean[] locked_wards = null;
+	public static int shown_map = 0;
 	
 	static int max_hues = 9;
 	
@@ -130,8 +131,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			dys[i] = 0;
 			dcs[i] = 0;
 		}
-		if( ecology.population != null && ecology.population.size() > 0) {
-			DistrictMap dm  = ecology.population.get(0);
+		if( ecology.population != null && ecology.population.size() > shown_map) {
+			DistrictMap dm  = ecology.population.get(shown_map);
 			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.ward_districts.length);
 			if( dm.ward_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
@@ -199,17 +200,31 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         }
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
+				DistrictMap dm  = ecology.population.get(shown_map);
 				g.setColor(Color.BLACK);
 				g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
+				int total = 0;
 				for( int i = 0; i < Settings.num_districts; i++) {
+					total += dm.districts.get(i).getPopulation();
+				}
+				total /= Settings.num_districts;
+				for( int i = 0; i < Settings.num_districts; i++) {
+					//dm.districts.get(i).getPopulation();
 					dxs[i] /= dcs[i];
 					dys[i] /= dcs[i];
 					FontMetrics fm = g.getFontMetrics();
 					String name =""+i;
-					dxs[0] -= fm.stringWidth(name)/2.0;
-					dys[1] += fm.getHeight()/2.0;
+					//dys[1] += fm.getHeight()/2.0;
 
-					g.drawString(name, (int)dxs[i], (int)dys[i]);
+					g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
+					g.drawString(name, (int)dxs[i] - (int)(fm.stringWidth(name)/2.0), (int)dys[i]);
+					int amt = (int) (dm.districts.get(i).getPopulation() - total);
+					g.setFont(new Font("Arial",Font.PLAIN,10*MapPanel.FSAA));
+					if( amt > 0) {
+						g.drawString("+"+amt, (int)dxs[i] - (int)(fm.stringWidth("+"+amt)/2.0), (int)dys[i]+fm.getHeight());
+					} else {
+						g.drawString(""+amt, (int)dxs[i] - (int)(fm.stringWidth(""+amt)/2.0), (int)dys[i]+fm.getHeight());
+					}
 					//System.out.println("name "+name+" x "+(int)dxs[i]+" y "+(int)dys[i]+" size "+dcs[i]);
 				}
 	
