@@ -250,6 +250,9 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	}
 	
 	public void zoomTo(Rectangle r) {
+        if( Settings.num_maps_to_draw == 0) {
+        	return;
+        }
         Dimension d = this.getSize();
         double scalex = ((double)d.getWidth())/(maxx-minx);
         double scaley = ((double)d.getHeight())/(maxy-miny);
@@ -262,6 +265,25 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 				scalex = sign * FeatureCollection.xy*scaley;
 			}
 		}
+
+        if( Settings.num_maps_to_draw == 4) {
+        	int x = (r.x+r.width);
+        	int y = (r.y+r.height);
+        	
+        	x %= d.width/2;
+        	y %= d.height/2;
+        	x *= 2;
+        	y *= 2;
+
+        	r.x %= d.width/2;
+        	r.y %= d.height/2;
+        	r.x *= 2;
+        	r.y *= 2;
+        	
+        	r.width = x-r.x;
+        	r.height = y-r.y;
+        }
+
 /*
         if( MapPanel.zoomStack.empty()) {
         	scalex = Geometry.scalex;

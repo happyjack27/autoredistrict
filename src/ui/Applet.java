@@ -15,7 +15,7 @@ import solutions.StaticFunctions;
  */
 /*
  * TODO:
- *  
+ * 
  * VISUAL
  * add option to show google map in background, and set transparency
  * add toolbar (zoom, view options) (zoom in, out, reset ("0"); force mutate, alias level, # maps, district labels; open / merge / save / export
