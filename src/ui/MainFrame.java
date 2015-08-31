@@ -3189,7 +3189,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnEvolution.add(chckbxmntmAutoAnneal);
 		
 		chckbxmntmUseAnnealFloor = new JCheckBoxMenuItem("Use anneal floor");
-		chckbxmntmUseAnnealFloor.setSelected(true);
+		chckbxmntmUseAnnealFloor.setSelected(Settings.use_annealing_floor);
 		chckbxmntmUseAnnealFloor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.use_annealing_floor = chckbxmntmUseAnnealFloor.isSelected();

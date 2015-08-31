@@ -25,14 +25,14 @@ import solutions.StaticFunctions;
  * 
  * 
  * FEATURE
- * change ranking to exponential moving average scaling (20 generations)
- * add button to force mutate on toolbar
+ * CHECK change ranking to exponential moving average scaling (20 generations)
  * CHECK add option to turn on/off annealing floor 
+ * add button to force mutate on toolbar
  * add option to lock together a set of districts together (under constraints)
  * 
  * 
  * MEASURE
- * check compactness measure
+ * CHECK check compactness measure
  * 
  */
 

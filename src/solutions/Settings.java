@@ -5,8 +5,8 @@ import java.util.Vector;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
-	public static int num_maps_to_draw = 1;
-	public static boolean use_annealing_floor = true;
+	public static int num_maps_to_draw = 4;
+	public static boolean use_annealing_floor = false;
 	public static int RANK = 0;
 	public static int EMA = 1;
 	public static int LINEARIZE_MODE = EMA;
@@ -95,7 +95,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//map_population (folder)
 	//
 	public static int num_ward_outcomes = 16;
-	public static boolean replace_all = false;
+	public static boolean replace_all = true;
 	public static void setPopulation(double i) {
 		population = (int)i;
 		for( iChangeListener c : populationChangeListeners) {
