@@ -920,14 +920,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double getPopVariance() {
     	double tot = 0;
     	double tot2 = 0;
+    	double N = (double) districts.size();
         for(District district : districts) {
         	double pop = district.getPopulation();
         	tot += pop;
         	tot2 += pop*pop;
         }
-        tot /= (double) districts.size();
-        tot2 /= (double) districts.size();
-        return Math.sqrt(tot2-tot*tot);
+        //tot /= (double) districts.size();
+        return (tot2-tot*tot/N) / N;
     }
 
     public int compareTo(DistrictMap o) {
