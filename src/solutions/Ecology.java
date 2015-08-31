@@ -440,8 +440,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            	fairnessScoreEmaVars[i] = var;
 	            	fairnessScoreEmaMeans[i] = avg;
 	            } else {
-	            	fairnessScoreEmaVars[i] += (var-fairnessScoreEmaVars[i])/40.0;
-	            	fairnessScoreEmaMeans[i] += (avg-fairnessScoreEmaMeans[i])/40.0;
+	            	fairnessScoreEmaVars[i] += (var-fairnessScoreEmaVars[i])/20.0;
+	            	fairnessScoreEmaMeans[i] += (avg-fairnessScoreEmaMeans[i])/20.0;
 	            }
 	        }
             for( DistrictMap map : population) {

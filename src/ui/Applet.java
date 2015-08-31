@@ -14,25 +14,16 @@ import solutions.StaticFunctions;
 
  */
 /*
- * 
- * TODO: 
- * 
+ * TODO:
+ *  
  * VISUAL
- * CHECK add option to show 4 maps simultaneously
- * CHECK show population imbalance in showing precinct labels
  * add option to show google map in background, and set transparency
- * add toolbar (zoom, view options)
+ * add toolbar (zoom, view options) (zoom in, out, reset ("0"); force mutate, alias level, # maps, district labels; open / merge / save / export
  * 
  * 
  * FEATURE
- * CHECK change ranking to exponential moving average scaling (20 generations)
- * CHECK add option to turn on/off annealing floor 
  * add button to force mutate on toolbar
  * add option to lock together a set of districts together (under constraints)
- * 
- * 
- * MEASURE
- * CHECK check compactness measure
  * 
  */
 

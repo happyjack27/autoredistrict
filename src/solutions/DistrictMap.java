@@ -927,7 +927,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	tot2 += pop*pop;
         }
         //tot /= (double) districts.size();
-        return (tot2-tot*tot/N) / N;
+        return Math.sqrt((tot2-tot*tot/N) / N);
     }
 
     public int compareTo(DistrictMap o) {
