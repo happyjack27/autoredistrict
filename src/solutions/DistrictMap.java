@@ -987,10 +987,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	d.area = areas[i];
         	d.iso_quotent = Math.sqrt( (4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]) );
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
-        	weighted_sum += 1.0/d.iso_quotent;//Settings.squared_compactness ? isop*isop : Settings.square_root_compactness ? Math.sqrt(isop) : isop;
+        	weighted_sum += Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
         }
         //weighted_sum = Math.sqrt(weighted_sum);
         wel = (weighted_sum / (double)lengths.length);
+        if( Settings.squared_compactness ) {
+        	wel = Math.sqrt(wel);
+        }
         return wel;
     }
     
