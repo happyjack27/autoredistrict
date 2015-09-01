@@ -150,10 +150,6 @@ public class Project extends ReflectionJSONObject<Project> {
 		if( containsKey("representation_weight")) {
 			MainFrame.mainframe.sliderRepresentation.setValue((int)(100.0*Double.parseDouble(getString("representation_weight").trim())));
 		}
-		if( containsKey("area_weighted")) {
-			Settings.border_length_area_weighted = getString("area_weighted").trim().toLowerCase().equals("true");
-			//MainFrame.mainframe.chckbxAreaWeighted.setSelected(getString("area_weighted").trim().toLowerCase().equals("true"));
-		}		
 	}
 	
 	boolean isEsriSapefile() {
@@ -177,7 +173,6 @@ public class Project extends ReflectionJSONObject<Project> {
 		equalize_turnout = Settings.adjust_vote_to_population;
 		
 		members_per_district = Settings.members_per_district;
-		area_weighted = Settings.border_length_area_weighted;
 		
 		if( primary_key_column == null || primary_key_column.length() == 0) {
 			if( isEsriSapefile())

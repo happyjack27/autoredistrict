@@ -16,6 +16,10 @@ import solutions.StaticFunctions;
 /*
  * TODO:
  * 
+ * EVOLUTION
+ * make mutate proportional to district score (pop imbalance, compactness, competitiveness...)
+ * add show other measures on map - compactness (iso quotent), wasted votes
+ * 
  * VISUAL
  * add option to show google map in background, and set transparency
  * add toolbar (zoom, view options) (zoom in, out, reset ("0"); force mutate, alias level, # maps, district labels; open / merge / save / export

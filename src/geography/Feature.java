@@ -13,6 +13,13 @@ import solutions.Ward;
 
 public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
 	
+	public static final int DISPLAY_MODE_NORMAL = 0;
+	public static final int DISPLAY_MODE_TEST1 = 1;
+	public static final int DISPLAY_MODE_TEST2 = 2;
+	public static final int DISPLAY_MODE_DEMOGRAPHICS = 3;
+	public static final int DISPLAY_MODE_DIST_POP = 4;
+	public static final int DISPLAY_MODE_DIST_DEMO = 5;
+	public static final int DISPLAY_MODE_COMPACTNESS = 6;
 	
 	public Vector<JDBField> dbfFields = new Vector<JDBField>();
 	
@@ -37,20 +44,103 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	
 	
 	public double calcArea() {
+		System.out.print(".");
+		
+		//Geometry.RADIUS_OF_EARTH
+		
 		double tot_area = 0;
 		for( int i = 0; i < geometry.coordinates.length; i++) {
 			double area = 0;
-			double[][] coords = geometry.coordinates[i]; 
+			double[][] coords = geometry.coordinates[i];
+			double[] lons = new double[coords.length];
+			double[] lats = new double[coords.length];
+			for( int j = 0; j < coords.length; j++) {
+				lons[j] = Math.toRadians(coords[j][0]);
+				lats[j] = Math.toRadians(coords[j][1]);
+			}
+			tot_area += SphericalPolygonArea(lats,lons,Geometry.RADIUS_OF_EARTH);
+			/*
 			int k = coords.length-1;
 			for( int j = 0; j < coords.length; j++) {
 				area += FeatureCollection.dlonlat*(coords[k][0]+coords[j][0])*(coords[k][1]-coords[j][1]);
 				k = j;
 			}
 			tot_area += Math.abs(area)/2.0;
+			*/
 		}
 		ward.area = tot_area;
 		return tot_area;
 	}
+	
+	/// <summary>
+	/// Haversine function : hav(x) = (1-cos(x))/2
+	/// </summary>
+	/// <param name="x"></param>
+	/// <returns>Returns the value of Haversine function</returns>
+	public double Haversine( double x )
+	{
+	        return ( 1.0 - Math.cos( x ) ) / 2.0;
+	}
+
+	/// <summary>
+	/// Compute the Area of a Spherical Polygon
+	/// </summary>
+	/// <param name="lat">the latitudes of all vertices(in radian)</param>
+	/// <param name="lon">the longitudes of all vertices(in radian)</param>
+	/// <param name="r">spherical radius</param>
+	/// <returns>Returns the area of a spherical polygon</returns>
+	public double SphericalPolygonArea( double[ ] lat , double[ ] lon , double r )
+	{
+	       double lam1 = 0, lam2 = 0, beta1 =0, beta2 = 0, cosB1 =0, cosB2 = 0;
+	       double hav = 0;
+	       double sum = 0;
+
+	       for( int j = 0 ; j < lat.length ; j++ )
+	       {
+		int k = j + 1;
+		if( j == 0 )
+		{
+		     lam1 = lon[j];
+		     beta1 = lat[j];
+		     lam2 = lon[j + 1];
+		     beta2 = lat[j + 1];
+		     cosB1 = Math.cos( beta1 );
+		     cosB2 = Math.cos( beta2 );
+	             }
+		else
+		{
+		     k = ( j + 1 ) % lat.length;
+		     lam1 = lam2;
+		     beta1 = beta2;
+		     lam2 = lon[k];
+	                  beta2 = lat[k];
+		     cosB1 = cosB2;
+		     cosB2 = Math.cos( beta2 );
+		}
+		if( lam1 != lam2 )
+		{
+		     hav = Haversine( beta2 - beta1 ) + 
+	                          cosB1 * cosB2 * Haversine( lam2 - lam1 );
+		     double a = 2 * Math.asin( Math.sqrt( hav ) );
+		     double b = Math.PI / 2 - beta2;
+		     double c = Math.PI / 2 - beta1;
+		     double s = 0.5 * ( a + b + c );
+		     double t = Math.tan( s / 2 ) * Math.tan( ( s - a ) / 2 ) *  
+	                                Math.tan( ( s - b ) / 2 ) * Math.tan( ( s - c ) / 2 );
+
+		     double excess = Math.abs( 4 * Math.atan( Math.sqrt( 
+	                                        Math.abs( t ) ) ) );
+
+		     if( lam2 < lam1 )
+		     {
+			excess = -excess;
+		     }
+
+		     sum += excess;
+		}
+	      }
+	      return Math.abs( sum ) * r * r;
+	}	
 	
 	public void toggleClicked() {
 		try {
@@ -121,14 +211,6 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		return super.instantiateObject(key);
 	}
 
-	public static int DISPLAY_MODE_NORMAL = 0;
-	public static int DISPLAY_MODE_TEST1 = 1;
-	public static int DISPLAY_MODE_TEST2 = 2;
-	public static int DISPLAY_MODE_DEMOGRAPHICS = 3;
-	public static int DISPLAY_MODE_DIST_POP = 4;
-	public static int DISPLAY_MODE_DIST_DEMO = 5;
-	
-	
 	public void draw(Graphics g) {
 		if( geometry.polygons == null) {
 			geometry.makePolys();

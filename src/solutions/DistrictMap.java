@@ -6,6 +6,8 @@ import java.util.*;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
+	public double area_multiplier = 1;//Math.pow(100,2)*10;
+	
     public static int sorting_polarity = 1;
     public static boolean use_border_length_on_mutate_boundary = true;
     
@@ -182,6 +184,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate(double prob) {
+    	wel = -1;
         double max = Settings.num_districts;
         for( int i = 0; i < vtd_districts.length; i++) {
             if( Math.random() <= prob) {
@@ -283,6 +286,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate_boundary(double prob) {
+    	wel = -1;
     	//start at 1 for regularization
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
@@ -299,6 +303,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public void crossover(int[] genome1, int[] genome2) {
+    	wel = -1;
         for( int i = 0; i < vtd_districts.length; i++) {
             double r = Math.random();
             if( Settings.pso ) {
@@ -429,6 +434,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( districts.size() > 1000) {
     		System.out.println("too many districts "+districts.size());
     	} else {
+    		int total = 0;
 	    	for( int i = 0; i < districts.size()  && i < Settings.num_districts; i++) {
 	    		districts.get(i).resetPopulation();
 	    		int pop = (int)districts.get(i).getPopulation();
@@ -510,6 +516,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         return vtd_districts;
     }
     public void setGenome(int[] genome) {
+    	wel = -1;
     	if( num_districts < genome.length) {
     		num_districts = genome.length;
     	}
@@ -649,7 +656,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time0 = System.currentTimeMillis();    
     	long wasted_votes = 0;
     	//===fairness score: compactness
-        double length = Settings.border_length_area_weighted ? getWeightedEdgeLength() : getEdgeLength();
+        double length = getWeightedEdgeLength();// : getEdgeLength();
         
     	long time1 = System.currentTimeMillis();
     	//===fairness score: population balance
@@ -933,6 +940,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double d2 = 1.0-min/max;
         return d1 > d2 ? d1 : d2;
     }
+    
+    //needs to be variance, not sqrt variance, so that delta is linear
     public double getPopVariance() {
     	double tot = 0;
     	double tot2 = 0;
@@ -950,7 +959,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double d = (fitness_score-o.fitness_score)*sorting_polarity; 
         return  d > 0 ? 1 : d == 0 ? 0 : -1;
     }
-    double getWeightedEdgeLength() {
+    double wel = -1;
+    public double getWeightedEdgeLength() {
+    	if( wel >= 0) {
+    		return wel;
+    	}
     	double[] lengths = new double[districts.size()]; 
     	double[] areas = new double[districts.size()]; 
         for( Ward b : vtds) {
@@ -968,13 +981,17 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         
         double weighted_sum = 0;
         for( int i = 0; i < lengths.length; i++) {
+        	areas[i] *= area_multiplier;
+        	District d = districts.get(i);
+        	d.edge_length = lengths[i];
+        	d.area = areas[i];
+        	d.iso_quotent = Math.sqrt( (4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]) );
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
-        	double isop = (lengths[i]*lengths[i]) / (4.0*Math.PI*areas[i]);
-        	isop = Math.sqrt(isop);
-        	weighted_sum += isop;//Settings.squared_compactness ? isop*isop : Settings.square_root_compactness ? Math.sqrt(isop) : isop;
+        	weighted_sum += 1.0/d.iso_quotent;//Settings.squared_compactness ? isop*isop : Settings.square_root_compactness ? Math.sqrt(isop) : isop;
         }
         //weighted_sum = Math.sqrt(weighted_sum);
-        return (weighted_sum / (double)lengths.length);
+        wel = (weighted_sum / (double)lengths.length);
+        return wel;
     }
     
     double getEdgeLength() {

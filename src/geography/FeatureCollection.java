@@ -19,6 +19,7 @@ import com.hexiong.jdbf.DBFReader;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
 import solutions.Edge;
@@ -242,6 +243,61 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		double mavg_min = 0; 
+		double mavg_max = 0; 
+		if( Feature.display_mode == Feature.DISPLAY_MODE_COMPACTNESS) {
+			if( shown_map < ecology.population.size()) {
+				DistrictMap dm  = ecology.population.get(shown_map);
+				dm.getWeightedEdgeLength();
+				
+				double max = -1000000000; 
+				double min = +1000000000; 
+				for( int i = 0; i < Settings.num_districts; i++) {
+					if( dm.districts.get(i).iso_quotent > max) {
+						max = dm.districts.get(i).iso_quotent;
+					}
+					if( dm.districts.get(i).iso_quotent < min) {
+						min = dm.districts.get(i).iso_quotent;
+					}
+				}
+				mavg_min += (min-mavg_min)/(mavg_min == 0 ? 1 : 20); 
+				mavg_max += (max-mavg_max)/(mavg_max == 0 ? 1 : 20); 
+				if( mavg_min < min) min = mavg_min;
+				if( mavg_max > max) max = mavg_max;
+				
+				Color[] district_colors = new Color[Settings.num_districts];
+				for( int i = 0; i < Settings.num_districts; i++) {
+					double amt = 1.0-Math.abs((dm.districts.get(i).iso_quotent-min)/(max-min));
+					amt = amt*2.0-1.0;
+					if( amt < 0) {
+						amt *= -1;
+						int shade = (int)(255.0*amt); 
+						district_colors[i] = new Color(255-shade,255,255-shade);
+					} else if (amt > 0) {
+						int shade = (int)(255.0*amt); 
+						district_colors[i] = new Color(255,255-shade,255-shade);
+					} else {
+						district_colors[i] = Color.WHITE;
+					}
+					
+					int shade = (int)(255.0*amt); 
+					if( shade < 0) {
+						shade = 0;
+					}
+					if( shade > 255) {
+						shade = 255;
+					}
+					district_colors[i] = new Color(255,255-shade,255-shade);
+				}
+				for( int i = 0; i < features.size(); i++) {
+					Feature f = features.get(i);
+					Ward b = f.ward;
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[b.id];
+					geo.fillColor = district_colors[di];
+				}
+			}
+		}
 		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_DEMO) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
@@ -295,6 +351,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         }
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
+	        	DecimalFormat sdm = new DecimalFormat("###,###,##0.00000");  
+	        	DecimalFormat sdm0 = new DecimalFormat("###,###,##0");  
 				int total = 0;
 				DistrictMap dm = null;
 				if( shown_map < ecology.population.size()) {
@@ -303,27 +361,47 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						total += dm.districts.get(i).getPopulation();
 					}
 					total /= Settings.num_districts;
+					dm.getWeightedEdgeLength();
 				}	        	
-				g.setColor(Color.BLACK);
-				g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
-				for( int i = 0; i < Settings.num_districts; i++) {
-					//dm.districts.get(i).getPopulation();
-					dxs[i] /= dcs[i];
-					dys[i] /= dcs[i];
-					FontMetrics fm = g.getFontMetrics();
-					String name =""+i;
-					//dys[1] += fm.getHeight()/2.0;
-
+				try {
+					g.setColor(Color.BLACK);
 					g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
-					g.drawString(name, (int)dxs[i] - (int)(fm.stringWidth(name)/2.0), (int)dys[i]);
-					int amt = dm == null ? 0 : (int) (dm.districts.get(i).getPopulation() - total);
-					g.setFont(new Font("Arial",Font.PLAIN,10*MapPanel.FSAA));
-					if( amt > 0) {
-						g.drawString("+"+amt, (int)dxs[i] - (int)(fm.stringWidth("+"+amt)/2.0), (int)dys[i]+fm.getHeight());
-					} else {
-						g.drawString(""+amt, (int)dxs[i] - (int)(fm.stringWidth(""+amt)/2.0), (int)dys[i]+fm.getHeight());
+					for( int i = 0; i < Settings.num_districts; i++) {
+						District d = dm == null ? null : dm.districts.get(i);
+						//dm.districts.get(i).getPopulation();
+						dxs[i] /= dcs[i];
+						dys[i] /= dcs[i];
+						FontMetrics fm = g.getFontMetrics();
+						String name =""+i;
+						//dys[1] += fm.getHeight()/2.0;
+	
+						g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
+						g.drawString(name, (int)dxs[i] - (int)(fm.stringWidth(name)/2.0), (int)dys[i]);
+						int amt = dm == null ? 0 : (int) (d.getPopulation() - total);
+						g.setFont(new Font("Arial",Font.PLAIN,10*MapPanel.FSAA));
+						if( amt > 0) {
+							g.drawString("+"+amt, (int)dxs[i] - (int)(fm.stringWidth("+"+amt)/2.0), (int)dys[i]+fm.getHeight());
+						} else {
+							g.drawString(""+amt, (int)dxs[i] - (int)(fm.stringWidth(""+amt)/2.0), (int)dys[i]+fm.getHeight());
+						}
+						
+						double iso = dm == null ? 0 : (d.iso_quotent);
+						String siso = sdm.format(iso);
+	
+						g.drawString(siso, (int)dxs[i] - (int)(fm.stringWidth(siso)/2.0), (int)dys[i]+fm.getHeight()*2);
+
+						double len = dm == null ? 0 : (d.edge_length);
+						String slen = sdm.format(len);
+						
+						double area = dm == null ? 0 : (d.area);
+						String sarea = sdm.format(area);
+						//g.drawString(slen, (int)dxs[i] - (int)(fm.stringWidth(slen)/2.0), (int)dys[i]+fm.getHeight()*3);
+						//g.drawString(sarea, (int)dxs[i] - (int)(fm.stringWidth(sarea)/2.0), (int)dys[i]+fm.getHeight()*4);
+						
+						//System.out.println("name "+name+" x "+(int)dxs[i]+" y "+(int)dys[i]+" size "+dcs[i]);
 					}
-					//System.out.println("name "+name+" x "+(int)dxs[i]+" y "+(int)dys[i]+" size "+dcs[i]);
+				} catch(Exception ex) {
+					ex.printStackTrace();
 				}
 	
 	        }

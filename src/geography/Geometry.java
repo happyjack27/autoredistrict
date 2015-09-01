@@ -25,6 +25,8 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	
 	public static boolean isLatLon = true; 
 	public static double SCALELATLON = 100000;
+	public static double RADIUS_OF_EARTH = 6372.8; //in km
+
 
 	
 	public static double shiftx=0,shifty=0,scalex=1,scaley=1;

@@ -10,6 +10,11 @@ public class District extends JSONObject {
     double[][] pop_balanced_outcomes;
     
     private double population = -1;
+    
+    public double area = 1;
+    public double edge_length = 1;
+    public double iso_quotent = 1;
+    
     void resetPopulation() {
     	population = -1;
     }

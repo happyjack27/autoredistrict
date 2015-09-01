@@ -86,7 +86,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelGraph panelGraph = new PanelGraph();
 
 	//===========COMPONENTS - MENU ITEMS
-	JMenuItem mntmShowDemographics = new JMenuItem("Color by demographic");
+	JMenuItem mntmShowDemographics = null;
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
@@ -995,6 +995,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByDistrict;
 	public JMenuItem mntmColorByPop;
 	public JMenuItem mntmColorByVote;
+	public JMenuItem mntmColorByCompactness;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3240,7 +3241,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnView.add(new JSeparator());
-		mnView.add(chckbxmntmShowPrecinctLabels);
+		//mnView.add(chckbxmntmShowPrecinctLabels);
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Feature.showDistrictLabels = chckbxmntmShowDistrictLabels.isSelected();
@@ -3260,15 +3261,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(chckbxmntmHideMapLines);
 		
-		mntmShowDemographics.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("old mode: "+Feature.display_mode );
-				Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;// mntmShowDemographics.isSelected() ? 3 : 0;
-				System.out.println("new mode: "+Feature.display_mode );
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
 		
 		separator_6 = new JSeparator();
 		mnView.add(separator_6);
@@ -3276,9 +3268,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByDistrict = new JMenuItem("Color by district");
 		mntmColorByDistrict.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("old mode: "+Feature.display_mode );
-				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;// mntmShowDemographics.isSelected() ? 3 : 0;
-				System.out.println("new mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -3288,9 +3278,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByPop = new JMenuItem("Color by pop imbalance");
 		mntmColorByPop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("old mode: "+Feature.display_mode );
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;// mntmShowDemographics.isSelected() ? 3 : 0;
-				System.out.println("new mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -3300,14 +3288,32 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByVote = new JMenuItem("Color by vote imbalance");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("old mode: "+Feature.display_mode );
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;// mntmShowDemographics.isSelected() ? 3 : 0;
-				System.out.println("new mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
 		});
 		mnView.add(mntmColorByVote);
+		
+		
+		mntmColorByCompactness = new JMenuItem("Color by compactness");
+		mntmColorByCompactness.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByCompactness);
+		
+		mntmShowDemographics = new JMenuItem("Color by demographic");
+		mntmShowDemographics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
 		mnView.add(mntmShowDemographics);
 		
 		
