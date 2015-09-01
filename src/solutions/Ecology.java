@@ -194,7 +194,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		if( !evolve_paused) {
 			return;
 		}
-		Feature.display_mode = 0;
+		//Feature.display_mode = 0;
 
 		if( evolveThread != null) {
 			try {
