@@ -279,6 +279,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					} else {
 						district_colors[i] = Color.WHITE;
 					}
+					/*
 					
 					int shade = (int)(255.0*amt); 
 					if( shade < 0) {
@@ -288,6 +289,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						shade = 255;
 					}
 					district_colors[i] = new Color(255,255-shade,255-shade);
+					*/
 				}
 				for( int i = 0; i < features.size(); i++) {
 					Feature f = features.get(i);
