@@ -157,7 +157,7 @@ public class DialogManageLocks extends JDialog {
 		for( int i = 0; i < featureCollection.features.size(); i++) {
 			Feature feat = featureCollection.features.get(i);
 			if( feat.properties.get(key).toString().equals(keychoice)) {
-				int dist = featureCollection.ecology.population.get(0).ward_districts[i];
+				int dist = featureCollection.ecology.population.get(0).vtd_districts[i];
 				counts[dist]++;
 			}
 		}
@@ -175,7 +175,7 @@ public class DialogManageLocks extends JDialog {
 			Feature feat = featureCollection.features.get(i);
 			if( feat.properties.get(key).toString().equals(keychoice)) {
 				for( DistrictMap dm : featureCollection.ecology.population) {
-					dm.ward_districts[i] = max_index;
+					dm.vtd_districts[i] = max_index;
 				}
 			}
 		}

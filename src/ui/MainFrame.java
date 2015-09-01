@@ -38,7 +38,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 
-	
+	 
 	
 
 	//public Ecology ecology = new Ecology();
@@ -86,7 +86,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelGraph panelGraph = new PanelGraph();
 
 	//===========COMPONENTS - MENU ITEMS
-	JCheckBoxMenuItem mntmShowDemographics = new JCheckBoxMenuItem("Show demographics");
+	JMenuItem mntmShowDemographics = new JMenuItem("Color by demographic");
 	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
@@ -643,7 +643,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		System.out.println();
 					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.ward.id]);
 		    					
 		    					try {
 		    						//System.out.println("writing...");
@@ -745,7 +745,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		System.out.println();
 					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.ward.id]);
 		    					
 		    					try {
 		    						//System.out.println("writing...");
@@ -991,6 +991,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmFourMaps;
 	public JSeparator separator_5;
 	public JCheckBoxMenuItem chckbxmntmUseAnnealFloor;
+	public JSeparator separator_6;
+	public JMenuItem mntmColorByDistrict;
+	public JMenuItem mntmColorByPop;
+	public JMenuItem mntmColorByVote;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -1499,8 +1503,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		System.out.println("renumbering...");
 		for( DistrictMap dm : featureCollection.ecology.population) {
 			System.out.print(".");
-			for( int i = 0; i < dm.ward_districts.length; i++) {
-				dm.ward_districts[i] = renumbering[dm.ward_districts[i]];
+			for( int i = 0; i < dm.vtd_districts.length; i++) {
+				dm.vtd_districts[i] = renumbering[dm.vtd_districts[i]];
 			}
 		}
 		System.out.println();
@@ -3259,13 +3263,51 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmShowDemographics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.out.println("old mode: "+Feature.display_mode );
-				Feature.display_mode = mntmShowDemographics.isSelected() ? 3 : 0;
+				Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;// mntmShowDemographics.isSelected() ? 3 : 0;
 				System.out.println("new mode: "+Feature.display_mode );
 				mapPanel.invalidate();
 				mapPanel.repaint();
-
 			}
 		});
+		
+		separator_6 = new JSeparator();
+		mnView.add(separator_6);
+		
+		mntmColorByDistrict = new JMenuItem("Color by district");
+		mntmColorByDistrict.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				System.out.println("old mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;// mntmShowDemographics.isSelected() ? 3 : 0;
+				System.out.println("new mode: "+Feature.display_mode );
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByDistrict);
+		
+		mntmColorByPop = new JMenuItem("Color by pop imbalance");
+		mntmColorByPop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("old mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;// mntmShowDemographics.isSelected() ? 3 : 0;
+				System.out.println("new mode: "+Feature.display_mode );
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByPop);
+		
+		mntmColorByVote = new JMenuItem("Color by vote imbalance");
+		mntmColorByVote.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("old mode: "+Feature.display_mode );
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;// mntmShowDemographics.isSelected() ? 3 : 0;
+				System.out.println("new mode: "+Feature.display_mode );
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByVote);
 		mnView.add(mntmShowDemographics);
 		
 		
@@ -3399,7 +3441,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					FileOutputStream fis = new FileOutputStream(f);
 					
 					DistrictMap dm = featureCollection.ecology.population.get(0);
-					for( int i = 0; i < dm.ward_districts.length; i++) {
+					for( int i = 0; i < dm.vtd_districts.length; i++) {
 						Ward b = featureCollection.ecology.wards.get(i);
 						//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 						//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
@@ -3536,7 +3578,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						FileOutputStream fis = new FileOutputStream(f);
 						
 						DistrictMap dm = featureCollection.ecology.population.get(pop);
-						for( int i = 0; i < dm.ward_districts.length; i++) {
+						for( int i = 0; i < dm.vtd_districts.length; i++) {
 							Ward b = featureCollection.ecology.wards.get(i);
 							//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 							//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());

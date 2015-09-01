@@ -134,7 +134,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		if( ecology.population != null && ecology.population.size() > shown_map) {
 			DistrictMap dm  = ecology.population.get(shown_map);
 			//System.out.println("snd:"+Settings.num_districts+" dmbd:"+dm.ward_districts.length);
-			if( dm.ward_districts != null) {
+			if( dm.vtd_districts != null) {
 				Color[] c = new Color[Settings.num_districts];
 				int saturations = (int) Math.ceil((double)Settings.num_districts / (double)(max_hues*4));
 				int values = (int) Math.ceil((double)Settings.num_districts / (double)max_hues);
@@ -167,7 +167,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					Feature f = features.get(i);
 					Ward b = f.ward;
 					Geometry geo = features.get(i).geometry;
-					int di = dm.ward_districts[b.id];
+					int di = dm.vtd_districts[b.id];
+					if( di >= Settings.num_districts) {
+						System.out.println("district out of range! "+di);
+						continue;
+					}
 					try {
 				       	f.geometry.makePolys();
 						double area = features.get(i).ward.area;
@@ -194,83 +198,95 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		DistrictMap dm  = ecology.population.get(shown_map);
-		int total = 0;
-		for( int i = 0; i < Settings.num_districts; i++) {
-			total += dm.districts.get(i).getPopulation();
-		}
-		total /= Settings.num_districts;
 
 		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_POP) {
-			int max = -1000000000; 
-			int min = +1000000000; 
-			for( int i = 0; i < Settings.num_districts; i++) {
-				if( dm.districts.get(i).getPopulation() > max) {
-					max = (int)dm.districts.get(i).getPopulation()-total;
+			if( shown_map < ecology.population.size()) {
+				DistrictMap dm  = ecology.population.get(shown_map);
+				int total = 0;
+				for( int i = 0; i < Settings.num_districts; i++) {
+					total += dm.districts.get(i).getPopulation();
 				}
-				if( dm.districts.get(i).getPopulation() < min) {
-					min = (int)dm.districts.get(i).getPopulation()-total;
+				total /= Settings.num_districts;
+				
+				int max = -1000000000; 
+				int min = +1000000000; 
+				for( int i = 0; i < Settings.num_districts; i++) {
+					if( dm.districts.get(i).getPopulation()-total > max) {
+						max = (int)dm.districts.get(i).getPopulation()-total;
+					}
+					if( dm.districts.get(i).getPopulation()-total < min) {
+						min = (int)dm.districts.get(i).getPopulation()-total;
+					}
 				}
-			}
-			Color[] district_colors = new Color[Settings.num_districts];
-			for( int i = 0; i < Settings.num_districts; i++) {
-				double amt = dm.districts.get(i).getPopulation()-total;
-				if( amt < 0) {
-					amt /= min;
-					int shade = (int)(255.0*amt); 
-					district_colors[i] = new Color(255,255-shade,255-shade);
-				} else if (amt > 0) {
-					amt /= max;
-					int shade = (int)(255.0*amt); 
-					district_colors[i] = new Color(255-shade,255,255-shade);
-				} else {
-					district_colors[i] = Color.WHITE;
+				Color[] district_colors = new Color[Settings.num_districts];
+				for( int i = 0; i < Settings.num_districts; i++) {
+					double amt = dm.districts.get(i).getPopulation()-total;
+					if( amt < 0) {
+						amt /= min;
+						int shade = (int)(255.0*amt); 
+						district_colors[i] = new Color(255,255-shade,255-shade);
+					} else if (amt > 0) {
+						amt /= max;
+						int shade = (int)(255.0*amt); 
+						district_colors[i] = new Color(255-shade,255,255-shade);
+					} else {
+						district_colors[i] = Color.WHITE;
+					}
 				}
-			}
-			for( int i = 0; i < features.size(); i++) {
-				Feature f = features.get(i);
-				Ward b = f.ward;
-				Geometry geo = features.get(i).geometry;
-				int di = dm.ward_districts[b.id];
-				geo.fillColor = district_colors[di];
+				for( int i = 0; i < features.size(); i++) {
+					Feature f = features.get(i);
+					Ward b = f.ward;
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[b.id];
+					geo.fillColor = district_colors[di];
+				}
 			}
 		}
 		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_DEMO) {
-			Color[] district_colors = new Color[Settings.num_districts];
-			Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
-			//double[] district_colors = new Color[Settings.num_districts];
-			double[] tot = new double[Settings.num_districts];
-			double[] red = new double[Settings.num_districts];
-			double[] green = new double[Settings.num_districts];
-			double[] blue = new double[Settings.num_districts];
-			
-			for( int i = 0; i < features.size(); i++) {
-				Feature f = features.get(i);
-				Ward b = f.ward;
-				Geometry geo = features.get(i).geometry;
-				int di = dm.ward_districts[b.id];
-				
-				for( int j = 0; j < b.demographics.size() && j < colors.length; j++) {
-					int pop = b.demographics.get(i).population;
-					tot[di] += pop;
-					red[di] += colors[j].getRed()*pop;
-					green[di] += colors[j].getGreen()*pop;
-					blue[di] += colors[j].getBlue()*pop;
+			if( shown_map < ecology.population.size()) {
+				DistrictMap dm  = ecology.population.get(shown_map);
+				int total = 0;
+				for( int i = 0; i < Settings.num_districts; i++) {
+					total += dm.districts.get(i).getPopulation();
 				}
-			}
-			for( int i = 0; i < Settings.num_districts; i++) {
-				district_colors[i] = new Color(
-						(int)(red[i] / tot[i]),
-						(int)(green[i] / tot[i]),
-						(int)(blue[i] / tot[i])
-				);
-			}			
-			for( int i = 0; i < features.size(); i++) {
-				Feature f = features.get(i);
-				Ward b = f.ward;
-				Geometry geo = features.get(i).geometry;
-				int di = dm.ward_districts[b.id];
-				geo.fillColor = district_colors[di];
+				total /= Settings.num_districts;
+				
+				Color[] district_colors = new Color[Settings.num_districts];
+				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+				//double[] district_colors = new Color[Settings.num_districts];
+				double[] tot = new double[Settings.num_districts];
+				double[] red = new double[Settings.num_districts];
+				double[] green = new double[Settings.num_districts];
+				double[] blue = new double[Settings.num_districts];
+				
+				for( int i = 0; i < features.size(); i++) {
+					Feature f = features.get(i);
+					Ward b = f.ward;
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[b.id];
+					
+					for( int j = 0; j < b.demographics.size() && j < colors.length; j++) {
+						int pop = b.demographics.get(j).population;
+						tot[di] += pop;
+						red[di] += colors[j].getRed()*pop;
+						green[di] += colors[j].getGreen()*pop;
+						blue[di] += colors[j].getBlue()*pop;
+					}
+				}
+				for( int i = 0; i < Settings.num_districts; i++) {
+					district_colors[i] = new Color(
+							(int)(red[i] / tot[i]),
+							(int)(green[i] / tot[i]),
+							(int)(blue[i] / tot[i])
+					);
+				}			
+				for( int i = 0; i < features.size(); i++) {
+					Feature f = features.get(i);
+					Ward b = f.ward;
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[b.id];
+					geo.fillColor = district_colors[di];
+				}
 			}
 		}
         for( Feature f : features) {
@@ -279,6 +295,15 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         }
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
+				int total = 0;
+				DistrictMap dm = null;
+				if( shown_map < ecology.population.size()) {
+					dm = ecology.population.get(shown_map);
+					for( int i = 0; i < Settings.num_districts; i++) {
+						total += dm.districts.get(i).getPopulation();
+					}
+					total /= Settings.num_districts;
+				}	        	
 				g.setColor(Color.BLACK);
 				g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
 				for( int i = 0; i < Settings.num_districts; i++) {
@@ -291,7 +316,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 					g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
 					g.drawString(name, (int)dxs[i] - (int)(fm.stringWidth(name)/2.0), (int)dys[i]);
-					int amt = (int) (dm.districts.get(i).getPopulation() - total);
+					int amt = dm == null ? 0 : (int) (dm.districts.get(i).getPopulation() - total);
 					g.setFont(new Font("Arial",Font.PLAIN,10*MapPanel.FSAA));
 					if( amt > 0) {
 						g.drawString("+"+amt, (int)dxs[i] - (int)(fm.stringWidth("+"+amt)/2.0), (int)dys[i]+fm.getHeight());
