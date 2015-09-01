@@ -11,7 +11,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int EMA = 1;
 	public static int LINEARIZE_MODE = EMA;
     public static boolean mutate_disconnected = false;
-    public static double mutate_disconnected_threshold = 0.05;
+    public static double mutate_disconnected_threshold = 0.10;
 
 	
 	
