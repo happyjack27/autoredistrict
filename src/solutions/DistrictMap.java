@@ -952,7 +952,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	tot2 += pop*pop;
         }
         //tot /= (double) districts.size();
-        return (tot2-tot*tot/N) / N;
+        double variance =  (tot2-tot*tot/N) / N;
+        return Settings.squared_pop_variance ? variance*variance : variance;
     }
 
     public int compareTo(DistrictMap o) {
@@ -969,6 +970,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( Ward b : vtds) {
         	int d1 = vtd_districts[b.id];
         	areas[d1] += b.area;
+        	lengths[d1] += b.unpaired_edge_length;
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id; 
             	int d2 = vtd_districts[b2id];

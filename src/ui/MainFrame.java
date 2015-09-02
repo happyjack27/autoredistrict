@@ -2013,13 +2013,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//comboBoxPopulation.setSelectedIndex(0);
 		
 	}
-	public void finishLoadingGeography() {
+	public void getMinMaxXY() {
 		Vector<Feature> features = featureCollection.features;
-		System.out.println(features.size()+" precincts loaded.");
-		System.out.println("Initializing wards...");
-		featureCollection.initwards();
-	    dlbl.setText("Setting min and max coordinates...");
-	
+
 		minx = features.get(0).geometry.coordinates[0][0][0];
 		maxx = features.get(0).geometry.coordinates[0][0][0];
 		miny = features.get(0).geometry.coordinates[0][0][1];
@@ -2048,6 +2044,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		System.out.println(""+minx+","+miny);
 		System.out.println(""+maxx+","+maxy);
 		featureCollection.recalcDlonlat();
+	}
+	public void finishLoadingGeography() {
+		Vector<Feature> features = featureCollection.features;
+		System.out.println(features.size()+" precincts loaded.");
+	    getMinMaxXY();
+		System.out.println("Initializing wards...");
+		featureCollection.initwards();
+	    dlbl.setText("Setting min and max coordinates...");
+	    
+	    getMinMaxXY();
+	
 		resetZoom();
 		
 	    dlbl.setText("Initializing ecology...");

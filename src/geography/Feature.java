@@ -4,11 +4,13 @@ import java.util.*;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Polygon;
 
 import com.hexiong.jdbf.JDBField;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.Settings;
 import solutions.Ward;
 
 public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
@@ -46,30 +48,48 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public double calcArea() {
 		System.out.print(".");
 		
-		//Geometry.RADIUS_OF_EARTH
-		
 		double tot_area = 0;
-		for( int i = 0; i < geometry.coordinates.length; i++) {
-			double area = 0;
-			double[][] coords = geometry.coordinates[i];
-			double[] lons = new double[coords.length];
-			double[] lats = new double[coords.length];
-			for( int j = 0; j < coords.length; j++) {
-				lons[j] = Math.toRadians(coords[j][0]);
-				lats[j] = Math.toRadians(coords[j][1]);
+		if( !Settings.use_rectangularized_compactness) {
+			for( int i = 0; i < geometry.coordinates.length; i++) {
+				double area = 0;
+				double[][] coords = geometry.coordinates[i];
+				double[] lons = new double[coords.length];
+				double[] lats = new double[coords.length];
+				for( int j = 0; j < coords.length; j++) {
+					lons[j] = Math.toRadians(coords[j][0]);
+					lats[j] = Math.toRadians(coords[j][1]);
+				}
+				tot_area += SphericalPolygonArea(lats,lons,Geometry.RADIUS_OF_EARTH);
 			}
-			tot_area += SphericalPolygonArea(lats,lons,Geometry.RADIUS_OF_EARTH);
-			/*
-			int k = coords.length-1;
-			for( int j = 0; j < coords.length; j++) {
-				area += FeatureCollection.dlonlat*(coords[k][0]+coords[j][0])*(coords[k][1]-coords[j][1]);
-				k = j;
+		} else {
+			for( int i = 0; i < geometry.coordinates.length; i++) {
+				double[][] coords = geometry.coordinates[i];
+				int[] xpoints = new int[coords.length];
+				int[] ypoints = new int[coords.length];
+				int npoints = coords.length;
+				
+				FeatureCollection.recalcDlonlat();
+				double xscale = FeatureCollection.dlonlat*Geometry.SCALELATLON;
+				double yscale = Geometry.SCALELATLON;
+				for( int j = 0; i < coords.length; i++) {
+					xpoints[j] = (int)(coords[j][0]*xscale);
+					ypoints[j] = (int)(coords[j][1]*yscale);
+				}
+				Polygon p = new Polygon(xpoints,ypoints,npoints);
+				tot_area += Math.abs(flatArea(p));
 			}
-			tot_area += Math.abs(area)/2.0;
-			*/
+			
 		}
 		ward.area = tot_area;
 		return tot_area;
+	}
+	
+	public double flatArea(Polygon p) {
+	        double sum = 0.0;
+	        for (int i = 0; i < p.npoints; i++) {
+	            sum += (p.xpoints[i] * p.ypoints[(i+1)%p.npoints]) - (p.ypoints[i] * p.xpoints[(i+1)%p.npoints]);
+	        }
+	        return Math.sqrt(0.5 * sum);
 	}
 	
 	/// <summary>

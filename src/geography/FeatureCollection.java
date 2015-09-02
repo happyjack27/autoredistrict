@@ -84,7 +84,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		return data;
 	}
-	public void recalcDlonlat() {
+	public static void recalcDlonlat() {
 		//lock aspect ratio
 		double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
 		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
@@ -469,6 +469,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		Geometry.shiftx = Geometry.shifty = 0;
 		Geometry.scalex = Geometry.scaley = 1;
+		
+		//now if has no neighbors, add nearest.
 		for( Feature f : features) {
 			if( f.ward.neighbors.size() == 0) {
 				if( f.geometry == null || f.geometry.polygons == null) {
@@ -477,6 +479,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				if( f.geometry == null || f.geometry.polygons == null) {
 					continue;
 				}
+
+				Feature nearest = getNearestFeature(f);
+
+				//new way, just add the unpaired edge length of the no-neighbors feature.
+				double[] new_neighbbor_lengths = new double[nearest.ward.neighbor_lengths.length+1];
+				for( int i = 0; i < nearest.ward.neighbor_lengths.length; i++) {
+					new_neighbbor_lengths[i] = nearest.ward.neighbor_lengths[i]; 
+				}
+				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.ward.unpaired_edge_length;
+				
+				nearest.ward.neighbors.add(f.ward);
+				nearest.ward.neighbor_lengths = new_neighbbor_lengths;
+				
+				f.ward.neighbors.add(nearest.ward);
+				f.ward.neighbor_lengths = new double[]{f.ward.unpaired_edge_length};
+				f.ward.unpaired_edge_length = 0;
+
+				/*
+				 //old way - grab a fraction of the new neighbors edges.
 
 				Feature nearest = getNearestFeature(f);
 				double total_length = 0;
@@ -493,8 +514,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				
 				f.ward.neighbors.add(nearest.ward);
 				f.ward.neighbor_lengths = new double[]{total_length};
+				*/
 			}
 		}
+		
+		//initialize locked_wards array.
 		locked_wards = new boolean[precincts.size()];
 		for( int i = 0; i < locked_wards.length; i++) {
 			locked_wards[i] = false;

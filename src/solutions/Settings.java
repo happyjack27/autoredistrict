@@ -13,10 +13,13 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static boolean mutate_disconnected = false;
     public static double mutate_disconnected_threshold = 0.10;
 
+	public static boolean use_rectangularized_compactness = false;
+
 	
-	
-	public static boolean square_root_compactness = false;
 	public static boolean squared_compactness = false;
+	public static boolean squared_pop_variance = true;
+	
+	
 	//public static boolean border_length_area_weighted = true;
 	public static final boolean make_unique = false; //not the cost of this is population times population times precinct count.
 	public static long annealing_starts_at = 0;

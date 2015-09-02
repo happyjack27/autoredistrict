@@ -16,6 +16,7 @@ public class Ward extends ReflectionJSONObject<Ward> {
     public Vector<Edge> edges = new Vector<Edge>();
     public Vector<Ward> neighbors = new Vector<Ward>();
     public double[] neighbor_lengths;
+    public double unpaired_edge_length = 0;
     public Vector<Demographic> demographics = new Vector<Demographic>();
     private double[][] mu_sigma_n = null;
     
@@ -88,26 +89,31 @@ public class Ward extends ReflectionJSONObject<Ward> {
     	
     }
     public void collectNeighborLengths() {
+    	unpaired_edge_length = 0;
     	neighbor_lengths = new double[neighbors.size()];
     	for( int i = 0; i < neighbor_lengths.length; i++) {
     		neighbor_lengths[i] = 0;
     	}
 		for(Edge e : edges) {
+			boolean found = false;
 	    	for( int i = 0; i < neighbor_lengths.length; i++) {
 	    		Ward b = neighbors.get(i);
 	    		if( e.ward1_id == b.id || e.ward2_id == b.id){
-	    			neighbor_lengths[i] += e.length;	
+	    			neighbor_lengths[i] += e.length;
+	    			found = true;
+	    			break;
 	    		}
 	    	}
+	    	if( !found) {
+	    		unpaired_edge_length += e.length;
+	    	}
 		}
-    	
     }
     
     public void collectNeighbors() {
-		//HashSet<ward> hashwards = new HashSet<ward>(); 
+    	//this gets a list of distinct neighbors.
+    	
 		neighbors = new Vector<Ward>();
-		//System.out.println("edges: "+edges.size());
-		//System.out.print("ward "+id+" neighbors: ");
 		for( Edge e : edges) {
 			Ward b = e.ward1.id == this.id ? e.ward2 : e.ward1;
 			if( b != null && b.id != this.id) {
