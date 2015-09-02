@@ -965,37 +965,87 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( wel >= 0) {
     		return wel;
     	}
-    	double[] lengths = new double[districts.size()]; 
+    	//double[] lengths = new double[districts.size()]; 
+    	double[] paired_lengths = new double[districts.size()]; 
+    	double[] unpaired_lengths = new double[districts.size()]; 
     	double[] areas = new double[districts.size()]; 
         for( Ward b : vtds) {
         	int d1 = vtd_districts[b.id];
         	areas[d1] += b.area;
-        	lengths[d1] += b.unpaired_edge_length;
+        	unpaired_lengths[d1] += b.unpaired_edge_length;
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id; 
             	int d2 = vtd_districts[b2id];
             	if( d1 != d2) {
-            		lengths[d1] += b.neighbor_lengths[i];
+            		paired_lengths[d1] += b.neighbor_lengths[i];
             		//lengths[d2] += b.neighbor_lengths[i];
             	}
         	}
         }
         
         double weighted_sum = 0;
-        for( int i = 0; i < lengths.length; i++) {
+        double weighted_sum_all_paired = 0;
+        double num_all_paired = 0;
+        for( int i = 0; i < paired_lengths.length; i++) {
         	areas[i] *= area_multiplier;
         	District d = districts.get(i);
-        	d.edge_length = lengths[i];
+        	d.paired_edge_length = paired_lengths[i];
+        	d.unpaired_edge_length = unpaired_lengths[i];
+
+        	/*
+        	double a = paired_lengths[i];
+        	double b = unpaired_lengths[i];
+        	d.edge_length = paired_lengths[i];
+        	d.area = areas[i]*(a*a)/((a+b)*(a+b));
+        	*/
+        	
+        	d.edge_length = d.paired_edge_length + d.unpaired_edge_length/2;
         	d.area = areas[i];
-        	d.iso_quotent = Math.sqrt( (4.0*Math.PI*areas[i]) / (lengths[i]*lengths[i]) );
+        	
+        	d.iso_quotent = Math.sqrt( (4.0*Math.PI*d.area) / (d.edge_length*d.edge_length) );
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
-        	weighted_sum += Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
+        	if( Settings.squared_compactness) {
+        		d.iso_quotent *= d.iso_quotent;
+        	}
+        	if( unpaired_lengths[i] == 0) {
+        		weighted_sum_all_paired += 1.0/d.iso_quotent;
+        		num_all_paired++;
+        	}
+        	weighted_sum += 1.0/d.iso_quotent;//Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
         }
         //weighted_sum = Math.sqrt(weighted_sum);
-        wel = (weighted_sum / (double)lengths.length);
-        if( Settings.squared_compactness ) {
-        	wel = Math.sqrt(wel);
+        if( num_all_paired == 0) { num_all_paired = 1; }
+        wel = (weighted_sum / (double)paired_lengths.length);
+        double wel_all_paired = (weighted_sum_all_paired / num_all_paired);
+        
+        /*
+        for( int i = 0; i < paired_lengths.length; i++) {
+        	areas[i] *= area_multiplier;
+        	District d = districts.get(i);
+        	d.edge_length = paired_lengths[i];
+        	d.unpaired_edge_length = unpaired_lengths[i];
+        	d.area = areas[i];
+        	double a = paired_lengths[i];
+        	double b = unpaired_lengths[i];
+        	d.area = areas[i]*(a*a)/((a+b)*(a+b));
+        	
+        	d.iso_quotent = Math.sqrt( (4.0*Math.PI*d.area) / (d.edge_length*d.edge_length) );
+        	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
+        	if( Settings.squared_compactness) {
+        		d.iso_quotent *= d.iso_quotent;
+        	}
+        	if( unpaired_lengths[i] == 0) {
+        		weighted_sum_all_paired += 1.0/d.iso_quotent;
+        		num_all_paired++;
+        	}
+        	weighted_sum += 1.0/d.iso_quotent;//Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
         }
+        */
+        
+        
+        //if( Settings.squared_compactness ) {
+        	//wel = Math.sqrt(wel);
+        //}
         return wel;
     }
     

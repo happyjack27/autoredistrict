@@ -253,11 +253,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				double max = -1000000000; 
 				double min = +1000000000; 
 				for( int i = 0; i < Settings.num_districts; i++) {
-					if( dm.districts.get(i).iso_quotent > max) {
-						max = dm.districts.get(i).iso_quotent;
+					if( Math.sqrt(dm.districts.get(i).iso_quotent) > max) {
+						max = Math.sqrt(dm.districts.get(i).iso_quotent);
 					}
-					if( dm.districts.get(i).iso_quotent < min) {
-						min = dm.districts.get(i).iso_quotent;
+					if( Math.sqrt(dm.districts.get(i).iso_quotent) < min) {
+						min = Math.sqrt(dm.districts.get(i).iso_quotent);
 					}
 				}
 				mavg_min += (min-mavg_min)/(mavg_min == 0 ? 1 : 20); 
@@ -267,7 +267,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				
 				Color[] district_colors = new Color[Settings.num_districts];
 				for( int i = 0; i < Settings.num_districts; i++) {
-					double amt = 1.0-Math.abs((dm.districts.get(i).iso_quotent-min)/(max-min));
+					double amt = 1.0-Math.abs((Math.sqrt(dm.districts.get(i).iso_quotent)-min)/(max-min));
 					amt = amt*2.0-1.0;
 					if( amt < 0) {
 						amt *= -1;

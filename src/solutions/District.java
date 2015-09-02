@@ -14,6 +14,8 @@ public class District extends JSONObject {
     public double area = 1;
     public double edge_length = 1;
     public double iso_quotent = 1;
+    public double paired_edge_length = 1;
+    public double unpaired_edge_length = 1;
     
     void resetPopulation() {
     	population = -1;
