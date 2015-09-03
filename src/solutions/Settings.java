@@ -12,8 +12,11 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int LINEARIZE_MODE = EMA;
     public static boolean mutate_disconnected = false;
     public static double mutate_disconnected_threshold = 0.10;
+	public static boolean mutate_excess_pop = false;
 
-	public static boolean use_rectangularized_compactness = false;
+	public static boolean adjust_vote_to_population = false;
+
+	public static boolean use_rectangularized_compactness = true;
 
 	
 	public static boolean squared_compactness = true;
@@ -115,5 +118,4 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			c.valueChanged();
 		}
 	}
-	public static boolean adjust_vote_to_population = false;
 }

@@ -49,9 +49,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		System.out.print(".");
 		
 		double tot_area = 0;
+		try {
 		if( !Settings.use_rectangularized_compactness) {
 			for( int i = 0; i < geometry.coordinates.length; i++) {
-				double area = 0;
 				double[][] coords = geometry.coordinates[i];
 				double[] lons = new double[coords.length];
 				double[] lats = new double[coords.length];
@@ -62,34 +62,57 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				tot_area += SphericalPolygonArea(lats,lons,Geometry.RADIUS_OF_EARTH);
 			}
 		} else {
+			FeatureCollection.recalcDlonlat();
+			double xscale = FeatureCollection.dlonlat*(double)Geometry.SCALELATLON;
+			double yscale = Geometry.SCALELATLON;
+			//System.out.println("dlatlon "+FeatureCollection.dlonlat);
+			//System.out.println("xscale "+xscale);
+			//System.out.println("yscale "+yscale);
+			
 			for( int i = 0; i < geometry.coordinates.length; i++) {
 				double[][] coords = geometry.coordinates[i];
-				int[] xpoints = new int[coords.length];
-				int[] ypoints = new int[coords.length];
+				double[] xpoints = new double[coords.length];
+				double[] ypoints = new double[coords.length];
 				int npoints = coords.length;
 				
-				FeatureCollection.recalcDlonlat();
-				double xscale = FeatureCollection.dlonlat*Geometry.SCALELATLON;
-				double yscale = Geometry.SCALELATLON;
-				for( int j = 0; i < coords.length; i++) {
-					xpoints[j] = (int)(coords[j][0]*xscale);
-					ypoints[j] = (int)(coords[j][1]*yscale);
+				for( int j = 0; j < coords.length; j++) {
+					xpoints[j] = coords[j][0]*xscale;
+					ypoints[j] = coords[j][1]*yscale;
 				}
-				Polygon p = new Polygon(xpoints,ypoints,npoints);
-				tot_area += Math.abs(flatArea(p));
+				tot_area += Math.abs(flatArea(xpoints,ypoints,npoints));
 			}
 			
+		}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 		ward.area = tot_area;
 		return tot_area;
 	}
 	
-	public double flatArea(Polygon p) {
+	public double flatArea(double[] X,double[] Y,int N) {
 	        double sum = 0.0;
-	        for (int i = 0; i < p.npoints; i++) {
-	            sum += (p.xpoints[i] * p.ypoints[(i+1)%p.npoints]) - (p.ypoints[i] * p.xpoints[(i+1)%p.npoints]);
+	        int j = N-1;  // The last vertex is the 'previous' one to the first
+
+	        for (int i = 0; i < N; i++) {
+	            //sum += (X[i] * Y[(i+1)%N]) - (Y[i] * X[(i+1)%N]);
+	            sum += (X[j]+X[i]) * (Y[j]-Y[i]);
+	            j = i;
 	        }
-	        return Math.sqrt(0.5 * sum);
+	        return sum/2.0;
+	        //return Math.sqrt(0.5 * sum);
+	}
+	
+	double getPolygonArea(double[] X,double[] Y,int N) {
+		int i,j;
+		double area = 0;
+		for( i=0; i < N; i++) {
+			j = (i + 1) % N;
+			area += X[i] * Y[j];
+			area -= Y[i] * X[j];
+	    }
+		area /= 2;
+		return(area < 0 ? -area : area);
 	}
 	
 	/// <summary>

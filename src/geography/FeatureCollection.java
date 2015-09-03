@@ -86,8 +86,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public static void recalcDlonlat() {
 		//lock aspect ratio
-		double lat0 = MapPanel.miny;//features.get(0).geometry.coordinates[0][0][1];
-		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
+		double lat0 = MainFrame.mainframe.miny;//features.get(0).geometry.coordinates[0][0][1];
+		double lat1 = MainFrame.mainframe.maxy;//features.get(0).geometry.coordinates[0][0][1];
+		System.out.println("lat0"+lat0);
+		System.out.println("lat1"+lat1);
 		
 		dlonlat = Math.cos((lat0+lat1)/2);
 	}

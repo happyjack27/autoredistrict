@@ -29,16 +29,20 @@ public class Edge extends ReflectionJSONObject<Edge> {
     }
     
 	public void setLength() {
-		if( !Settings.use_rectangularized_compactness) {
-			length = haversine(vertex1.y,vertex1.x,vertex2.y,vertex2.x);
-		} else {
-			double xscale = FeatureCollection.dlonlat*Geometry.SCALELATLON;
-			double yscale = Geometry.SCALELATLON;
-			double dx = xscale*(vertex1.x-vertex2.x);
-			double dy = yscale*(vertex1.y-vertex2.y);
-			length = Math.sqrt(dx*dx+dy*dy);
+		try {
+			if( !Settings.use_rectangularized_compactness) {
+				length = haversine(vertex1.y,vertex1.x,vertex2.y,vertex2.x);
+			} else {
+				double xscale = FeatureCollection.dlonlat*Geometry.SCALELATLON;
+				double yscale = Geometry.SCALELATLON;
+				double dx = xscale*(vertex1.x-vertex2.x);
+				double dy = yscale*(vertex1.y-vertex2.y);
+				length = Math.sqrt(dx*dx+dy*dy);
+			}
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		
 		
 		/*
 		if( isLatLon) {

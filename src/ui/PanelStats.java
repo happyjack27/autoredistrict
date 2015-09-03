@@ -120,13 +120,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		try {
 			
-			String[] dcolumns = new String[5+Candidate.candidates.size()*2];
+			String[] dcolumns = new String[8+Candidate.candidates.size()*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			dcolumns[0] = "District";
 			dcolumns[1] = "Population";
 			dcolumns[2] = "Winner";
 			dcolumns[3] = "Self-entropy";
 			dcolumns[4] = "Compactness";
+			dcolumns[5] = "Area";
+			dcolumns[6] = "Paired edge length";
+			dcolumns[7] = "Unpaired edge length";
 			
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Candidate.candidates.size()][];
@@ -137,8 +140,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
-				dcolumns[i+5] = ""+i+" vote %";
-				dcolumns[i+5+Candidate.candidates.size()] = ""+i+" votes";
+				dcolumns[i+8] = ""+i+" vote %";
+				dcolumns[i+8+Candidate.candidates.size()] = ""+i+" votes";
 			}
 			
 			double total_population = 0;
@@ -168,14 +171,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
 				ddata[i][4] = ""+d.iso_quotent;
-				for( int j = 5; j < ddata[i].length; j++) {
+				ddata[i][5] = ""+d.area;
+				ddata[i][6] = ""+d.paired_edge_length;
+				ddata[i][7] = ""+d.unpaired_edge_length;
+				for( int j = 8; j < ddata[i].length; j++) {
 					ddata[i][j] = "";
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+5] = ""+(result[0][j]/total);
+					ddata[i][j+8] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+5+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
+					ddata[i][j+8+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
 			}
 			//System.out.println("tot votes "+tot_votes);

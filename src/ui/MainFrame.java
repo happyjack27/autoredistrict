@@ -64,10 +64,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public boolean hushcomboBoxCounty = false;
 
 	double mutation_rate_multiplier = 0.1;
-	public static double boundary_mutation_rate_multiplier = 0.4;
+	public static double boundary_mutation_rate_multiplier = 0.2;
 	long load_wait = 100;
 	
-	double minx,maxx,miny,maxy;
+	double minx,maxx;
+	public double miny;
+	public double maxy;
 	
 	public String openedProjectFilePath = "";	
 	
@@ -126,7 +128,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     public JTextField textField = new JTextField();
 	public JTextField textFieldMembersPerDistrict;
 
-	public JSlider slider_1 = new JSlider();
+	public JSlider slider_mutation = new JSlider();
 	public JSlider sliderDisconnected = new JSlider();
 	public JSlider sliderBorderLength = new JSlider();
 	public JSlider sliderPopulationBalance = new JSlider();
@@ -980,6 +982,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JLabel lblWastedVotesimbalance;
 	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
+	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
@@ -2610,11 +2613,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void initFeatures() {
 		Vector<Feature> features = featureCollection.features;
 		System.out.println(features.size()+" precincts loaded.");
+		System.out.println("Getting min/max...");
+	    getMinMaxXY();
 		System.out.println("Initializing wards...");
 		featureCollection.initwards();
 		Settings.resetAnnealing();
 		featureCollection.ecology.generation = 0;
-
+/*
 		minx = features.get(0).geometry.coordinates[0][0][0];
 		maxx = features.get(0).geometry.coordinates[0][0][0];
 		miny = features.get(0).geometry.coordinates[0][0][1];
@@ -2642,6 +2647,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		System.out.println(""+minx+","+miny);
 		System.out.println(""+maxx+","+maxy);
+		*/
 		resetZoom();
 		mapPanel.featureCollection = featureCollection;
 		mapPanel.invalidate();
@@ -2662,7 +2668,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		jbInit();
 		
 		Settings.mutation_rate = 0; 
-		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
+		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
@@ -3721,8 +3727,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JLabel lblBorderMutation = new JLabel("% mutation");
 		lblBorderMutation.setBounds(6, 103, 172, 16);
 		panel_3.add(lblBorderMutation);
-		slider_1.setBounds(6, 130, 190, 29);
-		panel_3.add(slider_1);
+		slider_mutation.setBounds(6, 130, 190, 29);
+		panel_3.add(slider_mutation);
 		
 		JLabel lblTrials = new JLabel("Elections simulated");
 		lblTrials.setBounds(6, 74, 134, 16);
@@ -3953,9 +3959,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			}
 		});
-		slider_1.addChangeListener(new ChangeListener() {
+		slider_mutation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_1.getValue()/100.0;
+				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
 			}
 		});
 		sliderPopulationBalance.addChangeListener(new ChangeListener() {
@@ -3982,6 +3988,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateDisconnected);
+		
+		chckbxmntmMutateExcessPop = new JCheckBoxMenuItem("Mutate excess pop only");
+		chckbxmntmMutateExcessPop.setSelected(Settings.mutate_excess_pop );
+		chckbxmntmMutateExcessPop.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_excess_pop = chckbxmntmMutateExcessPop.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateExcessPop);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
@@ -4031,7 +4046,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void valueChanged() {
  		textField.setText(""+Settings.population);
 		//System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
-		slider_1.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
+		slider_mutation.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
 		invalidate();
 		repaint();
 	}
