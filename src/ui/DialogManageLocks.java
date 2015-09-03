@@ -62,6 +62,14 @@ public class DialogManageLocks extends JDialog {
 				String[] ss = new String[feat.properties.keySet().size()];
 				feat.properties.keySet().toArray(ss);
 				
+				Vector<String> sortable = new Vector<String>();
+				for( int i = 0; i < ss.length; i++) {
+					sortable.add(ss[i]);
+				}
+				Collections.sort(sortable);
+				sortable.toArray(ss);
+				
+				
 				String key = (String) JOptionPane.showInputDialog(null, "Select column",
 						"Select column", JOptionPane.QUESTION_MESSAGE, null, 
 							        ss, // Array of choices
@@ -72,7 +80,8 @@ public class DialogManageLocks extends JDialog {
 				}
 				String[] keyoptions = new String[hash.size()];
 				hash.keySet().toArray(keyoptions);
-				Vector<String> sortable = new Vector<String>();
+				
+				sortable = new Vector<String>();
 				for( int i = 0; i < keyoptions.length; i++) {
 					sortable.add(keyoptions[i]);
 				}
