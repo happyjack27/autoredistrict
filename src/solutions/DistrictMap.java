@@ -187,11 +187,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	wel = -1;
         double max = Settings.num_districts;
         for( int i = 0; i < vtd_districts.length; i++) {
+        	/*
         	if( Settings.mutate_excess_pop) {
         		if(districts.get(vtd_districts[i]).excess_pop < 0) {
         			continue;
         		}
         	}
+        	*/
             if( Math.random() <= prob) {
                 vtd_districts[i] = (int)(Math.floor(Math.random()*max));
                 while( vtd_districts[i] >= Settings.num_districts) {
@@ -280,6 +282,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
     					Ward b = ward.neighbors.get(j);
+    					if( Settings.mutate_excess_pop) {
+			        		if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
+			        			break;
+			        		}
+			        	}
     					vtd_districts[i] = vtd_districts[b.id];
     					break;
     				}
@@ -296,11 +303,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
         for( int i = 0; i < vtd_districts.length; i++) {
+        	/*
         	if( Settings.mutate_excess_pop) {
         		if(districts.get(vtd_districts[i]).excess_pop < 0) {
         			continue;
         		}
-        	}
+        	}*/
         	mutate_ward_boundary(i,prob,true);
         }
         if( boundaries_tested == 0) {

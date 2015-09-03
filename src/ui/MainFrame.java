@@ -983,6 +983,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
+	public JCheckBoxMenuItem chckbxmntmAddBest;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
@@ -3989,7 +3990,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnEvolution.add(chckbxmntmMutateDisconnected);
 		
-		chckbxmntmMutateExcessPop = new JCheckBoxMenuItem("Mutate excess pop only");
+		chckbxmntmMutateExcessPop = new JCheckBoxMenuItem("Mutate towards equal pop only");
 		chckbxmntmMutateExcessPop.setSelected(Settings.mutate_excess_pop );
 		chckbxmntmMutateExcessPop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -3997,6 +3998,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateExcessPop);
+
+		chckbxmntmAddBest = new JCheckBoxMenuItem("Add best map as parent");
+		chckbxmntmAddBest.setSelected(Settings.pso );
+		chckbxmntmAddBest.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.pso = chckbxmntmAddBest.isSelected();
+			}
+		});
+
+		mnEvolution.add(chckbxmntmAddBest);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
