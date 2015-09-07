@@ -7,6 +7,10 @@ import solutions.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Map.Entry;
@@ -108,9 +112,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
+	JMenu mnHelp = new JMenu("Help");
+	JMenuItem mntmWebsite = new JMenuItem("Website");
+	JMenuItem mntmAbout = new JMenuItem("About");
 	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
 	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
 	JMenuItem mntmShowStats = new JMenuItem("Show stats");
+	
+	JMenu mnImportExport = new JMenu("Aggregate/Deaggregate");
 
 	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
 	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
@@ -2723,6 +2732,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		menuBar.add(mnFile);
+		menuBar.add(mnImportExport);
 		
 		JMenuItem mntmOpenProjectFile = new JMenuItem("Open project file");
 		mntmOpenProjectFile.addActionListener(new ActionListener() {
@@ -2816,7 +2826,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(mntmOpenWktTabdelimited);
 		
 		mnFile.add(separator_1);
-		mnFile.add(mntmImportCensusData);
+		mnImportExport.add(mntmImportCensusData);
 		
 		mntmExportToBlock = new JMenuItem("Export districts to block level");
 		mntmExportToBlock.addActionListener(new ActionListener() {
@@ -2830,10 +2840,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnFile.add(mntmImportAggregate);
+		mnImportExport.add(mntmImportAggregate);
 		
-		mnFile.add(separator_2);
-		mnFile.add(mntmExportToBlock);
+		mnImportExport.add(separator_2);
+		mnImportExport.add(mntmExportToBlock);
 		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -2850,9 +2860,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}				
 		});
 		
-		mnFile.add(mntmExportAndDeaggregate);
+		mnImportExport.add(mntmExportAndDeaggregate);
+		mnImportExport.add(new JSeparator());
+		mnImportExport.add(mntmConvertWktTo);
+
+
 		
-		mnFile.add(new JSeparator());
+		//mnFile.add(new JSeparator());
 		
 		//mnFile.add(chckbxmntmOpenCensusResults);
 		
@@ -3004,9 +3018,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				new WKTFileToCoordsThread().init();
 			}
 		});
-		mnFile.add(mntmConvertWktTo);
-
-		mnFile.add(new JSeparator());
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
@@ -3444,6 +3455,45 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
+		mntmAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(mainframe,""
+					    +"\nCopyright (C) 2015 Kevin Baas"
+					    +"\n"
+					    +"\nThis program is free software: you can redistribute it and/or modify"
+					    +"\nit under the terms of the GNU General Public License as published by"
+					    +"\nthe Free Software Foundation, either version 3 of the License, or"
+					    +"\n(at your option) any later version."
+					    +"\n"
+					    +"\nThis program is distributed in the hope that it will be useful,"
+					    +"\nbut WITHOUT ANY WARRANTY; without even the implied warranty of"
+					    +"\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
+					    +"\nGNU General Public License for more details."
+					    +"\n"
+					    +"\nYou should have received a copy of the GNU General Public License"
+					    +"\nalong with this program.  If not, see <http://www.gnu.org/licenses/>."
+						);
+			}	
+		});
+		
+		mntmWebsite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				URI uri = null;
+				try {
+					uri = new URL("http://autoredistrict.org/documentation.html").toURI();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+			    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+			        try {
+			            desktop.browse(uri);
+			        } catch (Exception e) {
+			            e.printStackTrace();
+			        }
+			    }
+			}	
+		});
 		
 		mntmExportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -3621,6 +3671,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JOptionPane.showMessageDialog(null,"Not implemented.");
 			}
 		});
+		//menuBar.add(S)
+		mnHelp.add(mntmWebsite);
+		mnHelp.add(mntmAbout);
+		menuBar.add(Box.createHorizontalGlue());
+		menuBar.add(mnHelp);
 		
 		JSplitPane splitPane = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
