@@ -3676,6 +3676,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnHelp.add(mntmWebsite);
 		mnHelp.add(mntmAbout);
 		menuBar.add(Box.createHorizontalGlue());
+		mnHelp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); 
 		menuBar.add(mnHelp);
 		
 		JSplitPane splitPane = new JSplitPane();
