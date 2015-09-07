@@ -5,7 +5,7 @@ import java.util.Vector;
 import serialization.JSONObject;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
-	public static int num_maps_to_draw = 4;
+	public static int num_maps_to_draw = 1;
 	public static boolean use_annealing_floor = true;
 	public static int RANK = 0;
 	public static int EMA = 1;

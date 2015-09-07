@@ -3277,7 +3277,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
-
+		chckbxmntmHideMapLines.setSelected(!Feature.draw_lines );
 		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.draw_lines = !chckbxmntmHideMapLines.isSelected();

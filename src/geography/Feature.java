@@ -33,7 +33,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static boolean showPrecinctLabels = false;
 	public static boolean showDistrictLabels = false;
 	public static int display_mode = 0;
-	public static boolean draw_lines = true;
+	public static boolean draw_lines = false;
 	
 	@Override
 	public int compareTo(Feature o) {
