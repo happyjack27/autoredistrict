@@ -2862,7 +2862,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnImportExport.add(mntmExportAndDeaggregate);
 		mnImportExport.add(new JSeparator());
-		mnImportExport.add(mntmConvertWktTo);
 
 
 		
@@ -3018,6 +3017,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				new WKTFileToCoordsThread().init();
 			}
 		});
+		mnImportExport.add(mntmConvertWktTo);
+
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mntmExit.addActionListener(new ActionListener() {
