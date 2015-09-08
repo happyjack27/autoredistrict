@@ -3260,6 +3260,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmWholeCounties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				manageLocks.show();
+				mapPanel.invalidate();
+				mapPanel.repaint();
 				//JOptionPane.showMessageDialog(mainframe,"Not implemented.");
 			}
 		});
