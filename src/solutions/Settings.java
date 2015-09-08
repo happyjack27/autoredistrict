@@ -12,7 +12,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int LINEARIZE_MODE = EMA;
 	public static int TRUNCATION_SELECTION = 0;
 	public static int ROULETTE_SELECTION = 1;
-	public static int SELECTION_MODE = TRUNCATION_SELECTION;
+	public static int SELECTION_MODE = ROULETTE_SELECTION;
     public static boolean mutate_disconnected = false;
     public static double mutate_disconnected_threshold = 0.10;
 	public static boolean mutate_excess_pop = false;
