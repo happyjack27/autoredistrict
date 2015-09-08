@@ -580,7 +580,16 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 }
             }
         } else {
-        	if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+        	if( Settings.SELECTION_MODE == Settings.RANK_SELECTION) {
+        		double inc = 1.0/(double)population.size();
+        		double current = 0;
+    	        for(int i = population.size()-1; i >= 0; i--) {
+    	        	DistrictMap dm = population.get(i);
+    	        	current += inc;
+    	        	dm.fitness_score = current;
+    	        }
+        	}
+    		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
         		//reverse it, we want it maximal instead of minimal
         		for( DistrictMap dm : population) {
         			dm.fitness_score = -dm.fitness_score;
@@ -598,26 +607,21 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	        	current += dm.fitness_score;
     	        	dm.fitness_score = current/total;
     	        }
+        	}
+        	if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
     	        while( swap_population.size() < population.size()) {
     	        	swap_population.add(new DistrictMap(wards,Settings.num_districts));
     	        }
     	        while( swap_population.size() > population.size()) {
     	        	swap_population.remove(0);
     	        }
-    	        /*
-    	        for(int i = 0; i < population.size(); i++) {
-    	        	DistrictMap dm = population.get(i);
-    	        	System.out.println(dm.fitness_score);
-    	        }
-    	        System.exit(0);
-    	        */
         	}
 		//System.out.print(""+step);
-        	cutoff = Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION ? 0 : population.size()/2; 
+        	cutoff = Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION ? 0 : population.size()/2; 
     		for( int j = 0; j < matingThreads.length; j++) {
     			matingThreads[j].available_mate.clear();
     			if( Settings.SELECTION_MODE != Settings.ROULETTE_SELECTION) {
-	    	        for(int i = 0; i < (Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION ? population.size() : population.size()/2); i++) {
+	    	        for(int i = 0; i < (Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION ? population.size() : population.size()/2); i++) {
 	    	        	matingThreads[j].available_mate.add(population.get(i));
 	    	        }
     			}
@@ -634,7 +638,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
-    		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
 	    		if( Settings.replace_all) {
 	    			Vector<DistrictMap> temp = population;
 	    			population = swap_population;
@@ -719,7 +723,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public int id = 0;
     	public Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
     	public void run() {
-    		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
 	            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
 	            	double d1 = Math.random();
 	            	DistrictMap map1 = null;

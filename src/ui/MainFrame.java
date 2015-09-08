@@ -1011,6 +1011,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByVote;
 	public JMenuItem mntmColorByCompactness;
 	public JCheckBoxMenuItem chckbxmntmTruncationSelection;
+	public JCheckBoxMenuItem chckbxmntmRankSelection;
 	public JCheckBoxMenuItem chckbxmntmFitnessProportionateSelection;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -4107,6 +4108,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( hush0) return;
 				hush0 = true;
 				chckbxmntmTruncationSelection.setSelected(true);
+				chckbxmntmRankSelection.setSelected(false);
 				chckbxmntmFitnessProportionateSelection.setSelected(false);
 				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
 				hush0 = false;
@@ -4114,12 +4116,28 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnEvolution.add(chckbxmntmTruncationSelection);
 		
+		chckbxmntmRankSelection = new JCheckBoxMenuItem("Rank selection");
+		chckbxmntmRankSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if( hush0) return;
+				hush0 = true;
+				chckbxmntmTruncationSelection.setSelected(false);
+				chckbxmntmRankSelection.setSelected(true);
+				chckbxmntmFitnessProportionateSelection.setSelected(false);
+				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
+				hush0 = false;
+			}
+		});
+		mnEvolution.add(chckbxmntmRankSelection);
+		
+		
 		chckbxmntmFitnessProportionateSelection = new JCheckBoxMenuItem("Fitness proportionate selection");
 		chckbxmntmFitnessProportionateSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if( hush0) return;
 				hush0 = true;
 				chckbxmntmTruncationSelection.setSelected(false);
+				chckbxmntmRankSelection.setSelected(false);
 				chckbxmntmFitnessProportionateSelection.setSelected(true);
 				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
 				hush0 = false;
@@ -4128,6 +4146,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		hush0 = true;
 		chckbxmntmTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
+		chckbxmntmRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
 		chckbxmntmFitnessProportionateSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
 		hush0 = false;
 
