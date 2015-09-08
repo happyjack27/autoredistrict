@@ -433,7 +433,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            for( DistrictMap map : population) {
 	            	var += Math.abs(map.fairnessScores[i]-avg);
 	            }
-	            var /= (double)population.size();
+	            var /= ((double)population.size()-1.0); //subtract 1 to make it an "unbiased estimator".
 
 	            if( var == 0) { var = 0.001; }
 	            if( fairnessScoreEmaVars[i] == 0) {
