@@ -456,7 +456,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	System.out.println("  weighing fairness...");
         
         double fairness_weight_multiplier = 1;//0.5;
-        double geometry_weight_multiplier = 2;
+        double geometry_weight_multiplier = 1;
 
         double[] weights = new double[]{
         		Settings.geometry_weight                *1.0, 
