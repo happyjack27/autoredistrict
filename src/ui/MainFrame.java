@@ -114,7 +114,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenu mnEvolution = new JMenu("Evolution");
 	JMenu mnHelp = new JMenu("Help");
 	JMenuItem mntmWebsite = new JMenuItem("Website");
-	JMenuItem mntmAbout = new JMenuItem("About");
+	JMenuItem mntmSourceCode = new JMenuItem("Source code");
+	JMenuItem mntmLicense = new JMenuItem("License");
 	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
 	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
 	JMenuItem mntmShowStats = new JMenuItem("Show stats");
@@ -3474,7 +3475,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
-		mntmAbout.addActionListener(new ActionListener() {
+		mntmLicense.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JOptionPane.showMessageDialog(mainframe,""
 					    +"\nCopyright (C) 2015 Kevin Baas"
@@ -3494,7 +3495,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						);
 			}	
 		});
-		
+		mntmSourceCode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				URI uri = null;
+				try {
+					uri = new URL("https://github.com/happyjack27/autoredistrict").toURI();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+			    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+			        try {
+			            desktop.browse(uri);
+			        } catch (Exception e) {
+			            e.printStackTrace();
+			        }
+			    }
+			}	
+		});
 		mntmWebsite.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				URI uri = null;
@@ -3692,7 +3710,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		//menuBar.add(S)
 		mnHelp.add(mntmWebsite);
-		mnHelp.add(mntmAbout);
+		mnHelp.add(mntmSourceCode);
+		mnHelp.add(mntmLicense);
 		menuBar.add(Box.createHorizontalGlue());
 		mnHelp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); 
 		menuBar.add(mnHelp);
