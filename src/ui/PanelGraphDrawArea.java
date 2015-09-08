@@ -30,9 +30,9 @@ public class PanelGraphDrawArea extends JPanel {
     		"Annealing floor",
     		
     		//10
-    		"Border length",
-    		"Disconnected population",
-    		"Population imbalance",
+    		"Compactness",
+    		"Contiguity",
+    		"Equal population",
     		"",
     		"",
     };

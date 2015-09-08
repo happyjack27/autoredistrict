@@ -3713,7 +3713,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderPopulationBalance.setBounds(6, 179, 190, 29);
 		panel_2.add(sliderPopulationBalance);
 		
-		JLabel lblConnectedness = new JLabel("Contiguency");
+		JLabel lblConnectedness = new JLabel("Contiguity");
 		lblConnectedness.setBounds(6, 97, 172, 16);
 		panel_2.add(lblConnectedness);
 		
