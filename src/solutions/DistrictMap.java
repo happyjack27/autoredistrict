@@ -872,6 +872,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             if( disproportional_representation != disproportional_representation) {
             	System.out.println("disproportional_representation not a number");
             }
+            
+            wasted_votes /= Settings.num_elections_simulated;
     	}
 
     	long time3 = System.currentTimeMillis();
