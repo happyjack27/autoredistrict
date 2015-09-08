@@ -57,6 +57,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	Settings settings = new Settings();
 	
     public Vector<DistrictMap> population = new Vector<DistrictMap>();
+    public Vector<DistrictMap> swap_population = new Vector<DistrictMap>();
     
     public EvolveThread evolveThread; 
     public long generation = 0;
@@ -579,12 +580,47 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 }
             }
         } else {
+        	if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+        		//reverse it, we want it maximal instead of minimal
+        		for( DistrictMap dm : population) {
+        			dm.fitness_score = -dm.fitness_score;
+        		}
+        		
+        		double min = population.get(population.size()-1).fitness_score;
+        		double total = 0;
+        		for( DistrictMap dm : population) {
+        			dm.fitness_score -= min;
+        			total += dm.fitness_score;
+        		}
+        		double current = 0;
+    	        for(int i = population.size()-1; i >= 0; i--) {
+    	        	DistrictMap dm = population.get(i);
+    	        	current += dm.fitness_score;
+    	        	dm.fitness_score = current/total;
+    	        }
+    	        while( swap_population.size() < population.size()) {
+    	        	swap_population.add(new DistrictMap(wards,Settings.num_districts));
+    	        }
+    	        while( swap_population.size() > population.size()) {
+    	        	swap_population.remove(0);
+    	        }
+    	        /*
+    	        for(int i = 0; i < population.size(); i++) {
+    	        	DistrictMap dm = population.get(i);
+    	        	System.out.println(dm.fitness_score);
+    	        }
+    	        System.exit(0);
+    	        */
+        	}
 		//System.out.print(""+step);
+        	cutoff = Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION ? 0 : population.size()/2; 
     		for( int j = 0; j < matingThreads.length; j++) {
     			matingThreads[j].available_mate.clear();
-    	        for(int i = 0; i < cutoff; i++) {
-    	        	matingThreads[j].available_mate.add(population.get(i));
-    	        }
+    			if( Settings.SELECTION_MODE != Settings.ROULETTE_SELECTION) {
+	    	        for(int i = 0; i < (Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION ? population.size() : population.size()/2); i++) {
+	    	        	matingThreads[j].available_mate.add(population.get(i));
+	    	        }
+    			}
     		}
     		matingLatch = new CountDownLatch(num_threads);
     		for( int i = 0; i < matingThreads.length; i++) {
@@ -598,35 +634,52 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
-    		if( Settings.replace_all) {
-    			Vector<DistrictMap> temp = new Vector<DistrictMap>();
-    			for(int j = cutoff; j < population.size(); j++) {
-    				temp.add(population.get(j));
-    				population.set(j, new DistrictMap(wards,Settings.num_districts));
-    			}
+    		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+	    		if( Settings.replace_all) {
+	    			Vector<DistrictMap> temp = population;
+	    			population = swap_population;
+	    			swap_population = temp;
+	    		} else {
+	    			for( int i = population.size()/2; i < population.size(); i++) {
+	    				DistrictMap temp1 = population.get(i);
+	    				DistrictMap temp2 = swap_population.get(i);
+	    				population.set(i, temp2);
+	    				swap_population.set(i, temp1);
+	    			}
+	    			
+	    		}
     			
-    	  		for( int j = 0; j < matingThreads.length; j++) {
-        			matingThreads[j].available_mate.clear();
-        	        for(int i = 0; i < cutoff; i++) {
-        	        	matingThreads[j].available_mate.add(population.get(i));
-        	        }
-        		}
-        		matingLatch = new CountDownLatch(num_threads);
-        		for( int i = 0; i < matingThreads.length; i++) {
-        			matingThreadPool.execute(matingThreads[i]);
-        			//iterationThreads[j].start();
-        		}
-        		try {
-        			matingLatch.await();
-        		} catch (InterruptedException e) {
-        			System.out.println("ex");
-        			// TODO Auto-generated catch ward
-        			e.printStackTrace();
-        		}
-        		for( int j = 0; j < cutoff && j+cutoff < population.size(); j++) {
-        			population.set(j, temp.get(j));
-        		}
-      
+    		} else {
+	    		if( Settings.replace_all) {
+	    			Vector<DistrictMap> temp = new Vector<DistrictMap>();
+	    			for(int j = cutoff; j < population.size(); j++) {
+	    				temp.add(population.get(j));
+	    				population.set(j, new DistrictMap(wards,Settings.num_districts));
+	    			}
+	    			
+	    	  		for( int j = 0; j < matingThreads.length; j++) {
+	        			matingThreads[j].available_mate.clear();
+	        	        for(int i = 0; i < cutoff; i++) {
+	        	        	matingThreads[j].available_mate.add(population.get(i));
+	        	        }
+	        		}
+	        		matingLatch = new CountDownLatch(num_threads);
+	        		for( int i = 0; i < matingThreads.length; i++) {
+	        			matingThreadPool.execute(matingThreads[i]);
+	        			//iterationThreads[j].start();
+	        		}
+	        		try {
+	        			matingLatch.await();
+	        		} catch (InterruptedException e) {
+	        			System.out.println("ex");
+	        			// TODO Auto-generated catch ward
+	        			e.printStackTrace();
+	        		}
+	        		for( int j = 0; j < cutoff && j+cutoff < population.size(); j++) {
+	        			population.set(j, temp.get(j));
+	        		}
+	      
+	    		}
     		}
         	
         }
@@ -666,33 +719,60 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public int id = 0;
     	public Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
     	public void run() {
-            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
-                int g1 = (int)(Math.random()*(double)cutoff);
-                DistrictMap map1 = available_mate.get(g1);
-                if( speciation_cutoff != cutoff) {
-                    for(DistrictMap m : available_mate) {
-                        //m.makeLike(map1.getGenome());
-                        if( Settings.mate_merge) {
-                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
-                        } else {
-                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
-                        }
-                    }
-                    try {
-                    	Collections.sort(available_mate);
-                    } catch (Exception ex) {
-                    	ex.printStackTrace();
-                    }
-                }
-                int g2 = (int)(Math.random()*(double)speciation_cutoff);
-                DistrictMap map2 = available_mate.get(g2);
+    		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
+	            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
+	            	double d1 = Math.random();
+	            	DistrictMap map1 = null;
+	            	for( int j = population.size()-1; j >=0; j--) {
+	            		if( population.get(j).fitness_score >= d1) {
+	            			map1 = population.get(j);
+	            			break;
+	            		}
+	            	}
+	            	DistrictMap map2 = null;
+	            	
+	            	//no clones
+	            	while( map2 == null || map2 == map1) {
+		            	double d2 = Math.random();
+		            	for( int j = population.size()-1; j >=0; j--) {
+		            		if( population.get(j).fitness_score >= d2) {
+		            			map2 = population.get(j);
+		            			break;
+		            		}
+		            	}
+	            	}
+                    swap_population.get(i).crossover(map1.getGenome(), map2.getGenome());
 
-                if( Settings.mate_merge) {
-                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
-                } else {
-                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
-                }
-            }
+	            }
+    		} else {
+	            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
+	                int g1 = (int)(Math.random()*(double)cutoff);
+	                DistrictMap map1 = available_mate.get(g1);
+	                if( speciation_cutoff != cutoff) {
+	                    for(DistrictMap m : available_mate) {
+	                        //m.makeLike(map1.getGenome());
+	                        if( Settings.mate_merge) {
+	                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+	                        } else {
+	                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+	                        }
+	                    }
+	                    try {
+	                    	Collections.sort(available_mate);
+	                    } catch (Exception ex) {
+	                    	ex.printStackTrace();
+	                    }
+	                }
+	                int g2 = (int)(Math.random()*(double)speciation_cutoff);
+	                DistrictMap map2 = available_mate.get(g2);
+	
+	                if( Settings.mate_merge) {
+	                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+	                } else {
+	                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
+	                }
+	            }
+    		}
 
             //System.out.print("o");
     		matingLatch.countDown();

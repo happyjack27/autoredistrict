@@ -42,6 +42,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 
+	public boolean hush0 = false;
 	 
 	
 
@@ -993,7 +994,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
-	public JCheckBoxMenuItem chckbxmntmAddBest;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
@@ -1010,6 +1010,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByPop;
 	public JMenuItem mntmColorByVote;
 	public JMenuItem mntmColorByCompactness;
+	public JCheckBoxMenuItem chckbxmntmTruncationSelection;
+	public JCheckBoxMenuItem chckbxmntmFitnessProportionateSelection;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3246,8 +3248,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmUseAnnealFloor);
+		mnEvolution.add(new JSeparator());
 		mnEvolution.add(chckbxmntmReplaceAll);
 		mnEvolution.add(chckbxmntmMutateAll);
+		mnEvolution.add(new JSeparator());
 		
 		mnConstraints = new JMenu("Constraints");
 		menuBar.add(mnConstraints);
@@ -4093,15 +4097,39 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnEvolution.add(chckbxmntmMutateExcessPop);
 
-		chckbxmntmAddBest = new JCheckBoxMenuItem("Add best map as parent");
-		chckbxmntmAddBest.setSelected(Settings.pso );
-		chckbxmntmAddBest.addActionListener(new ActionListener() {
+		mnEvolution.add(new JSeparator());
+		
+		chckbxmntmTruncationSelection = new JCheckBoxMenuItem("Truncation selection");
+		chckbxmntmTruncationSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if( hush0) return;
+				hush0 = true;
+				chckbxmntmTruncationSelection.setSelected(true);
+				chckbxmntmFitnessProportionateSelection.setSelected(false);
+				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
+				hush0 = false;
+			}
+		});
+		mnEvolution.add(chckbxmntmTruncationSelection);
+		
+		chckbxmntmFitnessProportionateSelection = new JCheckBoxMenuItem("Fitness proportionate selection");
+		chckbxmntmFitnessProportionateSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Settings.pso = chckbxmntmAddBest.isSelected();
+				if( hush0) return;
+				hush0 = true;
+				chckbxmntmTruncationSelection.setSelected(false);
+				chckbxmntmFitnessProportionateSelection.setSelected(true);
+				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
+				hush0 = false;
 			}
 		});
 
-		mnEvolution.add(chckbxmntmAddBest);
+		hush0 = true;
+		chckbxmntmTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
+		chckbxmntmFitnessProportionateSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
+		hush0 = false;
+
+		mnEvolution.add(chckbxmntmFitnessProportionateSelection);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
