@@ -3895,6 +3895,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.num_districts = target;
 				featureCollection.ecology.resize_districts();
 				setEnableds();
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		resetButton.setBounds(6, 11, 62, 29);

@@ -583,10 +583,16 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	if( Settings.SELECTION_MODE == Settings.RANK_SELECTION) {
         		double inc = 1.0/(double)population.size();
         		double current = 0;
+        		double total = 0;
     	        for(int i = population.size()-1; i >= 0; i--) {
     	        	DistrictMap dm = population.get(i);
     	        	current += inc;
-    	        	dm.fitness_score = current;
+    	        	total += current;
+    	        	dm.fitness_score = total;
+    	        }
+    	        for(int i = population.size()-1; i >= 0; i--) {
+    	        	DistrictMap dm = population.get(i);
+    	        	dm.fitness_score /= total;
     	        }
         	}
     		if( Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION) {
