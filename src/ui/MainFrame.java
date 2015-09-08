@@ -1523,6 +1523,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		System.out.println();
 		System.out.println("done.");
+		mapPanel.invalidate();
+		mapPanel.repaint();
 	}
 	
 	class OpenWKTFileThread extends Thread {
@@ -2914,7 +2916,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 				project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
 				project.population_column = (String) comboBoxPopulation.getSelectedItem();
+				
 				fillComboBoxes();
+				
+				hushcomboBoxPopulation = true;
+				comboBoxPopulation.setSelectedItem("");
+				hushcomboBoxPopulation = false;
+				comboBoxPopulation.setSelectedItem(project.population_column);
+				
+				setDemographicColumns(project.demographic_columns);
+
+				hushcomboBoxDistrict = true;
+				comboBoxDistrictColumn.setSelectedItem("");
+				hushcomboBoxDistrict = false;
+				comboBoxDistrictColumn.setSelectedItem(project.district_column);
+				
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		mnFile.add(mntmImportData);
