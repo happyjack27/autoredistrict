@@ -627,7 +627,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	        }
         	}
 		//System.out.print(""+step);
-        	cutoff = population.size()/3; 
+			cutoff = (int)(Settings.elite_fraction*(double)population.size());
         	speciation_cutoff = cutoff;
     		for( int j = 0; j < matingThreads.length; j++) {
     			matingThreads[j].available_mate.clear();
@@ -649,13 +649,14 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
+    		
     		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
-	    		if( Settings.replace_all) {
+	    		if( cutoff == 0) {
 	    			Vector<DistrictMap> temp = population;
 	    			population = swap_population;
 	    			swap_population = temp;
 	    		} else {
-	    			for( int i = population.size()/3; i < population.size(); i++) {
+	    			for( int i = cutoff; i < population.size(); i++) {
 	    				DistrictMap temp1 = population.get(i);
 	    				DistrictMap temp2 = swap_population.get(i);
 	    				population.set(i, temp2);
@@ -665,7 +666,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	    		}
     			
     		} else {
-	    		if( Settings.replace_all) {
+	    		if( cutoff == 0) {
 	    			Vector<DistrictMap> temp = new Vector<DistrictMap>();
 	    			for(int j = cutoff; j < population.size(); j++) {
 	    				temp.add(population.get(j));
@@ -702,7 +703,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("  applying mutation...");
 
-        for(int i = Settings.mutate_all || Settings.replace_all ? 0 : cutoff; i < population.size(); i++) {
+        for(int i = Settings.mutate_all ? 0 : cutoff; i < population.size(); i++) {
             DistrictMap dm = population.get(i);
             if(Settings.mutation_rate > 0)
             	dm.mutate(Settings.mutation_rate);
@@ -734,59 +735,63 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public int id = 0;
     	public Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
     	public void run() {
-    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
-	            for(int i = 0+id; i < population.size(); i+=num_threads) {
-	            	double d1 = Math.random();
-	            	DistrictMap map1 = null;
-	            	for( int j = population.size()-1; j >=0; j--) {
-	            		if( population.get(j).fitness_score >= d1) {
-	            			map1 = population.get(j);
-	            			break;
-	            		}
-	            	}
-	            	DistrictMap map2 = null;
-	            	
-	            	//no clones
-	            	while( map2 == null || map2 == map1) {
-		            	double d2 = Math.random();
+    		try {
+	    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
+		            for(int i = 0+id; i < population.size(); i+=num_threads) {
+		            	double d1 = Math.random();
+		            	DistrictMap map1 = null;
 		            	for( int j = population.size()-1; j >=0; j--) {
-		            		if( population.get(j).fitness_score >= d2) {
-		            			map2 = population.get(j);
+		            		if( population.get(j).fitness_score >= d1) {
+		            			map1 = population.get(j);
 		            			break;
 		            		}
 		            	}
-	            	}
-                    swap_population.get(i).crossover(map1.getGenome(), map2.getGenome());
-
-	            }
-    		} else {
-	            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
-	                int g1 = (int)(Math.random()*(double)cutoff);
-	                DistrictMap map1 = available_mate.get(g1);
-	                if( speciation_cutoff != cutoff) {
-	                    for(DistrictMap m : available_mate) {
-	                        //m.makeLike(map1.getGenome());
-	                        if( Settings.mate_merge) {
-	                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
-	                        } else {
-	                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
-	                        }
-	                    }
-	                    try {
-	                    	Collections.sort(available_mate);
-	                    } catch (Exception ex) {
-	                    	ex.printStackTrace();
-	                    }
-	                }
-	                int g2 = (int)(Math.random()*(double)speciation_cutoff);
-	                DistrictMap map2 = available_mate.get(g2);
+		            	DistrictMap map2 = null;
+		            	
+		            	//no clones
+		            	while( map2 == null || map2 == map1) {
+			            	double d2 = Math.random();
+			            	for( int j = population.size()-1; j >=0; j--) {
+			            		if( population.get(j).fitness_score >= d2) {
+			            			map2 = population.get(j);
+			            			break;
+			            		}
+			            	}
+		            	}
+	                    swap_population.get(i).crossover(map1.getGenome(), map2.getGenome());
 	
-	                if( Settings.mate_merge) {
-	                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
-	                } else {
-	                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
-	                }
-	            }
+		            }
+	    		} else {
+		            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
+		                int g1 = (int)(Math.random()*(double)cutoff);
+		                DistrictMap map1 = available_mate.get(g1);
+		                if( speciation_cutoff != cutoff) {
+		                    for(DistrictMap m : available_mate) {
+		                        //m.makeLike(map1.getGenome());
+		                        if( Settings.mate_merge) {
+		                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(map1.getGenome()), map1.getGenome());
+		                        } else {
+		                            m.fitness_score = DistrictMap.getGenomeHammingDistance(m.getGenome(), map1.getGenome());
+		                        }
+		                    }
+		                    try {
+		                    	Collections.sort(available_mate);
+		                    } catch (Exception ex) {
+		                    	ex.printStackTrace();
+		                    }
+		                }
+		                int g2 = (int)(Math.random()*(double)speciation_cutoff);
+		                DistrictMap map2 = available_mate.get(g2);
+		
+		                if( Settings.mate_merge) {
+		                    population.get(i).crossover(map1.getGenome(), map2.getGenome(map1.getGenome()));
+		                } else {
+		                    population.get(i).crossover(map1.getGenome(), map2.getGenome());
+		                }
+		            }
+	    		}
+    		} catch (Exception ex) {
+    			ex.printStackTrace();
     		}
 
             //System.out.print("o");

@@ -109,7 +109,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//map_population (folder)
 	//
 	public static int num_ward_outcomes = 16;
-	public static boolean replace_all = false;
+	public static double elite_fraction;
 	public static void setPopulation(double i) {
 		population = (int)i;
 		for( iChangeListener c : populationChangeListeners) {

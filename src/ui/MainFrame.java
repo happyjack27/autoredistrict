@@ -94,12 +94,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	//===========COMPONENTS - MENU ITEMS
 	JMenuItem mntmShowDemographics = null;
-	JCheckBoxMenuItem chckbxmntmMutateAll = new JCheckBoxMenuItem("Mutate all");
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
-	JCheckBoxMenuItem chckbxmntmReplaceAll = new JCheckBoxMenuItem("Replace all");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
@@ -1013,6 +1011,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem chckbxmntmTruncationSelection;
 	public JCheckBoxMenuItem chckbxmntmRankSelection;
 	public JCheckBoxMenuItem chckbxmntmFitnessProportionateSelection;
+	public JLabel lblElitism;
+	public JSlider sliderElitism;
+	public JCheckBox chckbxMutateElite;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3218,20 +3219,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		menuBar.add(mnEvolution);
-		
-		chckbxmntmMutateAll.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_all = chckbxmntmMutateAll.isSelected();
-			}
-		});
-		chckbxmntmReplaceAll.setSelected(Settings.replace_all);
-		
-		chckbxmntmReplaceAll.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.replace_all = chckbxmntmReplaceAll.isSelected();
-				chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
-			}
-		});
 		chckbxmntmAutoAnneal.setSelected(true);
 		
 		chckbxmntmAutoAnneal.addActionListener(new ActionListener() {
@@ -3249,9 +3236,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmUseAnnealFloor);
-		mnEvolution.add(new JSeparator());
-		mnEvolution.add(chckbxmntmReplaceAll);
-		mnEvolution.add(chckbxmntmMutateAll);
 		mnEvolution.add(new JSeparator());
 		
 		mnConstraints = new JMenu("Constraints");
@@ -3794,7 +3778,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 360, 200, 166);
+		panel_3.setBounds(0, 360, 200, 248);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -3855,6 +3839,29 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		textFieldElectionsSimulated.setText("3");
 		textFieldElectionsSimulated.setColumns(10);
+		
+		lblElitism = new JLabel("% elitism");
+		lblElitism.setBounds(6, 181, 69, 16);
+		panel_3.add(lblElitism);
+		
+		sliderElitism = new JSlider();
+		sliderElitism.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.elite_fraction = ((double)sliderElitism.getValue())/200.0;
+			}
+		});
+		sliderElitism.setBounds(6, 208, 190, 29);
+		panel_3.add(sliderElitism);
+		
+		chckbxMutateElite = new JCheckBox("mutate elite");
+		chckbxMutateElite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.mutate_all = chckbxMutateElite.isSelected();
+			}
+		});
+		chckbxMutateElite.setBounds(81, 178, 115, 23);
+		chckbxMutateElite.setSelected(Settings.mutate_all);
+		panel_3.add(chckbxMutateElite);
 		textFieldNumDistricts.setText("10");
 		
 		
@@ -4078,11 +4085,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 			}
 		});
-		
-		chckbxmntmMutateAll.setEnabled(!Settings.replace_all);
-
-		
-		chckbxmntmMutateAll.setSelected(Settings.mutate_all);
 		
 		chckbxmntmMutateDisconnected = new JCheckBoxMenuItem("Mutate disconnected");
 		chckbxmntmMutateDisconnected.setSelected(Settings.mutate_disconnected );
