@@ -3896,7 +3896,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
 		selectionType.add(rdbtnRouletteSelection);
-		textFieldNumDistricts.setText("10");
+		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
 		textFieldNumDistricts.addFocusListener(new FocusAdapter() {
