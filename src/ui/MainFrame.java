@@ -41,8 +41,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	//======LOOPBACK
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
-
-	public boolean hush0 = false;
 	 
 	
 
@@ -93,6 +91,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelGraph panelGraph = new PanelGraph();
 
 	//===========COMPONENTS - MENU ITEMS
+	public ButtonGroup selectionType = new ButtonGroup();
 	JMenuItem mntmShowDemographics = null;
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
@@ -1008,12 +1007,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByPop;
 	public JMenuItem mntmColorByVote;
 	public JMenuItem mntmColorByCompactness;
-	public JCheckBoxMenuItem chckbxmntmTruncationSelection;
-	public JCheckBoxMenuItem chckbxmntmRankSelection;
-	public JCheckBoxMenuItem chckbxmntmFitnessProportionateSelection;
 	public JLabel lblElitism;
 	public JSlider sliderElitism;
 	public JCheckBox chckbxMutateElite;
+	public JRadioButton rdbtnTruncationSelection;
+	public JRadioButton rdbtnRankSelection;
+	public JRadioButton rdbtnRouletteSelection;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3778,7 +3777,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 360, 200, 248);
+		panel_3.setBounds(0, 280, 200, 328);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -3806,7 +3805,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		textField.setText("64");
 		textField.setColumns(10);
 		
-		JLabel lblNewLabel = new JLabel("Population dynamics");
+		JLabel lblNewLabel = new JLabel("Evolution");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
@@ -3862,6 +3861,41 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxMutateElite.setBounds(81, 178, 115, 23);
 		chckbxMutateElite.setSelected(Settings.mutate_all);
 		panel_3.add(chckbxMutateElite);
+		
+		rdbtnTruncationSelection = new JRadioButton("Truncation selection");
+		rdbtnTruncationSelection.setBounds(6, 244, 188, 23);
+		panel_3.add(rdbtnTruncationSelection);
+		rdbtnTruncationSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
+			}
+		});
+		
+		rdbtnTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
+		
+		selectionType.add(rdbtnTruncationSelection);
+		
+		rdbtnRankSelection = new JRadioButton("Rank selection");
+		rdbtnRankSelection.setBounds(6, 270, 188, 23);
+		panel_3.add(rdbtnRankSelection);
+		rdbtnRankSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
+			}
+		});
+		rdbtnRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
+		selectionType.add(rdbtnRankSelection);
+		
+		rdbtnRouletteSelection = new JRadioButton("Roulette selection");
+		rdbtnRouletteSelection.setBounds(6, 298, 188, 23);
+		panel_3.add(rdbtnRouletteSelection);
+		rdbtnRouletteSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
+			}
+		});
+		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
+		selectionType.add(rdbtnRouletteSelection);
 		textFieldNumDistricts.setText("10");
 		
 		
@@ -4059,6 +4093,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderBalance.setBounds(208, 32, 182, 29);
 		panel.add(sliderBalance);
+		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
@@ -4103,58 +4138,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateExcessPop);
-
-		mnEvolution.add(new JSeparator());
-		
-		chckbxmntmTruncationSelection = new JCheckBoxMenuItem("Truncation selection");
-		chckbxmntmTruncationSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if( hush0) return;
-				hush0 = true;
-				chckbxmntmTruncationSelection.setSelected(true);
-				chckbxmntmRankSelection.setSelected(false);
-				chckbxmntmFitnessProportionateSelection.setSelected(false);
-				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
-				hush0 = false;
-			}
-		});
-		mnEvolution.add(chckbxmntmTruncationSelection);
-		
-		chckbxmntmRankSelection = new JCheckBoxMenuItem("Rank selection");
-		chckbxmntmRankSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if( hush0) return;
-				hush0 = true;
-				chckbxmntmTruncationSelection.setSelected(false);
-				chckbxmntmRankSelection.setSelected(true);
-				chckbxmntmFitnessProportionateSelection.setSelected(false);
-				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
-				hush0 = false;
-			}
-		});
-		mnEvolution.add(chckbxmntmRankSelection);
-		
-		
-		chckbxmntmFitnessProportionateSelection = new JCheckBoxMenuItem("Fitness proportionate selection");
-		chckbxmntmFitnessProportionateSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if( hush0) return;
-				hush0 = true;
-				chckbxmntmTruncationSelection.setSelected(false);
-				chckbxmntmRankSelection.setSelected(false);
-				chckbxmntmFitnessProportionateSelection.setSelected(true);
-				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
-				hush0 = false;
-			}
-		});
-
-		hush0 = true;
-		chckbxmntmTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
-		chckbxmntmRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
-		chckbxmntmFitnessProportionateSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
-		hush0 = false;
-
-		mnEvolution.add(chckbxmntmFitnessProportionateSelection);
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
