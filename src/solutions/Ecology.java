@@ -517,8 +517,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			System.out.println();
 		}
         if( Settings.auto_anneal) {
-	        int total = 3;
-	        int mutated = 1;
+	        int total = 2;
+	        int mutated = 0;
 	        if( population.size() > 0) {
 		        for(int i = 0; i < population.size()/3; i++) {
 		            DistrictMap dm = population.get(i);
@@ -531,7 +531,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        	mutated = (int) (Settings.population);
 	        }
 	        
-        	double new_rate = ((double)mutated/(double)total)*0.99995; //always at least go down a little
+        	double new_rate = ((double)mutated/(double)total)*0.999; //always at least go down a little (0.1%)
 	        if( new_rate < Settings.max_mutation) {
 	        	Settings.startAnnealing(generation);
 	        }
@@ -796,6 +796,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		            }
 	    		}
     		} catch (Exception ex) {
+    			System.out.println("mating thread ex "+ex);
     			ex.printStackTrace();
     		}
 

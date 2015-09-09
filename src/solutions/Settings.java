@@ -40,7 +40,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		if( !use_annealing_floor) {
 			return 0;
 		}
-		if( !annealing_has_started) {
+		if( !annealing_has_started || generation < 0) {
 			return max_mutation;
 		}
 		generation -= annealing_starts_at;
@@ -48,9 +48,6 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
        	if( new_rate <= 0.0001) {
     		new_rate = 0.0001;
     	}
-       	if( generation < 0) {
-       		return new_rate;
-       	}
     	double e = max_mutation*Math.exp(-0.0005*(double)generation); // reaches -0.0005 0.000005 at 4000
     	if( new_rate < e) {
     		new_rate = e;
