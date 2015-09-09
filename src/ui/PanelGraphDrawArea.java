@@ -8,9 +8,11 @@ import javax.swing.*;
 import solutions.Ecology;
 
 import java.awt.*;
+import java.util.Vector;
 
 public class PanelGraphDrawArea extends JPanel {
 	public double pctToHide = 0.0;
+	public boolean use_normalized = false;
 	
     public String[] ss = new String[]{
     		"Generation",
@@ -88,30 +90,37 @@ public class PanelGraphDrawArea extends JPanel {
         g.fillRect(0, 0, (int)d.getWidth(), (int)d.getHeight());
         g.setColor(Color.black);
         g.drawRect(0, 0, (int)d.getWidth()-1, (int)d.getHeight()-1);
+        
+        Vector<double[]> v = use_normalized ? Ecology.normalized_history : Ecology.history;
 
-        if( Ecology.history != null && Ecology.history.size() > 0) {
-        	int start = (int)(pctToHide*(double)Ecology.history.size());
-            double scalex = ((double)d.getWidth())/(double)(Ecology.history.size()-start);
-            if( start >= Ecology.history.size()) {
+        if( v != null && v.size() > 0) {
+        	int start = (int)(pctToHide*(double)v.size());
+            double scalex = ((double)d.getWidth())/(double)(v.size()-start);
+            if( start >= v.size()) {
             	return;
             }
-            double[] maxys = new double[Ecology.history.get(start).length];
-            for( int i = start; i < Ecology.history.size(); i++) {
-            	double[] vals = Ecology.history.get(i);
+            double[] scaleys = new double[v.get(start).length];
+            double[] maxys = new double[v.get(start).length];
+            double[] minys = new double[v.get(start).length];
+            for( int i = start; i < v.size(); i++) {
+            	double[] vals = v.get(i);
             	for( int j = 0; j < vals.length; j++) {
             		if( i == 0 || vals[j] > maxys[j]) {
             			maxys[j] = vals[j];
+            		}
+            		if( i == 0 || vals[j] < minys[j]) {
+            			minys[j] = vals[j];
             		}
             	}
             }
             maxys[3] = maxys[3] > maxys[9] ? maxys[3] : maxys[9];
             maxys[9] = maxys[3];
         	for( int j = 0; j < maxys.length; j++) {
-        		maxys[j] =  ((double)d.getHeight())/maxys[j];
+        		scaleys[j] = ((double)d.getHeight())/(maxys[j]-minys[j]);
         	}
-            double[] last_vals = Ecology.history.get(start);
-            for( int i = start+1; i < Ecology.history.size(); i++) {
-            	double[] vals = Ecology.history.get(i);
+            double[] last_vals = v.get(start);
+            for( int i = start+1; i < v.size(); i++) {
+            	double[] vals = v.get(i);
             	
             	for( int j = 0; j < vals.length; j++) {
             		if( !b_draw[j]) {
@@ -120,9 +129,9 @@ public class PanelGraphDrawArea extends JPanel {
             		g.setColor(cc[j]);
             		g.drawLine(
             				(int)(scalex*(double)(i-1-start)),
-            				(int)(d.getHeight()-maxys[j]*(double)(last_vals[j])),
+            				(int)(d.getHeight()-scaleys[j]*(double)(last_vals[j]-minys[j])),
             				(int)(scalex*(double)(i-start)),
-            				(int)(d.getHeight()-maxys[j]*(double)(vals[j]))
+            				(int)(d.getHeight()-scaleys[j]*(double)(vals[j]-minys[j]))
             				);
             	}
             	
@@ -131,7 +140,7 @@ public class PanelGraphDrawArea extends JPanel {
             }
 
         } else {
-        	System.out.println("no history found! "+Ecology.history);
+        	System.out.println("no history found! "+v);
         }
     }
 

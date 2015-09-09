@@ -87,7 +87,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     JLabel dlbl = new JLabel();
 	public MapPanel mapPanel = new MapPanel(); 
 	JFrame frameStats = new JFrame();
-	PanelStats panelStats = new PanelStats();
+	public PanelStats panelStats = new PanelStats();
 	JFrame frameGraph = new JFrame();
 	DialogShowProperties df = new DialogShowProperties();
 	public PanelGraph panelGraph = new PanelGraph();

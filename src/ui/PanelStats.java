@@ -24,6 +24,40 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	JLabel label_2 = new JLabel();
 	JLabel label_4 = new JLabel();
 
+	public void getNormalizedStats() {
+		DistrictMap dm = featureCollection.ecology.population.get(0);
+		double conversion_to_bits = 1.0/Math.log(2.0);
+
+
+		Ecology.normalized_history.add(new double[]{
+				featureCollection.ecology.generation,
+				featureCollection.ecology.population.size(),
+				Settings.num_districts,
+				
+				Settings.mutation_boundary_rate,
+				
+				dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
+				dm.fairnessScores[4], //POWER IMBALANCE
+				dm.fairnessScores[5], //WASTED VOTES TOTAL
+				dm.fairnessScores[6], //WASTED VOTES IMBALANCE
+				0,
+				
+
+				Settings.getAnnealingFloor( featureCollection.ecology.generation),
+
+				(
+						//Settings.square_root_compactness 
+						dm.fairnessScores[0]
+						//: (Math.sqrt(dm.fairnessScores[0])+Math.sqrt(dm2.fairnessScores[0])+Math.sqrt(dm3.fairnessScores[0]))*0.3333333
+					), //BORDER LENGTH
+				dm.fairnessScores[3], //DISCONNECTED POP
+				dm.fairnessScores[2], //POP IMBALANCE
+				0,
+				0,
+				
+		});
+		
+	}
 
 
 	public void getStats() {

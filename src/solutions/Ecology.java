@@ -19,6 +19,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public Vector<iDiscreteEventListener> evolveListeners = new Vector<iDiscreteEventListener>();
 	
 	public static Vector<double[]> history = new Vector<double[]>();
+	public static Vector<double[]> normalized_history = new Vector<double[]>();
 
 	static public DistrictMap bestMap = null;
 	
@@ -304,6 +305,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	population = new Vector<DistrictMap>();
     	this.generation = 0;
     	history = new Vector<double[]>();
+    	normalized_history = new Vector<double[]>();
     	for( Ward b : wards) {
     		b.recalcMuSigmaN();
     	}
@@ -490,13 +492,15 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
             		map.fairnessScores[i] = 0;
             	}
-                map.fitness_score += map.fairnessScores[i]*weights[i]*invert;
+            	map.fairnessScores[i] = map.fairnessScores[i]*weights[i]*invert;
                 if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.99) {
-                    map.fitness_score += map.fairnessScores[i]*weights[i]*invert*1.0;
-                	map.fitness_score += 10;
+                	map.fairnessScores[i] += map.fairnessScores[i];
+                	map.fairnessScores[i] += 10;
                 }
+                map.fitness_score += map.fairnessScores[i];
             }
         }
+        MainFrame.mainframe.panelStats.getNormalizedStats();
 
         if( verbosity > 1)
         	System.out.println("  sorting population...");
