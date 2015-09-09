@@ -3849,6 +3849,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.elite_fraction = ((double)sliderElitism.getValue())/100.0;
 			}
 		});
+		sliderElitism.setValue((int)(Settings.elite_fraction*100.0));
 		sliderElitism.setBounds(6, 208, 190, 29);
 		panel_3.add(sliderElitism);
 		
@@ -4146,7 +4147,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panelStats.featureCollection = featureCollection;
 		frameStats = new JFrame();
 		frameStats.setContentPane(panelStats);
-		frameStats.setTitle("Map stats");
+		frameStats.setTitle("Stats");
 		Dimension dim = panelStats.getPreferredSize();
 		dim.height += 20;		
 		frameStats.setSize(dim);

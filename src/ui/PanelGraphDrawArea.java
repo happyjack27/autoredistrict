@@ -102,13 +102,16 @@ public class PanelGraphDrawArea extends JPanel {
             double[] scaleys = new double[v.get(start).length];
             double[] maxys = new double[v.get(start).length];
             double[] minys = new double[v.get(start).length];
+            for( int i = 0; i < minys.length; i++) {
+            	minys[i] = 0;
+            }
             for( int i = start; i < v.size(); i++) {
             	double[] vals = v.get(i);
             	for( int j = 0; j < vals.length; j++) {
             		if( i == 0 || vals[j] > maxys[j]) {
             			maxys[j] = vals[j];
             		}
-            		if( i == 0 || vals[j] < minys[j]) {
+            		if( vals[j] < minys[j]) {
             			minys[j] = vals[j];
             		}
             	}

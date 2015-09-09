@@ -361,9 +361,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     }
     int step = 0;
     public void evolveWithSpeciation() {
-        cutoff = Settings.getCutoff();//population.size()-(int)((double)population.size()*Settings.replace_fraction);
-        speciation_cutoff = (int)((double)cutoff*Settings.species_fraction);
-        if( verbosity > 1) {
+		cutoff = (int)(Settings.elite_fraction*(double)population.size());
+    	speciation_cutoff = cutoff;
+
+    	if( verbosity > 1) {
         	System.out.println("evolving {");
         } else if (verbosity == 1) {
         	System.out.print(".");
@@ -458,7 +459,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	System.out.println("  weighing fairness...");
         
         double fairness_weight_multiplier = 1;//0.5;
-        double geometry_weight_multiplier = 1;
+        double geometry_weight_multiplier = 2;
 
         double[] weights = new double[]{
         		Settings.geometry_weight                *1.0, 
@@ -516,21 +517,22 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			System.out.println();
 		}
         if( Settings.auto_anneal) {
-	        int total = 2;
-	        int mutated = 0;
+	        int total = 3;
+	        int mutated = 1;
 	        if( population.size() > 0) {
-		        for(int i = 0; i < cutoff; i++) {
+		        for(int i = 0; i < population.size()/3; i++) {
 		            DistrictMap dm = population.get(i);
 		            total += dm.boundaries_tested;
 		            mutated += dm.boundaries_mutated;
 		        }
 	        }
-	        //minimum 3 mutations
-	        if( mutated < Settings.population*3.0 || mutated != mutated) {
-	        	mutated = (int) (Settings.population*3.0);
+	        //minimum 3 mutations avg
+	        if( mutated < Settings.population || mutated != mutated) {
+	        	mutated = (int) (Settings.population);
 	        }
-        	double new_rate = ((double)mutated/(double)total)*0.995;
-	        if( new_rate < 0.25) {
+	        
+        	double new_rate = ((double)mutated/(double)total)*0.99995; //always at least go down a little
+	        if( new_rate < Settings.max_mutation) {
 	        	Settings.startAnnealing(generation);
 	        }
 
@@ -540,12 +542,14 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	if( new_rate < Settings.getAnnealingFloor(generation) ){
         		new_rate = Settings.getAnnealingFloor(generation);
         	}
-        	Settings.mutation_boundary_rate = Settings.mutation_boundary_rate*(1.0-Settings.auto_anneal_Frac) + new_rate*Settings.auto_anneal_Frac;
+        	Settings.mutation_boundary_rate += (new_rate-Settings.mutation_boundary_rate)*Settings.auto_anneal_Frac;
+        	/*
         	//grow population if under a threshold
         	if( Settings.mutation_boundary_rate < 0.33333/(double)Settings.population) {
         		Settings.mutation_boundary_rate = 0.33333/(double)Settings.population;
         		Settings.setPopulation(Settings.population+1);
         	}
+        	*/
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
         }
         
@@ -627,8 +631,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	        }
         	}
 		//System.out.print(""+step);
-			cutoff = (int)(Settings.elite_fraction*(double)population.size());
-        	speciation_cutoff = cutoff;
     		for( int j = 0; j < matingThreads.length; j++) {
     			matingThreads[j].available_mate.clear();
     			if( Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION) {

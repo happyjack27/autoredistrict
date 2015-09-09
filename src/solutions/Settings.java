@@ -34,21 +34,29 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int members_per_district = 1;
 	public static void resetAnnealing() { annealing_has_started = false; }
 	public static void startAnnealing(long generation) { if( annealing_has_started) { return; } annealing_starts_at = generation; annealing_has_started = true; }
+	
+	public static double max_mutation = 0.10;
 	public static double getAnnealingFloor(long generation) {
 		if( !use_annealing_floor) {
 			return 0;
 		}
 		if( !annealing_has_started) {
-			return 0.25;
+			return max_mutation;
 		}
 		generation -= annealing_starts_at;
 		double new_rate = 0;
-       	if( new_rate <= 0.001) {
-    		new_rate = 0.001;
+       	if( new_rate <= 0.0001) {
+    		new_rate = 0.0001;
     	}
-    	double e = 0.25*Math.exp(-0.0005*(double)generation); // reaches -0.0005 0.000005 at 4000
+       	if( generation < 0) {
+       		return new_rate;
+       	}
+    	double e = max_mutation*Math.exp(-0.0005*(double)generation); // reaches -0.0005 0.000005 at 4000
     	if( new_rate < e) {
     		new_rate = e;
+    	}
+    	if( new_rate > 0.5) {
+    		return 0.5;
     	}
     	return new_rate;
 	}
@@ -94,10 +102,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double wasted_votes_imbalance_weight = 1;
     
     //public static double replace_fraction = 0.5;
-    public static int getCutoff() {
-    	int d = (int)(Math.sqrt(Settings.population)*4.0); 
-    	return d < Settings.population/2 ? d : Settings.population/2;
-    }
+
     public static double mutation_rate = 0.5;
     public static double mutation_boundary_rate = 0.5;
     public static int num_elections_simulated = 3;
@@ -109,7 +114,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//map_population (folder)
 	//
 	public static int num_ward_outcomes = 16;
-	public static double elite_fraction;
+	public static double elite_fraction = 0.25;
 	public static void setPopulation(double i) {
 		population = (int)i;
 		for( iChangeListener c : populationChangeListeners) {
