@@ -3846,7 +3846,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderElitism = new JSlider();
 		sliderElitism.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-				Settings.elite_fraction = ((double)sliderElitism.getValue())/200.0;
+				Settings.elite_fraction = ((double)sliderElitism.getValue())/100.0;
 			}
 		});
 		sliderElitism.setBounds(6, 208, 190, 29);
