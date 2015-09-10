@@ -303,7 +303,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     							break;
     						}
     					}
+    					districts.get(vtd_districts[i]).wards.remove(ward);
+    					districts.get(vtd_districts[i]).excess_pop -= ward.population;
+    					
     					vtd_districts[i] = vtd_districts[b.id];
+    					
+    					districts.get(vtd_districts[i]).wards.add(ward);
+    					districts.get(vtd_districts[i]).excess_pop += ward.population;
+    					
     					break;
     				}
     			}
