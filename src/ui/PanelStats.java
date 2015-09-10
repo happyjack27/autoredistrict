@@ -12,17 +12,10 @@ import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
-	
-	JLabel lblNewLabel_1 = new JLabel();
-	JLabel label_1 = new JLabel();
-	JLabel label_3 = new JLabel();
-	JLabel label_5 = new JLabel();
-	JLabel label_7 = new JLabel();
-	
-	JLabel label_2 = new JLabel();
-	JLabel label_4 = new JLabel();
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -79,6 +72,26 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
 		try {
+			int wasted_votes = 0;
+			for( int m : dm.wasted_votes_by_party) {
+				wasted_votes += m;
+			}
+			
+			String[] dcolumns = new String[]{"Value","Measure"};
+			String[][] ddata = new String[][]{
+					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
+					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population"},
+					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct","Population imbalance"},
+					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits","Representation imbalance"},
+					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits","Voting power imbalance"},
+					new String[]{""+integer.format(wasted_votes),"Wasted votes (total)"},
+					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct","Mutation rate"},		
+					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation"},
+			};
+			TableModel tm = new DefaultTableModel(ddata,dcolumns);
+			summaryTable.setModel(tm);
+
+			/*
 		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
 		label_1.setText(""+integer.format(dm.fairnessScores[3]));
 		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
@@ -86,6 +99,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
 		label_2.setText(""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct");		
 		label_4.setText(""+integer.format(featureCollection.ecology.generation));
+		*/
 		if( false) {
 			Ecology.history.add(new double[]{
 					featureCollection.ecology.generation,
@@ -250,54 +264,13 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		}
 	}
 	public PanelStats() {
+
+		initComponents();
+	}
+	private void initComponents() {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(449, 612));
-		
-		JLabel lblNewLabel = new JLabel("Isoperimetric quotent (compactness):");
-		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNewLabel.setBounds(6, 6, 202, 16);
-		add(lblNewLabel);
-		
-		lblNewLabel_1.setBounds(220, 5, 196, 16);
-		add(lblNewLabel_1);
-		
-		JLabel lblDisconnectedPopulation = new JLabel("Disconnected population:");
-		lblDisconnectedPopulation.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblDisconnectedPopulation.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblDisconnectedPopulation.setBounds(6, 34, 202, 16);
-		add(lblDisconnectedPopulation);
-		
-		label_1.setBounds(220, 34, 196, 16);
-		add(label_1);
-		
-		JLabel lblPopulationBalance = new JLabel("Population imbalance:");
-		lblPopulationBalance.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblPopulationBalance.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblPopulationBalance.setBounds(6, 62, 202, 16);
-		add(lblPopulationBalance);
-		
-		label_3.setBounds(220, 62, 196, 16);
-		add(label_3);
-		
-		JLabel lblDisproportionateRepresentation = new JLabel("Representation imbalance:");
-		lblDisproportionateRepresentation.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblDisproportionateRepresentation.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblDisproportionateRepresentation.setBounds(6, 90, 202, 16);
-		add(lblDisproportionateRepresentation);
-		
-		label_5.setBounds(220, 90, 196, 16);
-		add(label_5);
-		
-		JLabel lblPowerImbalance = new JLabel("Voting power imbalance:");
-		lblPowerImbalance.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblPowerImbalance.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblPowerImbalance.setBounds(6, 118, 202, 16);
-		add(lblPowerImbalance);
-		
-		label_7.setBounds(220, 118, 202, 16);
-		add(label_7);
+		this.setPreferredSize(new Dimension(443, 647));
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(26, 194, 390, 223);
@@ -307,35 +280,76 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 426, 390, 155);
+		scrollPane_1.setBounds(26, 466, 390, 155);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
 		scrollPane_1.setViewportView(table_1);
-		
-		JLabel lblBorderMutationRate = new JLabel("Mutation rate:");
-		lblBorderMutationRate.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblBorderMutationRate.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblBorderMutationRate.setBounds(6, 146, 202, 16);
-		add(lblBorderMutationRate);
-		
-		label_2.setBounds(220, 146, 202, 16);
-		add(label_2);
-		
-		JLabel lblGeneration = new JLabel("Generation:");
-		lblGeneration.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblGeneration.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		lblGeneration.setBounds(6, 174, 202, 16);
-		add(lblGeneration);
-		
-		label_4.setBounds(220, 174, 202, 16);
-		add(label_4);
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+		
+		btnCopy = new JButton("copy");
+		btnCopy.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ActionEvent nev = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "copy");
+				table.selectAll();
+				table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+			}
+		});
+		btnCopy.setBounds(327, 160, 89, 23);
+		add(btnCopy);
+		
+		button = new JButton("copy");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ActionEvent nev = new ActionEvent(table_1, ActionEvent.ACTION_PERFORMED, "copy");
+				table_1.selectAll();
+				table_1.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+			}
+		});
+		button.setBounds(327, 432, 89, 23);
+		add(button);
+		
+		button_1 = new JButton("copy");
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ActionEvent nev = new ActionEvent(summaryTable, ActionEvent.ACTION_PERFORMED, "copy");
+				summaryTable.selectAll();
+				summaryTable.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+			}
+		});
+		button_1.setBounds(327, 11, 89, 23);
+		add(button_1);
+		
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(26, 45, 390, 104);
+		add(scrollPane_2);
+		
+		summaryTable = new JTable();
+		scrollPane_2.setViewportView(summaryTable);
+		
+		lblSummary = new JLabel("Summary");
+		lblSummary.setBounds(26, 15, 226, 14);
+		add(lblSummary);
+		
+		lblByDistrict = new JLabel("By district");
+		lblByDistrict.setBounds(26, 169, 226, 14);
+		add(lblByDistrict);
+		
+		lblByParty = new JLabel("By party");
+		lblByParty.setBounds(26, 441, 226, 14);
+		add(lblByParty);
 	}
 	public FeatureCollection featureCollection;
 	private JTable table;
 	private JTable table_1;
+	public JButton btnCopy;
+	public JButton button;
+	public JTable summaryTable;
+	public JButton button_1;
+	public JScrollPane scrollPane_2;
+	public JLabel lblSummary;
+	public JLabel lblByDistrict;
+	public JLabel lblByParty;
 
 
 

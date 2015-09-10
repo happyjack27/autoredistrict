@@ -16,6 +16,8 @@ import solutions.StaticFunctions;
 /*
  * TODO:
  * 
+ * add feature to mutate towards competitiveness only (mutates towards reduces wasted votes between the two districts)
+ * 
  * EVOLUTION
  * make mutate proportional to district score (pop imbalance, compactness, competitiveness...)
  * add show other measures on map - compactness (iso quotent), wasted votes

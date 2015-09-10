@@ -17,6 +17,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static boolean mutate_disconnected = false;
     public static double mutate_disconnected_threshold = 0.10;
 	public static boolean mutate_excess_pop = false;
+	public static boolean mutate_competitive = false;
 
 	public static boolean adjust_vote_to_population = false;
 

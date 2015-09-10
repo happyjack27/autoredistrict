@@ -287,6 +287,22 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			        			break;
 			        		}
 			        	}
+    					if( Settings.mutate_competitive) {
+    						double[] o1 = this.districts.get(vtd_districts[i]).getAnOutcome(); //coming from
+    						double[] o2 = this.districts.get(vtd_districts[b.id]).getAnOutcome(); //going to
+    						double[] diff = this.vtds.get(i).getOutcome();
+    						double tot_now = 0;
+    						double tot_next = 0;
+    						for( int k = 0; k < o1.length; k++) {
+    							tot_now += Math.abs(o1[k]-o2[k]);
+    							o1[k] -= diff[k];
+    							o2[k] += diff[k];
+    							tot_next += Math.abs(o1[k]-o2[k]);
+    						}
+    						if( tot_next > tot_now) {
+    							break;
+    						}
+    					}
     					vtd_districts[i] = vtd_districts[b.id];
     					break;
     				}
