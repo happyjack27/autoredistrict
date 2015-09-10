@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
+	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -80,16 +81,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			String[] dcolumns = new String[]{"Value","Measure"};
 			String[][] ddata = new String[][]{
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
-					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population"},
-					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct","Population imbalance"},
-					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits","Representation imbalance"},
-					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits","Voting power imbalance"},
-					new String[]{""+integer.format(wasted_votes),"Wasted votes (total)"},
-					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct","Mutation rate"},		
-					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation"},
+					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
+					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population imbalance (%)"},
+					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (KL-div bits)"},
+					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (KL-div bits)"},
+					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
+					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
+					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
+					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
 			};
 			TableModel tm = new DefaultTableModel(ddata,dcolumns);
 			summaryTable.setModel(tm);
+			
+			table.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
 			/*
 		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
@@ -271,6 +275,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
 		this.setPreferredSize(new Dimension(443, 647));
+		
+		rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(26, 194, 390, 223);
