@@ -1003,6 +1003,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmFourMaps;
 	public JSeparator separator_5;
 	public JCheckBoxMenuItem chckbxmntmUseAnnealFloor;
+	public JMenuItem mntmResetAnnealFloor;
 	public JSeparator separator_6;
 	public JMenuItem mntmColorByDistrict;
 	public JMenuItem mntmColorByPop;
@@ -3236,6 +3237,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmUseAnnealFloor);
+		
+		mntmResetAnnealFloor = new JMenuItem("Reset anneal floor");
+		mntmResetAnnealFloor.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.annealing_starts_at = featureCollection.ecology.generation;
+			}
+		});
+		mnEvolution.add(mntmResetAnnealFloor);
 		mnEvolution.add(new JSeparator());
 		
 		mnConstraints = new JMenu("Constraints");
