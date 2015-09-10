@@ -94,7 +94,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public ButtonGroup selectionType = new ButtonGroup();
 	JMenuItem mntmShowDemographics = null;
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
-	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Hide map lines");
+	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
@@ -3268,14 +3268,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				resetZoom();
 			}
 		});
-		mnView.add(chckbxmntmFlipVertical);
+		//mnView.add(chckbxmntmFlipVertical);
 		
 		chckbxmntmFlipHorizontal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				resetZoom();
 			}
 		});
-		mnView.add(chckbxmntmFlipHorizontal);
+		//mnView.add(chckbxmntmFlipHorizontal);
 		
 		chckbxmntmShowPrecinctLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -3285,7 +3285,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnView.add(new JSeparator());
+		//mnView.add(new JSeparator());
 		//mnView.add(chckbxmntmShowPrecinctLabels);
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -3296,10 +3296,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
-		chckbxmntmHideMapLines.setSelected(!Feature.draw_lines );
+		chckbxmntmHideMapLines.setSelected(Feature.draw_lines );
 		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.draw_lines = !chckbxmntmHideMapLines.isSelected();
+				Feature.draw_lines = chckbxmntmHideMapLines.isSelected();
+				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -3409,7 +3410,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmShowProperties);
 		
-		mnView.add(separator_3);
+		//mnView.add(separator_3);
 		mntmAntialiasingOff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MapPanel.FSAA = 1;
@@ -3418,7 +3419,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnView.add(mntmAntialiasingOff);
+		//mnView.add(mntmAntialiasingOff);
 		mntmxAntialiasing.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MapPanel.FSAA = 2;
@@ -3427,7 +3428,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnView.add(mntmxAntialiasing);
+		//mnView.add(mntmxAntialiasing);
 		mntmxAntialiasing_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				MapPanel.FSAA = 4;
@@ -3437,7 +3438,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mntmxAntialiasing_1.setSelected(true);
 		
-		mnView.add(mntmxAntialiasing_1);
+		//mnView.add(mntmxAntialiasing_1);
 		
 		separator_5 = new JSeparator();
 		mnView.add(separator_5);
