@@ -15,12 +15,14 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int RANK_SELECTION = 2;
 	public static int SELECTION_MODE = TRUNCATION_SELECTION;
     public static boolean mutate_disconnected = false;
-    public static double mutate_disconnected_threshold = 0.10;
+    public static double mutate_disconnected_threshold = 0.25;
 	public static boolean mutate_excess_pop = false;
 	public static boolean mutate_competitive = false;
 	public static boolean mutate_overpopulated = false;
 	public static boolean mutate_compactness= false;
 	public static boolean mutate_good = false;
+	
+	public static boolean mutate_compactness_working = false;
 
 	public static boolean adjust_vote_to_population = false;
 
@@ -116,6 +118,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//
 	public static int num_ward_outcomes = 16;
 	public static double elite_fraction = 0.25;
+	public static double unpaired_edge_length_weight = 0.5;
 	public static void setPopulation(double i) {
 		population = (int)i;
 		for( iChangeListener c : populationChangeListeners) {

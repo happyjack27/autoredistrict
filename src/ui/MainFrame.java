@@ -4181,7 +4181,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.mutate_compactness = chckbxmntmMutateCompactness.isSelected();
 			}
 		});
-		mnEvolution.add(chckbxmntmMutateCompactness);
+		if( Settings.mutate_compactness_working) {
+			mnEvolution.add(chckbxmntmMutateCompactness);
+		}
 		
 		chckbxmntmMutateAnyAbove = new JCheckBoxMenuItem("Mutate towards any above only");
 		chckbxmntmMutateAnyAbove.setSelected(Settings.mutate_good );

@@ -93,7 +93,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			TableModel tm = new DefaultTableModel(ddata,dcolumns);
 			summaryTable.setModel(tm);
 			
-			table.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+			summaryTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
 			/*
 		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
@@ -222,7 +222,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
-				ddata[i][4] = ""+d.iso_quotent;
+				ddata[i][4] = ""+d.iso_quotient;
 				ddata[i][5] = ""+d.area;
 				ddata[i][6] = ""+d.paired_edge_length;
 				ddata[i][7] = ""+d.unpaired_edge_length;

@@ -184,7 +184,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate(double prob) {
-    	wel = -1;
+    	reciprocal_iso_quotient = -1;
         double max = Settings.num_districts;
         for( int i = 0; i < vtd_districts.length; i++) {
         	/*
@@ -238,6 +238,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	return;
 	        }
     		mutating_disconnected = true;
+    		reciprocal_iso_quotient = -1;
 	        for( int i = 0; i < vtd_districts.length; i++) {
 	        	if( ward_connected[i] == false) {
 	        		mutate_ward_boundary(i,prob,false);
@@ -252,8 +253,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //System.out.println("connected: "+connected+" disconnected: "+disconnected);
     }    
     
-    int boundaries_tested = 2;
-    int boundaries_mutated = 1;
+    int boundaries_tested = 1;
+    int boundaries_mutated = 0;
+    int mutations_rejected = 0;
     boolean mutating_disconnected = false;
     public void mutate_ward_boundary(int i, double prob, boolean count) {
     	if( FeatureCollection.locked_wards[i]) {
@@ -282,10 +284,22 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			}
     			double mutate_to = Math.random()*total_length;
 				int num_failures = 0;
+				double from_paired_delta = 0;
+				double from_unpaired_delta = 0;
+				double from_area_delta = 0;
+				double to_paired_delta = 0;
+				double to_unpaired_delta = 0;
+				double to_area_delta = 0;
+				double from_next_iso = 0;
+				double to_next_iso = 0; 
        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
     					Ward b = ward.neighbors.get(j);
+
+    					District dfrom = this.districts.get(vtd_districts[i]); //coming from
+						District dto = this.districts.get(vtd_districts[b.id]); //going to
+    					
 	   					if( !mutating_disconnected) {
     						if( Settings.mutate_excess_pop || Settings.mutate_good) {
 	    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
@@ -294,6 +308,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    							if( Settings.mutate_good) {
 	    								num_failures++;
 	    							} else {
+	    								mutations_rejected++;
 	    								break;
 	    							}
 	    						}
@@ -326,13 +341,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    							if( Settings.mutate_good) {
 	    								num_failures++;
 	    							} else {
+	    								mutations_rejected++;
 	    								break;
 	    							}
 	    						}
 	    					}
-	    					if( Settings.mutate_compactness || Settings.mutate_good) {
-	    						District dfrom = this.districts.get(vtd_districts[i]); //coming from
-	    						District dto = this.districts.get(vtd_districts[b.id]); //going to
+	    					if( Settings.mutate_compactness || (Settings.mutate_good && Settings.mutate_compactness_working)) {
 	    						double length_from = 0;
 	    						double length_to = 0;
 	    						double length_other = 0;
@@ -340,33 +354,64 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    						Ward vtd = vtds.get(i);
 	    						for( int k = 0; k < vtd.neighbors.size(); k++) {
 	    							int neighbor_id = vtd_districts[vtd.neighbors.get(k).id];
-	    							int neighbor_district = neighbor_id < 0 ? 1 : vtd_districts[neighbor_id];
+	    							int neighbor_district = neighbor_id < 0 ? -1 : vtd_districts[neighbor_id];
 	    							if( neighbor_district == vtd_districts[i]) {
 	    								length_from += vtd.neighbor_lengths[k];
 	    							}
 	    							if( neighbor_district == vtd_districts[b.id]) {
-	    								length_to  += vtd.neighbor_lengths[k];
+	    								length_to += vtd.neighbor_lengths[k];
 	    							}
 	    							if( neighbor_district < 0) {
-	    								length_unpaired  += vtd.neighbor_lengths[k];
+	    								length_unpaired += vtd.neighbor_lengths[k];
 	    							}
-	    							if( neighbor_district != vtd_districts[b.id] && neighbor_district != vtd_districts[i]) {
-	    								length_other  += vtd.neighbor_lengths[k];
+	    							if( neighbor_district != vtd_districts[b.id] && neighbor_district != vtd_districts[i] && neighbor_district >= 0) {
+	    								length_other += vtd.neighbor_lengths[k];
 	    							}
 	    						}
+	    						
+	    						from_paired_delta = -length_other-length_to+length_from;
+	    						from_unpaired_delta = -length_unpaired;
+	    						from_area_delta = -vtd.area;
+	    						
+	    						to_paired_delta = +length_other-length_to+length_from;
+	    						to_unpaired_delta = length_unpaired;
+	    						to_area_delta = vtd.area;
+	    						
+	    						from_next_iso = DistrictMap.iso_quotient(dfrom.area + from_area_delta, dfrom.paired_edge_length + from_paired_delta, dfrom.unpaired_edge_length + from_unpaired_delta);
+	    						to_next_iso = DistrictMap.iso_quotient(dto.area + to_area_delta, dto.paired_edge_length + to_paired_delta, dto.unpaired_edge_length + to_unpaired_delta); 
+
+	    						double tot_now = 1.0/dfrom.iso_quotient + 1.0/dto.iso_quotient; 
+	    						double tot_next = 1.0/from_next_iso + 1.0/to_next_iso;
+	    						
 	    						//need to make sure that compactness has already been calculated!
 	    						//if good, need to update.
 	    						if( tot_next > tot_now) {
 	    							if( Settings.mutate_good) {
 	    								num_failures++;
 	    							} else {
+	    								mutations_rejected++;
 	    								break;
 	    							}
 	    						}
 	    					}
 	    				}
-	   					if( Settings.mutate_good && num_failures == 3) {
+	   					if( Settings.mutate_good && num_failures == (Settings.mutate_compactness_working ? 3 : 2)) {
+							mutations_rejected++;
 	   						break;
+	   					}
+	   					if( !mutating_disconnected && (Settings.mutate_good || Settings.mutate_compactness)) {
+	   						dfrom.paired_edge_length += from_paired_delta;
+	   						dfrom.unpaired_edge_length += from_unpaired_delta;
+	   						dfrom.area += from_area_delta;
+	   						dfrom.edge_length = this.edge_length(dfrom.paired_edge_length, dfrom.unpaired_edge_length);
+	   						dfrom.iso_quotient = this.iso_quotient(dfrom.area, dfrom.paired_edge_length, dfrom.unpaired_edge_length);
+
+	   						dto.paired_edge_length += to_paired_delta;
+	   						dto.unpaired_edge_length += to_unpaired_delta;
+	   						dto.area += to_area_delta;
+	   						dto.edge_length = this.edge_length(dto.paired_edge_length, dto.unpaired_edge_length);
+	   						dto.iso_quotient = this.iso_quotient(dto.area, dto.paired_edge_length, dto.unpaired_edge_length);
+
 	   					}
     					districts.get(vtd_districts[i]).wards.remove(ward);
     					districts.get(vtd_districts[i]).excess_pop -= ward.population;
@@ -386,17 +431,18 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate_boundary(double prob) {
-    	wel = -1;
+    	reciprocal_iso_quotient = -1;
+    	if( Settings.mutate_compactness || Settings.mutate_overpopulated || Settings.mutate_competitive || Settings.mutate_good) {
+    		fillDistrictwards();
+    	}
+    	if( Settings.mutate_compactness || Settings.mutate_good) {
+    		getReciprocalIsoPerimetricQuotient();
+    	}
     	//start at 1 for regularization
     	boundaries_tested = 0;
     	boundaries_mutated = 0;
+		mutations_rejected = 0;
         for( int i = 0; i < vtd_districts.length; i++) {
-        	/*
-        	if( Settings.mutate_excess_pop) {
-        		if(districts.get(vtd_districts[i]).excess_pop < 0) {
-        			continue;
-        		}
-        	}*/
         	mutate_ward_boundary(i,prob,true);
         }
         if( boundaries_tested == 0) {
@@ -409,7 +455,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public void crossover(int[] genome1, int[] genome2) {
-    	wel = -1;
+    	reciprocal_iso_quotient = -1;
         for( int i = 0; i < vtd_districts.length; i++) {
             double r = Math.random();
             if( Settings.pso ) {
@@ -622,7 +668,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         return vtd_districts;
     }
     public void setGenome(int[] genome) {
-    	wel = -1;
+    	reciprocal_iso_quotient = -1;
     	if( num_districts < genome.length) {
     		num_districts = genome.length;
     	}
@@ -762,7 +808,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time0 = System.currentTimeMillis();    
     	long wasted_votes = 0;
     	//===fairness score: compactness
-        double length = getWeightedEdgeLength();// : getEdgeLength();
+        double length = getReciprocalIsoPerimetricQuotient();// : getEdgeLength();
         
     	long time1 = System.currentTimeMillis();
     	//===fairness score: population balance
@@ -1072,10 +1118,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double d = (fitness_score-o.fitness_score)*sorting_polarity; 
         return  d > 0 ? 1 : d == 0 ? 0 : -1;
     }
-    double wel = -1;
-    public double getWeightedEdgeLength() {
-    	if( wel >= 0) {
-    		return wel;
+    double reciprocal_iso_quotient = -1;
+	public static double edge_length(double paired_edge_length, double unpaired_edge_length) {
+    	return paired_edge_length + unpaired_edge_length*Settings.unpaired_edge_length_weight;
+	}
+	public static double iso_quotient(double area, double paired_edge_length, double unpaired_edge_length) {
+    	double edge_length = paired_edge_length + unpaired_edge_length*Settings.unpaired_edge_length_weight;
+		double iso = (4.0*Math.PI*area) / (edge_length*edge_length);
+		return Settings.squared_compactness ? iso : Math.sqrt(iso);
+	}
+    
+    public double getReciprocalIsoPerimetricQuotient() {
+    	if( reciprocal_iso_quotient >= 0) {
+    		return reciprocal_iso_quotient;
     	}
     	//double[] lengths = new double[districts.size()]; 
     	double[] paired_lengths = new double[districts.size()]; 
@@ -1111,23 +1166,20 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	d.area = areas[i]*(a*a)/((a+b)*(a+b));
         	*/
         	
-        	d.edge_length = d.paired_edge_length + d.unpaired_edge_length/2;
+        	d.edge_length = edge_length(d.paired_edge_length, d.unpaired_edge_length);
         	d.area = areas[i];
+        	d.iso_quotient = iso_quotient(d.area, d.paired_edge_length,d.unpaired_edge_length);
         	
-        	d.iso_quotent = Math.sqrt( (4.0*Math.PI*d.area) / (d.edge_length*d.edge_length) );
         	//weighted_sum += lengths[i] / Math.sqrt(areas[i]);
-        	if( Settings.squared_compactness) {
-        		d.iso_quotent *= d.iso_quotent;
-        	}
         	if( unpaired_lengths[i] == 0) {
-        		weighted_sum_all_paired += 1.0/d.iso_quotent;
+        		weighted_sum_all_paired += 1.0/d.iso_quotient;
         		num_all_paired++;
         	}
-        	weighted_sum += 1.0/d.iso_quotent;//Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
+        	weighted_sum += 1.0/d.iso_quotient;//Settings.squared_compactness ? 1.0/(d.iso_quotent*d.iso_quotent) : 1.0/d.iso_quotent;
         }
         //weighted_sum = Math.sqrt(weighted_sum);
         if( num_all_paired == 0) { num_all_paired = 1; }
-        wel = (weighted_sum / (double)paired_lengths.length);
+        reciprocal_iso_quotient = (weighted_sum / (double)paired_lengths.length);
         double wel_all_paired = (weighted_sum_all_paired / num_all_paired);
         
         /*
@@ -1158,7 +1210,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //if( Settings.squared_compactness ) {
         	//wel = Math.sqrt(wel);
         //}
-        return wel;
+        return reciprocal_iso_quotient;
     }
     
     double getEdgeLength() {

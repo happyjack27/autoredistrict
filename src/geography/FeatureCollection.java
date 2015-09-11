@@ -250,16 +250,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		if( Feature.display_mode == Feature.DISPLAY_MODE_COMPACTNESS) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
-				dm.getWeightedEdgeLength();
+				dm.getReciprocalIsoPerimetricQuotient();
 				
 				double max = -1000000000; 
 				double min = +1000000000; 
 				for( int i = 0; i < Settings.num_districts; i++) {
-					if( Math.sqrt(dm.districts.get(i).iso_quotent) > max) {
-						max = Math.sqrt(dm.districts.get(i).iso_quotent);
+					if( Math.sqrt(dm.districts.get(i).iso_quotient) > max) {
+						max = Math.sqrt(dm.districts.get(i).iso_quotient);
 					}
-					if( Math.sqrt(dm.districts.get(i).iso_quotent) < min) {
-						min = Math.sqrt(dm.districts.get(i).iso_quotent);
+					if( Math.sqrt(dm.districts.get(i).iso_quotient) < min) {
+						min = Math.sqrt(dm.districts.get(i).iso_quotient);
 					}
 				}
 				mavg_min += (min-mavg_min)/(mavg_min == 0 ? 1 : 20); 
@@ -269,7 +269,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				
 				Color[] district_colors = new Color[Settings.num_districts];
 				for( int i = 0; i < Settings.num_districts; i++) {
-					double amt = 1.0-Math.abs((Math.sqrt(dm.districts.get(i).iso_quotent)-min)/(max-min));
+					double amt = 1.0-Math.abs((Math.sqrt(dm.districts.get(i).iso_quotient)-min)/(max-min));
 					amt = amt*2.0-1.0;
 					if( amt < 0) {
 						amt *= -1;
@@ -365,7 +365,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						total += dm.districts.get(i).getPopulation();
 					}
 					total /= Settings.num_districts;
-					dm.getWeightedEdgeLength();
+					dm.getReciprocalIsoPerimetricQuotient();
 				}	        	
 				try {
 					g.setColor(Color.BLACK);
@@ -389,7 +389,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 							g.drawString(""+amt, (int)dxs[i] - (int)(fm.stringWidth(""+amt)/2.0), (int)dys[i]+fm.getHeight());
 						}
 						
-						double iso = dm == null ? 0 : (d.iso_quotent);
+						double iso = dm == null ? 0 : (d.iso_quotient);
 						String siso = sdm.format(iso);
 	
 						g.drawString(siso, (int)dxs[i] - (int)(fm.stringWidth(siso)/2.0), (int)dys[i]+fm.getHeight()*2);
