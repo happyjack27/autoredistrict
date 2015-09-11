@@ -237,12 +237,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		//System.out.println("disconnected exceeds connected!");
 	        	return;
 	        }
+    		mutating_disconnected = true;
 	        for( int i = 0; i < vtd_districts.length; i++) {
 	        	if( ward_connected[i] == false) {
 	        		mutate_ward_boundary(i,prob,false);
 	        	} else {
 	        	}
 	        }
+    		mutating_disconnected = false;
 	    } catch (Exception ex) {
 	    	System.out.println("ex mac "+ex);
 	    	ex.printStackTrace();
@@ -252,6 +254,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     int boundaries_tested = 2;
     int boundaries_mutated = 1;
+    boolean mutating_disconnected = false;
     public void mutate_ward_boundary(int i, double prob, boolean count) {
     	if( FeatureCollection.locked_wards[i]) {
     		return;
@@ -282,40 +285,42 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
     					Ward b = ward.neighbors.get(j);
-    					if( Settings.mutate_excess_pop) {
-    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
-			        		double new_delta = Math.abs((districts.get(vtd_districts[i]).excess_pop-ward.population) - (districts.get(vtd_districts[b.id]).excess_pop+ward.population));
-    						if( new_delta > cur_delta) {
-    							break;
-    						}
-			        		/*if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
-			        			break;
-			        		}*/
-			        	}
-    					if( Settings.mutate_overpopulated) {
-    						if( districts.get(vtd_districts[i]).excess_pop <= 0) {    							
-        						if( districts.get(vtd_districts[b.id]).excess_pop >= 0) {
-        							break;
-        						}        						
-    						}
-    						
-    					}
-    					if( Settings.mutate_competitive) {
-    						double[] o1 = this.districts.get(vtd_districts[i]).getAnOutcome(); //coming from
-    						double[] o2 = this.districts.get(vtd_districts[b.id]).getAnOutcome(); //going to
-    						double[] diff = this.vtds.get(i).getOutcome();
-    						double tot_now = 0;
-    						double tot_next = 0;
-    						for( int k = 0; k < o1.length; k++) {
-    							tot_now += Math.abs(o1[k]-o2[k]);
-    							o1[k] -= diff[k];
-    							o2[k] += diff[k];
-    							tot_next += Math.abs(o1[k]-o2[k]);
-    						}
-    						if( tot_next > tot_now) {
-    							break;
-    						}
-    					}
+    					if( !mutating_disconnected) {
+	    					if( Settings.mutate_excess_pop) {
+	    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
+				        		double new_delta = Math.abs((districts.get(vtd_districts[i]).excess_pop-ward.population) - (districts.get(vtd_districts[b.id]).excess_pop+ward.population));
+	    						if( new_delta > cur_delta) {
+	    							break;
+	    						}
+				        		/*if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
+				        			break;
+				        		}*/
+				        	}
+	    					if( Settings.mutate_overpopulated) {
+	    						if( districts.get(vtd_districts[i]).excess_pop <= 0) {    							
+	        						if( districts.get(vtd_districts[b.id]).excess_pop >= 0) {
+	        							break;
+	        						}        						
+	    						}
+	    						
+	    					}
+	    					if( Settings.mutate_competitive) {
+	    						double[] o1 = this.districts.get(vtd_districts[i]).getAnOutcome(); //coming from
+	    						double[] o2 = this.districts.get(vtd_districts[b.id]).getAnOutcome(); //going to
+	    						double[] diff = this.vtds.get(i).getOutcome();
+	    						double tot_now = 0;
+	    						double tot_next = 0;
+	    						for( int k = 0; k < o1.length; k++) {
+	    							tot_now += Math.abs(o1[k]-o2[k]);
+	    							o1[k] -= diff[k];
+	    							o2[k] += diff[k];
+	    							tot_next += Math.abs(o1[k]-o2[k]);
+	    						}
+	    						if( tot_next > tot_now) {
+	    							break;
+	    						}
+	    					}
+	    					}
     					districts.get(vtd_districts[i]).wards.remove(ward);
     					districts.get(vtd_districts[i]).excess_pop -= ward.population;
     					
