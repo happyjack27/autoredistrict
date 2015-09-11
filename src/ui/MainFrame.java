@@ -991,6 +991,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
+	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
 	public JCheckBoxMenuItem chckbxmntmMutateCompetitive;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
@@ -4150,6 +4151,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateExcessPop);
+
+		chckbxmntmMutateExcessPopOnly = new JCheckBoxMenuItem("Mutate overpopulated only");
+		chckbxmntmMutateExcessPopOnly.setSelected(Settings.mutate_overpopulated);
+		chckbxmntmMutateExcessPopOnly.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_overpopulated = chckbxmntmMutateExcessPopOnly.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateExcessPopOnly);
 
 		chckbxmntmMutateCompetitive = new JCheckBoxMenuItem("Mutate towards competitive only");
 		chckbxmntmMutateCompetitive.setSelected(Settings.mutate_competitive );

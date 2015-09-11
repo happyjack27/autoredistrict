@@ -283,10 +283,23 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     				if( mutate_to < 0) {
     					Ward b = ward.neighbors.get(j);
     					if( Settings.mutate_excess_pop) {
-			        		if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
+    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
+			        		double new_delta = Math.abs((districts.get(vtd_districts[i]).excess_pop-ward.population) - (districts.get(vtd_districts[b.id]).excess_pop+ward.population));
+    						if( new_delta > cur_delta) {
+    							break;
+    						}
+			        		/*if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
 			        			break;
-			        		}
+			        		}*/
 			        	}
+    					if( Settings.mutate_overpopulated) {
+    						if( districts.get(vtd_districts[i]).excess_pop <= 0) {    							
+        						if( districts.get(vtd_districts[b.id]).excess_pop >= 0) {
+        							break;
+        						}        						
+    						}
+    						
+    					}
     					if( Settings.mutate_competitive) {
     						double[] o1 = this.districts.get(vtd_districts[i]).getAnOutcome(); //coming from
     						double[] o2 = this.districts.get(vtd_districts[b.id]).getAnOutcome(); //going to
