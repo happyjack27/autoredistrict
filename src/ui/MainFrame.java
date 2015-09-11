@@ -3769,6 +3769,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JLabel lblMaxPop = new JLabel("Max population % diff ");
 		lblMaxPop.setBounds(6, 225, 134, 16);
 		panel_2.add(lblMaxPop);
+		lblMaxPop.setVisible(false);
 		
 		textField_3.addFocusListener(new FocusAdapter() {
 			@Override
@@ -3787,6 +3788,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		textField_3.setColumns(10);
 		textField_3.setBounds(138, 219, 58, 28);
 		panel_2.add(textField_3);
+		textField_3.setVisible(false);
 		
 		
 		JPanel panel_3 = new JPanel();

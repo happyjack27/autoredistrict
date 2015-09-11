@@ -494,10 +494,11 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             		map.fairnessScores[i] = 0;
             	}
             	map.fairnessScores[i] = map.fairnessScores[i]*weights[i]*invert;
+            	/*
                 if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.99) {
                 	map.fairnessScores[i] += map.fairnessScores[i];
-                	map.fairnessScores[i] += 10;
-                }
+                	//map.fairnessScores[i] += 10;
+                }*/
                 map.fitness_score += map.fairnessScores[i];
             }
         }
