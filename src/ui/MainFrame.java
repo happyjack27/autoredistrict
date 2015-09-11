@@ -4188,6 +4188,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmMutateAnyAbove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Settings.mutate_good = chckbxmntmMutateAnyAbove.isSelected();
+				chckbxmntmMutateCompactness.setEnabled(!Settings.mutate_good);
+				chckbxmntmMutateCompetitive.setEnabled(!Settings.mutate_good);
+				chckbxmntmMutateExcessPop.setEnabled(!Settings.mutate_good);
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateAnyAbove);
