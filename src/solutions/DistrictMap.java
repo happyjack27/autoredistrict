@@ -281,21 +281,27 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     				total_length += ward.neighbor_lengths[j];
     			}
     			double mutate_to = Math.random()*total_length;
+				int num_failures = 0;
        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
     					Ward b = ward.neighbors.get(j);
-    					if( !mutating_disconnected) {
-	    					if( Settings.mutate_excess_pop) {
+	   					if( !mutating_disconnected) {
+    						if( Settings.mutate_excess_pop || Settings.mutate_good) {
 	    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
 				        		double new_delta = Math.abs((districts.get(vtd_districts[i]).excess_pop-ward.population) - (districts.get(vtd_districts[b.id]).excess_pop+ward.population));
 	    						if( new_delta > cur_delta) {
-	    							break;
+	    							if( Settings.mutate_good) {
+	    								num_failures++;
+	    							} else {
+	    								break;
+	    							}
 	    						}
 				        		/*if(districts.get(vtd_districts[i]).excess_pop < districts.get(vtd_districts[b.id]).excess_pop) {
 				        			break;
 				        		}*/
 				        	}
+	    					/*
 	    					if( Settings.mutate_overpopulated) {
 	    						if( districts.get(vtd_districts[i]).excess_pop <= 0) {    							
 	        						if( districts.get(vtd_districts[b.id]).excess_pop >= 0) {
@@ -303,8 +309,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        						}        						
 	    						}
 	    						
-	    					}
-	    					if( Settings.mutate_competitive) {
+	    					}*/
+	    					if( Settings.mutate_competitive || Settings.mutate_good) {
 	    						double[] o1 = this.districts.get(vtd_districts[i]).getAnOutcome(); //coming from
 	    						double[] o2 = this.districts.get(vtd_districts[b.id]).getAnOutcome(); //going to
 	    						double[] diff = this.vtds.get(i).getOutcome();
@@ -317,10 +323,51 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    							tot_next += Math.abs(o1[k]-o2[k]);
 	    						}
 	    						if( tot_next > tot_now) {
-	    							break;
+	    							if( Settings.mutate_good) {
+	    								num_failures++;
+	    							} else {
+	    								break;
+	    							}
 	    						}
 	    					}
+	    					if( Settings.mutate_compactness || Settings.mutate_good) {
+	    						District dfrom = this.districts.get(vtd_districts[i]); //coming from
+	    						District dto = this.districts.get(vtd_districts[b.id]); //going to
+	    						double length_from = 0;
+	    						double length_to = 0;
+	    						double length_other = 0;
+	    						double length_unpaired = ward.unpaired_edge_length;
+	    						Ward vtd = vtds.get(i);
+	    						for( int k = 0; k < vtd.neighbors.size(); k++) {
+	    							int neighbor_id = vtd_districts[vtd.neighbors.get(k).id];
+	    							int neighbor_district = neighbor_id < 0 ? 1 : vtd_districts[neighbor_id];
+	    							if( neighbor_district == vtd_districts[i]) {
+	    								length_from += vtd.neighbor_lengths[k];
+	    							}
+	    							if( neighbor_district == vtd_districts[b.id]) {
+	    								length_to  += vtd.neighbor_lengths[k];
+	    							}
+	    							if( neighbor_district < 0) {
+	    								length_unpaired  += vtd.neighbor_lengths[k];
+	    							}
+	    							if( neighbor_district != vtd_districts[b.id] && neighbor_district != vtd_districts[i]) {
+	    								length_other  += vtd.neighbor_lengths[k];
+	    							}
+	    						}
+	    						//need to make sure that compactness has already been calculated!
+	    						//if good, need to update.
+	    						if( tot_next > tot_now) {
+	    							if( Settings.mutate_good) {
+	    								num_failures++;
+	    							} else {
+	    								break;
+	    							}
+	    						}
 	    					}
+	    				}
+	   					if( Settings.mutate_good && num_failures == 3) {
+	   						break;
+	   					}
     					districts.get(vtd_districts[i]).wards.remove(ward);
     					districts.get(vtd_districts[i]).excess_pop -= ward.population;
     					

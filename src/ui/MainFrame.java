@@ -993,6 +993,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
 	public JCheckBoxMenuItem chckbxmntmMutateCompetitive;
+	public JCheckBoxMenuItem chckbxmntmMutateCompactness;
+	public JCheckBoxMenuItem chckbxmntmMutateAnyAbove;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
@@ -4143,6 +4145,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnEvolution.add(chckbxmntmMutateDisconnected);
 		
+		mnEvolution.add(new JSeparator());
+		
 		chckbxmntmMutateExcessPop = new JCheckBoxMenuItem("Mutate towards equal pop only");
 		chckbxmntmMutateExcessPop.setSelected(Settings.mutate_excess_pop );
 		chckbxmntmMutateExcessPop.addActionListener(new ActionListener() {
@@ -4159,7 +4163,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.mutate_overpopulated = chckbxmntmMutateExcessPopOnly.isSelected();
 			}
 		});
-		mnEvolution.add(chckbxmntmMutateExcessPopOnly);
+		//mnEvolution.add(chckbxmntmMutateExcessPopOnly);
 
 		chckbxmntmMutateCompetitive = new JCheckBoxMenuItem("Mutate towards competitive only");
 		chckbxmntmMutateCompetitive.setSelected(Settings.mutate_competitive );
@@ -4169,6 +4173,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateCompetitive);
+
+		chckbxmntmMutateCompactness = new JCheckBoxMenuItem("Mutate towards compactness only");
+		chckbxmntmMutateCompactness.setSelected(Settings.mutate_compactness );
+		chckbxmntmMutateCompactness.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_compactness = chckbxmntmMutateCompactness.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateCompactness);
+		
+		chckbxmntmMutateAnyAbove = new JCheckBoxMenuItem("Mutate towards any above only");
+		chckbxmntmMutateAnyAbove.setSelected(Settings.mutate_good );
+		chckbxmntmMutateAnyAbove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_good = chckbxmntmMutateAnyAbove.isSelected();
+			}
+		});
+		mnEvolution.add(chckbxmntmMutateAnyAbove);
+
+
 
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;

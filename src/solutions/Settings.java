@@ -19,6 +19,8 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean mutate_excess_pop = false;
 	public static boolean mutate_competitive = false;
 	public static boolean mutate_overpopulated = false;
+	public static boolean mutate_compactness= false;
+	public static boolean mutate_good = false;
 
 	public static boolean adjust_vote_to_population = false;
 
