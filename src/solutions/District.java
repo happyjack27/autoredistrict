@@ -11,13 +11,21 @@ public class District extends JSONObject {
     
     private double population = -1;
     
-    public double area = 1;
-    public double edge_length = 1;
-    public double iso_quotient = 1;
-    public double paired_edge_length = 1;
-    public double unpaired_edge_length = 1;
+    public double area = -1;
+    public double edge_length = -1;
+    public double iso_quotient = -1;
+    public double paired_edge_length = -1;
+    public double unpaired_edge_length = -1;
+    public Vector<Vector<Ward>> regions = null;
 
 	public int excess_pop = 0;
+	
+	public void invalidate() {
+		population = -1;
+		iso_quotient = -1;
+		regions = null;
+		
+	}
     
     void resetPopulation() {
     	population = -1;
@@ -370,8 +378,12 @@ public class District extends JSONObject {
         return high;
     }
     Vector<Vector<Ward>> getRegions(int[] ward_districts) {
+    	/*
+    	if( regions != null) {
+    		return regions;
+    	}*/
         Hashtable<Integer,Vector<Ward>> region_hash = new Hashtable<Integer,Vector<Ward>>();
-        Vector<Vector<Ward>> regions = new Vector<Vector<Ward>>();
+        regions = new Vector<Vector<Ward>>();
         for( Ward ward : wards) {
             if( region_hash.get(ward.id) != null)
                 continue;

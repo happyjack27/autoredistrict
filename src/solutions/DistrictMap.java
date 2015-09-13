@@ -28,6 +28,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public int[] wasted_votes_by_party;
     public int[] wasted_votes_by_district;
     
+    public void invalidate() {
+    	for(District d : districts) {
+    		d.invalidate();
+    	}
+    }
+    
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
 		boolean has_districts = true;
