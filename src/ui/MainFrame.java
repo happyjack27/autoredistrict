@@ -1018,6 +1018,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnTruncationSelection;
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
+	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3334,7 +3335,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByPop);
 		
-		mntmColorByVote = new JMenuItem("Color by vote imbalance");
+		mntmColorByVote = new JMenuItem("Color by vote");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
@@ -3353,6 +3354,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mapPanel.repaint();
 			}
 		});
+		mntmColorByWasted.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		
+		mnView.add(mntmColorByWasted);
 		mnView.add(mntmColorByCompactness);
 		
 		mntmShowDemographics = new JMenuItem("Color by demographic");

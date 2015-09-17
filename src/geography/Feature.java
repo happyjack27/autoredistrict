@@ -22,6 +22,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static final int DISPLAY_MODE_DIST_POP = 4;
 	public static final int DISPLAY_MODE_DIST_DEMO = 5;
 	public static final int DISPLAY_MODE_COMPACTNESS = 6;
+	public static final int DISPLAY_MODE_WASTED_VOTES = 7;
 	
 	public Vector<JDBField> dbfFields = new Vector<JDBField>();
 	

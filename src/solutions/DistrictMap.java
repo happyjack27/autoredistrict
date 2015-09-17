@@ -27,6 +27,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     public int[] wasted_votes_by_party;
     public int[] wasted_votes_by_district;
+    public int[][] wasted_votes_by_district_and_party;
+    
     
     public void invalidate() {
     	for(District d : districts) {
@@ -878,11 +880,17 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	//===fairness score: proportional representation
     		wasted_votes_by_party = new int[Candidate.candidates.size()];
     	    wasted_votes_by_district = new int[districts.size()];
+    	    wasted_votes_by_district_and_party = new int[districts.size()][Candidate.candidates.size()];
     	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
     	    	wasted_votes_by_party[i] = 0;
     	    }
     	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
     	    	wasted_votes_by_district[i] = 0;
+    	    }
+    	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
+	    	    for( int j = 0; j < wasted_votes_by_party.length; j++) {
+	    	    	wasted_votes_by_district_and_party[i][j] = 0;
+	    	    }
     	    }
  
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
@@ -930,6 +938,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	wasted_votes += amt;
                     	wasted_votes_by_party[j] += amt;
                     	wasted_votes_by_district[k] += amt;
+                    	wasted_votes_by_district_and_party[k][j] += amt; 
                     }
                 	} catch (Exception ex) {
                 		System.out.println("ex aa "+ex);
@@ -993,8 +1002,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	    	wasted_votes_by_party[i] /= Settings.num_elections_simulated;;
     	    	total_by_party += wasted_votes_by_party[i];
     	    }
-    	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
+     	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
     	    	wasted_votes_by_district[i] /= Settings.num_elections_simulated;
+    	    }
+      	    for( int i = 0; i < wasted_votes_by_district_and_party.length; i++) {
+      	  	    for( int j = 0; j < wasted_votes_by_district_and_party[i].length; j++) {
+      	  	    	wasted_votes_by_district_and_party[i][j] /= Settings.num_elections_simulated;
+      	  	    }
     	    }
     	    
     	    double[] target_wasted = new double[wasted_votes_by_party.length];
