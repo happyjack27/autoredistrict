@@ -30,7 +30,7 @@ import ui.MainFrame;
 import ui.MapPanel;
 
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
-	Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
@@ -96,8 +96,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		//lock aspect ratio
 		double lat0 = MainFrame.mainframe.miny;//features.get(0).geometry.coordinates[0][0][1];
 		double lat1 = MainFrame.mainframe.maxy;//features.get(0).geometry.coordinates[0][0][1];
-		System.out.println("lat0"+lat0);
-		System.out.println("lat1"+lat1);
+		//System.out.println("lat0"+lat0);
+		//System.out.println("lat1"+lat1);
 		
 		dlonlat = Math.cos((lat0+lat1)/2);
 	}
@@ -459,6 +459,15 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						
 						//System.out.println("name "+name+" x "+(int)dxs[i]+" y "+(int)dys[i]+" size "+dcs[i]);
 					}
+					/*
+					if( Feature.show_seats || true) {
+						g.setColor(Color.WHITE);
+						g.fillRect(-100, -100, 100, 100);
+						g.setColor(Color.RED);
+						g.fillRect(100, 100, 100, 100);
+						g.setColor(Color.BLUE);
+						g.fillRect(200, 200, 1000, 1000);
+					}*/
 				} catch(Exception ex) {
 					ex.printStackTrace();
 				}

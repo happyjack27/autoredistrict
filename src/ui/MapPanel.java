@@ -19,11 +19,24 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	FeatureCollection featureCollection;
 	boolean zooming = false;
 	Rectangle selection = null;
+	public JPanel seatsPanel;
 	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
 	public static int FSAA = 1;
 	public static Object RENDERING_INTERPOLATION = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
 	
+	public void invalidate() {
+		super.invalidate();
+		if( seatsPanel != null) {
+			seatsPanel.invalidate();
+		}
+	}
+	public void repaint() {
+		super.repaint();
+		if( seatsPanel != null) {
+			seatsPanel.repaint();
+		}
+	}
 
 	MapPanel() {
         // set a preferred size for the custom panel.

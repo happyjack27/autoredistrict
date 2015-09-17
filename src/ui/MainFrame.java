@@ -41,6 +41,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	//======LOOPBACK
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
+	public PanelSeats seatsPanel = new PanelSeats();
 	 
 	
 
@@ -3731,6 +3732,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		menuBar.add(mnHelp);
 		
 		JSplitPane splitPane = new JSplitPane();
+		JSplitPane splitPane2 = new JSplitPane();
 		getContentPane().add(splitPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
@@ -4214,7 +4216,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 
-		splitPane.setRightComponent(mapPanel);
+		splitPane.setRightComponent(splitPane2);
+		splitPane2.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPane2.setTopComponent(seatsPanel);
+		splitPane2.setBottomComponent(mapPanel);
+		mapPanel.seatsPanel = seatsPanel;
+		seatsPanel.mapPanel= mapPanel;
 		
 		panelStats.featureCollection = featureCollection;
 		frameStats = new JFrame();
