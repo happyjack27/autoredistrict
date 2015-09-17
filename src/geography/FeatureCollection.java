@@ -222,6 +222,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						tot += amts1[j];
 					}
 					tot /= 3;
+					if( tot == 0) { tot = 1; }
 					
 					for( int j = 0; j < amts0.length; j++) {
 						if( amts1[j] == 0) {
@@ -231,6 +232,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						double d = ((double)amts0[j]) / tot;//amts1[j];
 						//System.out.println(""+j+": "+amts0[j]+" "+amts1[j]+" "+d+" "+tot);
 						if( d > 1) { d = 1; }
+						if( d < 0) { d = 0; }
 						rgb[0] += d*c.getRed();
 						rgb[1] += d*c.getGreen();
 						rgb[2] += d*c.getBlue();
