@@ -58,21 +58,32 @@ public class PanelSeats extends JPanel {
 	        }
 	        
 	        double seat_width = w/tot_seats;
+	        double padding = 1;
+	        int height = 15;
+	        
+	        if( seat_width-padding*2 > height) {
+	        	if( seat_width/2 > height) {
+	        		padding = seat_width/4;
+	        	} else {
+	        		padding = (seat_width-height)/2;
+	        	}
+	        	
+	        }
 	        
 	        x = 5;
 	        for( int i = 0; i < seats.length; i++) {
 		        if( seat_width > 5) {
 		        	for( int j = 0; j < seats[i]; j++) {
 			        	g.setColor(FeatureCollection.standard_district_colors[i]);
-			        	g.fillRect((int)x+1, 5, (int)seat_width-2, 15);
+			        	g.fillRect((int)(x+padding), 5, (int)(seat_width-padding*2), height);
 		        		g.setColor(Color.black);
-			        	g.drawRect((int)x+1, 5, (int)seat_width-2, 15);
+			        	g.drawRect((int)(x+padding), 5, (int)(seat_width-padding*2), height);
 			        	x += seat_width;
 		        	}
 	        	} else {
 		        	g.setColor(FeatureCollection.standard_district_colors[i]);
 		        	double width = w * (seats[i]/tot_seats);
-		        	g.fillRect((int)x, 5, (int)width, 15);
+		        	g.fillRect((int)x, 5, (int)width, height);
 		        	x += width;
 	        	}
 	        }
