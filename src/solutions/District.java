@@ -102,8 +102,27 @@ public class District extends JSONObject {
    	            double[] district_vote = outcomes[result];
    	            double[] pop_district_vote = pop_balanced_outcomes[result];
    	            //System.out.println("candidates "+Candidate.candidates.size()+" outcomes: "+district_vote.length);
+   	            if( district_vote == null) {
+   	            	int i = 0;
+   	            	while( district_vote == null && i < 3) {
+   	   	            	System.out.println("district still null district_vote "+i+" "+result);
+   	            		result = (int)Math.floor(Math.random()*(double)outcomes.length);
+   	    	            district_vote = outcomes[result];
+   	    	            this.getAnOutcome();
+   	    	            pop_district_vote = pop_balanced_outcomes[result];
+   	            		i++;
+   	            	}
+   	   	            if( district_vote == null) {
+   	   	            	outcomes[result] = getAnOutcome();
+   	   	            	district_vote = outcomes[result];
+   	   	            }
+   	   	            
+   	            }
    	            
    	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.members_per_district);
+   	            if( prop_rep_results == null) {
+   	            	System.out.println("district null prop results");
+   	            }
    	            total_pop = prop_rep_results[3][0];
    	            if( total_pop == 0 || total_pop != total_pop) total_pop = 1;
 		        for( int j = 0; j < district_vote.length; j++) {
