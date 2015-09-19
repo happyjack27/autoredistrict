@@ -16,6 +16,18 @@ import solutions.StaticFunctions;
 /*
  * TODO:
  * 
+ * on import census data - say no centroid (intplat,intplon) found, and ask if there's another file that contains centroid,
+then join on geoid
+
+add feature to download all data from census.gov and aggregate it all, given state name and census year.
+
+then just need to import vtd-level election data
+
+make a wizard - > simple vs advanced
+ * 
+ * 
+ * -----
+ * 
  * add feature to mutate towards competitiveness only (mutates towards reduces wasted votes between the two districts)
  * 
  * EVOLUTION
