@@ -39,11 +39,11 @@ public class Download extends Thread {
 		downloadState(1,2010,2012,null,null);
 	}
 	public static void downloadState(int state, int census_year, int election_year, JDialog _dlg, JLabel _lbl) {
-		dlg =_dlg;
-		lbl = _lbl;
 		downloadState(state, census_year, election_year, null, null,lbl); 
 	}
-	public static boolean downloadData(JDialog dlg, JLabel lbl) {
+	public static boolean downloadData(JDialog _dlg, JLabel _lbl) {
+		dlg =_dlg;
+		lbl = _lbl;
 		istate = -1;
 		String state = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the state", "Select state.", 0, null, states, states[0]);
 		if( state == null)
@@ -220,21 +220,28 @@ public class Download extends Thread {
 		return s;
 	}
 	
+	
+	
+	
+	
+	
+	
 	public static String[] states = new String[]{
 			"",
 			"Alabama",
 			"Alaska",
-			"American Samoa",
+			"",
 			"Arizona",
 			"Arkansas",
 			"California",
+			"",
 			"Colorado",
 			"Connecticut",
 			"Delaware",
 			"District of Columbia",
 			"Florida",
 			"Georgia",
-			"Guam",
+			"",
 			"Hawaii",
 			"Idaho",
 			"Illinois",
@@ -263,6 +270,7 @@ public class Download extends Thread {
 			"Oklahoma",
 			"Oregon",
 			"Pennsylvania",
+			"",
 			"Rhode Island",
 			"South Carolina",
 			"South Dakota",
@@ -271,15 +279,19 @@ public class Download extends Thread {
 			"Utah",
 			"Vermont",
 			"Virginia",
+			"",
 			"Washington",
 			"West Virginia",
 			"Wisconsin",
 			"Wyoming",
+			/*
 			"American Samoa",
 			"Guam",
 			"Commonwealth Of The Northern Marianas Islands",
 			"Puerto Rico",
 			"Virgin Islands Of The United States",
+			*/
+
 			};
 	
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
