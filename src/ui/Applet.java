@@ -24,6 +24,10 @@ add feature to download all data from census.gov and aggregate it all, given sta
 then just need to import vtd-level election data
 
 make a wizard - > simple vs advanced
+
+in wizard add option to switch to tweaking (no mutate of elite) after so many generations, then save after so many more.
+
+add selection mode: tournament (will have to add slider to that then)
  * 
  * 
  * -----

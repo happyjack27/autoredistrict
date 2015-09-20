@@ -1020,6 +1020,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
 	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
+	public final JMenuItem mntmWizard = new JMenuItem("Wizard...");
+	public final JSeparator separator_7 = new JSeparator();
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2805,6 +2807,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//mnFile.add(mntmSaveProjectFile);
 		
 		JSeparator separator = new JSeparator();
+		mntmWizard.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
+			}
+		});
+		
+		mnFile.add(mntmWizard);
+		
+		mnFile.add(separator_7);
 		//mnFile.add(separator);
 		
 		mnFile.add(mntmOpenGeojson);
