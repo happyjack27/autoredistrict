@@ -14,8 +14,8 @@ import javax.swing.*;
 
 //http://www2.census.gov/geo/docs/maps-data/data/gazetteer/census_tracts_list_01.txt
 public class Download {
-	public static boolean census_merge_working = false;
-	public static boolean census_merge_old = false;
+	public static boolean census_merge_working = true;
+	public static boolean census_merge_old = true;
 	
 	public static int istate = -1;
 	public static int cyear = -1;
@@ -61,6 +61,8 @@ public class Download {
 		if( svyear == null)
 			return false;
 		vyear = Integer.parseInt(svyear);
+		
+		JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 
 		if( !downloadState( istate,cyear,vyear,null, dlg,lbl)) {
 			return false;

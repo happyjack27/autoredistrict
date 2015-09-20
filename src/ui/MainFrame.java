@@ -1108,6 +1108,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println();
 				
 	    		dlbl.setText("Loading population...");
+	    		int d = 0;
 			    while (dbfreader.hasNextRecord()) {
 			    	try {
 			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
@@ -1117,7 +1118,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		}
 			    		String pop = ss[col_pop];
 			    		String geoid =  ss[col_geoid_pop];
-			    		hash_population.put(geoid,pop);
+			    		if( d < 10) {
+			    			System.out.println(geoid);
+			    			d++;
+			    			//continue;
+			    		} else {
+			    			//if( true) break;
+			    		}
+
+			    		hash_population.put(geoid.trim(),pop.replaceAll(",","").trim());
 			    	} catch (Exception ex) {
 			    		ex.printStackTrace();
 			    	}
@@ -1149,7 +1158,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
 						col_lon = i;
 					}
-					if( dh.header[i].toUpperCase().trim().indexOf("BLOCKCE") == 0) {
+					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid_centroid = i;
 					}
 				}
@@ -1179,6 +1188,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    		hits = 0;
 	    		misses = 0;
+	    		int c = 0;
 			    while (dbfreader.hasNextRecord()) {
 			    	try {
 			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
@@ -1186,8 +1196,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		for( int i = 0; i < oo.length; i++) {
 			    			ss[i] = oo[i].toString();
 			    		}
-			    		String geoid = ss[col_geoid_centroid];
-			    		int pop18 = Integer.parseInt(hash_population.get(geoid));
+			    		String geoid = ss[col_geoid_centroid].trim();
+			    		if( c < 10) {
+			    			System.out.println(geoid);
+			    			c++;
+			    			//continue;
+			    		} else {
+			    			//if( true) return;
+			    		}
+			    		int pop18 = 0;
+			    		String pop = hash_population.get(geoid);
+			    		if( pop == null) {
+			    			System.out.println("geoid not found: "+geoid);
+			    		} else {
+			    			pop18 = Integer.parseInt(pop);
+			    		}
 			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -1284,7 +1307,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
 	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
-	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile from census.gov...");
+	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 	public final JSeparator separator_7 = new JSeparator();
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
