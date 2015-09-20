@@ -1747,9 +1747,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class OpenShapeFileThread extends FileThread {
-		OpenShapeFileThread(File f) { super(f); }
+		OpenShapeFileThread(File f) { super(f);  }
 		Thread nextThread = null;
     	public void run() { 
+    		if( f == null) { this.f = Download.vtd_file; }
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
 
@@ -3101,9 +3102,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JSeparator separator = new JSeparator();
 		mntmWizard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if( !Download.downloadData(dlg, dlbl)) {
-					return;
-				}
 				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 				if( Download.census_merge_working) {
 					if( Download.census_merge_old) {
@@ -3113,7 +3111,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						
 					}
 				}
-				ost.start();
+				Download.nextThread = ost;
+				if( !Download.downloadData(dlg, dlbl)) {
+					return;
+				}
+				//ost.start();
 
 				//JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
 			}
