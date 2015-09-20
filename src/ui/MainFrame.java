@@ -975,6 +975,182 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
 	}
 
+
+	class ImportCensus2Thread extends Thread {
+		ImportCensus2Thread() { super(); }
+    	public void run() { 
+    		try {
+	
+	    		dlg.setVisible(true);
+	    		dlbl.setText("Loading population...");
+	    		Hashtable<String,String> hash_population = new Hashtable<String,String>();
+	    		
+				
+				DBFReader dbfreader;
+
+				try {
+					dbfreader = new DBFReader(Download.census_pop_file.getAbsolutePath());
+				} catch (JDBFException e1) {
+					e1.printStackTrace();
+					return;
+				}
+				DataAndHeader dh = new DataAndHeader();
+				
+				int col_pop = -1;
+				int col_geoid_pop = -1;
+				
+	    		dlbl.setText("Reading header...");
+
+				dh.header = new String[dbfreader.getFieldCount()];
+				for( int i = 0; i < dh.header.length; i++) {
+					dh.header[i] = dbfreader.getField(i).getName();
+					System.out.println(dh.header[i]+" ");
+					if( dh.header[i].toUpperCase().trim().indexOf("POP") == 0) {
+						col_pop = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("BLOCKID") == 0) {
+						col_geoid_pop = i;
+					}
+				}
+				if( col_geoid_pop < 0 || col_pop < 0) {
+					JOptionPane.showMessageDialog(mainframe, "Required columns not found.\ncol_geoid_pop "+col_geoid_pop+"\ncol_pop "+col_pop);
+					dlg.setVisible(false);
+					return;
+				}
+				System.out.println();
+				
+	    		dlbl.setText("Loading population...");
+			    while (dbfreader.hasNextRecord()) {
+			    	try {
+			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+			    		String[] ss = new String[oo.length];
+			    		for( int i = 0; i < oo.length; i++) {
+			    			ss[i] = oo[i].toString();
+			    		}
+			    		String pop = ss[col_pop];
+			    		String geoid =  ss[col_geoid_pop];
+			    		hash_population.put(geoid,pop);
+			    	} catch (Exception ex) {
+			    		ex.printStackTrace();
+			    	}
+			    }
+			    dbfreader.close();
+			    
+				try {
+					dbfreader = new DBFReader(Download.census_centroid_file.getAbsolutePath());
+				} catch (JDBFException e1) {
+					e1.printStackTrace();
+					return;
+				}
+
+			    
+				int col_lat = -1;
+				int col_lon = -1;
+				int col_geoid_centroid = -1;
+				
+	    		dlbl.setText("Reading header...");
+
+				dh.header = new String[dbfreader.getFieldCount()];
+				for( int i = 0; i < dh.header.length; i++) {
+					dh.header[i] = dbfreader.getField(i).getName();
+					System.out.println(dh.header[i]+" ");
+
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+						col_lat = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+						col_lon = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("BLOCKCE") == 0) {
+						col_geoid_centroid = i;
+					}
+				}
+				if( col_geoid_centroid < 0 || col_lat < 0 || col_lon < 0) {
+					JOptionPane.showMessageDialog(mainframe, "Required columns not found."
+							+"\ncol_geoid_centroid "+col_geoid_centroid
+							+"\ncol_lat "+col_lat
+							+"\ncol_lon "+col_lon
+							);
+					dlg.setVisible(false);
+					return;
+				}
+
+
+	    		dlbl.setText("Making polygons...");
+
+				
+				int count = 0;
+	    		for( Feature feat : featureCollection.features) {
+	    			feat.geometry.makePolysFull();
+					feat.ward.population = 0;
+	    		}
+	    		
+	    		dlbl.setText("Doing hit tests...");
+	    		Collections.sort(featureCollection.features);
+
+
+	    		hits = 0;
+	    		misses = 0;
+			    while (dbfreader.hasNextRecord()) {
+			    	try {
+			    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
+			    		String[] ss = new String[oo.length];
+			    		for( int i = 0; i < oo.length; i++) {
+			    			ss[i] = oo[i].toString();
+			    		}
+			    		String geoid = ss[col_geoid_centroid];
+			    		int pop18 = Integer.parseInt(hash_population.get(geoid));
+			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
+			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
+			    		
+			    		Feature feat = getHit(dlon,dlat);
+			    		if( feat == null) {
+			    			System.out.print("x");
+				    		System.out.println("miss "+dlon+","+dlat+" ");
+			    		} else {
+	    					feat.ward.population += pop18;
+	    					feat.ward.has_census_results = true;
+			    			
+			    		}
+			    		
+			    		count++; 
+			    		if( count % 100 == 0) {
+			    			System.out.print(".");
+				    		dlbl.setText("Doing hit tests... "+count);
+			    		}
+			    		if( count % (100*100) == 0) {
+			    			System.out.println(""+count);
+			    		}
+					} catch (Exception e) {
+						// TODO Auto-generated catch ward
+						e.printStackTrace();
+					}
+			    }
+			    dbfreader.close();
+			    
+	    		dlbl.setText("Finalizing...");
+
+			    
+	    		for( Feature feat : featureCollection.features) {
+				    feat.properties.put("POPULATION",feat.ward.population);
+				    feat.properties.POPULATION = (int) feat.ward.population;
+	    		}
+	    		System.out.println("setting pop column");
+	    		
+	    		comboBoxPopulation.addItem("POPULATION");
+			    setPopulationColumn("POPULATION");
+	    		
+	    		dlg.setVisible(false);
+	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+    		} catch (Exception ex) {
+    			System.out.println("ex "+ex);
+    			ex.printStackTrace();
+    		}
+    	}
+	}
+
 	// ask what file type
 	//ask whether to accumulate or use first match
 	//if first match, ask whether to convert from 0 to 1 indexed, vice-versa, or none.
@@ -1020,7 +1196,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
 	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
-	public final JMenuItem mntmWizard = new JMenuItem("Wizard...");
+	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile from census.gov...");
 	public final JSeparator separator_7 = new JSeparator();
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -1461,6 +1637,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	class OpenShapeFileThread extends FileThread {
 		OpenShapeFileThread(File f) { super(f); }
+		Thread nextThread = null;
     	public void run() { 
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
@@ -1498,6 +1675,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					featureCollection.features.add(fe);
 				}
 				finishLoadingGeography();
+				if( nextThread != null) {
+					nextThread.start();
+					nextThread = null;
+				}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -2809,7 +2990,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JSeparator separator = new JSeparator();
 		mntmWizard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
+				if( !Download.downloadData(dlg, dlbl)) {
+					return;
+				}
+				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+				if( Download.census_merge_working) { ost.nextThread = new ImportCensus2Thread(); }
+				ost.start();
+
+				//JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
 			}
 		});
 		

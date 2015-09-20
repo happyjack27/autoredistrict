@@ -3,18 +3,63 @@ package ui;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
+import java.util.Date;
 import java.util.zip.*;
 
 import javax.swing.*;
 
 public class Download {
+	public static boolean census_merge_working = false;
+	public static int istate = -1;
+	public static int cyear = -1;
+	public static int vyear = -1;
+	
+	public static File vtd_file = null;
+	public static File census_pop_file = null;
+	public static File census_centroid_file = null;
+	
 	public static void main(String[] args) {
-		downloadState(1,2010,2012);
+		downloadState(1,2010,2012,null,null);
 	}
-	public static void downloadState(int state, int census_year, int election_year) {
-		downloadState(state, census_year, election_year, null); 
+	public static void downloadState(int state, int census_year, int election_year, JDialog dlg, JLabel lbl) {
+		downloadState(state, census_year, election_year, null, null,lbl); 
 	}
-	public static void downloadState(int state, int census_year, int election_year, String start_path) {
+	public static boolean downloadData(JDialog dlg, JLabel lbl) {
+		istate = -1;
+		String state = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the state", "Select state.", 0, null, states, states[0]);
+		if( state == null)
+			return false;
+		for( int i = 0; i < states.length; i++) {
+			if( state.equals(states[i])) {
+				istate = i;
+				break;
+			}
+		}
+		if( istate <= 0) {
+			return false;
+		}
+		int y = new Date().getYear()+1900;
+		int y10 = y - y % 10;
+		int y4 = y - y % 4;
+		String[] cyears = new String[]{""+y10,""+(y10-10)};
+		String[] eyears = new String[]{""+y4,""+(y4-4),""+(y4-8),""+(y4-12),""+(y4-16),""+(y4-20)};
+
+		String scyear = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the census year.", "Select year.", 0, null, cyears, cyears[0]);
+		if( scyear == null)
+			return false;
+		cyear =  Integer.parseInt(scyear);
+		
+		String svyear = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the election year for voting tabulation districts.", "Select election year.", 0, null, eyears, eyears[0]);
+		if( svyear == null)
+			return false;
+		vyear = Integer.parseInt(svyear);
+
+		if( !downloadState( istate,cyear,vyear,null, dlg,lbl)) {
+			return false;
+		}
+		return true;
+	}
+	public static boolean downloadState(int state, int census_year, int election_year, String start_path, JDialog dlg, JLabel lbl) {
 		if( start_path == null) {
 			File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
 			start_path = f.getAbsolutePath();
@@ -36,26 +81,59 @@ public class Download {
 		String census_vtd_path = path+election_year+File.separator+"vtd"+File.separator;
 		
 		File ftest1 = new File(census_vtd_path+"vtds.zip");
-		File ftest2 = new File(census_centroid_path+"block_centroids.zip");
-		if( ftest1.exists() && ftest2.exists()) {
-			if( JOptionPane.YES_OPTION != JOptionPane.showConfirmDialog(null, "Files already exist.  Re-download?")) {
-				return;
-			}
-		}
+		File ftest2 = new File(census_pop_path+"block_pops.zip");
+		File ftest3 = new File(census_centroid_path+"block_centroids.zip");
 		
-		download(census_vtd_url(state,census_year,election_year),census_vtd_path,"vtds.zip");
-		download(census_pop_url(state,census_year),census_pop_path,"block_pops.zip");
-		download(census_centroid_url(state,census_year),census_centroid_path,"block_centroids.zip");
+		boolean download_census = true;
+		boolean download_vtd = true;
+		
+		if( ftest1.exists()) {
+			download_vtd = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
+		}
+		if( ftest2.exists() && ftest3.exists()) {
+			download_census = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
+		}
+
+		if( dlg != null) { dlg.show(); }
+		try {
+			if( download_vtd) {
+				if( lbl != null) { lbl.setText("Downloading vtd shapfile..."); }
+				download(census_vtd_url(state,census_year,election_year),census_vtd_path,"vtds.zip");
+			}
+			if( download_census && census_merge_working) {
+				if( lbl != null) { lbl.setText("Downloading census population..."); }
+				download(census_pop_url(state,census_year),census_pop_path,"block_pops.zip");
+				if( lbl != null) { lbl.setText("Downloading census block centroids..."); }
+				download(census_centroid_url(state,census_year),census_centroid_path,"block_centroids.zip");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			if( dlg != null) { dlg.hide(); }
+			return false;
+		}
 		System.out.println("done downloading. extracting...");
 		try {
+			if( lbl != null) { lbl.setText("Extracting vtd shapfile..."); }
 			unzip(census_vtd_path+"vtds.zip", census_vtd_path);
-			unzip(census_pop_path+"block_pops.zip", census_pop_path);
-			unzip(census_centroid_path+"block_centroids.zip", census_centroid_path);
+			if( census_merge_working) {
+				if( lbl != null) { lbl.setText("Extracting census population..."); }
+				unzip(census_pop_path+"block_pops.zip", census_pop_path);
+				if( lbl != null) { lbl.setText("Extracting census block centroids..."); }
+				unzip(census_centroid_path+"block_centroids.zip", census_centroid_path);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			if( dlg != null) { dlg.hide(); }
+			return false;
 		}
+		census_centroid_file = new File(census_centroid_path+census_centroid_filename(state,census_year));
+		census_pop_file = new File(census_pop_path+census_pop_filename(state,census_year));
+		vtd_file = new File(census_vtd_path+census_vtd_filename(state,census_year,election_year));
+
+		if( dlg != null) { dlg.hide(); }
 		System.out.println("done extracting.");
+		return true;
 	}
 	public static String census_centroid_url(int state, int year) {
 		return "ftp://ftp2.census.gov/geo/pvs/tiger"+year+"st/"
@@ -64,12 +142,26 @@ public class Download {
 	}
 	public static String census_pop_url(int state, int year) {
 		return "ftp://ftp2.census.gov/geo/tiger/TIGER"+year+"BLKPOPHU/"
-				+"tabblock2010_"+num(state)+"_pophu.zip";
+				+"tabblock"+year+"_"+num(state)+"_pophu.zip";
 
 	}
 	public static String census_vtd_url(int state, int year, int elec_year) {
 		return "http://www2.census.gov/geo/tiger/TIGER"+elec_year+"/VTD/"
 				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".zip";
+	}
+	
+	public static String census_centroid_filename(int state, int year) {
+		return ""
+				+"tl_"+year+"_"+num(state)+"_tabblock"+shortyear(year)+".dbf";
+	}
+	public static String census_pop_filename(int state, int year) {
+		return ""
+				+"tabblock"+year+"_"+num(state)+"_pophu.dbf";
+
+	}
+	public static String census_vtd_filename(int state, int year, int elec_year) {
+		return ""
+				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".shp";
 	}
 	public static String shortyear(int year) {
 		String s = ""+year;
@@ -143,24 +235,20 @@ public class Download {
 			"Virgin Islands Of The United States",
 			};
 	
-	public static boolean download(String url, String dest_path, String dest_name) {
+	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
 		System.out.println("downloading:");
 		System.out.println("url :"+url);
 		System.out.println("path:"+dest_path);
 		System.out.println("file:"+dest_name);
-		try {
-			File f = new File(dest_path);
-			if( !f.exists()) { f.mkdirs(); }
 
-			URL website = new URL(url);
-			ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-			FileOutputStream fos = new FileOutputStream(dest_path+dest_name);
-			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
+		File f = new File(dest_path);
+		if( !f.exists()) { f.mkdirs(); }
+
+		URL website = new URL(url);
+		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+		FileOutputStream fos = new FileOutputStream(dest_path+dest_name);
+		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+
 		return true;
 	}
 	
