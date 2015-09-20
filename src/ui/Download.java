@@ -8,8 +8,15 @@ import java.util.zip.*;
 
 import javax.swing.*;
 
+//http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
+//http://www.census.gov/geo/maps-data/data/baf_description.html description
+//http://www.census.gov/geo/maps-data/data/gazetteer2010.html try using these to get population data
+
+//http://www2.census.gov/geo/docs/maps-data/data/gazetteer/census_tracts_list_01.txt
 public class Download {
 	public static boolean census_merge_working = false;
+	public static boolean census_merge_old = false;
+	
 	public static int istate = -1;
 	public static int cyear = -1;
 	public static int vyear = -1;
@@ -17,6 +24,7 @@ public class Download {
 	public static File vtd_file = null;
 	public static File census_pop_file = null;
 	public static File census_centroid_file = null;
+	public static File census_tract_file = null;
 	
 	public static void main(String[] args) {
 		downloadState(1,2010,2012,null,null);
@@ -76,6 +84,7 @@ public class Download {
 		File f = new File(path);
 		if( !f.exists()) { f.mkdirs(); }
 		
+		String census_tract_path = path;
 		String census_centroid_path = path+"block_centroids"+File.separator;
 		String census_pop_path = path+"block_pop"+File.separator;
 		String census_vtd_path = path+election_year+File.separator+"vtd"+File.separator;
@@ -83,6 +92,7 @@ public class Download {
 		File ftest1 = new File(census_vtd_path+"vtds.zip");
 		File ftest2 = new File(census_pop_path+"block_pops.zip");
 		File ftest3 = new File(census_centroid_path+"block_centroids.zip");
+		File ftest4 = new File(census_tract_path+census_tract_filename(state,cyear));
 		
 		boolean download_census = true;
 		boolean download_vtd = true;
@@ -90,7 +100,7 @@ public class Download {
 		if( ftest1.exists()) {
 			download_vtd = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
 		}
-		if( ftest2.exists() && ftest3.exists()) {
+		if( ftest4.exists()) {//ftest2.exists() && ftest3.exists()) {
 			download_census = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
 		}
 
@@ -101,10 +111,15 @@ public class Download {
 				download(census_vtd_url(state,census_year,election_year),census_vtd_path,"vtds.zip");
 			}
 			if( download_census && census_merge_working) {
-				if( lbl != null) { lbl.setText("Downloading census population..."); }
-				download(census_pop_url(state,census_year),census_pop_path,"block_pops.zip");
-				if( lbl != null) { lbl.setText("Downloading census block centroids..."); }
-				download(census_centroid_url(state,census_year),census_centroid_path,"block_centroids.zip");
+				if( !census_merge_old) {
+					if( lbl != null) { lbl.setText("Downloading census population..."); }
+					download(census_tract_url(state,census_year),census_tract_path,census_tract_filename(state,cyear));
+				} else {
+					if( lbl != null) { lbl.setText("Downloading census population..."); }
+					download(census_pop_url(state,census_year),census_pop_path,"block_pops.zip");
+					if( lbl != null) { lbl.setText("Downloading census block centroids..."); }
+					download(census_centroid_url(state,census_year),census_centroid_path,"block_centroids.zip");
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -115,7 +130,7 @@ public class Download {
 		try {
 			if( lbl != null) { lbl.setText("Extracting vtd shapfile..."); }
 			unzip(census_vtd_path+"vtds.zip", census_vtd_path);
-			if( census_merge_working) {
+			if( census_merge_working && census_merge_old) {
 				if( lbl != null) { lbl.setText("Extracting census population..."); }
 				unzip(census_pop_path+"block_pops.zip", census_pop_path);
 				if( lbl != null) { lbl.setText("Extracting census block centroids..."); }
@@ -130,10 +145,15 @@ public class Download {
 		census_centroid_file = new File(census_centroid_path+census_centroid_filename(state,census_year));
 		census_pop_file = new File(census_pop_path+census_pop_filename(state,census_year));
 		vtd_file = new File(census_vtd_path+census_vtd_filename(state,census_year,election_year));
+		census_tract_file = new File(census_tract_path+census_tract_filename(state,census_year));
 
 		if( dlg != null) { dlg.hide(); }
 		System.out.println("done extracting.");
 		return true;
+	}
+	public static String census_tract_url(int state, int year) {
+		return "http://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
+			+"census_tracts_list_"+num(state)+".txt";
 	}
 	public static String census_centroid_url(int state, int year) {
 		return "ftp://ftp2.census.gov/geo/pvs/tiger"+year+"st/"
@@ -149,6 +169,11 @@ public class Download {
 		return "http://www2.census.gov/geo/tiger/TIGER"+elec_year+"/VTD/"
 				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".zip";
 	}
+	public static String census_tract_filename(int state, int year) {
+		return ""
+			+"census_tracts_list_"+num(state)+".txt";
+	}
+
 	
 	public static String census_centroid_filename(int state, int year) {
 		return ""

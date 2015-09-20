@@ -974,13 +974,101 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		}
     	}
 	}
+	class ImportGazzeterThread extends Thread {
+		ImportGazzeterThread() { super(); }
+    	public void run() { 
+    		try {
+	    		dlg.setVisible(true);
+	    		dlbl.setText("Loading population...");
+	    		String delimiter = "\t";
+	    		DataAndHeader dh = new DataAndHeader();
+				//TODO: CONVERT TO IMPORT CUSTOM
+				FileReader fr = new FileReader(Download.census_tract_file);
+				BufferedReader br = new BufferedReader(fr);
+				dh.header = br.readLine().split(delimiter);
+				
+				//now select the columns
+	    		System.out.println("reading columns");
+				int col_lat = -1;
+				int col_lon = -1;
+				int col_pop = -1;
+				for( int i = 0; i < dh.header.length; i++) {
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+						col_lat = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+						col_lon = i;
+					}
+					if( dh.header[i].toUpperCase().trim().indexOf("POP") == 0) {
+						col_pop = i;
+					}
+				}
+				if( col_pop < 0 || col_lon < 0 || col_lat < 0) {
+					JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
+					dlg.setVisible(false);
+					return;
+				}
+				
+				int count = 0;
+	    		for( Feature feat : featureCollection.features) {
+	    			feat.geometry.makePolysFull();
+					feat.ward.population = 0;
+	    		}
+	    		
+	    		dlbl.setText("Doing hit tests...");
+	    		Collections.sort(featureCollection.features);
+	    		
+	    		hits = 0;
+	    		misses = 0;
 
+				String line = null;
+			    while ((line = br.readLine()) != null) {
+			    	try {
+				    	String[] ss = line.split(delimiter);
+				    	if( ss.length > dh.header.length) {
+				    		System.out.print("+"+(ss.length - dh.header.length));
+				    	}
+				    	
+			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+			    		
+		    			Feature feat = getHit(dlon,dlat);
+				    	if( feat == null) {
+				    		System.out.println();
+				    		System.out.println("miss "+dlon+","+dlat+" ");
+				    	} else {
+	    					feat.ward.population += Integer.parseInt(ss[col_pop]);
+	    					feat.ward.has_census_results = true;
+				    	}
+				    } catch (Exception ex) {
+				    	ex.printStackTrace();
+				    }
+			    }
+
+    		} catch (Exception ex) {
+    			ex.printStackTrace();
+    		}
+    		
+    		dlbl.setText("Finalizing...");
+		    
+    		for( Feature feat : featureCollection.features) {
+			    feat.properties.put("POPULATION",feat.ward.population);
+			    feat.properties.POPULATION = (int) feat.ward.population;
+    		}
+    		System.out.println("setting pop column");
+    		
+    		comboBoxPopulation.addItem("POPULATION");
+		    setPopulationColumn("POPULATION");
+    		
+    		dlg.setVisible(false);
+    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+    	}
+	}
 
 	class ImportCensus2Thread extends Thread {
 		ImportCensus2Thread() { super(); }
     	public void run() { 
     		try {
-	
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading population...");
 	    		Hashtable<String,String> hash_population = new Hashtable<String,String>();
@@ -2994,7 +3082,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					return;
 				}
 				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
-				if( Download.census_merge_working) { ost.nextThread = new ImportCensus2Thread(); }
+				if( Download.census_merge_working) {
+					if( Download.census_merge_old) {
+						ost.nextThread = new ImportCensus2Thread(); 
+					} else {
+						ost.nextThread = new ImportGazzeterThread(); 
+						
+					}
+				}
 				ost.start();
 
 				//JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
