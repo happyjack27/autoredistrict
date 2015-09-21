@@ -3,17 +3,15 @@ package geography;
 import javax.swing.*;
 
 import java.awt.*;
-import java.text.DecimalFormat;
+import java.text.*;
 import java.util.*;
 import java.io.*;
 import java.nio.charset.Charset;
 
-import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
-import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
-import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
+import org.nocrala.tools.gis.data.esri.shapefile.*;
+import org.nocrala.tools.gis.data.esri.shapefile.header.*;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import com.hexiong.jdbf.DBFReader;
 
@@ -37,7 +35,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public Vector<Ward> precincts;
 	public HashMap<String,Ward> wardHash;
 	public Ecology ecology = new Ecology();
-	double snap_to_grid_resolution = 10000.0*10.0;
+	double snap_to_grid_resolution = 10000.0*10.0*10.0;
 	public static double xy = 1;
 	public static double dlonlat = 1;
 	

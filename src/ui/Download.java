@@ -113,7 +113,7 @@ public class Download extends Thread {
 		if( ftest1.exists()) {
 			download_vtd = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
 		}
-		if( ftest4.exists()) {//ftest2.exists() && ftest3.exists()) {
+		if( ftest2.exists() && ftest3.exists()) {
 			download_census = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
 		}
 		new Download().start();

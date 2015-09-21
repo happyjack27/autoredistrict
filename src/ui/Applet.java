@@ -18,6 +18,12 @@ import solutions.StaticFunctions;
  * 
  * OCCASSIONALLY STOPPING AND STARTING SEEMS TO DO MAGIC - MAKE IT DO THAT AUTOMATICALLY AND FIND OUT WHY
  * 
+ * MAKE IT JOIN ON GEOID BY DEFAULT
+ * MAKE A SETTINGS.JSON FILE IN AUTOREDISTRICT_JSON THAT STORES THE STUFF LIKE RECENT FILES
+ * ABILITY TO COMPARE RESULTS
+ * ABILITY TO COPY COLUMN TO NEW COLUMN
+ * ABILITY TO EXPORT RESULTS IN .DOC
+ * 
  * on import census data - say no centroid (intplat,intplon) found, and ask if there's another file that contains centroid,
 then join on geoid
 
