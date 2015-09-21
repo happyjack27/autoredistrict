@@ -4156,7 +4156,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textField.setText("64");
+		textField.setText(""+Settings.population);
 		textField.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Evolution");
@@ -4190,7 +4190,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textFieldElectionsSimulated.setText("3");
+		textFieldElectionsSimulated.setText(""+Settings.num_elections_simulated);
 		textFieldElectionsSimulated.setColumns(10);
 		
 		lblElitism = new JLabel("% elitism");
