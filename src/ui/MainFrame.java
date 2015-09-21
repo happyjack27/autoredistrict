@@ -4261,12 +4261,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_3.add(rdbtnTournamentSelection);
 		tournamentSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.tournament_exponent = Settings.tournament_exponent_max*((double)sliderElitism.getValue())/100.0;
+				Settings.tournament_exponent = Settings.tournament_exponent_max*(100.0-(double)tournamentSlider.getValue())/100.0;
 			}
 		});
 		tournamentSlider.setBounds(6, 361, 190, 29);
 		tournamentSlider.setVisible(false);
-		tournamentSlider.setValue((int)(100.0*(Settings.tournament_exponent/Settings.tournament_exponent_max)));
+		tournamentSlider.setValue((int)(100.0-100.0*(Settings.tournament_exponent/Settings.tournament_exponent_max)));
 		
 		
 		panel_3.add(tournamentSlider);

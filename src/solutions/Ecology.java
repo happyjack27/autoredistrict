@@ -608,7 +608,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	        }
         	}
         	if( Settings.SELECTION_MODE == Settings.TOURNAMENT_SELECTION) {
-        		double exp_per = Settings.tournament_exponent/(double)population.size();
+        		double exp_per = Settings.tournament_exponent/((double)population.size());
         		double survival_prob = Math.pow(2.0,-exp_per);
         		double select_prob = 1.0-survival_prob;
         		//double current = 1.0;
@@ -616,6 +616,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		double total = 0;
     	        for(int i = 0; i < population.size(); i++) {
     	        	DistrictMap dm = population.get(i);
+    	        	remainder = Math.pow(2.0,-Settings.tournament_exponent*((double)i)/((double)population.size()));
     	        	double selected = remainder*select_prob;
     	        	remainder = remainder*survival_prob;
     	        	total += selected;
@@ -762,6 +763,31 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	public Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
     	public void run() {
     		try {
+	    		if( Settings.SELECTION_MODE == Settings.TOURNAMENT_SELECTION) {
+		            for(int i = 0+id; i < population.size(); i+=num_threads) {
+		            	double d1 = Math.random();
+		            	DistrictMap map1 = population.get(0);
+		            	for( int j = 0; j <  population.size(); j++) {
+		            		if( population.get(j).fitness_score >= d1) {
+		            			map1 = population.get(j);
+		            			break;
+		            		}
+		            	}
+		            	DistrictMap map2 = population.get(1);
+		            	
+		            	//no clones
+		            	while( map2 == null || map2 == map1) {
+			            	double d2 = Math.random();
+			            	for( int j = 0; j < population.size(); j++) {
+			            		if( population.get(j).fitness_score >= d2) {
+			            			map2 = population.get(j);
+			            			break;
+			            		}
+			            	}
+		            	}
+	                    swap_population.get(i).crossover(map1.getGenome(), map2.getGenome());
+		            }
+	    		} else 
 	    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
 		            for(int i = 0+id; i < population.size(); i+=num_threads) {
 		            	double d1 = Math.random();
@@ -785,7 +811,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			            	}
 		            	}
 	                    swap_population.get(i).crossover(map1.getGenome(), map2.getGenome());
-	
 		            }
 	    		} else {
 		            for(int i = cutoff+id; i < population.size(); i+=num_threads) {
