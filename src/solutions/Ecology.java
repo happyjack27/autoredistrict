@@ -602,7 +602,27 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	        	total += current;
     	        	dm.fitness_score = total;
     	        }
-    	        for(int i = population.size()-1; i >= 0; i--) {
+    	        for(int i = 0; i < population.size(); i++) {
+    	        	DistrictMap dm = population.get(i);
+    	        	dm.fitness_score /= total;
+    	        }
+        	}
+        	if( Settings.SELECTION_MODE == Settings.TOURNAMENT_SELECTION) {
+        		double exp_per = Settings.tournament_exponent/(double)population.size();
+        		double survival_prob = Math.pow(2.0,-exp_per);
+        		double select_prob = 1.0-survival_prob;
+        		//double current = 1.0;
+        		double remainder = 1.0;
+        		double total = 0;
+    	        for(int i = 0; i < population.size(); i++) {
+    	        	DistrictMap dm = population.get(i);
+    	        	double selected = remainder*select_prob;
+    	        	remainder = remainder*survival_prob;
+    	        	total += selected;
+    	        	dm.fitness_score = total;
+    	        }
+    	        //total += remainder; //should be 1 now.
+    	        for(int i = 0; i < population.size(); i++) {
     	        	DistrictMap dm = population.get(i);
     	        	dm.fitness_score /= total;
     	        }

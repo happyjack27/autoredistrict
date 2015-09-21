@@ -13,7 +13,10 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int TRUNCATION_SELECTION = 0;
 	public static int ROULETTE_SELECTION = 1;
 	public static int RANK_SELECTION = 2;
+	public static int TOURNAMENT_SELECTION = 3;
 	public static int SELECTION_MODE = TRUNCATION_SELECTION;
+	public static double tournament_exponent = 10;
+	public static double tournament_exponent_max = 20;
     public static boolean mutate_disconnected = false;
     public static double mutate_disconnected_threshold = 0.25;
 	public static boolean mutate_excess_pop = false;

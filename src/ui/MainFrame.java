@@ -1309,6 +1309,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
 	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 	public final JSeparator separator_7 = new JSeparator();
+	public final JRadioButton rdbtnTournamentSelection = new JRadioButton("Tournament selection");
+	public final JSlider tournamentSlider = new JSlider();
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -4124,7 +4126,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 280, 200, 328);
+		panel_3.setBounds(0, 280, 200, 423);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -4216,6 +4218,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnTruncationSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
+				tournamentSlider.setVisible(false);
 			}
 		});
 		
@@ -4229,6 +4232,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnRankSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
+				tournamentSlider.setVisible(false);
 			}
 		});
 		rdbtnRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
@@ -4240,10 +4244,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnRouletteSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
+				tournamentSlider.setVisible(false);
 			}
 		});
 		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
 		selectionType.add(rdbtnRouletteSelection);
+		rdbtnTournamentSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.TOURNAMENT_SELECTION;
+				tournamentSlider.setVisible(true);
+			}
+		});
+		rdbtnTournamentSelection.setBounds(6, 326, 172, 23);
+		
+		panel_3.add(rdbtnTournamentSelection);
+		tournamentSlider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.tournament_exponent = Settings.tournament_exponent_max*((double)sliderElitism.getValue())/100.0;
+			}
+		});
+		tournamentSlider.setBounds(6, 361, 190, 29);
+		tournamentSlider.setVisible(false);
+		tournamentSlider.setValue((int)(100.0*(Settings.tournament_exponent/Settings.tournament_exponent_max)));
+		
+		
+		panel_3.add(tournamentSlider);
 		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
