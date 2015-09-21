@@ -16,6 +16,8 @@ import solutions.StaticFunctions;
 /*
  * TODO:
  * 
+ * OCCASSIONALLY STOPPING AND STARTING SEEMS TO DO MAGIC - MAKE IT DO THAT AUTOMATICALLY AND FIND OUT WHY
+ * 
  * on import census data - say no centroid (intplat,intplon) found, and ask if there's another file that contains centroid,
 then join on geoid
 
