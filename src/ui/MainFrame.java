@@ -3325,6 +3325,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						System.out.println("f is null.");
 						return;
 					}
+					String s = f.getAbsolutePath();
+					if( !s.substring(s.length()-4).toLowerCase().equals(opt == 0 ? ".csv" : ".txt")) {
+						s += opt == 0 ? ".csv" : ".txt";
+						f = new File(s);
+					}
 					try {
 						System.out.println("creating...");
 						FileOutputStream fos = new FileOutputStream(f);
