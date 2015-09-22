@@ -1311,6 +1311,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JSeparator separator_7 = new JSeparator();
 	public final JRadioButton rdbtnTournamentSelection = new JRadioButton("Tournament selection");
 	public final JSlider tournamentSlider = new JSlider();
+	public JMenuItem mntmHarvardElectionData;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3124,6 +3125,28 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnFile.add(mntmWizard);
+		
+		mntmHarvardElectionData = new JMenuItem("Harvard Election Data Archive...");
+		mntmHarvardElectionData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+	    		// open the default web browser for the HTML page
+	    		try {
+					Desktop.getDesktop().browse(new URI("http://projects.iq.harvard.edu/eda/data"));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					System.out.println("failed "+e1);
+					e1.printStackTrace();
+		    		try {
+						//Desktop.getDesktop().open(htmlFile.toURI());
+					} catch (Exception e2) {
+						System.out.println("failed "+e2);
+						e1.printStackTrace();
+						
+					}
+				}
+			}
+		});
+		mnFile.add(mntmHarvardElectionData);
 		
 		mnFile.add(separator_7);
 		//mnFile.add(separator);

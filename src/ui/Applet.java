@@ -79,6 +79,9 @@ public class Applet extends JApplet {
 		new Applet();
 	}
     public Applet() {
+    	
+    	String version = System.getProperty("java.version");
+    	
 		//InputStream in = getClass().getResourceAsStream("/resources/Wards_111312_ED_110612.json"); 
 		//System.out.println("in: "+in);
 		//System.exit(0);
