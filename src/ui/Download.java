@@ -45,7 +45,8 @@ public class Download extends Thread {
 		dlg =_dlg;
 		lbl = _lbl;
 		istate = -1;
-		String state = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the state", "Select state.", 0, null, states, states[0]);
+		//String state = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the state", "Select state.", 0, null, states, states[0]);
+		String state = (String)JOptionPane.showInputDialog(null, "Select the state", "Select state.", JOptionPane.QUESTION_MESSAGE, null, states, states[0]);
 		if( state == null)
 			return false;
 		for( int i = 0; i < states.length; i++) {
@@ -55,6 +56,7 @@ public class Download extends Thread {
 			}
 		}
 		if( istate <= 0) {
+			System.out.println("state not found!");
 			return false;
 		}
 		int y = new Date().getYear()+1900;
@@ -77,7 +79,7 @@ public class Download extends Thread {
 
 		if( !downloadState( istate,cyear,vyear,null, dlg,lbl)) {
 			return false;
-		}
+		} 
 		return true;
 	}
 	public static boolean downloadState(int state, int census_year, int election_year, String start_path, JDialog dlg, JLabel lbl) {
@@ -179,7 +181,7 @@ public class Download extends Thread {
 	}
 	public static String census_centroid_url(int state, int year) {
 		return "ftp://ftp2.census.gov/geo/pvs/tiger"+year+"st/"
-				+num(state)+"_"+states[state]+"/"+num(state)+"/"
+				+num(state)+"_"+states[state].replaceAll(" ","_")+"/"+num(state)+"/"
 				+"tl_"+year+"_"+num(state)+"_tabblock"+shortyear(year)+".zip";
 	}
 	public static String census_pop_url(int state, int year) {
