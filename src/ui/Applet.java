@@ -1,6 +1,8 @@
 package ui;
 
+import java.awt.Desktop;
 import java.io.InputStream;
+import java.net.URI;
 
 import javax.swing.*;
 
@@ -18,7 +20,6 @@ import solutions.StaticFunctions;
  * 
  * OCCASSIONALLY STOPPING AND STARTING SEEMS TO DO MAGIC - MAKE IT DO THAT AUTOMATICALLY AND FIND OUT WHY
  * 
- * MAKE IT JOIN ON GEOID BY DEFAULT
  * MAKE A SETTINGS.JSON FILE IN AUTOREDISTRICT_JSON THAT STORES THE STUFF LIKE RECENT FILES
  * ABILITY TO COMPARE RESULTS
  * ABILITY TO COPY COLUMN TO NEW COLUMN
@@ -81,32 +82,64 @@ public class Applet extends JApplet {
     public Applet() {
     	
     	String version = System.getProperty("java.version");
+    	System.out.println("jre version: "+version);
+    	if( versionCompare(version,"1.5") < 0) {
+    		JOptionPane.showMessageDialog(null, ""
+    				+"You are running an out-of-date version of Java."
+    				+"\nWith this current installed version of Java, the program will not be able to allocate enough memory."
+    				+"\n"
+    				+"\nPlease upgrade your java version."
+    				+"\nTo find the latest release, google \"java jre download\"."
+    				+"\n"
+    				+"\nOnce you hit okay, you will be taken automatically to the download page."
+    				+"\n"
+    				+"\nAfter you've updated your Java version, run this program again."
+    				);
+    		browseTo("http://www.google.com/search?q=java+jre+download&btnI");
+        	System.exit(0);
+    	}
     	
-		//InputStream in = getClass().getResourceAsStream("/resources/Wards_111312_ED_110612.json"); 
-		//System.out.println("in: "+in);
-		//System.exit(0);
-
     	StaticFunctions.binomial(1, 1);
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.51));
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.52));
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.55));
-    	/*
-    	 * binomial cache created.
-binomial_as_normal n:1001.0 k:500.0 p:0.51 ret:0.7468185279694906
-0.7468185279694906
-binomial_as_normal n:1001.0 k:500.0 p:0.52 ret:0.902888853982651
-0.902888853982651
-binomial_as_normal n:1001.0 k:500.0 p:0.55 ret:0.9993399261462654
-0.9993399261462654
-pct to hide: 0.0
-    	 * 
-    	 */
+
 
     	MainFrame mainFrame = new MainFrame();
     	if( !no_gui) {
     		mainFrame.show();
     	}
     }
-
+	public static void browseTo(String s) {
+		try {
+			Desktop.getDesktop().browse(new URI(s));
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			System.out.println("failed "+e1);
+			e1.printStackTrace();
+    		try {
+				//Desktop.getDesktop().open(htmlFile.toURI());
+			} catch (Exception e2) {
+				System.out.println("failed "+e2);
+				e1.printStackTrace();
+				
+			}
+		}
+	}
+    
+    public int versionCompare(String str1, String str2) {
+        String[] vals1 = str1.split("\\.");
+        String[] vals2 = str2.split("\\.");
+        int i = 0;
+        while (i < vals1.length && i < vals2.length && vals1[i].equals(vals2[i]))  {
+          i++;
+        }
+        if (i < vals1.length && i < vals2.length)  {
+            int diff = Integer.valueOf(vals1[i]).compareTo(Integer.valueOf(vals2[i]));
+            return Integer.signum(diff);
+        } else  {
+            return Integer.signum(vals1.length - vals2.length);
+        }
+    }
 
 }

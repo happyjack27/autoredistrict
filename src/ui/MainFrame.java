@@ -118,6 +118,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmExportcsv = new JMenuItem("Export results .csv");
 	JMenuItem mntmImportcsv = new JMenuItem("Import results .csv");
 	JMenuItem mntmShowStats = new JMenuItem("Show stats");
+	JMenuItem mntmShowData = new JMenuItem("Show data");
 	
 	JMenu mnImportExport = new JMenu("Aggregate/Deaggregate");
 
@@ -970,6 +971,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		
 	    		comboBoxPopulation.addItem("POPULATION");
 			    setPopulationColumn("POPULATION");
+	    		comboBoxPopulation.setSelectedItem("POPULATION");
 	    		
 	    		dlg.setVisible(false);
 	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
@@ -3144,20 +3146,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmHarvardElectionData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 	    		// open the default web browser for the HTML page
-	    		try {
-					Desktop.getDesktop().browse(new URI("http://projects.iq.harvard.edu/eda/data"));
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					System.out.println("failed "+e1);
-					e1.printStackTrace();
-		    		try {
-						//Desktop.getDesktop().open(htmlFile.toURI());
-					} catch (Exception e2) {
-						System.out.println("failed "+e2);
-						e1.printStackTrace();
-						
-					}
-				}
+				Applet.browseTo("http://projects.iq.harvard.edu/eda/data");
 			}
 		});
 		mnFile.add(mntmHarvardElectionData);
@@ -3777,13 +3766,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnView.add(mntmZoomIn);
 		
-		mnView.add(new JSeparator());
-
-		mnView.add(mntmShowStats);
-		mnView.add(mntmShowGraph);
 		
-		JMenuItem mntmShowProperties = new JMenuItem("Show data");
-		mntmShowProperties.addActionListener(new ActionListener() {
+		mntmShowData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String[] headers = featureCollection.getHeaders();
 				String[][] data = featureCollection.getData(headers);
@@ -3793,7 +3777,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				df.show();//new DialogShowProperties(featureCollection).show();
 			}
 		});
-		mnView.add(mntmShowProperties);
 		
 		//mnView.add(separator_3);
 		mntmAntialiasingOff.addActionListener(new ActionListener() {
@@ -3858,6 +3841,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmFourMaps);
 
+		mnView.add(new JSeparator());
+
+		mnView.add(mntmShowStats);
+		mnView.add(mntmShowGraph);
+		mnView.add(mntmShowData);
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
