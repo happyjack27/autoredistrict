@@ -12,7 +12,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.util.HashMap;
 
-public class DialogImport extends JDialog {
+public class DialogMerge extends JDialog {
 	JComboBox comboBoxMapLayer = new JComboBox();
 	JComboBox comboBoxFileLinkColumn = new JComboBox();
 	
@@ -33,17 +33,27 @@ public class DialogImport extends JDialog {
 		map_headers = fc.getHeaders();
 		map_data = fc.getData(map_headers);
 		
+		int found = -1;
 		comboBoxMapLayer.removeAllItems();
 		for( int i = 0; i < map_headers.length; i++) {
 			comboBoxMapLayer.addItem(map_headers[i]);
+			if( found < 0 && map_headers[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+				found = i;
+			}
 		}
-		comboBoxMapLayer.setSelectedIndex(0);
+		found = found < 0 ? 0 : found; 
+		comboBoxMapLayer.setSelectedIndex(found);
 		
+		found = -1;
 		comboBoxFileLinkColumn.removeAllItems();
 		for( int i = 0; i < data_headers.length; i++) {
 			comboBoxFileLinkColumn.addItem(data_headers[i]);
+			if( found < 0 && data_headers[i].toUpperCase().trim().indexOf("GEOID") == 0) {
+				found = i;
+			}
 		}
-		comboBoxFileLinkColumn.setSelectedIndex(0);
+		found = found < 0 ? 0 : found; 
+		comboBoxFileLinkColumn.setSelectedIndex(found);
 		
 		/*
 		comboBoxFilePopulationColumn.removeAllItems();
@@ -92,8 +102,8 @@ public class DialogImport extends JDialog {
 		
 	}
 	
-	public DialogImport() {
-		setTitle("Import data");
+	public DialogMerge() {
+		setTitle("Merge data");
 		setModal(true);
 		getContentPane().setLayout(null);
 		this.setSize(new Dimension(366, 188));

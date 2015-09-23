@@ -38,8 +38,22 @@ public class Download extends Thread {
 	public static void main(String[] args) {
 		downloadState(1,2010,2012,null,null);
 	}
-	public static void downloadState(int state, int census_year, int election_year, JDialog _dlg, JLabel _lbl) {
-		downloadState(state, census_year, election_year, null, null,lbl); 
+	public static String getBasePath() {
+		File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
+		String start_path = f.getAbsolutePath();
+		if( !start_path.substring(start_path.length()-1).equals(File.separator)) {
+			start_path += File.separator;
+		}
+		start_path += "autoredistrict_data"+File.separator;
+		if( !start_path.substring(start_path.length()-1).equals(File.separator)) {
+			start_path += File.separator;
+		}
+		
+		return start_path;
+	}
+	public static String getStartPath() {
+		if( istate < 0) return getBasePath();
+		return getBasePath()+states[istate]+File.separator+cyear+File.separator;
 	}
 	public static boolean downloadData(JDialog _dlg, JLabel _lbl) {
 		dlg =_dlg;
@@ -77,37 +91,29 @@ public class Download extends Thread {
 		
 		JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 
-		if( !downloadState( istate,cyear,vyear,null, dlg,lbl)) {
+		if( !downloadState( istate,cyear,vyear, dlg,lbl)) {
 			return false;
 		} 
 		return true;
 	}
-	public static boolean downloadState(int state, int census_year, int election_year, String start_path, JDialog dlg, JLabel lbl) {
-		if( start_path == null) {
-			File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
-			start_path = f.getAbsolutePath();
-			if( !start_path.substring(start_path.length()-1).equals(File.separator)) {
-				start_path += File.separator;
-			}
-			start_path += "autoredistrict_data"+File.separator;
-		}
-		if( !start_path.substring(start_path.length()-1).equals(File.separator)) {
-			start_path += File.separator;
-		}
+	public static boolean downloadState(int _state, int _census_year, int _election_year, JDialog dlg, JLabel lbl) {
+		istate = _state;
+		cyear = _census_year;
+		vyear = _election_year;
 
-		String path = start_path+states[state]+File.separator+census_year+File.separator;
+		String path = getStartPath();
 		File f = new File(path);
 		if( !f.exists()) { f.mkdirs(); }
 		
 		census_tract_path = path;
 		census_centroid_path = path+"block_centroids"+File.separator;
 		census_pop_path = path+"block_pop"+File.separator;
-		census_vtd_path = path+election_year+File.separator+"vtd"+File.separator;
+		census_vtd_path = path+vyear+File.separator+"vtd"+File.separator;
 		
 		File ftest1 = new File(census_vtd_path+"vtds.zip");
 		File ftest2 = new File(census_pop_path+"block_pops.zip");
 		File ftest3 = new File(census_centroid_path+"block_centroids.zip");
-		File ftest4 = new File(census_tract_path+census_tract_filename(state,cyear));
+		File ftest4 = new File(census_tract_path+census_tract_filename(istate,cyear));
 		
 		download_census = true;
 		download_vtd = true;

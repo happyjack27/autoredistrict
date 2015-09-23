@@ -101,8 +101,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
-	JMenuItem mntmExportData = new JMenuItem("Save data");
-	JMenuItem mntmImportData = new JMenuItem("Merge data");
+	JMenuItem mntmSaveData = new JMenuItem("Save data");
+	JMenuItem mntmMergeData = new JMenuItem("Merge data");
 	JMenuItem mntmRenumber = new JMenuItem("Renumber districts");
 
 	//JMenu mnGeography = new JMenu("Geography");
@@ -183,6 +183,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		public void init() {
 			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
 			JFileChooser jfc = new JFileChooser();
+			jfc.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
 			jfc.showOpenDialog(null);
 			f = jfc.getSelectedFile();
@@ -198,6 +199,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
 			JFileChooser jfc2 = new JFileChooser();
+			jfc.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
 			jfc2.showSaveDialog(null);
 			foutput = jfc2.getSelectedFile();
@@ -546,6 +548,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		try {
     			JOptionPane.showMessageDialog(mainframe, "Select the .dbf or .txt file with census block-level data.\n");
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
 				jfc.showOpenDialog(null);
@@ -562,6 +565,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
     			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
 				JFileChooser jfc2 = new JFileChooser();
+				jfc2.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
 				jfc2.showSaveDialog(null);
 				File foutput = jfc2.getSelectedFile();
@@ -820,6 +824,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		LoadCensusFileThread() { super(); }
 		public void init() {
 			JFileChooser jfc = new JFileChooser();
+			jfc.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
 			jfc.showOpenDialog(null);
 			f = jfc.getSelectedFile();
@@ -1406,6 +1411,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ImportAggregateCustom() { super(); }
 		public void init() {
 			JFileChooser jfc = new JFileChooser();
+			jfc.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
@@ -1794,6 +1800,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					nextThread.start();
 					nextThread = null;
 				}
+				if( Download.istate < 0) {
+					setTitle("Automatic Redistricter");
+				} else {
+					setTitle("Automatic Redistricter - "+Download.states[Download.istate]+" ("+Download.cyear+")");
+				}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -1841,6 +1852,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	public void run() { 
         		try {
         			JFileChooser jfc = new JFileChooser();
+        			jfc.setCurrentDirectory(new File(Download.getStartPath()));
     				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
     				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
     				jfc.showOpenDialog(null);
@@ -1989,6 +2001,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		public void init() {
 			JOptionPane.showMessageDialog(mainframe,"Select source file\n(first column = geoid, second column = mapobject, no header)");
 			JFileChooser jfc = new JFileChooser();
+			jfc.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
 			jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
 			jfc.showOpenDialog(null);
@@ -1998,6 +2011,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			JOptionPane.showMessageDialog(mainframe,"Select output file");
 			JFileChooser jfc2 = new JFileChooser();
+			jfc2.setCurrentDirectory(new File(Download.getStartPath()));
 			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
 			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
 			jfc2.showSaveDialog(null);
@@ -2451,10 +2465,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		chckbxmntmOpenCensusResults.setEnabled(geo_loaded);
 		mntmOpenElectionResults.setEnabled(geo_loaded);
-		mntmImportData.setEnabled(geo_loaded);
+		mntmMergeData.setEnabled(geo_loaded);
 		mntmImportcsv.setEnabled(geo_loaded);
 		mntmExportcsv.setEnabled(geo_loaded);
-		mntmExportData.setEnabled(geo_loaded);
+		mntmSaveData.setEnabled(geo_loaded);
 		mntmRenumber.setEnabled(geo_loaded);
 		mntmSaveProjectFile.setEnabled(geo_loaded);
 
@@ -3049,6 +3063,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOpenProjectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
 				jfc.setFileFilter(filter);
 				jfc.showOpenDialog(null);
@@ -3064,6 +3079,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmSaveProjectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
 				jfc.setFileFilter(filter);
 				jfc.showSaveDialog(null);
@@ -3089,6 +3105,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOpenProjectFile_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				FileNameExtensionFilter filter = new FileNameExtensionFilter(".json files", "json");
 				jfc.setFileFilter(filter);
 				jfc.showOpenDialog(null);
@@ -3115,12 +3132,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 				}
 				Download.nextThread = ost;
-				if( !Download.downloadData(dlg, dlbl)) {
-					return;
-				}
-				//ost.start();
-
-				//JOptionPane.showMessageDialog(mainframe, "Wizard not implemented yet.");
+				DialogDownload dd = new DialogDownload();
+				dd.show();
+				//!Download.downloadData(dlg, dlbl))
 			}
 		});
 		
@@ -3155,6 +3169,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("ESRI shapefiles", "shp");
 				jfc.setFileFilter(filter);
 				jfc.showOpenDialog(null);
@@ -3162,6 +3177,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( fd == null) {
 					return;
 				}
+				Download.istate = -1;
 				new OpenShapeFileThread(fd).start();
 			}				
 		});
@@ -3235,9 +3251,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmRenumber);
-		mntmImportData.addActionListener(new ActionListener() {
+		mntmMergeData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
 				jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","tsv"));
@@ -3265,7 +3282,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
 				}
-				DialogImport di = new DialogImport();
+				DialogMerge di = new DialogMerge();
 				di.setData(featureCollection, dh.header, dh.data);
 				di.show();
 				
@@ -3290,9 +3307,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mapPanel.repaint();
 			}
 		});
-		mnFile.add(mntmImportData);
+		mnFile.add(mntmMergeData);
 		
-		mntmExportData.addActionListener(new ActionListener() {
+		mntmSaveData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
 				if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
@@ -3322,6 +3339,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					} else if( opt == 2) {
 						JFileChooser jfc = new JFileChooser();
+						jfc.setCurrentDirectory(new File(Download.getStartPath()));
 						jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbase file","dbf"));
 						jfc.showSaveDialog(null);
 						f = jfc.getSelectedFile();
@@ -3335,6 +3353,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					System.out.println("writedbf done.");
 				} else {
 					JFileChooser jfc = new JFileChooser();
+					jfc.setCurrentDirectory(new File(Download.getStartPath()));
 					String delimiter = ",";
 					if( opt == 0) { 
 						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
@@ -3384,7 +3403,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JOptionPane.showMessageDialog(mainframe,"File saved.");
 			}
 		});
-		mnFile.add(mntmExportData);
+		mnFile.add(mntmSaveData);
 		
 		separator_4 = new JSeparator();
 		mnFile.add(separator_4);
@@ -3465,6 +3484,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOpenGeojson.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.showOpenDialog(null);
 				File fd = jfc.getSelectedFile();
 				
@@ -3486,6 +3506,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					} else {
 						JFileChooser jfc = new JFileChooser();
+						jfc.setCurrentDirectory(new File(Download.getStartPath()));
 						jfc.showOpenDialog(null);
 						f = jfc.getSelectedFile();
 					}
@@ -3558,6 +3579,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					} else {
 						JFileChooser jfc = new JFileChooser();
+						jfc.setCurrentDirectory(new File(Download.getStartPath()));
 						jfc.showOpenDialog(null);
 						f = jfc.getSelectedFile();
 					}
@@ -3902,6 +3924,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null,"No results");
 				}
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.showSaveDialog(null);
 				File f = jfc.getSelectedFile();
 				if( f == null) {
@@ -3952,6 +3975,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportcsv.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.showOpenDialog(null);
 				File f = jfc.getSelectedFile();
 
@@ -4035,6 +4059,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null,"No results");
 				}
 				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				jfc.showSaveDialog(null);
 				File fd = jfc.getSelectedFile();
