@@ -568,19 +568,34 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JFileChooser jfc2 = new JFileChooser();
 				jfc2.setCurrentDirectory(new File(Download.getStartPath()));
 				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
+				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
 				jfc2.showSaveDialog(null);
 				File foutput = jfc2.getSelectedFile();
 				if( foutput == null)  {
 					return;
 				}
+				String output_delimiter = ",";
 				FileOutputStream fos = null;
 				try {
 					System.out.println("creating..."+foutput.getAbsolutePath());
+					String ext2 = foutput.getAbsolutePath();
+					ext2 = ext2.trim().toLowerCase();
+					ext2 = ext2.substring(ext2.length()-4);
+					if( ext2.equals(".txt")) {
+						output_delimiter = "\t";
+					}
 					fos = new FileOutputStream(foutput);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-    			
+				
+				boolean include_centroid = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include centroid (aka center point)?");
+				boolean include_header = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include header row?");
+
+    			if( include_header) {
+    				fos.write(("GEOID10"+output_delimiter+(include_centroid ? ("INTPTLON"+output_delimiter+"INTPTLAT"+output_delimiter) : "")+"DISTRICT"+"\n").getBytes());
+    			}
+
     			
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading file...");
@@ -663,7 +678,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    					
 		    					try {
 		    						//System.out.println("writing...");
-		    						fos.write((""+geoid+","+district+"\n").getBytes());
+		    						fos.write((""+geoid+output_delimiter+(include_centroid ? (dlon+output_delimiter+dlat+output_delimiter) : "")+district+"\n").getBytes());
 		    					} catch (Exception e) {
 		    						// TODO Auto-generated catch block
 		    						e.printStackTrace();
@@ -765,7 +780,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    					
 		    					try {
 		    						//System.out.println("writing...");
-		    						fos.write((""+geoid+","+district+"\n").getBytes());
+		    						fos.write((""+geoid+output_delimiter+(include_centroid ? (dlon+output_delimiter+dlat+output_delimiter) : "")+district+"\n").getBytes());
 		    					} catch (Exception e) {
 		    						// TODO Auto-generated catch block
 		    						e.printStackTrace();
@@ -1427,7 +1442,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
     	public void run() {
     		try {
-				String fn = f.getName();
+				String fn = f.getName().trim();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
 				DataAndHeader dh = new DataAndHeader();
 
@@ -1471,6 +1486,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 		    		dlg.setVisible(false);
+					if( col_lat < 0 || col_lon < 0) {
+						dlg.setVisible(false);
+			    		System.out.println("Required columns not found.");
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.\nMissing centroid columns:\n INTPTLAT\n INTPTLON");
+						return;
+					}
 					DialogMultiColumnSelect dsc = new DialogMultiColumnSelect("Select columns to import",dh.header,new String[]{});
 					dsc.show();
 					if( !dsc.ok) {
@@ -1480,7 +1501,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String[] options = new String[]{"Accumulate","Majority vote"};
 					int ACCUMULATE = 0;
 					int OVERWRITE = 1;
-					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate or overwrite values?", "Select option", 0,0,null,options,options[0]);
+					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate values or majority vote?", "Select option", 0,0,null,options,options[0]);
 					if( opt < 0) {
 						System.out.println("aborted.");
 						return;
@@ -1498,12 +1519,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							}
 						}
 					}
-					if( col_lat < 0 || col_lon < 0) {
-						dlg.setVisible(false);
-			    		System.out.println("Required columns not found.");
-						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
-						return;
-					}
 		    		System.out.println("doing hit tests");
 
 		    		dlbl.setText("Doing hit tests...");
@@ -1514,9 +1529,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					 //and finally process the rows
 		    		try {
     					if( opt == OVERWRITE) { //overwrite
+    						//make properties in first feature
 	    					for( int j = 0; j < col_indexes.length; j++) {
 	    						featureCollection.features.get(0).properties.put((String)col_names[j]," ");		
 	    					}
+    						//reset hash in all features
 	    					for( Feature feat : featureCollection.features) {
 	    						feat.properties.temp_hash.clear();
 	    					}
@@ -1545,6 +1562,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    						}
 			    						integer++;
 			    						feat.properties.temp_hash.put(ss[col_indexes[0]],integer);
+			    						//System.out.println(""+feat.properties.get("GEOID10")+": "+ss[col_indexes[0]]+": "+integer);
 			    						/*
 				    					for( int j = 0; j < col_indexes.length; j++) {
 				    						feat.properties.put((String)col_names[j],ss[col_indexes[j]].trim());				    						
@@ -3193,7 +3211,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmExportToBlock = new JMenuItem("Export districts to block level");
 		mntmExportToBlock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				new ExportToBlockLevelThread().start();
+				boolean ok = true;
+				if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
+					ok = false;
+				}
+				if( ok && comboBoxDistrictColumn.getSelectedItem() == null) {
+					ok = false;
+				}
+				if( ok && ((String)comboBoxDistrictColumn.getSelectedItem()).length() == 0) {
+					ok = false;
+				}
+				if( ok) {
+					new ExportToBlockLevelThread().start();
+				} else {
+					JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
+				}
 			}
 		});
 		mntmImportAggregate.addActionListener(new ActionListener() {
