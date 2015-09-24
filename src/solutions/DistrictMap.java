@@ -44,6 +44,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			try {
 				Feature f = collection.features.get(i);
 				if( !f.properties.containsKey(column_name)) {
+					System.out.println("key missing");
 				} else {
 					try {
 						if( Integer.parseInt((String)f.properties.get(column_name)) == 0) {
@@ -61,6 +62,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			try {
 				Feature f = collection.features.get(i);
 				if( !f.properties.containsKey(column_name)) {
+					System.out.println("district missing ("+column_name+"), randomizing");
 					has_districts = false;
 					vtd_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
 				} else {

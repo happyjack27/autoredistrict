@@ -406,6 +406,33 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         	f.geometry.makePolys();
         	f.draw(g);
         }
+        if( Feature.showPoints) {
+        	for( Feature feature : features) {
+        		if( feature.points == null) {
+        			continue;
+        		}
+        		if( feature.ward.state != 2) {
+        			continue;
+        		}
+        		for( double[] dd : feature.points) {
+        			
+        			double lon = dd[0];
+        			double lat = dd[1];
+        			int district = (int)dd[2];
+        			while( district >= standard_district_colors.length) {
+        				district -= standard_district_colors.length;
+        			}
+        			
+        			Color c = standard_district_colors[district];
+        			g.setColor(c);
+    				int x = (int)((lon-Geometry.shiftx)*Geometry.scalex);
+    				int y = (int)((lat-Geometry.shifty)*Geometry.scaley);	        			
+        			g.drawRect((int)x, (int)y, 4, 4);
+        			
+        		}
+        	}
+        	
+        }
 		if( ecology.population != null && ecology.population.size() > 0) {
 	        if( Feature.showDistrictLabels) {
 	        	DecimalFormat sdm = new DecimalFormat("###,###,##0.00000");  
@@ -672,6 +699,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 
 	public void loadDistrictsFromProperties(String column_name) {
+		Feature.compare_centroid = false;
+		Collections.sort(features);
+		
 		
 		if( ecology.population == null) {
 			ecology.population = new Vector<DistrictMap>();

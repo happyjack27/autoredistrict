@@ -31,18 +31,50 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public Properties properties;
 	public Geometry geometry;
 	public Ward ward = null;
+	public Vector<double[]> points = new Vector<double[]>();
+	
+	public static boolean compare_centroid = true;
 	
 	public static boolean showPrecinctLabels = false;
 	public static boolean showDistrictLabels = false;
 	public static int display_mode = 0;
 	public static boolean draw_lines = false;
+	public static boolean showPoints = true;
+	
+	public void setDistFromPoints( String colname) {
+		int[] counts = new int[200];
+		for( int i = 0; i < counts.length; i++) {
+			counts[i] = 0;
+		}
+		int maxindex = -1;
+		int max = 0;
+		for( int i = 0; i < points.size(); i++) {
+			int p = (int)points.get(i)[2];
+			//System.out.print(p+" ");
+			counts[p]++;
+			if( counts[p] > max) {
+				max = counts[p];
+				maxindex = p;
+			}
+		}
+		//System.out.println();
+		//System.out.println(" "+colname+": "+maxindex+" "+max);
+		properties.put(colname,""+maxindex);
+	}
 	
 	@Override
 	public int compareTo(Feature o) {
-		return this.geometry.full_centroid[0] > o.geometry.full_centroid[0] ? 1 : 
-			 this.geometry.full_centroid[0] < o.geometry.full_centroid[0]  ? -1 :
-				 0
-				 ;
+		if( compare_centroid) {
+			return this.geometry.full_centroid[0] > o.geometry.full_centroid[0] ? 1 : 
+				 this.geometry.full_centroid[0] < o.geometry.full_centroid[0]  ? -1 :
+					 0
+					 ;
+		} else {
+			return 
+					this.ward.id > o.ward.id ? 1 :
+						this.ward.id < o.ward.id ? -1 :
+							0;
+		}
 	}
 
 	
