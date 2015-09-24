@@ -42,6 +42,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static boolean showPoints = true;
 	
 	public void setDistFromPoints( String colname) {
+		if( points == null || points.size() == 0) {
+			return;
+		}
 		int[] counts = new int[200];
 		for( int i = 0; i < counts.length; i++) {
 			counts[i] = 0;
@@ -60,6 +63,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		//System.out.println();
 		//System.out.println(" "+colname+": "+maxindex+" "+max);
 		properties.put(colname,""+maxindex);
+		points = null;
 	}
 	
 	@Override
