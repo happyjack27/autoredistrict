@@ -21,7 +21,7 @@ import solutions.StaticFunctions;
  * 
  * TODO: add ability to merge in using another file for centroids 
  * 
- * TODO:
+ * TODO: process florida data
  * 
  * OCCASSIONALLY STOPPING AND STARTING SEEMS TO DO MAGIC - MAKE IT DO THAT AUTOMATICALLY AND FIND OUT WHY
  * 
