@@ -1341,6 +1341,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JRadioButton rdbtnTournamentSelection = new JRadioButton("Tournament selection");
 	public final JSlider tournamentSlider = new JSlider();
 	public JMenuItem mntmHarvardElectionData;
+	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3466,6 +3467,29 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnImportExport.add(mntmConvertWktTo);
+		mntmDescramble.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for( Feature feat : featureCollection.features) {
+					feat.geometry.makePolysFull();
+				}
+
+				String[] districts = new String[featureCollection.features.size()];
+				Feature.compare_centroid = true;
+				String s = (String)mainframe.comboBoxDistrictColumn.getSelectedItem();
+				Collections.sort(featureCollection.features);
+				for( int i = 0; i < featureCollection.features.size(); i++) {
+					districts[i] = featureCollection.features.get(i).properties.getString(s);
+				}
+				Feature.compare_centroid = false;
+				Collections.sort(featureCollection.features);
+				for( int i = 0; i < featureCollection.features.size(); i++) {
+					featureCollection.features.get(i).properties.put(s,districts[i]);
+				}
+				System.out.println("done descrambling");
+			}
+		});
+		
+		mnImportExport.add(mntmDescramble);
 
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
