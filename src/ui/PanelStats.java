@@ -142,6 +142,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		try {
 			double total_pvi = 0;
 			double grand_total_votes = 0;
+			int num_competitive = 0;
 			double wasted_0 = 0;
 			double wasted_1 = 0;
 			
@@ -203,6 +204,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					wasted_0 += result[0][0] - (result[0][0] >= needed ? needed : 0);
 					wasted_1 += result[0][1] - (result[0][1] >= needed ? needed : 0);
 					pvi = 100.0*(result[0][0] >= needed ? result[0][0] - needed : result[0][1] - needed)/total_votes;
+					if( pvi < 5) {
+						num_competitive++;
+					}
 					total_pvi += pvi;
 					pviw = result[0][0] >= needed ? "D" : "R";
 				} catch (Exception ex) {
@@ -236,7 +240,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			double egap = 100.0*Math.abs(wasted_0-wasted_1)/grand_total_votes;
 
-
 			String[] scolumns = new String[]{"Value","Measure"};
 			String[][] sdata = new String[][]{
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
@@ -246,9 +249,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
 					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
+					new String[]{""+decimal.format(total_pvi / (double)Settings.num_districts),"Avg. PVI"},
+					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
 					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
-					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
+					//new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
 			};
 			TableModel tm = new DefaultTableModel(sdata,scolumns);
 			summaryTable.setModel(tm);
@@ -293,19 +298,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	private void initComponents() {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(443, 647));
+		this.setPreferredSize(new Dimension(443, 745));
 		
 		rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(26, 194, 390, 223);
+		scrollPane.setBounds(26, 291, 390, 223);
 		add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 466, 390, 155);
+		scrollPane_1.setBounds(26, 563, 390, 155);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
@@ -320,7 +325,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		btnCopy.setBounds(327, 160, 89, 23);
+		btnCopy.setBounds(327, 257, 89, 23);
 		add(btnCopy);
 		
 		button = new JButton("copy");
@@ -331,7 +336,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table_1.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		button.setBounds(327, 432, 89, 23);
+		button.setBounds(327, 529, 89, 23);
 		add(button);
 		
 		button_1 = new JButton("copy");
@@ -346,7 +351,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_1);
 		
 		scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(26, 45, 390, 104);
+		scrollPane_2.setBounds(26, 45, 390, 200);
 		add(scrollPane_2);
 		
 		summaryTable = new JTable();
@@ -357,11 +362,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(lblSummary);
 		
 		lblByDistrict = new JLabel("By district");
-		lblByDistrict.setBounds(26, 169, 226, 14);
+		lblByDistrict.setBounds(26, 266, 226, 14);
 		add(lblByDistrict);
 		
 		lblByParty = new JLabel("By party");
-		lblByParty.setBounds(26, 441, 226, 14);
+		lblByParty.setBounds(26, 538, 226, 14);
 		add(lblByParty);
 	}
 	public FeatureCollection featureCollection;
