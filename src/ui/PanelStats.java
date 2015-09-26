@@ -249,11 +249,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
 					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
+					new String[]{""+decimal.format(egap*(double)Settings.num_districts),"Adj. efficiency gap (pct)"},
 					new String[]{""+decimal.format(total_pvi / (double)Settings.num_districts),"Avg. PVI"},
 					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
 					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
-					//new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
+					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
 			};
 			TableModel tm = new DefaultTableModel(sdata,scolumns);
 			summaryTable.setModel(tm);
@@ -298,19 +299,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	private void initComponents() {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(443, 745));
+		this.setPreferredSize(new Dimension(443, 788));
 		
 		rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(26, 291, 390, 223);
+		scrollPane.setBounds(26, 332, 390, 223);
 		add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 563, 390, 155);
+		scrollPane_1.setBounds(26, 604, 390, 155);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
@@ -325,7 +326,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		btnCopy.setBounds(327, 257, 89, 23);
+		btnCopy.setBounds(327, 298, 89, 23);
 		add(btnCopy);
 		
 		button = new JButton("copy");
@@ -336,7 +337,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table_1.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		button.setBounds(327, 529, 89, 23);
+		button.setBounds(327, 570, 89, 23);
 		add(button);
 		
 		button_1 = new JButton("copy");
@@ -351,7 +352,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_1);
 		
 		scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(26, 45, 390, 200);
+		scrollPane_2.setBounds(26, 45, 390, 241);
 		add(scrollPane_2);
 		
 		summaryTable = new JTable();
@@ -362,11 +363,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(lblSummary);
 		
 		lblByDistrict = new JLabel("By district");
-		lblByDistrict.setBounds(26, 266, 226, 14);
+		lblByDistrict.setBounds(26, 307, 226, 14);
 		add(lblByDistrict);
 		
 		lblByParty = new JLabel("By party");
-		lblByParty.setBounds(26, 538, 226, 14);
+		lblByParty.setBounds(26, 579, 226, 14);
 		add(lblByParty);
 	}
 	public FeatureCollection featureCollection;
