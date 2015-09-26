@@ -249,7 +249,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
 					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
-					new String[]{""+decimal.format(egap*(double)Settings.num_districts),"Adj. efficiency gap (pct)"},
+					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
 					new String[]{""+decimal.format(total_pvi / (double)Settings.num_districts),"Avg. PVI"},
 					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
