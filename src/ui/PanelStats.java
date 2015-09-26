@@ -73,37 +73,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		//        fairnessScores = new double[]{length,disproportional_representation,population_imbalance,disconnected_pops,power_fairness}; //exponentiate because each bit represents twice as many people disenfranched
 
 		try {
-			int wasted_votes = 0;
-			for( int m : dm.wasted_votes_by_party) {
-				wasted_votes += m;
-			}
-			
-			String[] dcolumns = new String[]{"Value","Measure"};
-			String[][] ddata = new String[][]{
-					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
-					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
-					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population imbalance (%)"},
-					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (relative entropy)"},
-					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
-					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
-					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
-					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
-					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
-			};
-			TableModel tm = new DefaultTableModel(ddata,dcolumns);
-			summaryTable.setModel(tm);
-			
-			summaryTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
-
-			/*
-		lblNewLabel_1.setText(""+(1.0/dm.fairnessScores[0]));
-		label_1.setText(""+integer.format(dm.fairnessScores[3]));
-		label_3.setText(""+decimal.format(dm.getMaxPopDiff()*100.0)+" pct");
-		label_5. setText(""+decimal.format(dm.fairnessScores[1]*conversion_to_bits)+" bits");
-		label_7.setText(""+decimal.format(dm.fairnessScores[4]*conversion_to_bits)+" bits");
-		label_2.setText(""+decimal.format(100.0*Settings.mutation_boundary_rate)+" pct");		
-		label_4.setText(""+integer.format(featureCollection.ecology.generation));
-		*/
 		if( false) {
 			Ecology.history.add(new double[]{
 					featureCollection.ecology.generation,
@@ -171,17 +140,23 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		
 		try {
+			double total_pvi = 0;
+			double grand_total_votes = 0;
+			double wasted_0 = 0;
+			double wasted_1 = 0;
 			
-			String[] dcolumns = new String[8+Candidate.candidates.size()*2];
+			//=== by district
+			String[] dcolumns = new String[9+Candidate.candidates.size()*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			dcolumns[0] = "District";
 			dcolumns[1] = "Population";
 			dcolumns[2] = "Winner";
-			dcolumns[3] = "Self-entropy";
-			dcolumns[4] = "Compactness";
-			dcolumns[5] = "Area";
-			dcolumns[6] = "Paired edge length";
-			dcolumns[7] = "Unpaired edge length";
+			dcolumns[3] = "PVI"; //
+			dcolumns[4] = "Self-entropy";
+			dcolumns[5] = "Compactness";
+			dcolumns[6] = "Area";
+			dcolumns[7] = "Paired edge length";
+			dcolumns[8] = "Unpaired edge length";
 			
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Candidate.candidates.size()][];
@@ -192,11 +167,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
-				dcolumns[i+8] = ""+i+" vote %";
-				dcolumns[i+8+Candidate.candidates.size()] = ""+i+" votes";
+				dcolumns[i+9] = ""+i+" vote %";
+				dcolumns[i+9+Candidate.candidates.size()] = ""+i+" votes";
 			}
 			
 			double total_population = 0;
+	
 			for( int i = 0; i < dm.districts.size(); i++) {
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
@@ -217,28 +193,71 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					total += result[0][j];
 					tot_votes += result[0][j];
 				}
+				double total_votes = 0;
+				double pvi = 0;
+				String pviw = ""; 
+				try {
+					total_votes = result[0][0]+result[0][1];
+					grand_total_votes += total_votes;
+					double needed = total_votes/2;
+					wasted_0 += result[0][0] - (result[0][0] >= needed ? needed : 0);
+					wasted_1 += result[0][1] - (result[0][1] >= needed ? needed : 0);
+					pvi = 100.0*(result[0][0] >= needed ? result[0][0] - needed : result[0][1] - needed)/total_votes;
+					total_pvi += pvi;
+					pviw = result[0][0] >= needed ? "D" : "R";
+				} catch (Exception ex) {
+					
+				}
 				//String winner = ""+iwinner;
 				ddata[i][0] = ""+i;
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
-				ddata[i][3] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
-				ddata[i][4] = ""+d.iso_quotient;
-				ddata[i][5] = ""+d.area;
-				ddata[i][6] = ""+d.paired_edge_length;
-				ddata[i][7] = ""+d.unpaired_edge_length;
-				for( int j = 8; j < ddata[i].length; j++) {
+				ddata[i][3] = ""+pviw+"+"+integer.format((int)Math.round(pvi));
+				ddata[i][4] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][5] = ""+d.iso_quotient;
+				ddata[i][6] = ""+d.area;
+				ddata[i][7] = ""+d.paired_edge_length;
+				ddata[i][8] = ""+d.unpaired_edge_length;
+				for( int j = 9; j < ddata[i].length; j++) {
 					ddata[i][j] = "";
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+8] = ""+(result[0][j]/total);
+					ddata[i][j+9] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+8+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
+					ddata[i][j+9+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
 			}
-			//System.out.println("tot votes "+tot_votes);
-			//			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","% del","% pop vote"};
+			
+			//=== summary
+			int wasted_votes = 0;
+			for( int m : dm.wasted_votes_by_party) {
+				wasted_votes += m;
+			}
+			double egap = 100.0*Math.abs(wasted_0-wasted_1)/grand_total_votes;
 
+
+			String[] scolumns = new String[]{"Value","Measure"};
+			String[][] sdata = new String[][]{
+					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
+					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
+					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population imbalance (%)"},
+					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (relative entropy)"},
+					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
+					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
+					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
+					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
+					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
+					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
+			};
+			TableModel tm = new DefaultTableModel(sdata,scolumns);
+			summaryTable.setModel(tm);
+			
+			summaryTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+
+
+
+			//=== by party
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				cdata[i] = new String[]{
 						""+i,
@@ -251,8 +270,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 
 			
-			TableModel tm = new DefaultTableModel(ddata,dcolumns);
-			table.setModel(tm);
+			TableModel tm1 = new DefaultTableModel(ddata,dcolumns);
+			table.setModel(tm1);
 			TableModel tm2 = new DefaultTableModel(cdata,ccolumns);
 			table_1.setModel(tm2);
 		} catch (Exception ex) {
