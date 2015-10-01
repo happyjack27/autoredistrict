@@ -7,16 +7,19 @@ import javax.swing.table.*;
 
 import solutions.*;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Vector;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+	Color[] dmcolors = null;
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -149,6 +152,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			//=== by district
 			String[] dcolumns = new String[9+Candidate.candidates.size()*2];
 			String[][] ddata = new String[dm.districts.size()][];
+			if( dmcolors == null || dmcolors.length != dm.districts.size()) {
+				dmcolors = new Color[dm.districts.size()];
+			}
 			dcolumns[0] = "District";
 			dcolumns[1] = "Population";
 			dcolumns[2] = "Winner";
@@ -158,6 +164,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dcolumns[6] = "Area";
 			dcolumns[7] = "Paired edge length";
 			dcolumns[8] = "Unpaired edge length";
+			
 			
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Candidate.candidates.size()][];
@@ -175,6 +182,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double total_population = 0;
 	
 			for( int i = 0; i < dm.districts.size(); i++) {
+				dmcolors[i] = dm.getWastedVoteColor(i);
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
 				total_population += d.getPopulation();
@@ -278,6 +286,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			TableModel tm1 = new DefaultTableModel(ddata,dcolumns);
 			table.setModel(tm1);
+			Enumeration<TableColumn> en = table.getColumnModel().getColumns();
+	        while (en.hasMoreElements()) {
+	            TableColumn tc = en.nextElement();
+	            tc.setCellRenderer(new MyTableCellRenderer());
+	        }			
 			TableModel tm2 = new DefaultTableModel(cdata,ccolumns);
 			table_1.setModel(tm2);
 		} catch (Exception ex) {
@@ -381,6 +394,32 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JLabel lblSummary;
 	public JLabel lblByDistrict;
 	public JLabel lblByParty;
+	
+    public class MyTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
+        @Override
+        public JComponent getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            setBackground(null);
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setText(String.valueOf(value));
+            if( dmcolors != null && dmcolors.length > row) {
+            	setBackground(dmcolors[row]);
+            }
+            /*
+            boolean interestingRow = row % 5 == 2;
+            boolean secondColumn = column == 1;
+            if (interestingRow && secondColumn) {
+                setBackground(Color.ORANGE);
+            } else if (interestingRow) {
+                setBackground(Color.YELLOW);
+            } else if (secondColumn) {
+                setBackground(Color.RED);
+            }
+            */
+            return this;
+        }
+
+    }
 
 
 

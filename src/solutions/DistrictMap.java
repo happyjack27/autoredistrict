@@ -2,6 +2,7 @@ package solutions;
 
 import geography.*;
 
+import java.awt.Color;
 import java.util.*;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
@@ -1259,4 +1260,47 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     outerEdges.add(edge);
         return outerEdges;
     }
+
+
+	public Color getWastedVoteColor(int i) {
+		double[] rgb = new double[]{0,0,0};
+		int[] amts0 = wasted_votes_by_district_and_party[i];
+		double[] amts1 = districts.get(i).getElectionResults()[0];
+		double tot = 0;
+		for( int j = 0; j < amts1.length; j++) {
+			tot += amts1[j];
+		}
+		tot /= 3;
+		if( tot == 0) { tot = 1; }
+		
+		for( int j = 0; j < amts0.length; j++) {
+			if( amts1[j] == 0) {
+				amts1[j] = 1;
+			}
+			Color c = getComplement(FeatureCollection.standard_district_colors[j]);
+			double d = ((double)amts0[j]) / tot;//amts1[j];
+			//System.out.println(""+j+": "+amts0[j]+" "+amts1[j]+" "+d+" "+tot);
+			if( d > 1) { d = 1; }
+			if( d < 0) { d = 0; }
+			rgb[0] += d*c.getRed();
+			rgb[1] += d*c.getGreen();
+			rgb[2] += d*c.getBlue();
+		}
+		//System.out.print("c");
+		for( int j = 0; j < 3; j++) {
+			//rgb[j] /= 2;
+			if( rgb[j] < 0) rgb[j] = 0;
+			if( rgb[j] > 255) rgb[j] = 255;
+			//System.out.print(" "+rgb[j]);
+		}
+		//System.out.println();
+		return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+	}
+	public static Color getComplement(Color c) {
+		return new Color(
+				255-c.getRed(),
+				255-c.getGreen(),
+				255-c.getBlue()
+				);
+	}
 }
