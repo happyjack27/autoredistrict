@@ -269,12 +269,13 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			summaryTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
+			Vector<String> cands = MainFrame.mainframe.project.demographic_columns;
 
 
 			//=== by party
 			for( int i = 0; i < Candidate.candidates.size(); i++) {
 				cdata[i] = new String[]{
-						""+i,
+						""+cands.get(i),
 						""+integer.format(elec_counts[i]),
 						""+integer.format(vote_counts[i]),//*total_population/tot_votes),
 						""+(dm.wasted_votes_by_party[i]),
