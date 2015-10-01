@@ -426,5 +426,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	@Override
 	public void eventOccured() {
 		getStats();
+		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
 }

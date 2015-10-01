@@ -42,6 +42,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 	public PanelSeats seatsPanel = new PanelSeats();
+	public JProgressBar progressBar = new JProgressBar();
 	 
 	
 
@@ -1826,9 +1827,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println("Processing "+s+"...");
 				StringBuffer sb = getFile(f);
 				
-				featureCollection.ecology.stopEvolving();
-				goButton.setEnabled(true);
-				stopButton.setEnabled(false);
+				stopEvolving();
 				geo_loaded = false;
 				evolving = false;
 				Feature.display_mode = 0;
@@ -1956,11 +1955,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				featureCollection.features = new Vector<Feature>();
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
-				featureCollection.ecology.stopEvolving();
-				goButton.setEnabled(true);
-				stopButton.setEnabled(false);
+				stopEvolving();
 				geo_loaded = false;
-				evolving = false;
 				Feature.display_mode = 0;
 				setEnableds();
 
@@ -2264,11 +2260,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("Processing "+s+"...");
 			StringBuffer sb = getFile(f);
 			
-			featureCollection.ecology.stopEvolving();
-			goButton.setEnabled(true);
-			stopButton.setEnabled(false);
+			stopEvolving();
 			geo_loaded = false;
-			evolving = false;
 			Feature.display_mode = 0;
 			setEnableds();
 			
@@ -4419,26 +4412,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		textFieldNumDistricts.setColumns(10);
-		textFieldNumDistricts.setBounds(132, 51, 52, 28);
+		textFieldNumDistricts.setBounds(132, 69, 52, 28);
 		panel.add(textFieldNumDistricts);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
-		lblNumOfDistricts.setBounds(6, 57, 124, 16);
+		lblNumOfDistricts.setBounds(6, 75, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
 		stopButton.setText("Stop");
 		stopButton.setToolTipText("Stop evolving a solution.");
 		stopButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				featureCollection.ecology.stopEvolving();
-				evolving = false;
-				setEnableds();
-				goButton.setEnabled(true);
-				stopButton.setEnabled(false);
-
+				stopEvolving();
 			}
 		});
-		stopButton.setBounds(6, 11, 93, 29);
+		stopButton.setBounds(6, 29, 93, 29);
 		panel.add(stopButton);
 		
 		goButton.setText("Go");
@@ -4454,9 +4442,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setEnableds();
 				goButton.setEnabled(false);
 				stopButton.setEnabled(true);
+				progressBar.setIndeterminate(true);
+				progressBar.setValue(0);
 			}
 		});
-		goButton.setBounds(109, 11, 91, 29);
+		goButton.setBounds(109, 29, 91, 29);
 		panel.add(goButton);
 		
 		textFieldMembersPerDistrict = new JTextField();
@@ -4475,11 +4465,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		textFieldMembersPerDistrict.setText("1");
 		textFieldMembersPerDistrict.setColumns(10);
-		textFieldMembersPerDistrict.setBounds(132, 88, 52, 28);
+		textFieldMembersPerDistrict.setBounds(132, 106, 52, 28);
 		panel.add(textFieldMembersPerDistrict);
 		
 		JLabel lblMembersPerDistrict = new JLabel("Members per district");
-		lblMembersPerDistrict.setBounds(6, 94, 124, 16);
+		lblMembersPerDistrict.setBounds(6, 112, 124, 16);
 		panel.add(lblMembersPerDistrict);
 		
 		comboBoxPopulation.addItemListener(new ItemListener() {
@@ -4578,6 +4568,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderBalance.setBounds(208, 32, 182, 29);
 		panel.add(sliderBalance);
+		
+		progressBar.setBounds(10, 11, 190, 14);
+		panel.add(progressBar);
 		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -4730,7 +4723,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	@Override
 	public void eventOccured() {
 		if( project.num_generations > 0 && featureCollection.ecology.generation >= project.num_generations) {
-			featureCollection.ecology.stopEvolving();
+			stopEvolving();
 			System.out.println("collection districts...");
 			featureCollection.storeDistrictsToProperties(project.district_column);
 			System.out.println("getting headers...");
@@ -4781,4 +4774,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 	}	
+	public void stopEvolving() {
+		featureCollection.ecology.stopEvolving();
+		evolving = false;
+		setEnableds();
+		goButton.setEnabled(true);
+		stopButton.setEnabled(false);
+		progressBar.setIndeterminate(false);
+		progressBar.setValue(0);
+	}
 }
