@@ -4443,6 +4443,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				goButton.setEnabled(false);
 				stopButton.setEnabled(true);
 				progressBar.setIndeterminate(true);
+				progressBar.setStringPainted(true);
 				progressBar.setValue(0);
 			}
 		});
