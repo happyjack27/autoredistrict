@@ -221,7 +221,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					
 				}
 				//String winner = ""+iwinner;
-				ddata[i][0] = ""+i;
+				ddata[i][0] = ""+(i+1);
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+pviw+"+"+integer.format((int)Math.round(pvi));

@@ -155,6 +155,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				float sat = sat_start;
 				for( int i = 0; i < c.length; i++) {
 					c[i] = Color.getHSBColor(hue, (float)sat, (float)val);
+					int cr = (255-c[i].getRed())*2/3;
+					int cg = (255-c[i].getGreen())*2/3;
+					int cb = (255-c[i].getBlue())*2/3;
+					c[i] = new Color(255-cr,255-cg,255-cb);
 					hue += hue_inc;
 					if( hue >= 1.0) {
 						hue = hue_start;
@@ -418,21 +422,27 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						dxs[i] /= dcs[i];
 						dys[i] /= dcs[i];
 						FontMetrics fm = g.getFontMetrics();
-						String name =""+i;
+						String name =""+(i+1);
 						//dys[1] += fm.getHeight()/2.0;
+						double iso = dm == null ? 0 : (d.iso_quotient);
+						String siso = sdm.format(iso);
+						int amt = dm == null ? 0 : (int) (d.getPopulation() - total);
+
+						
+						g.setColor(new Color(255,255,255,64));
+						double h = fm.getHeight();
+						double w = fm.stringWidth("99");
+						w = w > fm.stringWidth(siso) ? w  : fm.stringWidth(siso);
+						w = w > fm.stringWidth((amt > 0 ? "+" : "")+amt) ? w  : fm.stringWidth((amt > 0 ? "+" : "")+amt);
+						w /= 2;
+						g.fillRect((int)(dxs[i]-w-2), (int)(dys[i]-h-2), (int)(w*2+4), (int)(h*3+4));
+						g.setColor(Color.BLACK);
 	
 						g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
 						g.drawString(name, (int)dxs[i] - (int)(fm.stringWidth(name)/2.0), (int)dys[i]);
-						int amt = dm == null ? 0 : (int) (d.getPopulation() - total);
 						g.setFont(new Font("Arial",Font.PLAIN,10*MapPanel.FSAA));
-						if( amt > 0) {
-							g.drawString("+"+amt, (int)dxs[i] - (int)(fm.stringWidth("+"+amt)/2.0), (int)dys[i]+fm.getHeight());
-						} else {
-							g.drawString(""+amt, (int)dxs[i] - (int)(fm.stringWidth(""+amt)/2.0), (int)dys[i]+fm.getHeight());
-						}
+						g.drawString((amt > 0 ? "+" : "")+amt, (int)dxs[i] - (int)(fm.stringWidth((amt > 0 ? "+" : "")+amt)/2.0), (int)dys[i]+fm.getHeight());
 						
-						double iso = dm == null ? 0 : (d.iso_quotient);
-						String siso = sdm.format(iso);
 	
 						g.drawString(siso, (int)dxs[i] - (int)(fm.stringWidth(siso)/2.0), (int)dys[i]+fm.getHeight()*2);
 
