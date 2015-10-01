@@ -3,6 +3,7 @@ package geography;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.text.*;
 import java.util.*;
 import java.io.*;
@@ -417,6 +418,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					g.setColor(Color.BLACK);
 					g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
 					for( int i = 0; i < Settings.num_districts; i++) {
+						try {
 						District d = dm == null ? null : dm.districts.get(i);
 						//dm.districts.get(i).getPopulation();
 						dxs[i] /= dcs[i];
@@ -429,13 +431,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						int amt = dm == null ? 0 : (int) (d.getPopulation() - total);
 
 						
-						g.setColor(new Color(255,255,255,64));
 						double h = fm.getHeight();
 						double w = fm.stringWidth("99");
 						w = w > fm.stringWidth(siso) ? w  : fm.stringWidth(siso);
 						w = w > fm.stringWidth((amt > 0 ? "+" : "")+amt) ? w  : fm.stringWidth((amt > 0 ? "+" : "")+amt);
 						w /= 2;
+						
+						double arcwidth = 4*MapPanel.FSAA;
+						g.setColor(new Color(0,0,0,64));
+						RoundRectangle2D roundedRectangle = new RoundRectangle2D.Float(
+								(float)(dxs[i]-w-2-arcwidth),(float)(dys[i]-h-2-arcwidth), 
+								(float)(w*2+3+2*arcwidth),(float)(h*3+3+2*arcwidth), 
+								(float)(arcwidth), (float)(arcwidth)
+								);
+				        ((Graphics2D)g).fill(roundedRectangle);
+						
+						g.setColor(new Color(255,255,255,128));
+						g.setColor(new Color(255,255,255,196));
 						g.fillRect((int)(dxs[i]-w-2), (int)(dys[i]-h-2), (int)(w*2+4), (int)(h*3+4));
+						
 						g.setColor(Color.BLACK);
 	
 						g.setFont(new Font("Arial",Font.BOLD,12*MapPanel.FSAA));
@@ -451,6 +465,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						
 						double area = dm == null ? 0 : (d.area);
 						String sarea = sdm.format(area);
+						} catch (Exception ex) {
+							System.out.println("ex ad "+ex);
+							ex.printStackTrace();
+						}
 						//g.drawString(slen, (int)dxs[i] - (int)(fm.stringWidth(slen)/2.0), (int)dys[i]+fm.getHeight()*3);
 						//g.drawString(sarea, (int)dxs[i] - (int)(fm.stringWidth(sarea)/2.0), (int)dys[i]+fm.getHeight()*4);
 						
