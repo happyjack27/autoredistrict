@@ -149,7 +149,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JLabel lblFairnessCriteria;
 	
 	public JButton goButton = new JButton();
-	public JButton resetButton = new JButton();
 	public JButton stopButton = new JButton();
 	public JMenuItem mntmOpenProjectFile_1;
 	public JPanel panel_4;
@@ -1828,6 +1827,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				StringBuffer sb = getFile(f);
 				
 				featureCollection.ecology.stopEvolving();
+				goButton.setEnabled(true);
+				stopButton.setEnabled(false);
 				geo_loaded = false;
 				evolving = false;
 				Feature.display_mode = 0;
@@ -1956,6 +1957,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
 				
 				featureCollection.ecology.stopEvolving();
+				goButton.setEnabled(true);
+				stopButton.setEnabled(false);
 				geo_loaded = false;
 				evolving = false;
 				Feature.display_mode = 0;
@@ -2262,6 +2265,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			StringBuffer sb = getFile(f);
 			
 			featureCollection.ecology.stopEvolving();
+			goButton.setEnabled(true);
+			stopButton.setEnabled(false);
 			geo_loaded = false;
 			evolving = false;
 			Feature.display_mode = 0;
@@ -4421,29 +4426,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNumOfDistricts.setBounds(6, 57, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
-		resetButton.setText("Reset");
-		resetButton.setToolTipText("Re-randomize");
-		resetButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Ecology.invert = -1;
-				
-		    	addEcologyListeners();
-				featureCollection.ecology.stopEvolving();
-				evolving = false;
-				featureCollection.ecology.reset();
-				int target = Settings.num_districts;
-				Settings.num_districts = 1;
-				featureCollection.ecology.resize_districts();
-				Settings.num_districts = target;
-				featureCollection.ecology.resize_districts();
-				setEnableds();
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		resetButton.setBounds(6, 11, 62, 29);
-		panel.add(resetButton);
-		
 		stopButton.setText("Stop");
 		stopButton.setToolTipText("Stop evolving a solution.");
 		stopButton.addActionListener(new ActionListener() {
@@ -4451,17 +4433,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				featureCollection.ecology.stopEvolving();
 				evolving = false;
 				setEnableds();
+				goButton.setEnabled(true);
+				stopButton.setEnabled(false);
 
 			}
 		});
-		stopButton.setBounds(80, 11, 64, 29);
+		stopButton.setBounds(6, 11, 93, 29);
 		panel.add(stopButton);
 		
 		goButton.setText("Go");
 		goButton.setToolTipText("Start evolving a solution.");
 		goButton.setBorder(BorderFactory.createRaisedBevelBorder());
 		stopButton.setBorder(BorderFactory.createRaisedBevelBorder());
-		resetButton.setBorder(BorderFactory.createRaisedBevelBorder());
 		goButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Ecology.invert = 1;
@@ -4469,10 +4452,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				featureCollection.ecology.startEvolving();
 				evolving = true;
 				setEnableds();
-
+				goButton.setEnabled(false);
+				stopButton.setEnabled(true);
 			}
 		});
-		goButton.setBounds(154, 11, 46, 29);
+		goButton.setBounds(109, 11, 91, 29);
 		panel.add(goButton);
 		
 		textFieldMembersPerDistrict = new JTextField();
