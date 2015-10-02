@@ -32,13 +32,15 @@ public class FrameSeatsVotesChart extends JFrame {
 	class SeatPanel extends JPanel {
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
+	    		int l1 = 192+32;
+	    		int l2 = 128+64;
 				Graphics2D g = (Graphics2D)graphics0;
 			    super.paintComponent(g);
 			    g.setColor(Color.white);
 			    g.fillRect(0, 0, 200, 200);
-			    g.setColor(new Color(192,192,255));
+			    g.setColor(new Color(l1,l1,255));
 			    g.fillPolygon(new int[]{0,200,0}, new int[]{0,0,200}, 3);
-			    g.setColor(new Color(255,192,192));
+			    g.setColor(new Color(255,l1,l1));
 			    g.fillPolygon(new int[]{0,200,200}, new int[]{200,0,200}, 3);
 
 			    
@@ -63,7 +65,7 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		double crossx = x0+frac*dx;
 				    		int new_cross_x = (int)(crossx*200.0);
 				    		int new_cross_y = 200-new_cross_x;
-				    		g.setColor(y0>0 ? new Color(128,128,255) : new Color(255,128,128));
+				    		g.setColor(y0>0 ? new Color(l2,l2,255) : new Color(255,l2,l2));
 				    		int[] xs = new int[i-last_cross_ndx+2];
 				    		int[] ys = new int[i-last_cross_ndx+2];
 				    		xs[0] = last_cross_x;
