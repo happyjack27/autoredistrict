@@ -99,7 +99,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
     public static double disconnected_population_weight = 0; 
 
     //fairness metrics
-    public static double max_pop_diff = 9;
+    public static double max_pop_diff = 100;
     public static double disenfranchise_weight = 1;
     public static double voting_power_balance_weight = 1;
     public static double geo_or_fair_balance_weight = 1;

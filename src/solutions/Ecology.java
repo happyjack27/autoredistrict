@@ -464,7 +464,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         double[] weights = new double[]{
         		Settings.geometry_weight                *1.0, 
         		Settings.disenfranchise_weight          *1.0, 
-        		Settings.population_balance_weight      *0.5, //it doubles if less than the ceiling number
+        		Settings.population_balance_weight      *1.0,
                 Settings.disconnected_population_weight *1.0,
                 Settings.voting_power_balance_weight    *1.0,
                 Settings.wasted_votes_total_weight      *1.0,
