@@ -36,6 +36,10 @@ public class FrameSeatsVotesChart extends JFrame {
 			    super.paintComponent(g);
 			    g.setColor(Color.white);
 			    g.fillRect(0, 0, 200, 200);
+			    g.setColor(new Color(192,192,255));
+			    g.fillPolygon(new int[]{0,200,0}, new int[]{0,0,200}, 3);
+			    g.setColor(new Color(255,192,192));
+			    g.fillPolygon(new int[]{0,200,200}, new int[]{200,0,200}, 3);
 			    g.setColor(Color.gray);
 			    g.drawLine(0,200, 200, 0);
 
@@ -48,8 +52,8 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	int x = (int)(Math.round(dd[1]*200.0)); 
 			    	int y = (int)(Math.round(200.0-dd[0]*200.0));
 			    	if( x == 0) { x++; }
-			    	if( y == 0) { y++; }
-			    	if( x == 200) { x--; }
+			    	//if( y == 0) { y++; }
+			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
 			    	g.drawLine(oldx,oldy,x,y);
 				    oldx = x;
