@@ -16,6 +16,8 @@ import solutions.StaticFunctions;
 
  */
 /*
+ *
+ * TODO: add calculate seat-vote curve (graph)
  * 
  * TODO: add ability to automaticaly load in congressional shape file (deaggregate it)
  * 
