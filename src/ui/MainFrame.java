@@ -43,6 +43,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 	public PanelSeats seatsPanel = new PanelSeats();
 	public JProgressBar progressBar = new JProgressBar();
+	public DialogSeatsVotesChart dialogSeatsVotesChart = new DialogSeatsVotesChart();
 	 
 	
 
@@ -1342,6 +1343,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JSlider tournamentSlider = new JSlider();
 	public JMenuItem mntmHarvardElectionData;
 	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
+	public final JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3930,6 +3932,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnView.add(mntmShowStats);
 		mnView.add(mntmShowGraph);
 		mnView.add(mntmShowData);
+		mntmShowSeats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dialogSeatsVotesChart.show();
+			}
+		});
+		
+		mnView.add(mntmShowSeats);
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
