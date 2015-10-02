@@ -19,6 +19,11 @@ import solutions.StaticFunctions;
  *
  * TODO: add calculate seat-vote curve (graph)
  * 
+ * TODO: add option to lock statewide result to 50/50?
+ * 
+ */
+/*
+ * 
  * TODO: add ability to automaticaly load in congressional shape file (deaggregate it)
  * 
  * TODO: add ability to merge in using another file for centroids 
