@@ -40,13 +40,66 @@ public class FrameSeatsVotesChart extends JFrame {
 			    g.fillPolygon(new int[]{0,200,0}, new int[]{0,0,200}, 3);
 			    g.setColor(new Color(255,192,192));
 			    g.fillPolygon(new int[]{0,200,200}, new int[]{200,0,200}, 3);
-			    g.setColor(Color.gray);
-			    g.drawLine(0,200, 200, 0);
 
 			    
+			    //in development
+			    boolean a = true;
+			    if( a) {
+				    int last_cross_x = 0;
+				    int last_cross_y = 200;
+				    int last_cross_ndx = 1;
+				    double x0 = 0;
+				    double y0 = 0;
+				    for( int i = 0; i < seats_votes.size(); i++) {
+				    	double[] dd = seats_votes.get(i);
+				    	double x1 = dd[1];
+				    	double y1 = dd[0]-dd[1];
+				    	
+				    	//if crossed
+				    	if( y0*y1<0 || y1 == 0 || i == seats_votes.size()-1) {
+				    		double dy = (y1-y0);
+				    		double dx = (x1-x0);
+				    		double frac = (0-y0)/dy;
+				    		double crossx = x0+frac*dx;
+				    		int new_cross_x = (int)(crossx*200.0);
+				    		int new_cross_y = 200-new_cross_x;
+				    		g.setColor(y0>0 ? new Color(128,128,255) : new Color(255,128,128));
+				    		int[] xs = new int[i-last_cross_ndx+2];
+				    		int[] ys = new int[i-last_cross_ndx+2];
+				    		xs[0] = last_cross_x;
+				    		ys[0] = last_cross_y;
+				    		
+				    		for( int j = last_cross_ndx; j <= i; j++) {
+				    			int xindex = j-last_cross_ndx+1;
+						    	double[] dd0 = seats_votes.get(j);
+						    	int x = (int)(Math.round(dd0[1]*200.0)); 
+						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
+				    			xs[xindex] = x;
+				    			ys[xindex] = y;
+				    		}
+				    		xs[xs.length-1] = new_cross_x;
+				    		ys[xs.length-1] = new_cross_y;
+	
+						    g.fillPolygon(xs,ys,xs.length);
+				    		last_cross_x = new_cross_x;
+				    		last_cross_y = new_cross_y;
+				    		last_cross_ndx = i;
+				    	}
+				    	
+				    	x0 = x1;
+				    	y0 = y1;
+				    	
+				    }
+			    }
+
+			    g.setColor(Color.gray);
+			    g.drawLine(0,200, 200, 0);
+			    g.drawLine(100,0, 100, 200);
+
 			    int oldx = 1;
 			    int oldy = 199;
 			    g.setColor(Color.black);
+			    
 			    for( int i = 0; i < seats_votes.size(); i++) {
 			    	double[] dd = seats_votes.get(i);
 			    	int x = (int)(Math.round(dd[1]*200.0)); 
