@@ -43,7 +43,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 	public PanelSeats seatsPanel = new PanelSeats();
 	public JProgressBar progressBar = new JProgressBar();
-	public DialogSeatsVotesChart dialogSeatsVotesChart = new DialogSeatsVotesChart();
+	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
 	 
 	
 
@@ -3934,7 +3934,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnView.add(mntmShowData);
 		mntmShowSeats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				dialogSeatsVotesChart.show();
+				frameSeatsVotesChart.show();
 			}
 		});
 		

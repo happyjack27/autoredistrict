@@ -15,7 +15,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 
-public class DialogSeatsVotesChart extends JDialog {
+public class FrameSeatsVotesChart extends JFrame {
 	public JPanel panel;
 	public JScrollPane scrollPane;
 	public JLabel lblVotes;
@@ -24,7 +24,7 @@ public class DialogSeatsVotesChart extends JDialog {
 	Vector<double[]> seats_votes = new Vector<double[]>(); 
 	public JButton btnCopy;
 	//label.setUI(new VerticalLabelUI());
-	public DialogSeatsVotesChart() {
+	public FrameSeatsVotesChart() {
 		super();
 		initComponents();
 	}
