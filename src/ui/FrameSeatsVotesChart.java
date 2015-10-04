@@ -47,16 +47,16 @@ public class FrameSeatsVotesChart extends JFrame {
 			    g.setColor(Color.white);
 			    g.fillRect(0, 0, 200, 200);
 			    g.setColor(new Color(l1,l1,255));
-			    g.fillPolygon(new int[]{0,200,0}, new int[]{0,0,200}, 3);
+			    g.fillPolygon(new int[]{scale(0),scale(200),0}, new int[]{0,0,200}, 3);
 			    g.setColor(new Color(255,l1,l1));
-			    g.fillPolygon(new int[]{0,200,200}, new int[]{200,0,200}, 3);
+			    g.fillPolygon(new int[]{scale(0),scale(200),200}, new int[]{200,0,200}, 3);
 
 			    
 			    //in development
 			    boolean a = true;
 			    if( a) {
 				    int last_cross_x = scale(0);
-				    int last_cross_y = scale(200);
+				    int last_cross_y = 200;//scale(200);
 				    int last_cross_ndx = 1;
 				    double x0 = 0;
 				    double y0 = 0;
@@ -77,7 +77,7 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		int[] xs = new int[i-last_cross_ndx+2];
 				    		int[] ys = new int[i-last_cross_ndx+2];
 				    		xs[0] = scale(last_cross_x);
-				    		ys[0] = scale(last_cross_y);
+				    		ys[0] = last_cross_y;//scale(last_cross_y);
 				    		
 				    		for( int j = last_cross_ndx; j <= i; j++) {
 				    			int xindex = j-last_cross_ndx+1;
@@ -88,7 +88,7 @@ public class FrameSeatsVotesChart extends JFrame {
 				    			ys[xindex] = scale(y);
 				    		}
 				    		xs[xs.length-1] = scale(new_cross_x);
-				    		ys[xs.length-1] = scale(new_cross_y);
+				    		ys[xs.length-1] = new_cross_y;
 	
 						    g.fillPolygon(xs,ys,xs.length);
 				    		last_cross_x = new_cross_x;
@@ -103,10 +103,10 @@ public class FrameSeatsVotesChart extends JFrame {
 			    }
 
 			    g.setColor(Color.gray);
-			    g.drawLine(0,200, 200, 0);
+			    g.drawLine(scale(0),200, scale(200), 0);
 			    g.drawLine(100,0, 100, 200);
 
-			    int oldx = 1;
+			    int oldx = scale(0);
 			    int oldy = 199;
 			    g.setColor(Color.black);
 			    
@@ -118,7 +118,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
-			    	g.drawLine(scale(oldx),scale(oldy),scale(x),scale(y));
+			    	g.drawLine(scale(oldx),oldy,scale(x),y);
 				    oldx = x;
 				    oldy = y;
 			    }
@@ -136,7 +136,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
-			    	g.drawLine(scale(oldx),scale(oldy),scale(x),scale(y));
+			    	g.drawLine(scale(oldx),oldy,scale(x),y);
 				    oldx = x;
 				    oldy = y;
 			    }
@@ -180,12 +180,12 @@ public class FrameSeatsVotesChart extends JFrame {
 		scrollPane.setViewportView(table);
 		
 		lblVotes = new JLabel("Votes -->");
-		lblVotes.setBounds(40, 222, 61, 14);
+		lblVotes.setBounds(40, 222, 83, 14);
 		getContentPane().add(lblVotes);
 		
 		lblSeats = new JLabel("Seats -->");
 		lblSeats.setUI(new VerticalLabelUI());
-		lblSeats.setBounds(10, 136, 20, 75);
+		lblSeats.setBounds(10, 124, 20, 87);
 		getContentPane().add(lblSeats);
 		
 		btnCopy = new JButton("copy");
