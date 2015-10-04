@@ -9,6 +9,7 @@ import javax.swing.table.TableModel;
 import solutions.District;
 import solutions.DistrictMap;
 import solutions.Settings;
+
 import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -23,6 +24,9 @@ public class FrameSeatsVotesChart extends JFrame {
 	public JTable table;
 	Vector<double[]> seats_votes = new Vector<double[]>(); 
 	public JButton btnCopy;
+	public final JButton btnx = new JButton("1x");
+	public final JButton btnx_1 = new JButton("5x");
+	double multiplier = 1;
 	//label.setUI(new VerticalLabelUI());
 	public FrameSeatsVotesChart() {
 		super();
@@ -30,6 +34,9 @@ public class FrameSeatsVotesChart extends JFrame {
 	}
 	
 	class SeatPanel extends JPanel {
+		public int scale(int x) {
+			return (int)((x-100)*multiplier+100);
+		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
 	    		int l1 = 192+32;
@@ -47,8 +54,8 @@ public class FrameSeatsVotesChart extends JFrame {
 			    //in development
 			    boolean a = true;
 			    if( a) {
-				    int last_cross_x = 0;
-				    int last_cross_y = 200;
+				    int last_cross_x = scale(0);
+				    int last_cross_y = scale(200);
 				    int last_cross_ndx = 1;
 				    double x0 = 0;
 				    double y0 = 0;
@@ -68,19 +75,19 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		g.setColor(y0>0 ? new Color(l2,l2,255) : new Color(255,l2,l2));
 				    		int[] xs = new int[i-last_cross_ndx+2];
 				    		int[] ys = new int[i-last_cross_ndx+2];
-				    		xs[0] = last_cross_x;
-				    		ys[0] = last_cross_y;
+				    		xs[0] = scale(last_cross_x);
+				    		ys[0] = scale(last_cross_y);
 				    		
 				    		for( int j = last_cross_ndx; j <= i; j++) {
 				    			int xindex = j-last_cross_ndx+1;
 						    	double[] dd0 = seats_votes.get(j);
 						    	int x = (int)(Math.round(dd0[1]*200.0)); 
 						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
-				    			xs[xindex] = x;
-				    			ys[xindex] = y;
+				    			xs[xindex] = scale(x);
+				    			ys[xindex] = scale(y);
 				    		}
-				    		xs[xs.length-1] = new_cross_x;
-				    		ys[xs.length-1] = new_cross_y;
+				    		xs[xs.length-1] = scale(new_cross_x);
+				    		ys[xs.length-1] = scale(new_cross_y);
 	
 						    g.fillPolygon(xs,ys,xs.length);
 				    		last_cross_x = new_cross_x;
@@ -110,10 +117,30 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
-			    	g.drawLine(oldx,oldy,x,y);
+			    	g.drawLine(scale(oldx),scale(oldy),scale(x),scale(y));
 				    oldx = x;
 				    oldy = y;
 			    }
+			    
+			    oldx = 1;
+			    oldy = 199;
+			    g.setColor(Color.gray);
+			    
+			    for( int i = 0; i < seats_votes.size(); i++) {
+			    	double[] dd = seats_votes.get(i);
+			    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
+			    	int x = (int)(Math.round(dd[1]*200.0)); 
+			    	int y = (int)(Math.round(200.0-((dd[0]+(1-dd2[0]))/2.0)*200.0));
+			    	if( x == 0) { x++; }
+			    	//if( y == 0) { y++; }
+			    	//if( x == 200) { x--; }
+			    	if( y == 200) { y--; }
+			    	g.drawLine(scale(oldx),scale(oldy),scale(x),scale(y));
+				    oldx = x;
+				    oldy = y;
+			    }
+
+
 	    	} catch (Exception ex) {
 	    		ex.printStackTrace();
 	    	}
@@ -155,6 +182,26 @@ public class FrameSeatsVotesChart extends JFrame {
 		});
 		btnCopy.setBounds(151, 222, 89, 23);
 		getContentPane().add(btnCopy);
+		btnx.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				multiplier = 1;
+				panel.invalidate();
+				panel.repaint();
+			}
+		});
+		btnx.setBounds(241, 116, 43, 29);
+		
+		getContentPane().add(btnx);
+		btnx_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				multiplier = 5;
+				panel.invalidate();
+				panel.repaint();
+			}
+		});
+		btnx_1.setBounds(241, 150, 43, 29);
+		
+		getContentPane().add(btnx_1);
 	}
 	public void setData(DistrictMap dm) {
 		

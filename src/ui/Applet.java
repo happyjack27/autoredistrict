@@ -16,7 +16,8 @@ import solutions.StaticFunctions;
 
  */
 /*
- *
+ * TODO: add PVI ranked by district chart
+ * 
  * TODO: add calculate seat-vote curve (graph)
  * 
  * TODO: add option to lock statewide result to 50/50?
