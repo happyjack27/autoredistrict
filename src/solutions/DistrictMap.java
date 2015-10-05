@@ -310,6 +310,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     					District dfrom = this.districts.get(vtd_districts[i]); //coming from
 						District dto = this.districts.get(vtd_districts[b.id]); //going to
+						
+				    	//don't mutate to uncontested
+						if( District.uncontested.length > vtd_districts[b.id] && District.uncontested[vtd_districts[b.id]] ) {
+				    		continue;
+				    	}
+						
     					
 	   					if( !mutating_disconnected) {
     						if( Settings.mutate_excess_pop || Settings.mutate_good) {

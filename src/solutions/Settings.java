@@ -122,6 +122,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int num_ward_outcomes = 16;
 	public static double elite_fraction = 0.333;
 	public static double unpaired_edge_length_weight = 0.5;
+	public static boolean ignore_uncontested = true;
 	public static void setPopulation(double i) {
 		population = (int)i;
 		for( iChangeListener c : populationChangeListeners) {

@@ -6,6 +6,8 @@ import serialization.JSONObject;
 public class District extends JSONObject {
     Vector<Ward> wards = new Vector<Ward>();
     
+    public static boolean[] uncontested = new boolean[0];
+    
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
     
@@ -145,6 +147,20 @@ public class District extends JSONObject {
         	tot_popular_vote[j] /= (double)outcomes.length;
         	residual_popular_vote[j] /= (double)outcomes.length;
         }*/
+   	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && (tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
+   	    	for( int i = 0; i < tot_popular_vote.length; i++) {
+   	    		tot_popular_vote[i] = 0;
+   	    	}
+   	    	for( int i = 0; i < tot_elected_vote.length; i++) {
+   	    		tot_elected_vote[i] = 0;
+   	    	}
+   	    	for( int i = 0; i < residual_popular_vote.length; i++) {
+   	    		residual_popular_vote[i] = 0;
+   	    	}
+   	    	for( int i = 0; i < residual_popular_vote2.length; i++) {
+   	    		residual_popular_vote2[i] = 0;
+   	    	}
+   	    }
    		
        	return new double[][]{tot_popular_vote,tot_elected_vote,residual_popular_vote,residual_popular_vote2, new double[]{total_pop}};
     }

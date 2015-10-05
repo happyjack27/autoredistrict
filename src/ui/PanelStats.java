@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
+	public static Vector<Integer> uncontested = new Vector<Integer>();
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -144,6 +145,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		try {
 			double total_pvi = 0;
+			double counted_districts = 0;
 			double grand_total_votes = 0;
 			int num_competitive = 0;
 			double wasted_0 = 0;
@@ -181,7 +183,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			double total_population = 0;
 	
+			Vector<Integer> uncontested_swap = new Vector<Integer>();
 			for( int i = 0; i < dm.districts.size(); i++) {
+				try {
 				dmcolors[i] = dm.getWastedVoteColor(i);
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
@@ -202,11 +206,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					total += result[0][j];
 					tot_votes += result[0][j];
 				}
+				if( total == 0) {
+					total = 1;
+				}
 				double total_votes = 0;
 				double pvi = 0;
 				String pviw = ""; 
 				try {
 					total_votes = result[0][0]+result[0][1];
+					if( total_votes == 0) {
+						total_votes = 1;
+					}
 					grand_total_votes += total_votes;
 					double needed = total_votes/2;
 					wasted_0 += result[0][0] - (result[0][0] >= needed ? needed : 0);
@@ -215,8 +225,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					if( pvi < 5) {
 						num_competitive++;
 					}
-					total_pvi += pvi;
-					pviw = result[0][0] >= needed ? "D" : "R";
+
+					if( total_votes > 1) {
+						total_pvi += pvi;
+						counted_districts++;
+						pviw = (result[0][0] >= needed ? "D" : "R")+"+"+integer.format((int)Math.round(pvi));
+					} else {
+						pviw = "uncontested";
+						uncontested_swap.add(new Integer(i+1));
+					}
 				} catch (Exception ex) {
 					
 				}
@@ -224,7 +241,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][0] = ""+(i+1);
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
-				ddata[i][3] = ""+pviw+"+"+integer.format((int)Math.round(pvi));
+				ddata[i][3] = ""+pviw;
 				ddata[i][4] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
 				ddata[i][5] = ""+d.iso_quotient;
 				ddata[i][6] = ""+d.area;
@@ -239,7 +256,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				for( int j = 0; j < result[0].length; j++) {
 					ddata[i][j+9+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
 				}	
+				} catch (Exception ex) {
+					System.out.println("ex stats 1 "+ex);
+					ex.printStackTrace();
+				}
 			}
+			uncontested = uncontested_swap;
 			
 			//=== summary
 			int wasted_votes = 0;
@@ -258,7 +280,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
 					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
-					new String[]{""+decimal.format(total_pvi / (double)Settings.num_districts),"Avg. PVI"},
+					new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
 					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
 					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		

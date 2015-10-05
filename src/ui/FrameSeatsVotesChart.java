@@ -28,6 +28,7 @@ public class FrameSeatsVotesChart extends JFrame {
 	public final JButton btnx = new JButton("1x");
 	public final JButton btnx_1 = new JButton("5x");
 	double multiplier = 1;
+	public JButton btnx_2;
 	//label.setUI(new VerticalLabelUI());
 	public FrameSeatsVotesChart() {
 		super();
@@ -40,10 +41,24 @@ public class FrameSeatsVotesChart extends JFrame {
 		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
-	    		int l1 = 192+32;
+	    		int l1 = 128+64+32;
 	    		int l2 = 128+64;
+	    		int l3 = 128;
+	    		
 				Graphics2D g = (Graphics2D)graphics0;
 			    super.paintComponent(g);
+
+			    //calculate balanced sesats-votes curve
+			    double[] mid_x = new double[seats_votes.size()];
+			    double[] mid_y = new double[seats_votes.size()];
+			    for( int i = 0; i < seats_votes.size(); i++) {
+			    	double[] dd = seats_votes.get(i);
+			    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
+			    	mid_x[i] = dd[1]*200.0; 
+			    	mid_y[i] = (dd[0]+(1-dd2[0]))/2.0;
+			    }
+			    
+			    //first do basic background
 			    g.setColor(Color.white);
 			    g.fillRect(0, 0, 200, 200);
 			    g.setColor(new Color(l1,l1,255));
@@ -52,7 +67,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    g.fillPolygon(new int[]{scale(0),scale(200),200}, new int[]{200,0,200}, 3);
 
 			    
-			    //in development
+			    //now do excess seats background
 			    boolean a = true;
 			    if( a) {
 				    int last_cross_x = scale(0);
@@ -85,7 +100,7 @@ public class FrameSeatsVotesChart extends JFrame {
 						    	int x = (int)(Math.round(dd0[1]*200.0)); 
 						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
 				    			xs[xindex] = scale(x);
-				    			ys[xindex] = scale(y);
+				    			ys[xindex] = y;
 				    		}
 				    		xs[xs.length-1] = scale(new_cross_x);
 				    		ys[xs.length-1] = new_cross_y;
@@ -102,14 +117,65 @@ public class FrameSeatsVotesChart extends JFrame {
 				    }
 			    }
 
+			    //in development - seats imbalance background
+			    boolean b = true;
+			    if( b) {
+				    int last_cross_x = scale(0);
+				    int last_cross_y = 200;//scale(200);
+				    int last_cross_ndx = 1;
+				    double x0 = 0;
+				    double y0 = 0;
+				    for( int i = 0; i < seats_votes.size(); i++) {
+				    	double[] dd = seats_votes.get(i);
+				    	double x1 = dd[1];
+				    	double y1 = dd[0]-dd[1];
+				    	
+				    	//if crossed
+				    	if( y0*y1<0 || y1 == 0 || i == seats_votes.size()-1) {
+				    		double dy = (y1-y0);
+				    		double dx = (x1-x0);
+				    		double frac = (0-y0)/dy;
+				    		double crossx = x0+frac*dx;
+				    		int new_cross_x = (int)(crossx*200.0);
+				    		int new_cross_y = 200-new_cross_x;
+				    		g.setColor(y0>0 ? new Color(l2,l2,255) : new Color(255,l2,l2));
+				    		int[] xs = new int[i-last_cross_ndx+2];
+				    		int[] ys = new int[i-last_cross_ndx+2];
+				    		xs[0] = scale(last_cross_x);
+				    		ys[0] = last_cross_y;//scale(last_cross_y);
+				    		
+				    		for( int j = last_cross_ndx; j <= i; j++) {
+				    			int xindex = j-last_cross_ndx+1;
+						    	double[] dd0 = seats_votes.get(j);
+						    	int x = (int)(Math.round(dd0[1]*200.0)); 
+						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
+				    			xs[xindex] = scale(x);
+				    			ys[xindex] = y;
+				    		}
+				    		xs[xs.length-1] = scale(new_cross_x);
+				    		ys[xs.length-1] = new_cross_y;
+	
+						    g.fillPolygon(xs,ys,xs.length);
+				    		last_cross_x = new_cross_x;
+				    		last_cross_y = new_cross_y;
+				    		last_cross_ndx = i;
+				    	}
+				    	
+				    	x0 = x1;
+				    	y0 = y1;
+				    	
+				    }
+			    }
+
+			    //draw diagonal line and mid line
 			    g.setColor(Color.gray);
 			    g.drawLine(scale(0),200, scale(200), 0);
 			    g.drawLine(100,0, 100, 200);
 
+			    //draw seats votes curve
 			    int oldx = scale(0);
 			    int oldy = 199;
 			    g.setColor(Color.black);
-			    
 			    for( int i = 0; i < seats_votes.size(); i++) {
 			    	double[] dd = seats_votes.get(i);
 			    	int x = (int)(Math.round(dd[1]*200.0)); 
@@ -123,15 +189,13 @@ public class FrameSeatsVotesChart extends JFrame {
 				    oldy = y;
 			    }
 			    
+			    //draw balanced seats-votes curve
 			    oldx = 1;
 			    oldy = 199;
 			    g.setColor(Color.gray);
-			    
 			    for( int i = 0; i < seats_votes.size(); i++) {
-			    	double[] dd = seats_votes.get(i);
-			    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
-			    	int x = (int)(Math.round(dd[1]*200.0)); 
-			    	int y = (int)(Math.round(200.0-((dd[0]+(1-dd2[0]))/2.0)*200.0));
+			    	int x = (int)Math.round(mid_x[i]*200.0); 
+			    	int y = (int)Math.round(200.0-mid_y[i]*200.0);
 			    	if( x == 0) { x++; }
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
@@ -148,16 +212,16 @@ public class FrameSeatsVotesChart extends JFrame {
 	    }
 	}
 	
-	public static Point lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
-		   double denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+	public static int[] lineIntersect(int x00, int y00, int x01, int y01, int x10, int y10, int x11, int y11) {
+		   double denom = (y11 - y10) * (x01 - x00) - (x11 - x10) * (y01 - y00);
 		   if (denom == 0.0) { // Lines are parallel.
 		      return null;
 		   }
-		   double ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3))/denom;
-		   double ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3))/denom;
+		   double ua = ((x11 - x10) * (y00 - y10) - (y11 - y10) * (x00 - x10))/denom;
+		   double ub = ((x01 - x00) * (y00 - y10) - (y01 - y00) * (x00 - x10))/denom;
 		     if (ua >= 0.0f && ua <= 1.0f && ub >= 0.0f && ub <= 1.0f) {
 		         // Get the intersection point.
-		         return new Point((int) (x1 + ua*(x2 - x1)), (int) (y1 + ua*(y2 - y1)));
+		         return new int[]{(int) (x00 + ua*(x01 - x00)), (int) (y00 + ua*(y01 - y00))};
 		     }
 
 		   return null;
@@ -165,7 +229,7 @@ public class FrameSeatsVotesChart extends JFrame {
 	
 	private void initComponents() {
 		getContentPane().setLayout(null);
-		setSize(284,524);
+		setSize(300,524);
 		setTitle("Seats / Votes");
 		
 		panel = new SeatPanel();
@@ -198,6 +262,7 @@ public class FrameSeatsVotesChart extends JFrame {
 		});
 		btnCopy.setBounds(151, 222, 89, 23);
 		getContentPane().add(btnCopy);
+		btnx.setBorder(BorderFactory.createLineBorder(Color.black));
 		btnx.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				multiplier = 1;
@@ -205,9 +270,10 @@ public class FrameSeatsVotesChart extends JFrame {
 				panel.repaint();
 			}
 		});
-		btnx.setBounds(241, 116, 43, 29);
+		btnx.setBounds(241, 70, 33, 29);
 		
 		getContentPane().add(btnx);
+		btnx_1.setBorder(BorderFactory.createLineBorder(Color.black));
 		btnx_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				multiplier = 5;
@@ -215,9 +281,21 @@ public class FrameSeatsVotesChart extends JFrame {
 				panel.repaint();
 			}
 		});
-		btnx_1.setBounds(241, 150, 43, 29);
+		btnx_1.setBounds(241, 150, 33, 29);
 		
 		getContentPane().add(btnx_1);
+		
+		btnx_2 = new JButton("2x");
+		btnx_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				multiplier = 2;
+				panel.invalidate();
+				panel.repaint();
+			}
+		});
+		btnx_2.setBorder(BorderFactory.createLineBorder(Color.black));
+		btnx_2.setBounds(241, 110, 33, 29);
+		getContentPane().add(btnx_2);
 	}
 	public void setData(DistrictMap dm) {
 		
@@ -252,6 +330,12 @@ public class FrameSeatsVotesChart extends JFrame {
 			double demseats = 0;
 			double totseats = 0;
 			for( int i = 0; i < dm.districts.size() && i < Settings.num_districts; i++) {
+				//if uncontested, ignore.
+				if( vote_count_districts[i][0] == 0 || vote_count_districts[i][1] == 0) {
+					if( Settings.ignore_uncontested) {
+						continue;
+					}
+				}
 				totseats++;
 				if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
 					demseats++;

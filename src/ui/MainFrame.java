@@ -2587,6 +2587,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
 				featureCollection.ecology.population.get(0).calcFairnessScores();
 				panelStats.getStats();
+				District.uncontested = new boolean[Settings.num_districts];
+				for( int i = 0; i < District.uncontested.length; i++) {
+					District.uncontested[i] = false;
+				}
+				if( panelStats.uncontested.size() > 0) {
+					int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
+					if( opt == JOptionPane.YES_OPTION) {
+						Settings.ignore_uncontested = true;
+						for( Integer d : panelStats.uncontested) {
+							District.uncontested[d-1] = true;
+							String key = district+","+d;
+							if( !manageLocks.locks.contains(key)) {
+								manageLocks.locks.add(key);
+							}
+						}
+						manageLocks.list.setListData(manageLocks.locks);
+						manageLocks.resetLocks();
+						manageLocks.show();
+					} else {
+						Settings.ignore_uncontested = false;
+					}
+				} else {
+					Settings.ignore_uncontested = false;
+				}
 			}
 			mapPanel.invalidate();
 			mapPanel.repaint();
