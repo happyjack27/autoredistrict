@@ -821,6 +821,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //all measures should be minimized.
     public void calcFairnessScores() {//border_length_area_weighted
     	try {
+    		try {
+	    		for( int i = 0; i < districts.size(); i++) {
+	    			if( districts.get(i) != null) {
+		    			districts.get(i).id = i;
+		    		}
+	    		}
+    		} catch (Exception ex) {
+    			ex.printStackTrace();
+    		}
     	
     	long time0 = System.currentTimeMillis();    
     	long wasted_votes = 0;
@@ -908,6 +917,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 double[][] residues = new double[districts.size()][];
                 double[] pops = new double[districts.size()];
                 for(int k = 0; k < districts.size(); k++) {
+                	/*
+                	if( Settings.ignore_uncontested && District.uncontested.length > k && District.uncontested[k]) {
+                		continue;
+                	}*/
                 	District district = districts.get(k);
                 	double[][] res = district.getElectionResults();
                 	pops[k] = res[4][0];

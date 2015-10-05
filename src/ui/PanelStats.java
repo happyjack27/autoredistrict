@@ -199,6 +199,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//double max = -1;
 				//int iwinner  = -1;
 				String winner = "";
+				if( result[0].length >= 2 && (result[0][0] < 50 || result[0][1] < 50) && Settings.ignore_uncontested) {
+		   	    	for( int j = 0; j < result[0].length; j++) {
+		   	    		result[0][j] = 0;
+		   	    	}
+		   	    	for( int j = 0; j < result[0].length; j++) {
+		   	    		result[1][j] = 0;
+		   	    	}
+				}
 				for( int j = 0; j < result[0].length; j++) {
 					winner += ""+((int)result[1][j])+",";
 					elec_counts[j] += result[1][j];

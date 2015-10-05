@@ -7,6 +7,7 @@ public class District extends JSONObject {
     Vector<Ward> wards = new Vector<Ward>();
     
     public static boolean[] uncontested = new boolean[0];
+    public static int id = -1;
     
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
@@ -147,7 +148,7 @@ public class District extends JSONObject {
         	tot_popular_vote[j] /= (double)outcomes.length;
         	residual_popular_vote[j] /= (double)outcomes.length;
         }*/
-   	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && (tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
+   	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && District.uncontested.length > id && id >= 0 && District.uncontested[id]) {//(tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
    	    	for( int i = 0; i < tot_popular_vote.length; i++) {
    	    		tot_popular_vote[i] = 0;
    	    	}
