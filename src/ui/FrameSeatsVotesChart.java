@@ -54,7 +54,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    for( int i = 0; i < seats_votes.size(); i++) {
 			    	double[] dd = seats_votes.get(i);
 			    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
-			    	mid_x[i] = dd[1]*200.0; 
+			    	mid_x[i] = dd[1]; 
 			    	mid_y[i] = (dd[0]+(1-dd2[0]))/2.0;
 			    }
 			    
