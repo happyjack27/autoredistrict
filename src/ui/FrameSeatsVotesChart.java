@@ -140,7 +140,7 @@ public class FrameSeatsVotesChart extends JFrame {
 				    			intersect[0] = 1;
 				    			intersect[1] = 1;
 				    		}
-				    		System.out.println(""+i+" "+last_cross_ndx+" "+(2+i-last_cross_ndx));
+				    		//System.out.println(""+i+" "+last_cross_ndx+" "+(2+i-last_cross_ndx));
 				    		int[] xs = new int[2*(1+i-last_cross_ndx)];
 				    		int[] ys = new int[2*(1+i-last_cross_ndx)];
 				    		xs[0] = scale((int)Math.round(200.0*last_cross_x));
