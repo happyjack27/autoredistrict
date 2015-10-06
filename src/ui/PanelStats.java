@@ -59,6 +59,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 
 	public void getStats() {
+		Vector<Double> ranked_dists = new Vector<Double>();
+
 		try {
 		if( featureCollection == null || featureCollection.ecology == null || featureCollection.ecology.population.size() < 1) {
 			System.out.println("no ecology attached "+featureCollection);
@@ -237,6 +239,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					if( total_votes > 1) {
 						total_pvi += pvi;
 						counted_districts++;
+						ranked_dists.add(pvi*(result[0][0] >= needed ? -1 : +1));
 						pviw = (result[0][0] >= needed ? "D" : "R")+"+"+integer.format((int)Math.round(pvi));
 					} else {
 						pviw = "uncontested";
@@ -337,6 +340,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		}
 		if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
 			MainFrame.mainframe.frameSeatsVotesChart.setData(featureCollection.ecology.population.get(0));
+			MainFrame.mainframe.frameRankedDist.setData(ranked_dists);
 		}
 	}
 	public PanelStats() {

@@ -44,6 +44,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelSeats seatsPanel = new PanelSeats();
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
+	public FrameRankedDistricts frameRankedDist = new FrameRankedDistricts();
 	 
 	
 
@@ -1344,6 +1345,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmHarvardElectionData;
 	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
 	public final JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
+	public final JMenuItem mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3963,6 +3965,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnView.add(mntmShowSeats);
+		mntmShowRankedDistricts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frameRankedDist.show();
+			}
+		});
+		
+		mnView.add(mntmShowRankedDistricts);
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
