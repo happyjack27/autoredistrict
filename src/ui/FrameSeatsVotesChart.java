@@ -127,13 +127,23 @@ public class FrameSeatsVotesChart extends JFrame {
 				    int last_cross_ndx = 0;
 				    double x0 = 0;
 				    double y0 = 0;
+			    	int red = 0;
+			    	int blue = 0;
 				    for( int i = 0; i < seats_votes.size(); i++) {
+				    	
 				    	double[] dd = seats_votes.get(i);
 				    	double y3 = i == 0 ? 0 : mid_y[i-1];
 				    	double y4 = mid_y[i];
 				    			
 				    	double x1 = dd[1];
 				    	double y1 = dd[0];
+
+				    	if( y1 > mid_y[i]) {
+				    		blue++;
+				    	} else if( y1 < mid_y[i]){
+				    		red++;
+				    	}
+
 				    	double[] intersect = lineIntersect(x0,y0,x1,y1,x0,y3,x1,y4);
 				    	if( (intersect != null && intersect[0] > x0 && intersect[0] <= x1) || i == seats_votes.size()-1) {
 				    		if( i == seats_votes.size()-1) {
@@ -168,8 +178,11 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		
 				    		last_cross_ndx = i;
 				    		
-				    		g.setColor(y0 > mid_y[i-1] ? new Color(l3,l3,255) : new Color(255,l3,l3));
+				    		g.setColor(blue > red ? new Color(l3,l3,255) : new Color(255,l3,l3));
 						    g.fillPolygon(xs,ys,xs.length);
+					    	red = 0;
+					    	blue = 0;
+
 				    	}
 				    	
 				    	x0 = x1;
