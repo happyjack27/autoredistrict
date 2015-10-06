@@ -27,7 +27,7 @@ public class FrameSeatsVotesChart extends JFrame {
 	public JButton btnCopy;
 	public final JButton btnx = new JButton("1x");
 	public final JButton btnx_1 = new JButton("5x");
-	double multiplier = 1;
+	double multiplier = 2;
 	public JButton btnx_2;
 	//label.setUI(new VerticalLabelUI());
 	public FrameSeatsVotesChart() {
