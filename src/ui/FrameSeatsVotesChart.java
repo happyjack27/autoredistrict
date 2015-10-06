@@ -120,45 +120,56 @@ public class FrameSeatsVotesChart extends JFrame {
 			    //in development - seats imbalance background
 			    boolean b = true;
 			    if( b) {
-				    int last_cross_x = scale(0);
-				    int last_cross_y = 200;//scale(200);
-				    int last_cross_ndx = 1;
+			    	
+			    	//mid_x
+				    double last_cross_x = 0;//scale(0);
+				    double last_cross_y = 0;//scale(200);
+				    int last_cross_ndx = 0;
 				    double x0 = 0;
 				    double y0 = 0;
 				    for( int i = 0; i < seats_votes.size(); i++) {
 				    	double[] dd = seats_votes.get(i);
+				    	double y3 = i == 0 ? 0 : mid_y[i-1];
+				    	double y4 = mid_y[i];
+				    			
 				    	double x1 = dd[1];
-				    	double y1 = dd[0]-dd[1];
-				    	
-				    	//if crossed
-				    	if( y0*y1<0 || y1 == 0 || i == seats_votes.size()-1) {
-				    		double dy = (y1-y0);
-				    		double dx = (x1-x0);
-				    		double frac = (0-y0)/dy;
-				    		double crossx = x0+frac*dx;
-				    		int new_cross_x = (int)(crossx*200.0);
-				    		int new_cross_y = 200-new_cross_x;
-				    		g.setColor(y0>0 ? new Color(l2,l2,255) : new Color(255,l2,l2));
-				    		int[] xs = new int[i-last_cross_ndx+2];
-				    		int[] ys = new int[i-last_cross_ndx+2];
-				    		xs[0] = scale(last_cross_x);
-				    		ys[0] = last_cross_y;//scale(last_cross_y);
-				    		
-				    		for( int j = last_cross_ndx; j <= i; j++) {
-				    			int xindex = j-last_cross_ndx+1;
-						    	double[] dd0 = seats_votes.get(j);
-						    	int x = (int)(Math.round(dd0[1]*200.0)); 
-						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
-				    			xs[xindex] = scale(x);
-				    			ys[xindex] = y;
+				    	double y1 = dd[0];
+				    	double[] intersect = lineIntersect(x0,y0,x1,y1,x0,y3,x1,y4);
+				    	if( (intersect != null && intersect[0] > x0 && intersect[0] <= x1) || i == seats_votes.size()-1) {
+				    		if( i == seats_votes.size()-1) {
+				    			intersect[0] = 1;
+				    			intersect[1] = 1;
 				    		}
-				    		xs[xs.length-1] = scale(new_cross_x);
-				    		ys[xs.length-1] = new_cross_y;
-	
-						    g.fillPolygon(xs,ys,xs.length);
-				    		last_cross_x = new_cross_x;
-				    		last_cross_y = new_cross_y;
+				    		System.out.println(""+i+" "+last_cross_ndx+" "+(2+i-last_cross_ndx));
+				    		int[] xs = new int[2*(1+i-last_cross_ndx)];
+				    		int[] ys = new int[2*(1+i-last_cross_ndx)];
+				    		xs[0] = scale((int)Math.round(200.0*last_cross_x));
+				    		ys[0] = (int)Math.round(200.0-200.0*last_cross_y);
+				    		
+				    		int ndx = 1;
+				    		for(int j = last_cross_ndx; j < i; j++) {
+				    			double[] ee = seats_votes.get(j);
+				    			xs[ndx] = scale((int)Math.round(200.0*ee[1]));
+				    			ys[ndx] = (int)Math.round(200.0-200.0*ee[0]);
+				    			ndx++;
+				    		}
+				    		
+				    		xs[ndx] = scale((int)Math.round(200.0*intersect[0]));
+				    		ys[ndx] = (int)Math.round(200.0-200.0*intersect[1]);
+				    		last_cross_x = intersect[0];
+				    		last_cross_y = intersect[1];
+				    		ndx++;
+				    		
+				    		for(int j = i-1; j >= last_cross_ndx; j--) {
+				    			xs[ndx] = scale((int)(200.0*mid_x[j]));
+				    			ys[ndx] = (int)(200.0-200.0*mid_y[j]);
+				    			ndx++;
+				    		}
+				    		
 				    		last_cross_ndx = i;
+				    		
+				    		g.setColor(y0 > mid_y[i-1] ? new Color(l3,l3,255) : new Color(255,l3,l3));
+						    g.fillPolygon(xs,ys,xs.length);
 				    	}
 				    	
 				    	x0 = x1;
@@ -212,7 +223,9 @@ public class FrameSeatsVotesChart extends JFrame {
 	    }
 	}
 	
-	public static int[] lineIntersect(int x00, int y00, int x01, int y01, int x10, int y10, int x11, int y11) {
+	public static double[] lineIntersect(
+			double x00, double y00, double x01, double y01, 
+			double x10, double y10, double x11, double y11) {
 		   double denom = (y11 - y10) * (x01 - x00) - (x11 - x10) * (y01 - y00);
 		   if (denom == 0.0) { // Lines are parallel.
 		      return null;
@@ -221,7 +234,7 @@ public class FrameSeatsVotesChart extends JFrame {
 		   double ub = ((x01 - x00) * (y00 - y10) - (y01 - y00) * (x00 - x10))/denom;
 		     if (ua >= 0.0f && ua <= 1.0f && ub >= 0.0f && ub <= 1.0f) {
 		         // Get the intersection point.
-		         return new int[]{(int) (x00 + ua*(x01 - x00)), (int) (y00 + ua*(y01 - y00))};
+		         return new double[]{ (x00 + ua*(x01 - x00)), (y00 + ua*(y01 - y00))};
 		     }
 
 		   return null;
