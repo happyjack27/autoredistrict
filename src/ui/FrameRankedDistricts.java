@@ -34,6 +34,7 @@ public class FrameRankedDistricts extends JFrame {
 	class SeatPanel extends JPanel {
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
+	    		int l0 = 128+64+32+16;
 	    		int l1 = 128+64+32;
 	    		int l2 = 128+64;
 	    		int l3 = 128;
@@ -41,10 +42,21 @@ public class FrameRankedDistricts extends JFrame {
 			    super.paintComponent(g);
 			    g.setColor(Color.white);
 			    g.fillRect(0, 0, 200, 200);
+
+			    g.setColor(new Color(l2,l2,255));
+			    g.fillRect(0, 0, 33, 200);
 			    g.setColor(new Color(l1,l1,255));
-			    g.fillRect(0, 0, 100, 200);
+			    g.fillRect(33, 0, 33, 200);
+			    g.setColor(new Color(l0,l0,255));
+			    g.fillRect(66, 0, 34, 200);
+
+			    
+			    g.setColor(new Color(255,l0,l0));
+			    g.fillRect(100, 0, 33, 200);
 			    g.setColor(new Color(255,l1,l1));
-			    g.fillRect(100, 0, 100, 200);
+			    g.fillRect(133, 0, 33, 200);
+			    g.setColor(new Color(255,l2,l2));
+			    g.fillRect(166, 0, 34, 200);
 
 				double inc = 200.0/(double)seats_votes.size();
 				double y = 0;
