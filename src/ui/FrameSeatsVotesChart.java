@@ -171,8 +171,8 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		ndx++;
 				    		
 				    		for(int j = i-1; j >= last_cross_ndx; j--) {
-				    			xs[ndx] = scale((int)(200.0*mid_x[j]));
-				    			ys[ndx] = (int)(200.0-200.0*mid_y[j]);
+				    			xs[ndx] = scale((int)Math.round(200.0*mid_x[j]));
+				    			ys[ndx] = (int)Math.round(200.0-200.0*mid_y[j]);
 				    			ndx++;
 				    		}
 				    		
