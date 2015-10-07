@@ -35,8 +35,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	static int num_threads = 8;
 
-	public static double[] fairnessScoreEmaVars = new double[7];
-	public static double[] fairnessScoreEmaMeans = new double[7];
+	public static double[] fairnessScoreEmaVars = new double[8];
+	public static double[] fairnessScoreEmaMeans = new double[8];
 
     int cutoff;
     int speciation_cutoff;
@@ -404,7 +404,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("  renormalizing fairness...");
         if( Settings.LINEARIZE_MODE == Settings.RANK) {
-	        for( int i = 0; i < 7; i++) {
+	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
 	        	//pre-randomize so that ties are treated unbiased.
 	            for( DistrictMap map : population) {
 	                map.fitness_score = Math.random();
@@ -425,7 +425,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        }
         } else
         if( Settings.LINEARIZE_MODE == Settings.EMA) {
-	        for( int i = 0; i < 7; i++) {
+	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
 
 	        	double avg = 0;
 	            for( DistrictMap map : population) {
@@ -449,7 +449,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            }
 	        }
             for( DistrictMap map : population) {
-    	        for( int i = 0; i < 7; i++) {
+    	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
     	        	map.fairnessScores[i] = (map.fairnessScores[i] - fairnessScoreEmaMeans[i])/fairnessScoreEmaVars[i];
     	        }
             }

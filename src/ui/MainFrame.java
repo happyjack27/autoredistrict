@@ -4590,7 +4590,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		btnNewButton.setBounds(6, 196, 174, 23);
 		panel.add(btnNewButton);
 		
-		lblGeometricFairness = new JLabel("Geometric <====> Fairness");
+		lblGeometricFairness = new JLabel("Geometric <===> Fairness");
 		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
 		lblGeometricFairness.setBounds(210, 17, 180, 16);
 		panel.add(lblGeometricFairness);
