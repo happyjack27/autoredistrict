@@ -881,10 +881,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	//weight = 1.0-2.0*Math.abs(dd[1]-0.5);
 	    	
 	    	//convolve with the binary entropy function
+	    	/*
 	    	weight = Math.abs(rln2*(dd[1]*Math.log(dd[1]) + (1.0-dd[1])*Math.log(1.0-dd[1])));
 	    	if( weight != weight || dd[1] == 0 || dd[1] == 1) {
 	    		weight = 0;
 	    	}
+	    	*/
 	    	
 	    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
 	    	double mid_y = (dd[0]+(1-dd2[0]))/2.0;
