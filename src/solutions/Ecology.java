@@ -309,7 +309,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	for( Ward b : wards) {
     		b.recalcMuSigmaN();
     	}
-        for( int i = 0; i < 7; i++) {
+        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
         	fairnessScoreEmaMeans[i] = 0;
         	fairnessScoreEmaVars[i] = 0;
         }
