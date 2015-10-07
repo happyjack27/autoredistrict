@@ -871,9 +871,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double total = 0;
 	    for( int i = 0; i < seats_votes.size(); i++) {
 	    	double[] dd = seats_votes.get(i);
+	    	double weight = 1;
+	    	
+	    	//don't count if vote is <25% or >75%
+	    	/*.
+	    	if( dd[1] < 0.25|| dd[1] > 0.75) {
+	    		weight = 0;
+	    	}
+	    	*/
+	    	weight = 1.0-2.0*Math.abs(dd[1]-0.5);
+	    	
 	    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
 	    	double mid_y = (dd[0]+(1-dd2[0]))/2.0;
-	    	total += Math.abs(dd[0]-mid_y);
+	    	total += weight*Math.abs(dd[0]-mid_y);
 	    }
 
     	return total;
