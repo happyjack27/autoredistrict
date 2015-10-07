@@ -11,7 +11,7 @@ import com.hexiong.jdbf.JDBField;
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 import solutions.Settings;
-import solutions.Ward;
+import solutions.VTD;
 
 public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
 	
@@ -30,7 +30,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public String type;
 	public Properties properties;
 	public Geometry geometry;
-	public Ward ward = null;
+	public VTD vtd = null;
 	public Vector<double[]> points = new Vector<double[]>();
 	
 	public static boolean compare_centroid = true;
@@ -75,8 +75,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 					 ;
 		} else {
 			return 
-					this.ward.id > o.ward.id ? 1 :
-						this.ward.id < o.ward.id ? -1 :
+					this.vtd.id > o.vtd.id ? 1 :
+						this.vtd.id < o.vtd.id ? -1 :
 							0;
 		}
 	}
@@ -124,7 +124,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		ward.area = tot_area;
+		vtd.area = tot_area;
 		return tot_area;
 	}
 	
@@ -226,9 +226,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public void toggleClicked() {
 		try {
 
-		if( ward.state == 0) {
-			ward.state = 2;
-			for( Ward b : ward.neighbors) {
+		if( vtd.state == 0) {
+			vtd.state = 2;
+			for( VTD b : vtd.neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -237,9 +237,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 					b.state = 1;
 				}
 			}
-		} else if( ward.state == 2) { 
-			ward.state = 0;
-			for( Ward b : ward.neighbors) {
+		} else if( vtd.state == 2) { 
+			vtd.state = 0;
+			for( VTD b : vtd.neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -296,12 +296,12 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null || ward.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
+		if( geometry.fillColor != null || vtd.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);
 			if( display_mode == DISPLAY_MODE_TEST1) {
-				g.setColor(ward.demographics != null && ward.demographics.size() > 0 ? Color.white :  Color.black);
+				g.setColor(vtd.demographics != null && vtd.demographics.size() > 0 ? Color.white :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_TEST2) {
-				g.setColor(ward.has_census_results ? Color.white :  Color.black);
+				g.setColor(vtd.has_census_results ? Color.white :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
 				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 				int max_col = -1;
@@ -310,8 +310,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				for( int i = 0; i < ward.demographics.size() && i < colors.length; i++) {
-					int pop = ward.demographics.get(i).population;
+				for( int i = 0; i < vtd.demographics.size() && i < colors.length; i++) {
+					int pop = vtd.demographics.get(i).population;
 					tot += pop;
 					red += colors[i].getRed()*pop;
 					green += colors[i].getGreen()*pop;
@@ -322,10 +322,10 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				blue /= tot;
 				g.setColor(new Color((int)red,(int)green,(int)blue));
 			} else {
-				if( ward.state == 1) {
+				if( vtd.state == 1) {
 					g.setColor(Color.blue);
 				}
-				if( ward.state == 2) {
+				if( vtd.state == 2) {
 					g.setColor(Color.white);
 				}
 			}

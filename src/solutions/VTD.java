@@ -3,7 +3,7 @@ import java.util.*;
 
 import serialization.*;
 
-public class Ward extends ReflectionJSONObject<Ward> {
+public class VTD extends ReflectionJSONObject<VTD> {
     public int id;
 	public static int id_enumerator = 0;
 	public int state = 0;
@@ -14,7 +14,7 @@ public class Ward extends ReflectionJSONObject<Ward> {
 
 
     public Vector<Edge> edges = new Vector<Edge>();
-    public Vector<Ward> neighbors = new Vector<Ward>();
+    public Vector<VTD> neighbors = new Vector<VTD>();
     public double[] neighbor_lengths;
     public double unpaired_edge_length = 0;
     public Vector<Demographic> demographics = new Vector<Demographic>();
@@ -66,17 +66,17 @@ public class Ward extends ReflectionJSONObject<Ward> {
     
 	double[][] outcomes;
 
-    public Ward() {
+    public VTD() {
     	super();
     	id = id_enumerator++;
     }
-    public boolean equals(Ward b) {
+    public boolean equals(VTD b) {
     	return b != null && b.id == this.id;
     }
     public void syncNeighbors() {
-		for(Ward b : neighbors) {
+		for(VTD b : neighbors) {
 			boolean is_in = false;
-			for(Ward b2 : b.neighbors) {
+			for(VTD b2 : b.neighbors) {
 				if( b2.id == this.id){
 					is_in = true;
 					break;
@@ -97,7 +97,7 @@ public class Ward extends ReflectionJSONObject<Ward> {
 		for(Edge e : edges) {
 			boolean found = false;
 	    	for( int i = 0; i < neighbor_lengths.length; i++) {
-	    		Ward b = neighbors.get(i);
+	    		VTD b = neighbors.get(i);
 	    		if( e.ward1_id == b.id || e.ward2_id == b.id){
 	    			neighbor_lengths[i] += e.length;
 	    			found = true;
@@ -113,12 +113,12 @@ public class Ward extends ReflectionJSONObject<Ward> {
     public void collectNeighbors() {
     	//this gets a list of distinct neighbors.
     	
-		neighbors = new Vector<Ward>();
+		neighbors = new Vector<VTD>();
 		for( Edge e : edges) {
-			Ward b = e.ward1.id == this.id ? e.ward2 : e.ward1;
+			VTD b = e.ward1.id == this.id ? e.ward2 : e.ward1;
 			if( b != null && b.id != this.id) {
 				boolean is_in = false;
-				for(Ward b2 : neighbors) {
+				for(VTD b2 : neighbors) {
 					if( b2.id == b.id){
 						is_in = true;
 						break;

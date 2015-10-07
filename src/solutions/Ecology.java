@@ -46,9 +46,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	int last_population = 0;
 	int last_num_districts = 0;
 	
-	public HashMap<Integer,Ward> wards_by_id;
+	public HashMap<Integer,VTD> wards_by_id;
 	
-	public Vector<Ward> wards = new Vector<Ward>();
+	public Vector<VTD> wards = new Vector<VTD>();
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
 	//public MapPanel mapPanel;
@@ -223,14 +223,14 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void post_deserialize() {
-		wards_by_id = new HashMap<Integer,Ward>();
+		wards_by_id = new HashMap<Integer,VTD>();
 		HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
 		HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
 		
 		//geometry
 		if( containsKey("wards")) {
 			wards = getVector("wards");
-			for( Ward ward: wards) {
+			for( VTD ward: wards) {
 				wards_by_id.put(ward.id,ward);
 			}
 		}
@@ -256,7 +256,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 				edge.ward2.edges.add(edge);
 			}
 		}
-		for( Ward b : wards) {
+		for( VTD b : wards) {
 			b.collectNeighbors();
 		}
 
@@ -286,7 +286,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			return new Edge();
 		}
 		if( key.equals("wards")) {
-			return new Ward();
+			return new VTD();
 		}
 		
 		if( key.equals("candidates")) {
@@ -306,7 +306,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	this.generation = 0;
     	history = new Vector<double[]>();
     	normalized_history = new Vector<double[]>();
-    	for( Ward b : wards) {
+    	for( VTD b : wards) {
     		b.recalcMuSigmaN();
     	}
         for( int i = 0; i < fairnessScoreEmaVars.length; i++) {

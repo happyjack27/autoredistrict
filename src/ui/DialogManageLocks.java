@@ -136,7 +136,7 @@ public class DialogManageLocks extends JDialog {
 	}
 	public void resetLocks() {
 		FeatureCollection featureCollection = MainFrame.mainframe.featureCollection;
-		boolean[] locked_districts = new boolean[ featureCollection.precincts.size()];
+		boolean[] locked_districts = new boolean[ featureCollection.vtds.size()];
 		String[] keys = new String[locks.size()];
 		String[] keychoices = new String[locks.size()];
 		for( int i = 0; i < keys.length; i++) {

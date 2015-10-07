@@ -14,7 +14,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public Vector<double[]> seats_votes = new Vector<double[]>();  
     
     public static int num_districts = 0;
-	public Vector<Ward> vtds = new Vector<Ward>();
+	public Vector<VTD> vtds = new Vector<VTD>();
 	public Vector<District> districts = new Vector<District>();
     
     public int[] vtd_districts = new int[]{};
@@ -226,14 +226,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	ward_connected[i] = false;
 	        }
 	        for( int i = 0; i < districts.size(); i++) {
-	        	Vector<Ward> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
+	        	Vector<VTD> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
 	        	double pop = districts.get(i).getRegionPopulation(vw);
 	        	if( pop < 25000 || vw == null || vw.size() < 5) {
 	        		for(int j = 0; j < vtd_districts.length; j++) {
 	        			ward_connected[j] |=  vtd_districts[j] == i;
 	        		}
 	        	} else {
-		        	for( Ward w : vw) {
+		        	for( VTD w : vw) {
 		        		ward_connected[w.id] = true;
 		        	}
 	        	}
@@ -273,9 +273,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( FeatureCollection.locked_wards[i]) {
     		return;
     	}
-    	Ward ward = vtds.get(i);
+    	VTD ward = vtds.get(i);
     	boolean border = false;
-        for( Ward bn : ward.neighbors) {
+        for( VTD bn : ward.neighbors) {
         	if( vtd_districts[bn.id] != vtd_districts[i]) {
         		border = true;
         		break;
@@ -307,7 +307,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
-    					Ward b = ward.neighbors.get(j);
+    					VTD b = ward.neighbors.get(j);
 
     					District dfrom = this.districts.get(vtd_districts[i]); //coming from
 						District dto = this.districts.get(vtd_districts[b.id]); //going to
@@ -369,7 +369,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    						double length_to = 0;
 	    						double length_other = 0;
 	    						double length_unpaired = ward.unpaired_edge_length;
-	    						Ward vtd = vtds.get(i);
+	    						VTD vtd = vtds.get(i);
 	    						for( int k = 0; k < vtd.neighbors.size(); k++) {
 	    							int neighbor_id = vtd_districts[vtd.neighbors.get(k).id];
 	    							int neighbor_district = neighbor_id < 0 ? -1 : vtd_districts[neighbor_id];
@@ -554,14 +554,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     //constructors
-    public DistrictMap(Vector<Ward> wards, int num_districts, int[] genome) {
+    public DistrictMap(Vector<VTD> wards, int num_districts, int[] genome) {
         this(wards,num_districts);
         setGenome(genome);
     }
     
     public void fillDistrictwards() {
     	for( District d : districts) {
-    		d.wards = new Vector<Ward>();
+    		d.wards = new Vector<VTD>();
     	}
 		while( Settings.num_districts > districts.size()) {
 			districts.add(new District());
@@ -622,7 +622,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     
     }
-    public DistrictMap(Vector<Ward> wards, int num_districts) {
+    public DistrictMap(Vector<VTD> wards, int num_districts) {
         this.num_districts = num_districts;
         this.vtds = wards;
         //System.out.println(" districtmap constructor numdists "+num_districts);
@@ -1290,7 +1290,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double[] paired_lengths = new double[districts.size()]; 
     	double[] unpaired_lengths = new double[districts.size()]; 
     	double[] areas = new double[districts.size()]; 
-        for( Ward b : vtds) {
+        for( VTD b : vtds) {
         	int d1 = vtd_districts[b.id];
         	areas[d1] += b.area;
         	unpaired_lengths[d1] += b.unpaired_edge_length;
@@ -1369,7 +1369,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     double getEdgeLength() {
         double length = 0;
-        for( Ward b : vtds) {
+        for( VTD b : vtds) {
         	int d1 = vtd_districts[b.id];
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id;
@@ -1385,7 +1385,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     Vector<Edge> getOuterEdges(int[] ward_districts) {
         Vector<Edge> outerEdges = new Vector<Edge>();
-        for( Ward ward : vtds)
+        for( VTD ward : vtds)
             for( Edge edge : ward.edges)
                 if( !edge.areBothSidesSameDistrict(ward_districts))
                     outerEdges.add(edge);
