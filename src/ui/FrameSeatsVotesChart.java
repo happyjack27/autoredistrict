@@ -147,8 +147,7 @@ public class FrameSeatsVotesChart extends JFrame {
 				    	double[] intersect = lineIntersect(x0,y0,x1,y1,x0,y3,x1,y4);
 				    	if( (intersect != null && intersect[0] >= x0 && intersect[0] <= x1) || i == seats_votes.size()-1) {
 				    		if( i == seats_votes.size()-1) {
-				    			intersect[0] = 1;
-				    			intersect[1] = 1;
+				    			intersect = new double[]{1,1};
 				    		}
 				    		//System.out.println(""+i+" "+last_cross_ndx+" "+(2+i-last_cross_ndx));
 				    		int[] xs = new int[2*(1+i-last_cross_ndx)];
