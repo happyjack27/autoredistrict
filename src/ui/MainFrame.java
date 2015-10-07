@@ -2547,6 +2547,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void setDistrictColumn(String district) {
 		boolean changed = !district.equals(project.district_column);
 		project.district_column = district;
+		boolean hush = false;
 		if( changed) {
 			Feature.compare_centroid = false;
 			Collections.sort(featureCollection.features);
@@ -2598,15 +2599,25 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				if( panelStats.uncontested.size() > 0) {
 					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
-						for( Integer d : panelStats.uncontested) {
-							District.uncontested[d-1] = true;
-						}
-						setSubstituteColumns(project.substitute_columns);
-						for( int i = 0; i < District.uncontested.length; i++) {
-							District.uncontested[i] = false;
+						try {
+							for( Integer d : panelStats.uncontested) {
+								District.uncontested[d-1] = true;
+							}
+							setSubstituteColumns(project.substitute_columns);
+							for( int i = 0; i < District.uncontested.length; i++) {
+								District.uncontested[i] = false;
+							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
 						}
 						Settings.ignore_uncontested = false;
 						panelStats.getStats();
+						if( !hush) {
+							hush = true;
+							project.district_column = "";
+							setDistrictColumn(district);
+							hush = false;
+						}
 					} else {
 						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
 						if( opt == JOptionPane.YES_OPTION) {
