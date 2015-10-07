@@ -11,6 +11,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
     public static int sorting_polarity = 1;
     public static boolean use_border_length_on_mutate_boundary = true;
+    public Vector<double[]> seats_votes = new Vector<double[]>();  
     
     public static int num_districts = 0;
 	public Vector<Ward> vtds = new Vector<Ward>();
@@ -815,6 +816,68 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return -div;
     }
+    public void calcSeatsVotesCurve() {
+		
+		Vector<double[]> swap = new Vector<double[]>();
+		double[] vote_count_totals = new double[2];
+		vote_count_totals[0] = 0;
+		vote_count_totals[1] = 0;
+		double total = 0; 
+		double[][] vote_count_districts = new double[Settings.num_districts][2];
+		
+		//aggregate all the votes
+		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+			District d = districts.get(i);
+			double[][] result = d.getElectionResults();
+			for( int j = 0; j < 2; j++) {
+				vote_count_totals[j] += result[0][j];
+				vote_count_districts[i][j] += result[0][j];
+				total += result[0][j];
+			}
+		}
+		
+		//now normalize to 50/50
+		double adjust = vote_count_totals[1]/vote_count_totals[0];
+		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+			vote_count_districts[i][0] *= adjust;
+		}
+		
+		//now sample it at different vote ratios
+		for( double dempct = 0; dempct <= 1; dempct += 0.01) {
+			double reppct = 1-dempct;
+			double votes = dempct;
+			double demseats = 0;
+			double totseats = 0;
+			for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+				//if uncontested, ignore.
+				if( vote_count_districts[i][0] == 0 || vote_count_districts[i][1] == 0) {
+					if( Settings.ignore_uncontested) {
+						continue;
+					}
+				}
+				totseats++;
+				if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
+					demseats++;
+				}
+			}
+			double demseatpct = demseats/totseats;
+			swap.add(new double[]{demseatpct,dempct});
+		}
+		seats_votes = swap;
+    }
+    
+    public double calcSeatsVoteAsymmetry() {
+    	calcSeatsVotesCurve();
+    	double total = 0;
+	    for( int i = 0; i < seats_votes.size(); i++) {
+	    	double[] dd = seats_votes.get(i);
+	    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
+	    	double mid_y = (dd[0]+(1-dd2[0]))/2.0;
+	    	total += Math.abs(dd[0]-mid_y);
+	    }
+
+    	return total;
+    }
 
     //returns total edge length, unfairness, population imbalance
     //a heuristic optimization algorithm would use a weighted combination of these 3 values as a cost function to minimize.
@@ -1102,6 +1165,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,power_fairness
         		,wasted_votes
         		,wasted_vote_imbalance
+        		,calcSeatsVoteAsymmetry()
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;

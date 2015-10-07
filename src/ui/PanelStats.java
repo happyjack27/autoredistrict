@@ -38,7 +38,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				dm.fairnessScores[4], //POWER IMBALANCE
 				dm.fairnessScores[5], //WASTED VOTES TOTAL
 				dm.fairnessScores[6], //WASTED VOTES IMBALANCE
-				0,
+				dm.fairnessScores[7], //seats votes asymmetry
 				
 
 				Settings.getAnnealingFloor( featureCollection.ecology.generation),
@@ -120,7 +120,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					dm.fairnessScores[4], //POWER IMBALANCE
 					dm.fairnessScores[5], //WASTED VOTES TOTAL
 					dm.fairnessScores[6], //WASTED VOTES IMBALANCE
-					0,
+					dm.fairnessScores[7], //seats / votes asymmetry
 					
 
 					Settings.getAnnealingFloor( featureCollection.ecology.generation),
@@ -293,6 +293,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
 					new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
 					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
+					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
 					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
 					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},

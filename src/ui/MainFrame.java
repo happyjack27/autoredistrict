@@ -134,8 +134,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 	public JComboBox comboBoxPopulation = new JComboBox();
 	public JComboBox comboBoxDistrictColumn = new JComboBox();
-
-    public JTextField textField_3 = new JTextField();
     public JTextField textFieldNumDistricts = new JTextField();
     public JTextField textFieldElectionsSimulated = new JTextField();
     public JTextField textField = new JTextField();
@@ -1346,6 +1344,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
 	public final JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
 	public final JMenuItem mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
+	public JLabel lblSeatsVotes;
+	public JSlider sliderSeatsVotes;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3085,6 +3085,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
+		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
 		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
@@ -4232,15 +4233,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(200, 61, 200, 258);
+		panel_2.setBounds(200, 61, 200, 221);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JLabel lblCompactness = new JLabel("Compactness");
-		lblCompactness.setBounds(6, 36, 90, 16);
+		lblCompactness.setBounds(6, 97, 90, 16);
 		panel_2.add(lblCompactness);
-		sliderBorderLength.setBounds(6, 57, 190, 29);
+		sliderBorderLength.setBounds(6, 118, 190, 29);
 		panel_2.add(sliderBorderLength);
 		
 		JLabel lblEvolutionaryPressure = new JLabel("Geometric criteria");
@@ -4255,7 +4256,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(sliderPopulationBalance);
 		
 		JLabel lblConnectedness = new JLabel("Contiguity");
-		lblConnectedness.setBounds(6, 97, 172, 16);
+		lblConnectedness.setBounds(6, 36, 172, 16);
 		panel_2.add(lblConnectedness);
 		
 		sliderDisconnected.addChangeListener(new ChangeListener() {
@@ -4263,32 +4264,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 			}
 		});
-		sliderDisconnected.setBounds(6, 118, 190, 29);
+		sliderDisconnected.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderDisconnected);
-		
-		JLabel lblMaxPop = new JLabel("Max population % diff ");
-		lblMaxPop.setBounds(6, 225, 134, 16);
-		panel_2.add(lblMaxPop);
-		lblMaxPop.setVisible(false);
-		
-		textField_3.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusLost(FocusEvent arg0) {
-				textField_3.postActionEvent();
-			}
-		});
-		textField_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					Settings.max_pop_diff = Integer.parseInt(textField_3.getText());
-				} catch (Exception ex) { }
-			}
-		});
-		textField_3.setText("9");
-		textField_3.setColumns(10);
-		textField_3.setBounds(138, 219, 58, 28);
-		panel_2.add(textField_3);
-		textField_3.setVisible(false);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -4545,7 +4522,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(200, 318, 200, 290);
+		panel_4.setBounds(200, 280, 200, 344);
 		panel.add(panel_4);
 		
 		lblFairnessCriteria = new JLabel("Fairness criteria");
@@ -4588,6 +4565,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderWastedVotesImbalance.setBounds(10, 247, 180, 29);
 		panel_4.add(sliderWastedVotesImbalance);
+		
+		lblSeatsVotes = new JLabel("Seats / votes asymmetry");
+		lblSeatsVotes.setBounds(10, 283, 172, 16);
+		panel_4.add(lblSeatsVotes);
+		
+		sliderSeatsVotes = new JSlider();
+		sliderSeatsVotes.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
+			}
+		});
+		sliderSeatsVotes.setBounds(10, 304, 180, 29);
+		panel_4.add(sliderSeatsVotes);
 		
 		btnNewButton = new JButton("Election columns");
 		btnNewButton.addActionListener(new ActionListener() {

@@ -26,7 +26,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Voting power imbalance",
     		"Wasted votes (total)",
     		"Wasted votes (imbalance)",
-    		"",
+    		"Seats / votes asymmetry",
 
     		//9
     		"Annealing floor",
@@ -41,8 +41,8 @@ public class PanelGraphDrawArea extends JPanel {
 
 
     public boolean[] b_draw = new boolean[]{
-    		false,false,false,false,
-    		true,true,true,true,false,
+    		false,false,false,true,
+    		true,true,true,true,true,
     		false,
     		true,true,true,false,false,
     		//true,true,

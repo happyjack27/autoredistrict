@@ -324,53 +324,8 @@ public class FrameSeatsVotesChart extends JFrame {
 		getContentPane().add(btnx_2);
 	}
 	public void setData(DistrictMap dm) {
-		
-		Vector<double[]> swap = new Vector<double[]>();
-		double[] vote_count_totals = new double[2];
-		vote_count_totals[0] = 0;
-		vote_count_totals[1] = 0;
-		double total = 0; 
-		double[][] vote_count_districts = new double[Settings.num_districts][2];
-		
-		//aggregate all the votes
-		for( int i = 0; i < dm.districts.size() && i < Settings.num_districts; i++) {
-			District d = dm.districts.get(i);
-			double[][] result = d.getElectionResults();
-			for( int j = 0; j < 2; j++) {
-				vote_count_totals[j] += result[0][j];
-				vote_count_districts[i][j] += result[0][j];
-				total += result[0][j];
-			}
-		}
-		
-		//now normalize to 50/50
-		double adjust = vote_count_totals[1]/vote_count_totals[0];
-		for( int i = 0; i < dm.districts.size() && i < Settings.num_districts; i++) {
-			vote_count_districts[i][0] *= adjust;
-		}
-		
-		//now sample it at different vote ratios
-		for( double dempct = 0; dempct <= 1; dempct += 0.01) {
-			double reppct = 1-dempct;
-			double votes = dempct;
-			double demseats = 0;
-			double totseats = 0;
-			for( int i = 0; i < dm.districts.size() && i < Settings.num_districts; i++) {
-				//if uncontested, ignore.
-				if( vote_count_districts[i][0] == 0 || vote_count_districts[i][1] == 0) {
-					if( Settings.ignore_uncontested) {
-						continue;
-					}
-				}
-				totseats++;
-				if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
-					demseats++;
-				}
-			}
-			double demseatpct = demseats/totseats;
-			swap.add(new double[]{demseatpct,dempct});
-		}
-		seats_votes = swap;
+		dm.calcSeatsVotesCurve();
+		seats_votes = dm.seats_votes;
 		
 		//now set the table
 		String[][] sd = new String[seats_votes.size()][2];
