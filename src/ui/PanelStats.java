@@ -201,7 +201,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//double max = -1;
 				//int iwinner  = -1;
 				String winner = "";
-				if( result[0].length >= 2 && (result[0][0] < 50 || result[0][1] < 50) && Settings.ignore_uncontested) {
+				boolean is_uncontested = false;
+				if( result[0].length >= 2) {
+					double sum = result[0][0] + result[0][1];
+					if( (result[0][0] < sum*0.02 || result[0][1] < sum*0.02)) { //less than 2% of the vote is uncontested.
+						is_uncontested = true;
+					}
+				}
+				if( is_uncontested && Settings.ignore_uncontested) {
 		   	    	for( int j = 0; j < result[0].length; j++) {
 		   	    		result[0][j] = 0;
 		   	    	}
@@ -232,11 +239,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					wasted_0 += result[0][0] - (result[0][0] >= needed ? needed : 0);
 					wasted_1 += result[0][1] - (result[0][1] >= needed ? needed : 0);
 					pvi = 100.0*(result[0][0] >= needed ? result[0][0] - needed : result[0][1] - needed)/total_votes;
-					if( pvi < 5) {
-						num_competitive++;
-					}
 
-					if( total_votes > 1) {
+					if( !is_uncontested) {
+						if( pvi < 5) {
+							num_competitive++;
+						}
 						total_pvi += pvi;
 						counted_districts++;
 						ranked_dists.add(pvi*(result[0][0] >= needed ? -1 : +1));
@@ -244,6 +251,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					} else {
 						pviw = "uncontested";
 						uncontested_swap.add(new Integer(i+1));
+						if( !Settings.ignore_uncontested) {
+							ranked_dists.add(pvi*(result[0][0] >= needed ? -1 : +1));
+						}
 					}
 				} catch (Exception ex) {
 					

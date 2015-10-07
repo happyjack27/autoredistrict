@@ -850,10 +850,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			double totseats = 0;
 			for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
 				//if uncontested, ignore.
-				if( vote_count_districts[i][0] == 0 || vote_count_districts[i][1] == 0) {
-					if( Settings.ignore_uncontested) {
-						continue;
-					}
+				if( District.uncontested != null && District.uncontested.length > i && District.uncontested[i] && Settings.ignore_uncontested) {
+					continue;
 				}
 				totseats++;
 				if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
@@ -879,7 +877,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    		weight = 0;
 	    	}
 	    	*/
-	    	weight = 1.0-2.0*Math.abs(dd[1]-0.5);
+	    	//weight = 1.0-2.0*Math.abs(dd[1]-0.5);
 	    	
 	    	double[] dd2 =  seats_votes.get(seats_votes.size()-1-i);
 	    	double mid_y = (dd[0]+(1-dd2[0]))/2.0;

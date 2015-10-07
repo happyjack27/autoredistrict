@@ -2587,6 +2587,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
+				Settings.ignore_uncontested = false;
 				featureCollection.ecology.population.get(0).calcFairnessScores();
 				panelStats.getStats();
 				District.uncontested = new boolean[Settings.num_districts];
@@ -2604,6 +2605,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 								manageLocks.locks.add(key);
 							}
 						}
+						panelStats.getStats();
 						manageLocks.list.setListData(manageLocks.locks);
 						manageLocks.resetLocks();
 						manageLocks.show();
