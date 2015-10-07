@@ -2597,27 +2597,40 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					District.uncontested[i] = false;
 				}
 				if( panelStats.uncontested.size() > 0) {
-					int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
-					if( opt == JOptionPane.YES_OPTION) {
-						Settings.ignore_uncontested = true;
+					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
 						for( Integer d : panelStats.uncontested) {
 							District.uncontested[d-1] = true;
-							String key = district+","+d;
-							if( !manageLocks.locks.contains(key)) {
-								manageLocks.locks.add(key);
-							}
 						}
-						panelStats.getStats();
-						manageLocks.list.setListData(manageLocks.locks);
-						manageLocks.resetLocks();
-						manageLocks.show();
-					} else {
+						setSubstituteColumns(project.substitute_columns);
+						for( int i = 0; i < District.uncontested.length; i++) {
+							District.uncontested[i] = false;
+						}
 						Settings.ignore_uncontested = false;
+						panelStats.getStats();
+					} else {
+						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
+						if( opt == JOptionPane.YES_OPTION) {
+							Settings.ignore_uncontested = true;
+							for( Integer d : panelStats.uncontested) {
+								District.uncontested[d-1] = true;
+								String key = district+","+d;
+								if( !manageLocks.locks.contains(key)) {
+									manageLocks.locks.add(key);
+								}
+							}
+							panelStats.getStats();
+							manageLocks.list.setListData(manageLocks.locks);
+							manageLocks.resetLocks();
+							manageLocks.show();
+						} else {
+							Settings.ignore_uncontested = false;
+						}
 					}
 				} else {
 					Settings.ignore_uncontested = false;
 				}
 			}
+
 			mapPanel.invalidate();
 			mapPanel.repaint();
 		}
@@ -2683,8 +2696,66 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		setEnableds();	
 	}
-	private void setSubstituteColumns(Vector<String> in) {
+	
+	public void setSubstituteColumns(Vector<String> candidate_cols) {
+		try {
 		// TODO Auto-generated method stub
+		int num_candidates = candidate_cols.size();
+		
+		for( VTD b : featureCollection.vtds) {
+			b.has_election_results = true;
+		}
+		DistrictMap dm = featureCollection.ecology.population.get(0);
+		
+		for( int id = 0; id < featureCollection.features.size(); id++) {
+			Feature f = featureCollection.features.get(id);
+			VTD b = f.vtd;
+			if( !District.uncontested[dm.vtd_districts[id]]) {
+				continue;
+			}
+			
+			b.resetOutcomes();
+			double[] dd = new double[num_candidates];
+			for( int i = 0; i < candidate_cols.size(); i++) {
+				try {
+					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+				} catch (Exception ex) {
+					
+					dd[i] = 0;
+					f.properties.put(candidate_cols.get(i),"0");
+				}
+			}
+		
+			b.demographics.clear();
+			for( int j = 0; j < num_candidates; j++) {
+				Demographic d = new Demographic();
+				//d.ward_id = b.id;
+				d.turnout_probability = 1;
+				d.population = (int) dd[j];
+				d.vote_prob = new double[num_candidates];
+				for( int i = 0; i < d.vote_prob.length; i++) {
+					d.vote_prob[i] = 0;
+				}
+				d.vote_prob[j] = 1;
+				b.demographics.add(d);
+				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+			}
+		}
+		
+		Candidate.candidates = new Vector<Candidate>();
+		for( int i = 0; i < num_candidates; i++) {
+			Candidate c = new Candidate();
+			c.index = i;
+			c.id = ""+i;
+			Candidate.candidates.add(c);
+		}
+		featureCollection.ecology.reset();
+		election_loaded = true;
+		
+		setEnableds();	
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		
 	}
 	
@@ -4617,11 +4688,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		btnSubstituteColumns = new JButton("Substitute columns");
 		btnSubstituteColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean implemented = false;
-				if( !implemented) {
-					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
-					return;
-				}
 				boolean is_evolving = evolving;
 				if( is_evolving) { featureCollection.ecology.stopEvolving(); }
 				setDistrictColumn(project.district_column);
@@ -4636,10 +4702,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				try {
 					project.substitute_columns = dlg.in;
-					setSubstituteColumns(dlg.in);
 				} catch (Exception ex) {
 					System.out.println("ex "+ex);
 					ex.printStackTrace();
+				}
+				if( project.substitute_columns.size() != project.demographic_columns.size()) {
+					JOptionPane.showMessageDialog(mainframe, "Election columns and substitute columns must match one-to-one.");
+					chckbxNewCheckBox.doClick();//.setSelected(false);
 				}
 				//mntmShowDemographics.setSelected(true);
 				//Feature.display_mode = 1;
@@ -4658,8 +4727,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxNewCheckBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean b = chckbxNewCheckBox.isSelected();
+				if( b && false) {
+					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
+					chckbxNewCheckBox.setSelected(false);
+					return;
+				}
 				btnSubstituteColumns.setEnabled(b);
 				Settings.substitute_uncontested = b;
+				if( b) {
+					btnSubstituteColumns.doClick();
+				}
 			}
 		});
 		chckbxNewCheckBox.setBounds(6, 261, 178, 23);
