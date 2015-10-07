@@ -1346,6 +1346,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
 	public JLabel lblSeatsVotes;
 	public JSlider sliderSeatsVotes;
+	public JButton btnSubstituteColumns;
+	public JCheckBox chckbxNewCheckBox;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2681,6 +2683,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		setEnableds();	
 	}
+	private void setSubstituteColumns(Vector<String> in) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void selectLayers() {
 		boolean is_evolving = this.evolving;
 		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
@@ -3115,7 +3122,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
-		this.setSize(d);
+		this.setSize(new Dimension(1021, 779));
 		
 		dlg.setModal(false);
 	    dpb.setIndeterminate(true);
@@ -4228,14 +4235,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel = new JPanel();
 		JPanel panel_1 = new JPanel();
-		panel.setPreferredSize(new Dimension(400, 100));
+		panel.setPreferredSize(new Dimension(600, 100));
 		panel_1.setPreferredSize(new Dimension(200,100));
 		panel.setLayout(null);
 		panel_1.setLayout(null);
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(200, 61, 200, 221);
+		panel_2.setBounds(400, 55, 200, 221);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -4272,7 +4279,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(0, 280, 200, 423);
+		panel_3.setBounds(200, 0, 200, 399);
 		panel.add(panel_3);
 		panel_3.setLayout(null);
 		
@@ -4447,7 +4454,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				stopEvolving();
 			}
 		});
-		stopButton.setBounds(6, 29, 93, 29);
+		stopButton.setBounds(6, 29, 83, 29);
 		panel.add(stopButton);
 		
 		goButton.setText("Go");
@@ -4468,7 +4475,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				progressBar.setValue(0);
 			}
 		});
-		goButton.setBounds(109, 29, 91, 29);
+		goButton.setBounds(109, 29, 83, 29);
 		panel.add(goButton);
 		
 		textFieldMembersPerDistrict = new JTextField();
@@ -4508,7 +4515,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(8, 230, 182, 16);
+		lblDistrictColumn.setBounds(8, 325, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -4518,13 +4525,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(8, 249, 178, 20);
+		comboBoxDistrictColumn.setBounds(8, 344, 178, 20);
 		panel.add(comboBoxDistrictColumn);
 		
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(200, 280, 200, 344);
+		panel_4.setBounds(400, 274, 200, 344);
 		panel.add(panel_4);
 		
 		lblFairnessCriteria = new JLabel("Fairness criteria");
@@ -4587,12 +4594,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				selectLayers();
 			}
 		});
-		btnNewButton.setBounds(6, 196, 174, 23);
+		btnNewButton.setBounds(6, 196, 184, 23);
 		panel.add(btnNewButton);
 		
 		lblGeometricFairness = new JLabel("Geometric <===> Fairness");
 		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
-		lblGeometricFairness.setBounds(210, 17, 180, 16);
+		lblGeometricFairness.setBounds(410, 11, 180, 16);
 		panel.add(lblGeometricFairness);
 		
 		sliderBalance = new JSlider();
@@ -4601,11 +4608,62 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 			}
 		});
-		sliderBalance.setBounds(208, 32, 182, 29);
+		sliderBalance.setBounds(408, 26, 182, 29);
 		panel.add(sliderBalance);
 		
-		progressBar.setBounds(10, 11, 190, 14);
+		progressBar.setBounds(10, 11, 180, 14);
 		panel.add(progressBar);
+		
+		btnSubstituteColumns = new JButton("Substitute columns");
+		btnSubstituteColumns.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean implemented = false;
+				if( !implemented) {
+					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
+					return;
+				}
+				boolean is_evolving = evolving;
+				if( is_evolving) { featureCollection.ecology.stopEvolving(); }
+				setDistrictColumn(project.district_column);
+				//featureCollection.loadDistrictsFromProperties(project.district_column);
+				DialogSelectLayers dlg = new DialogSelectLayers();
+				dlg.setData(featureCollection,project.substitute_columns);
+				dlg.show();
+				if( !dlg.ok) {
+					if( is_evolving) { featureCollection.ecology.startEvolving(); }
+					return;
+				}
+
+				try {
+					project.substitute_columns = dlg.in;
+					setSubstituteColumns(dlg.in);
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+				//mntmShowDemographics.setSelected(true);
+				//Feature.display_mode = 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				
+				if( is_evolving) { featureCollection.ecology.startEvolving(); }
+			}
+
+		});
+		btnSubstituteColumns.setEnabled(false);
+		btnSubstituteColumns.setBounds(6, 291, 184, 23);
+		panel.add(btnSubstituteColumns);
+		
+		chckbxNewCheckBox = new JCheckBox("Substitute uncontested");
+		chckbxNewCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean b = chckbxNewCheckBox.isSelected();
+				btnSubstituteColumns.setEnabled(b);
+				Settings.substitute_uncontested = b;
+			}
+		});
+		chckbxNewCheckBox.setBounds(6, 261, 178, 23);
+		panel.add(chckbxNewCheckBox);
 		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
