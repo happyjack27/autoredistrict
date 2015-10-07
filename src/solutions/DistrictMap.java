@@ -1141,7 +1141,38 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for(int i = 0; i < dist_pops.length; i++) {
                 voting_power[i] /= total_voting_power;
             }
-            power_fairness = getKLDiv(dist_pop_frac,voting_power,0.01);
+            if( Settings.ignore_uncontested && District.uncontested != null) {
+                int num_uncontested = 0;
+                for( int i = 0; i < District.uncontested.length; i++) {
+                	num_uncontested += District.uncontested[i] ? 1 : 0;
+                }
+                	
+            	double[] dq = new double[dist_pop_frac.length-num_uncontested];
+            	double[] dp = new double[dist_pop_frac.length-num_uncontested];
+            	int ndx = 0;
+            	double totp = 0;
+            	double totq = 0;
+                for( int i = 0; i < dist_pop_frac.length; i++) {
+                	if(  District.uncontested.length > i &&  District.uncontested[i]) {
+                		continue;
+                	}
+                	dq[ndx] = dist_pop_frac[i];
+                	dp[ndx] = voting_power[i];
+                	totp += dist_pop_frac[i];
+                	totq += voting_power[i];
+                	ndx++;
+                }
+                for(int i = 0; i < dp.length; i++) {
+                    dp[i] /= totp;
+                }
+                for(int i = 0; i < dq.length; i++) {
+                    dq[i] /= totq;
+                }
+            	power_fairness = getKLDiv(dp,dq,0.01);
+            	
+            } else {
+            	power_fairness = getKLDiv(dist_pop_frac,voting_power,0.01);
+            }
 /*
             for(int i = 0; i < districts.size(); i++) {
                 power_fairness += dist_pop_frac[i]*voting_power[i];
