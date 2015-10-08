@@ -4888,7 +4888,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxSecondElection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				boolean b = chckbxSecondElection.isSelected();
-				if( b && true) {
+				if( b && false) {
 					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
 					chckbxSecondElection.setSelected(false);
 					return;
