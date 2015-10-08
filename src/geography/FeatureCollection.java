@@ -18,6 +18,7 @@ import com.hexiong.jdbf.DBFReader;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.Demographic;
 import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
@@ -345,12 +346,15 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[b.id];
 					
-					for( int j = 0; j < b.demographics.size() && j < standard_district_colors.length; j++) {
-						int pop = b.demographics.get(j).population;
-						tot[di] += pop;
-						red[di] += standard_district_colors[j].getRed()*pop;
-						green[di] += standard_district_colors[j].getGreen()*pop;
-						blue[di] += standard_district_colors[j].getBlue()*pop;
+					for( int k = 0; k < b.demographics.size(); k++) {
+						Vector<Demographic> dem = b.demographics.get(k);
+						for( int j = 0; j < dem.size() && j < standard_district_colors.length; j++) {
+							int pop = dem.get(j).population;
+							tot[di] += pop;
+							red[di] += standard_district_colors[j].getRed()*pop;
+							green[di] += standard_district_colors[j].getGreen()*pop;
+							blue[di] += standard_district_colors[j].getBlue()*pop;
+						}
 					}
 				}
 				for( int i = 0; i < Settings.num_districts; i++) {

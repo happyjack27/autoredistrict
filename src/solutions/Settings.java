@@ -41,6 +41,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static long annealing_starts_at = 0;
 	public static boolean annealing_has_started = false;
 	public static int members_per_district = 1;
+	public static int num_candidates = 2;
 	public static void resetAnnealing() { annealing_has_started = false; }
 	public static void startAnnealing(long generation) { if( annealing_has_started) { return; } annealing_starts_at = generation; annealing_has_started = true; }
 	

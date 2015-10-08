@@ -88,10 +88,10 @@ public class District extends JSONObject {
 	}
     
     public double[][] getElectionResults() {
-        double[] tot_popular_vote = new double[Candidate.candidates.size()];
-        double[] tot_elected_vote = new double[Candidate.candidates.size()];
-        double[] residual_popular_vote = new double[Candidate.candidates.size()];
-        double[] residual_popular_vote2 = new double[Candidate.candidates.size()];
+        double[] tot_popular_vote = new double[Settings.num_candidates];
+        double[] tot_elected_vote = new double[Settings.num_candidates];
+        double[] residual_popular_vote = new double[Settings.num_candidates];
+        double[] residual_popular_vote2 = new double[Settings.num_candidates];
         if( outcomes == null) {
         	this.generateOutcomes(Settings.num_elections_simulated);
         }
@@ -99,12 +99,12 @@ public class District extends JSONObject {
         double total_pop = 0;
    		//for( int i = 0; i < outcomes.length; i++) {
    	       	try {
-   	            //double[] popular_vote = new double[Candidate.candidates.size()];
+   	            //double[] popular_vote = new double[Settings.num_candidates];
    	    		//int n = (int)Math.floor(Math.random()*(double)outcomes.length);
-   	            //double[] prop_rep = new double[Candidate.candidates.size()];
+   	            //double[] prop_rep = new double[Settings.num_candidates];
    	            double[] district_vote = outcomes[result];
    	            double[] pop_district_vote = pop_balanced_outcomes[result];
-   	            //System.out.println("candidates "+Candidate.candidates.size()+" outcomes: "+district_vote.length);
+   	            //System.out.println("candidates "+Settings.num_candidates+" outcomes: "+district_vote.length);
    	            if( district_vote == null) {
    	            	int i = 0;
    	            	while( district_vote == null && i < 2) {
@@ -195,7 +195,7 @@ public class District extends JSONObject {
     	}
 
         double total = 0;
-        double[] wins  = new double[Candidate.candidates.size()];
+        double[] wins  = new double[Settings.num_candidates];
         for( int i = 0; i < wins.length; i++) {
         	wins[i] = 0;
         }
@@ -320,7 +320,7 @@ public class District extends JSONObject {
     }
     
     public double[] getAnOutcome() {
-        double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] district_vote = new double[Settings.num_candidates]; //inited to 0
         if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
@@ -339,8 +339,8 @@ public class District extends JSONObject {
     }
     public double[][] getAnOutcomePair() {
     	try {
-        double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
-        double[] pop_district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] district_vote = new double[Settings.num_candidates]; //inited to 0
+        double[] pop_district_vote = new double[Settings.num_candidates]; //inited to 0
         if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {
                 district_vote[i] = 0;
@@ -377,7 +377,7 @@ public class District extends JSONObject {
 
 /*
     public double[] getVotes() {
-        double[] district_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] district_vote = new double[Settings.num_candidates]; //inited to 0
         if( wards.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;

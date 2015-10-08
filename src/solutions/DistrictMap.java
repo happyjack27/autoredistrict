@@ -708,8 +708,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double[][] getStandardResult() {
     	//System.out.println("num dists "+districts.size());
     	
-        double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
-        double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
+        double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
         for(District district : districts) {
             double[] district_vote = district.getVotes();
             int winner_num = -1;
@@ -733,8 +733,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double[][] getRandomResultSample() {
     	//System.out.println("num dists "+districts.size());
     	
-        double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
-        double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+        double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
+        double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
         for(District district : districts) {
             double[] district_vote = district.getAnOutcome();
             int winner_num = -1;
@@ -963,8 +963,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time2 = System.currentTimeMillis();
     	long time20 = System.currentTimeMillis();
     	
-        double[] p = new double[Candidate.candidates.size()];
-        double[] q = new double[Candidate.candidates.size()];
+        double[] p = new double[Settings.num_candidates];
+        double[] q = new double[Settings.num_candidates];
         double disproportional_representation = 0;
         double wasted_vote_imbalance = 0;
     	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0) {
@@ -976,9 +976,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( Settings.disenfranchise_weight > 0 || Settings.wasted_votes_total_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
-    		wasted_votes_by_party = new int[Candidate.candidates.size()];
+    		wasted_votes_by_party = new int[Settings.num_candidates];
     	    wasted_votes_by_district = new int[districts.size()];
-    	    wasted_votes_by_district_and_party = new int[districts.size()][Candidate.candidates.size()];
+    	    wasted_votes_by_district_and_party = new int[districts.size()][Settings.num_candidates];
     	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
     	    	wasted_votes_by_party[i] = 0;
     	    }
@@ -992,8 +992,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	    }
  
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
-                double[] popular_vote = new double[Candidate.candidates.size()]; //inited to 0
-                double[] elected_vote = new double[Candidate.candidates.size()]; //inited to 0
+                double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
+                double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
                 double[][] residues = new double[districts.size()][];
                 double[] pops = new double[districts.size()];
                 for(int k = 0; k < districts.size(); k++) {
@@ -1093,7 +1093,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             	}
             	
 
-                for( int j = 0; j < Candidate.candidates.size(); j++) {
+                for( int j = 0; j < Settings.num_candidates; j++) {
                     p[j] += popular_vote[j];
                     q[j] += elected_vote[j];
                 }

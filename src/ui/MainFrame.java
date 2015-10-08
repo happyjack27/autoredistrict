@@ -1348,6 +1348,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderSeatsVotes;
 	public JButton btnSubstituteColumns;
 	public JCheckBox chckbxNewCheckBox;
+	public final JMenu mnWindows = new JMenu("Windows");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2603,7 +2604,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							for( Integer d : panelStats.uncontested) {
 								District.uncontested[d-1] = true;
 							}
-							setSubstituteColumns(project.substitute_columns);
+							setSubstituteColumns();
 							for( int i = 0; i < District.uncontested.length; i++) {
 								District.uncontested[i] = false;
 							}
@@ -2679,7 +2680,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		
-			b.demographics.clear();
+			if( b.demographics.size() < 1) {
+				b.demographics.add(new Vector<Demographic>());
+			} else {
+				b.demographics.get(0).clear();
+			}
 			for( int j = 0; j < num_candidates; j++) {
 				Demographic d = new Demographic();
 				//d.ward_id = b.id;
@@ -2690,33 +2695,60 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				b.demographics.add(d);
+				if( b.demographics.size() < 1) {
+					b.demographics.add(new Vector<Demographic>());
+				}
+
+				b.demographics.get(0).add(d);
 				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
-		Candidate.candidates = new Vector<Candidate>();
-		for( int i = 0; i < num_candidates; i++) {
-			Candidate c = new Candidate();
-			c.index = i;
-			c.id = ""+i;
-			Candidate.candidates.add(c);
-		}
+		Settings.num_candidates = num_candidates;
 		featureCollection.ecology.reset();
 		election_loaded = true;
 		
 		setEnableds();	
 	}
 	
-	public void setSubstituteColumns(Vector<String> candidate_cols) {
+	public void setSubstituteColumns() {
 		try {
 		// TODO Auto-generated method stub
-		int num_candidates = candidate_cols.size();
+		int num_candidates = project.substitute_columns.size();
 		
 		for( VTD b : featureCollection.vtds) {
 			b.has_election_results = true;
 		}
 		DistrictMap dm = featureCollection.ecology.population.get(0);
+		
+		double[] total_origs = new double[num_candidates];
+		double[] total_substs = new double[num_candidates];
+		for( int i = 0; i < num_candidates; i++) {
+			total_origs[i] = 1;
+		}
+		for( int i = 0; i < num_candidates; i++) {
+			total_substs[i] = 1;
+		}
+		
+		for( int id = 0; id < featureCollection.features.size(); id++) {
+			Feature f = featureCollection.features.get(id);
+			if( District.uncontested[dm.vtd_districts[id]]) {
+				continue;
+			}
+			for( int i = 0; i < project.substitute_columns.size(); i++) {
+				try {
+					total_origs[i] += Double.parseDouble(f.properties.get(project.demographic_columns.get(i)).toString().replaceAll(",",""));
+				} catch (Exception ex) {
+				}
+				try {
+					total_substs[i] += Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
+				} catch (Exception ex) {
+				}
+			}
+		}	
+		for( int i = 0; i < num_candidates; i++) {
+			total_origs[i] /= total_substs[i];
+		}
 		
 		for( int id = 0; id < featureCollection.features.size(); id++) {
 			Feature f = featureCollection.features.get(id);
@@ -2727,17 +2759,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			b.resetOutcomes();
 			double[] dd = new double[num_candidates];
-			for( int i = 0; i < candidate_cols.size(); i++) {
+			for( int i = 0; i < project.substitute_columns.size(); i++) {
 				try {
-					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+					dd[i] = total_origs[i]*Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
 				} catch (Exception ex) {
 					
 					dd[i] = 0;
-					f.properties.put(candidate_cols.get(i),"0");
+					f.properties.put(project.substitute_columns.get(i),"0");
 				}
 			}
 		
-			b.demographics.clear();
+			if( b.demographics.size() < 1) {
+				b.demographics.add(new Vector<Demographic>());
+			} else {
+				b.demographics.get(0).clear();
+			}
 			for( int j = 0; j < num_candidates; j++) {
 				Demographic d = new Demographic();
 				//d.ward_id = b.id;
@@ -2748,18 +2784,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				b.demographics.add(d);
+				if( b.demographics.size() < 1) {
+					b.demographics.add(new Vector<Demographic>());
+				}
+				b.demographics.get(0).add(d);
 				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
-		Candidate.candidates = new Vector<Candidate>();
-		for( int i = 0; i < num_candidates; i++) {
-			Candidate c = new Candidate();
-			c.index = i;
-			c.id = ""+i;
-			Candidate.candidates.add(c);
-		}
+		Settings.num_candidates = num_candidates;
 		featureCollection.ecology.reset();
 		election_loaded = true;
 		
@@ -3088,18 +3121,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						d.vote_prob[i] = 0;
 					}
 					d.vote_prob[j] = 1;
-					b.demographics.add(d);
+					if( b.demographics.size() < 1) {
+						b.demographics.add(new Vector<Demographic>());
+					}
+					b.demographics.get(0).add(d);
 					System.out.println("ward "+b.id+" added demo "+d.population+" "+j);
 				}
 			}
-			
-			Candidate.candidates = new Vector<Candidate>();
-			for( int i = 0; i < num_candidates; i++) {
-				Candidate c = new Candidate();
-				c.index = i;
-				c.id = ""+i;
-				Candidate.candidates.add(c);
-			}
+			Settings.num_candidates = num_candidates;
 			featureCollection.ecology.reset();
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
@@ -3110,7 +3139,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mapPanel.repaint();
 		election_loaded = true;
 		setEnableds();
-		
 	}
 	
 	public void initFeatures() {
@@ -3830,7 +3858,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnConstraints.add(mntmWholeCounties);
 		
-		JMenu mnView = new JMenu("View");
+		JMenu mnView = new JMenu("Map");
 		menuBar.add(mnView);
 		chckbxmntmFlipVertical.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -3970,18 +3998,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnView.add(mntmZoomIn);
 		
-		
-		mntmShowData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				String[] headers = featureCollection.getHeaders();
-				String[][] data = featureCollection.getData(headers);
-
-				df.setTableSource(new DataAndHeader(data,headers));
-				df.setTitle("Map Data");
-				df.show();//new DialogShowProperties(featureCollection).show();
-			}
-		});
-		
 		//mnView.add(separator_3);
 		mntmAntialiasingOff.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -4044,26 +4060,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(mntmFourMaps);
-
-		mnView.add(new JSeparator());
-
-		mnView.add(mntmShowStats);
-		mnView.add(mntmShowGraph);
-		mnView.add(mntmShowData);
-		mntmShowSeats.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				frameSeatsVotesChart.show();
-			}
-		});
-		
-		mnView.add(mntmShowSeats);
-		mntmShowRankedDistricts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frameRankedDist.show();
-			}
-		});
-		
-		mnView.add(mntmShowRankedDistricts);
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
@@ -4156,24 +4152,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					ex.printStackTrace();
 					return;
 				}
-			}
-		});
-		
-		mntmShowStats.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					frameStats.show();
-					frameStats.invalidate();
-					frameStats.repaint();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-					
-				}
-			}
-		});
-		mntmShowGraph.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frameGraph.show();
 			}
 		});
 		
@@ -4307,6 +4285,56 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnHelp.add(mntmWebsite);
 		mnHelp.add(mntmSourceCode);
 		mnHelp.add(mntmLicense);
+		
+		menuBar.add(mnWindows);
+		mnWindows.add(mntmShowStats);
+		mnWindows.add(mntmShowGraph);
+		mnWindows.add(mntmShowData);
+		
+				JSeparator separator_8 = new JSeparator();
+				mnWindows.add(separator_8);
+		mnWindows.add(mntmShowSeats);
+		mnWindows.add(mntmShowRankedDistricts);
+		mntmShowRankedDistricts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frameRankedDist.show();
+			}
+		});
+		mntmShowSeats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frameSeatsVotesChart.show();
+			}
+		});
+		
+		
+		mntmShowData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String[] headers = featureCollection.getHeaders();
+				String[][] data = featureCollection.getData(headers);
+
+				df.setTableSource(new DataAndHeader(data,headers));
+				df.setTitle("Map Data");
+				df.show();//new DialogShowProperties(featureCollection).show();
+			}
+		});
+		mntmShowGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				frameGraph.show();
+			}
+		});
+		
+		mntmShowStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					frameStats.show();
+					frameStats.invalidate();
+					frameStats.repaint();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					
+				}
+			}
+		});
 		menuBar.add(Box.createHorizontalGlue());
 		mnHelp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); 
 		menuBar.add(mnHelp);

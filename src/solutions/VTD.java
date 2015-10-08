@@ -17,8 +17,8 @@ public class VTD extends ReflectionJSONObject<VTD> {
     public Vector<VTD> neighbors = new Vector<VTD>();
     public double[] neighbor_lengths;
     public double unpaired_edge_length = 0;
-    public Vector<Demographic> demographics = new Vector<Demographic>();
-    private double[][] mu_sigma_n = null;
+    public Vector<Vector<Demographic>> demographics = new Vector<Vector<Demographic>>();
+    //private double[][] mu_sigma_n = null;
     
     public boolean has_census_results = false;
     public boolean has_election_results = false;
@@ -27,10 +27,10 @@ public class VTD extends ReflectionJSONObject<VTD> {
     public void resetOutcomes() {
     	outcomes = null;    	
     }
-    
+    /*
     public void recalcMuSigmaN() {
     	try {
-   		double[] successes = new double[Candidate.candidates.size()];
+   		double[] successes = new double[Settings.num_candidates];
 		double total = 0;
         for( Demographic d : demographics) {
             for( int j = 0; j < d.vote_prob.length; j++) {
@@ -40,7 +40,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
             	successes[j] += n;
             }
         }
-        mu_sigma_n = new double[Candidate.candidates.size()][];
+        mu_sigma_n = new double[Settings.num_candidates][];
         for( int j = 0; j < successes.length; j++) {
         	double n = total;
         	double p = successes[j] / total;
@@ -62,7 +62,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
     	}
     	return mu_sigma_n;
     }
-    
+    */
     
 	double[][] outcomes;
 
@@ -164,34 +164,35 @@ public class VTD extends ReflectionJSONObject<VTD> {
     
     public void generateOutComes() {
     	outcomes = new double[Settings.num_ward_outcomes][];
-    	
-        //aggregate and normalize voting probs
-    	double[] probs = new double[Candidate.candidates.size()];
-        for(int i = 0; i < probs.length; i++) {
-        	probs[i] = 0;
-        }
-        for( Demographic d : demographics) {
-            for( int j = 0; j < d.vote_prob.length; j++) {
-            	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
+    	for( int out = 0; out < outcomes.length; out++) {
+    		outcomes[out] = new double[Settings.num_candidates];
+    	    
+    		//aggregate and normalize voting probs
+        	double[] probs = new double[Settings.num_candidates];
+            for(int i = 0; i < probs.length; i++) {
+            	probs[i] = 0;
             }
-        }
-        double total_population = 0;
-        for(int i = 0; i < probs.length; i++) {
-        	total_population += probs[i];
-        }
-        double r_tot_prob  = 1.0/total_population;
-        for(int i = 0; i < probs.length; i++) {
-        	probs[i] *= r_tot_prob;
-        }
+            int elec = (int)(Math.random()*(double)demographics.size());
+            for( Demographic d : demographics.get(elec)) {
+                for( int j = 0; j < d.vote_prob.length; j++) {
+                	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
+                }
+            }
+            double total_population = 0;
+            for(int i = 0; i < probs.length; i++) {
+            	total_population += probs[i];
+            }
+            double r_tot_prob  = 1.0/total_population;
+            for(int i = 0; i < probs.length; i++) {
+            	probs[i] *= r_tot_prob;
+            }
 
-    	for( int i = 0; i < outcomes.length; i++) {
-    		outcomes[i] = new double[probs.length];
             for(int j = 0; j < total_population; j++) {
                 double p = Math.random();
                 for( int k = 0; k < probs.length; k++) {
                     p -=  probs[k];
                     if( p <= 0) {
-                    	outcomes[i][k]++;
+                    	outcomes[out][k]++;
                         break;
                     }
                 }

@@ -10,6 +10,7 @@ import com.hexiong.jdbf.JDBField;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.Demographic;
 import solutions.Settings;
 import solutions.VTD;
 
@@ -310,12 +311,15 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				for( int i = 0; i < vtd.demographics.size() && i < colors.length; i++) {
-					int pop = vtd.demographics.get(i).population;
-					tot += pop;
-					red += colors[i].getRed()*pop;
-					green += colors[i].getGreen()*pop;
-					blue += colors[i].getBlue()*pop;
+				for( int k = 0; k < vtd.demographics.size(); k++) {
+					Vector<Demographic> dem = vtd.demographics.get(k);
+					for( int i = 0; i < dem.size() && i < colors.length; i++) {
+						int pop = dem.get(i).population;
+						tot += pop;
+						red += colors[i].getRed()*pop;
+						green += colors[i].getGreen()*pop;
+						blue += colors[i].getBlue()*pop;
+					}
 				}
 				red /= tot;
 				green /= tot;

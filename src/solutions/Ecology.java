@@ -262,7 +262,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 		//stuff
 		if( containsKey("candidates")) {
-			Candidate.candidates = getVector("candidates");
+			//Candidate.candidates = getVector("candidates");
 		}
 		
 		if( containsKey("settings")) { settings = (Settings)get("settings"); }
@@ -274,7 +274,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		put("edges",edges);
 		put("vertexes",vertexes);
 		
-		put("candidates",Candidate.candidates);
+		//put("candidates",Candidate.candidates);
 	}
 
 	@Override
@@ -290,7 +290,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 		}
 		
 		if( key.equals("candidates")) {
-			return new Candidate();
+			//return new Candidate();
 		}
 		if( key.equals("settings")) {
 			return new Settings();
@@ -307,7 +307,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	history = new Vector<double[]>();
     	normalized_history = new Vector<double[]>();
     	for( VTD b : wards) {
-    		b.recalcMuSigmaN();
+    		//b.recalcMuSigmaN();
     	}
         for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
         	fairnessScoreEmaMeans[i] = 0;

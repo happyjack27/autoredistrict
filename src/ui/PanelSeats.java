@@ -33,8 +33,8 @@ public class PanelSeats extends JPanel {
 	        	return;
 	        }
 	        DistrictMap dm = mapPanel.featureCollection.ecology.population.get(0);
-	        double[] votes = new double[Candidate.candidates.size()];
-	        double[] seats = new double[Candidate.candidates.size()];
+	        double[] votes = new double[Settings.num_candidates];
+	        double[] seats = new double[Settings.num_candidates];
 	        double tot_votes = 0;
 	        double tot_seats = 0;
 	        for( District d : dm.districts) {

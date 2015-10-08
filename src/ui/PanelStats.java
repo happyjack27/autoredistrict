@@ -154,7 +154,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_1 = 0;
 			
 			//=== by district
-			String[] dcolumns = new String[9+Candidate.candidates.size()*2];
+			String[] dcolumns = new String[9+Settings.num_candidates*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			if( dmcolors == null || dmcolors.length != dm.districts.size()) {
 				dmcolors = new Color[dm.districts.size()];
@@ -171,16 +171,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
-			String[][] cdata = new String[Candidate.candidates.size()][];
+			String[][] cdata = new String[Settings.num_candidates][];
 			
-			double[] elec_counts = new double[Candidate.candidates.size()];
-			double[] vote_counts = new double[Candidate.candidates.size()];
+			double[] elec_counts = new double[Settings.num_candidates];
+			double[] vote_counts = new double[Settings.num_candidates];
 			double tot_votes = 0;
-			for( int i = 0; i < Candidate.candidates.size(); i++) {
+			for( int i = 0; i < Settings.num_candidates; i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
 				dcolumns[i+9] = ""+i+" vote %";
-				dcolumns[i+9+Candidate.candidates.size()] = ""+i+" votes";
+				dcolumns[i+9+Settings.num_candidates] = ""+i+" votes";
 			}
 			
 			double total_population = 0;
@@ -275,7 +275,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					ddata[i][j+9] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+9+Candidate.candidates.size()] = ""+integer.format(result[0][j]);
+					ddata[i][j+9+Settings.num_candidates] = ""+integer.format(result[0][j]);
 				}	
 				} catch (Exception ex) {
 					System.out.println("ex stats 1 "+ex);
@@ -317,7 +317,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 
 			//=== by party
-			for( int i = 0; i < Candidate.candidates.size(); i++) {
+			for( int i = 0; i < Settings.num_candidates; i++) {
 				cdata[i] = new String[]{
 						""+cands.get(i),
 						""+integer.format(elec_counts[i]),
