@@ -1,5 +1,6 @@
 package ui;
 
+import geography.Feature;
 import geography.FeatureCollection;
 
 import javax.swing.*;
@@ -20,7 +21,6 @@ import java.awt.event.ActionEvent;
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
-	public static Vector<Integer> uncontested = new Vector<Integer>();
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -56,8 +56,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		});
 		
 	}
-
-
+	
 	public void getStats() {
 		Vector<Double> ranked_dists = new Vector<Double>();
 
@@ -143,7 +142,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			System.out.println("ex ad "+ex);
 			ex.printStackTrace();
 		}
-
+		
 		
 		try {
 			double total_pvi = 0;
@@ -185,7 +184,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			double total_population = 0;
 	
-			Vector<Integer> uncontested_swap = new Vector<Integer>();
 			for( int i = 0; i < dm.districts.size(); i++) {
 				try {
 				dmcolors[i] = dm.getWastedVoteColor(i);
@@ -204,7 +202,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				boolean is_uncontested = false;
 				if( result[0].length >= 2) {
 					double sum = result[0][0] + result[0][1];
-					if( (result[0][0] < sum*0.02 || result[0][1] < sum*0.02)) { //less than 2% of the vote is uncontested.
+					if( (result[0][0] < sum*Settings.uncontested_threshold || result[0][1] < sum*Settings.uncontested_threshold )) {
 						is_uncontested = true;
 					}
 				}
@@ -250,7 +248,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						pviw = (result[0][0] >= needed ? "D" : "R")+"+"+integer.format((int)Math.round(pvi));
 					} else {
 						pviw = "uncontested";
-						uncontested_swap.add(new Integer(i+1));
 						if( !Settings.ignore_uncontested) {
 							ranked_dists.add(pvi*(result[0][0] >= needed ? -1 : +1));
 						}
@@ -282,7 +279,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					ex.printStackTrace();
 				}
 			}
-			uncontested = uncontested_swap;
 			
 			//=== summary
 			int wasted_votes = 0;

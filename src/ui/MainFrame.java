@@ -153,7 +153,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton stopButton = new JButton();
 	public JMenuItem mntmOpenProjectFile_1;
 	public JPanel panel_4;
-	public JButton btnNewButton;
+	public JButton btnElectionColumns;
 	public JMenuItem mntmImportCensusData;
 	public JMenuItem mntmExportToBlock;
 	public final JSeparator separator_1 = new JSeparator();
@@ -1347,8 +1347,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JLabel lblSeatsVotes;
 	public JSlider sliderSeatsVotes;
 	public JButton btnSubstituteColumns;
-	public JCheckBox chckbxNewCheckBox;
+	public JCheckBox chckbxSubstituteColumns;
 	public final JMenu mnWindows = new JMenu("Windows");
+	public final JButton btnElection2Columns = new JButton("Election 2 columns");
+	public final JCheckBox chckbxSecondElection = new JCheckBox("Second election");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2594,20 +2596,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.ignore_uncontested = false;
 				featureCollection.ecology.population.get(0).calcFairnessScores();
 				panelStats.getStats();
-				District.uncontested = new boolean[Settings.num_districts];
-				for( int i = 0; i < District.uncontested.length; i++) {
-					District.uncontested[i] = false;
-				}
-				if( panelStats.uncontested.size() > 0) {
+				featureCollection.findUncontested();
+				panelStats.getStats();
+				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0) {
+					System.out.println("uncontested found!");
 					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
 						try {
-							for( Integer d : panelStats.uncontested) {
-								District.uncontested[d-1] = true;
-							}
+							System.out.println("setting substitutes");
 							setSubstituteColumns();
-							for( int i = 0; i < District.uncontested.length; i++) {
-								District.uncontested[i] = false;
-							}
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
@@ -2623,8 +2619,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
 						if( opt == JOptionPane.YES_OPTION) {
 							Settings.ignore_uncontested = true;
-							for( Integer d : panelStats.uncontested) {
-								District.uncontested[d-1] = true;
+							for( Integer d : FeatureCollection.vuncontested1) {
+								//District.uncontested[d-1] = true;
 								String key = district+","+d;
 								if( !manageLocks.locks.contains(key)) {
 									manageLocks.locks.add(key);
@@ -2659,10 +2655,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
 		}
 	}
-	public void setDemographicColumns(Vector<String> candidate_cols) {
-		int num_candidates = candidate_cols.size();
+	public void setDemographicColumns() {
+		int num_candidates = project.demographic_columns.size();
 		
 		for( VTD b : featureCollection.vtds) {
+			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
@@ -2670,13 +2667,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			VTD b = f.vtd;
 			b.resetOutcomes();
 			double[] dd = new double[num_candidates];
-			for( int i = 0; i < candidate_cols.size(); i++) {
+			for( int i = 0; i < project.demographic_columns.size(); i++) {
 				try {
-					dd[i] = Double.parseDouble(f.properties.get(candidate_cols.get(i)).toString().replaceAll(",",""));
+					dd[i] = Double.parseDouble(f.properties.get(project.demographic_columns.get(i)).toString().replaceAll(",",""));
 				} catch (Exception ex) {
 					
 					dd[i] = 0;
-					f.properties.put(candidate_cols.get(i),"0");
+					f.properties.put(project.demographic_columns.get(i),"0");
 				}
 			}
 		
@@ -2711,95 +2708,154 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setEnableds();	
 	}
 	
-	public void setSubstituteColumns() {
-		try {
-		// TODO Auto-generated method stub
-		int num_candidates = project.substitute_columns.size();
+	public void setDemographicColumns2() {
+		if( chckbxSubstituteColumns.isSelected()) {
+			chckbxSubstituteColumns.doClick();
+		}
 		
 		for( VTD b : featureCollection.vtds) {
+			b.resetOutcomes();
 			b.has_election_results = true;
 		}
-		DistrictMap dm = featureCollection.ecology.population.get(0);
 		
-		double[] total_origs = new double[num_candidates];
-		double[] total_substs = new double[num_candidates];
-		for( int i = 0; i < num_candidates; i++) {
-			total_origs[i] = 1;
-		}
-		for( int i = 0; i < num_candidates; i++) {
-			total_substs[i] = 1;
-		}
-		
-		for( int id = 0; id < featureCollection.features.size(); id++) {
-			Feature f = featureCollection.features.get(id);
-			if( District.uncontested[dm.vtd_districts[id]]) {
-				continue;
-			}
-			for( int i = 0; i < project.substitute_columns.size(); i++) {
-				try {
-					total_origs[i] += Double.parseDouble(f.properties.get(project.demographic_columns.get(i)).toString().replaceAll(",",""));
-				} catch (Exception ex) {
-				}
-				try {
-					total_substs[i] += Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
-				} catch (Exception ex) {
-				}
-			}
-		}	
-		for( int i = 0; i < num_candidates; i++) {
-			total_origs[i] /= total_substs[i];
-		}
-		
-		for( int id = 0; id < featureCollection.features.size(); id++) {
-			Feature f = featureCollection.features.get(id);
+		for( Feature f : featureCollection.features) {
 			VTD b = f.vtd;
-			if( !District.uncontested[dm.vtd_districts[id]]) {
-				continue;
-			}
-			
 			b.resetOutcomes();
-			double[] dd = new double[num_candidates];
-			for( int i = 0; i < project.substitute_columns.size(); i++) {
+			double[] dd = new double[Settings.num_candidates];
+			for( int i = 0; i < project.demographic_columns_2.size(); i++) {
 				try {
-					dd[i] = total_origs[i]*Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
+					dd[i] = Double.parseDouble(f.properties.get(project.demographic_columns_2.get(i)).toString().replaceAll(",",""));
 				} catch (Exception ex) {
 					
 					dd[i] = 0;
-					f.properties.put(project.substitute_columns.get(i),"0");
+					f.properties.put(project.demographic_columns_2.get(i),"0");
 				}
 			}
 		
-			if( b.demographics.size() < 1) {
+			while( b.demographics.size() < 2) {
 				b.demographics.add(new Vector<Demographic>());
-			} else {
-				b.demographics.get(0).clear();
 			}
-			for( int j = 0; j < num_candidates; j++) {
+			b.demographics.get(1).clear();
+			
+			for( int j = 0; j < Settings.num_candidates; j++) {
 				Demographic d = new Demographic();
 				//d.ward_id = b.id;
 				d.turnout_probability = 1;
 				d.population = (int) dd[j];
-				d.vote_prob = new double[num_candidates];
+				d.vote_prob = new double[Settings.num_candidates];
 				for( int i = 0; i < d.vote_prob.length; i++) {
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				if( b.demographics.size() < 1) {
+				while( b.demographics.size() < 2) {
 					b.demographics.add(new Vector<Demographic>());
 				}
-				b.demographics.get(0).add(d);
+
+				b.demographics.get(1).add(d);
 				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
-		Settings.num_candidates = num_candidates;
 		featureCollection.ecology.reset();
 		election_loaded = true;
 		
 		setEnableds();	
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	}
+
+	
+	public void setSubstituteColumns() {
+		int max = chckbxSecondElection.isSelected() ? 2 : 1;
+		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2};
+		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.demographic_columns, project.demographic_columns_2};
+		
+		for( VTD b : featureCollection.vtds) {
+			b.resetOutcomes();
+			b.has_election_results = true;
 		}
+		for( int idem = 0; idem < max; idem++) {
+			try {
+				// TODO Auto-generated method stub
+				DistrictMap dm = featureCollection.ecology.population.get(0);
+				
+				double[] total_origs = new double[Settings.num_candidates];
+				double[] total_substs = new double[Settings.num_candidates];
+				for( int i = 0; i < Settings.num_candidates; i++) {
+					total_origs[i] = 1;
+				}
+				for( int i = 0; i < Settings.num_candidates; i++) {
+					total_substs[i] = 1;
+				}
+				
+				for( int id = 0; id < featureCollection.features.size(); id++) {
+					Feature f = featureCollection.features.get(id);
+					if( buncontested[idem][dm.vtd_districts[id]]) {
+						continue;
+					}
+					for( int i = 0; i < project.substitute_columns.size(); i++) {
+						try {
+							total_origs[i] += Double.parseDouble(f.properties.get(dems[idem].get(i)).toString().replaceAll(",",""));
+						} catch (Exception ex) {
+						}
+						try {
+							total_substs[i] += Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
+						} catch (Exception ex) {
+						}
+					}
+				}	
+				for( int i = 0; i < Settings.num_candidates; i++) {
+					total_origs[i] /= total_substs[i];
+				}
+				
+				for( int id = 0; id < featureCollection.features.size(); id++) {
+					Feature f = featureCollection.features.get(id);
+					VTD b = f.vtd;
+					if( !buncontested[idem][dm.vtd_districts[id]]) {
+						continue;
+					}
+					
+					b.resetOutcomes();
+					double[] dd = new double[Settings.num_candidates];
+					for( int i = 0; i < project.substitute_columns.size(); i++) {
+						try {
+							dd[i] = total_origs[i]*Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
+						} catch (Exception ex) {
+							
+							dd[i] = 0;
+							f.properties.put(project.substitute_columns.get(i),"0");
+						}
+					}
+				
+					while( b.demographics.size() <= idem) {
+						b.demographics.add(new Vector<Demographic>());
+					}
+					b.demographics.get(idem).clear();
+					
+					for( int j = 0; j < Settings.num_candidates; j++) {
+						Demographic d = new Demographic();
+						//d.ward_id = b.id;
+						d.turnout_probability = 1;
+						d.population = (int) dd[j];
+						d.vote_prob = new double[Settings.num_candidates];
+						for( int i = 0; i < d.vote_prob.length; i++) {
+							d.vote_prob[i] = 0;
+						}
+						d.vote_prob[j] = 1;
+						if( b.demographics.size() < 1) {
+							b.demographics.add(new Vector<Demographic>());
+						}
+						b.demographics.get(idem).add(d);
+						System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		featureCollection.ecology.reset();
+		election_loaded = true;
+		
+		setEnableds();	
 		
 	}
 	
@@ -2818,7 +2874,42 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		try {
 			project.demographic_columns = dlg.in;
-			setDemographicColumns(dlg.in);
+			setDemographicColumns();
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+		//mntmShowDemographics.setSelected(true);
+		//Feature.display_mode = 1;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		
+		if( is_evolving) { featureCollection.ecology.startEvolving(); }
+	}
+	public void selectLayers2() {
+		boolean is_evolving = this.evolving;
+		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
+		setDistrictColumn(project.district_column);
+		//featureCollection.loadDistrictsFromProperties(project.district_column);
+		DialogSelectLayers dlg = new DialogSelectLayers();
+		dlg.setData(featureCollection,project.demographic_columns_2);
+		dlg.show();
+		if( !dlg.ok) {
+			if( is_evolving) { featureCollection.ecology.startEvolving(); }
+			return;
+		}
+		
+
+		try {
+			project.demographic_columns_2 = dlg.in;
+			if( project.demographic_columns_2.size() != project.demographic_columns.size()) {
+				JOptionPane.showMessageDialog(mainframe, "Election columns and second election columns must match one-to-one.");
+				chckbxSecondElection.doClick();//.setSelected(false);
+				//remove from demographics
+			} else {
+				//set as demographics
+				setDemographicColumns2();
+			}
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
@@ -3494,7 +3585,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				hushcomboBoxPopulation = false;
 				comboBoxPopulation.setSelectedItem(project.population_column);
 				
-				setDemographicColumns(project.demographic_columns);
+				setDemographicColumns();
 
 				hushcomboBoxDistrict = true;
 				comboBoxDistrictColumn.setSelectedItem("");
@@ -4625,7 +4716,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(8, 325, 182, 16);
+		lblDistrictColumn.setBounds(6, 360, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -4635,7 +4726,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(8, 344, 178, 20);
+		comboBoxDistrictColumn.setBounds(6, 379, 178, 20);
 		panel.add(comboBoxDistrictColumn);
 		
 		panel_4 = new JPanel();
@@ -4698,14 +4789,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderSeatsVotes.setBounds(10, 304, 180, 29);
 		panel_4.add(sliderSeatsVotes);
 		
-		btnNewButton = new JButton("Election columns");
-		btnNewButton.addActionListener(new ActionListener() {
+		btnElectionColumns = new JButton("Election columns");
+		btnElectionColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				selectLayers();
 			}
 		});
-		btnNewButton.setBounds(6, 196, 184, 23);
-		panel.add(btnNewButton);
+		btnElectionColumns.setBounds(6, 196, 184, 23);
+		panel.add(btnElectionColumns);
 		
 		lblGeometricFairness = new JLabel("Geometric <===> Fairness");
 		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
@@ -4747,7 +4838,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				if( project.substitute_columns.size() != project.demographic_columns.size()) {
 					JOptionPane.showMessageDialog(mainframe, "Election columns and substitute columns must match one-to-one.");
-					chckbxNewCheckBox.doClick();//.setSelected(false);
+					chckbxSubstituteColumns.doClick();//.setSelected(false);
 				}
 				//mntmShowDemographics.setSelected(true);
 				//Feature.display_mode = 1;
@@ -4759,27 +4850,64 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		});
 		btnSubstituteColumns.setEnabled(false);
-		btnSubstituteColumns.setBounds(6, 291, 184, 23);
+		btnSubstituteColumns.setBounds(4, 326, 184, 23);
 		panel.add(btnSubstituteColumns);
 		
-		chckbxNewCheckBox = new JCheckBox("Substitute uncontested");
-		chckbxNewCheckBox.addActionListener(new ActionListener() {
+		chckbxSubstituteColumns = new JCheckBox("Substitute uncontested");
+		chckbxSubstituteColumns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				boolean b = chckbxNewCheckBox.isSelected();
+				boolean b = chckbxSubstituteColumns.isSelected();
 				if( b && false) {
 					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
-					chckbxNewCheckBox.setSelected(false);
+					chckbxSubstituteColumns.setSelected(false);
 					return;
 				}
 				btnSubstituteColumns.setEnabled(b);
 				Settings.substitute_uncontested = b;
 				if( b) {
-					btnSubstituteColumns.doClick();
+					if( project.demographic_columns == null || project.demographic_columns.size() < 1) {
+						JOptionPane.showMessageDialog(mainframe, "Must select election columns first.");
+						chckbxSubstituteColumns.doClick();
+					} else {
+						btnSubstituteColumns.doClick();
+					}
 				}
 			}
 		});
-		chckbxNewCheckBox.setBounds(6, 261, 178, 23);
-		panel.add(chckbxNewCheckBox);
+		chckbxSubstituteColumns.setBounds(4, 296, 178, 23);
+		panel.add(chckbxSubstituteColumns);
+		btnElection2Columns.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectLayers2();
+			}
+		});
+		btnElection2Columns.setEnabled(false);
+		btnElection2Columns.setBounds(7, 261, 184, 23);
+		
+		panel.add(btnElection2Columns);
+		chckbxSecondElection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean b = chckbxSecondElection.isSelected();
+				if( b && true) {
+					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
+					chckbxSecondElection.setSelected(false);
+					return;
+				}
+				btnElection2Columns.setEnabled(b);
+				//Settings.substitute_uncontested = b;
+				if( b) {
+					if( project.demographic_columns == null || project.demographic_columns.size() < 1) {
+						JOptionPane.showMessageDialog(mainframe, "Must select election columns first.");
+						chckbxSecondElection.doClick();
+					} else {
+						btnElection2Columns.doClick();
+					}
+				}
+			}
+		});
+		chckbxSecondElection.setBounds(6, 229, 178, 23);
+		
+		panel.add(chckbxSecondElection);
 		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {

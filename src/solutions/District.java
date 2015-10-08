@@ -1,4 +1,6 @@
 package solutions;
+import geography.FeatureCollection;
+
 import java.util.*;
 
 import serialization.JSONObject;
@@ -6,7 +8,6 @@ import serialization.JSONObject;
 public class District extends JSONObject {
     Vector<VTD> wards = new Vector<VTD>();
     
-    public static boolean[] uncontested = new boolean[0];
     public static int id = -1;
     
     double[][] outcomes;
@@ -148,7 +149,7 @@ public class District extends JSONObject {
         	tot_popular_vote[j] /= (double)outcomes.length;
         	residual_popular_vote[j] /= (double)outcomes.length;
         }*/
-   	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && District.uncontested.length > id && id >= 0 && District.uncontested[id]) {//(tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
+   	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && FeatureCollection.buncontested1.length > id && id >= 0 && FeatureCollection.buncontested1[id]) {//(tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
    	    	for( int i = 0; i < tot_popular_vote.length; i++) {
    	    		tot_popular_vote[i] = 0;
    	    	}

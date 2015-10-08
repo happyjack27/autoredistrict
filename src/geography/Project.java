@@ -128,8 +128,18 @@ public class Project extends ReflectionJSONObject<Project> {
 			for( int i = 0; i < v.size(); i++) {
 				vs.add((String)v.get(i));
 			}
-			MainFrame.mainframe.setDemographicColumns(vs);
+			MainFrame.mainframe.setDemographicColumns();
 		} else { System.out.println("demographic_columns not found"); }
+		
+		if( containsKey("demographic_columns_2")) {
+			Vector v = getVector("demographic_columns_2");
+			demographic_columns_2 = v;
+			Vector<String> vs = new Vector<String>();
+			for( int i = 0; i < v.size(); i++) {
+				vs.add((String)v.get(i));
+			}
+			MainFrame.mainframe.setDemographicColumns2();
+		}
 
 		if( containsKey("disconnected_weight")) {
 			MainFrame.mainframe.sliderDisconnected.setValue((int)(100.0*Double.parseDouble(getString("disconnected_weight").trim())));

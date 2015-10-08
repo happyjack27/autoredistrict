@@ -16,6 +16,11 @@ import solutions.StaticFunctions;
 
  */
 /*
+ * 
+ * TODO: make substitute columsn work with second eleciotn by haivng uncontested look at raw demographics, na dDistrict.uncontested by a vector matching demographcis
+ * 
+ * TODO: make reset al stuff on load.
+ * 
  * TODO: add PVI ranked by district chart
  * 
  * TODO: add calculate seat-vote curve (graph)

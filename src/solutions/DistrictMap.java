@@ -313,7 +313,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 						District dto = this.districts.get(vtd_districts[b.id]); //going to
 						
 				    	//don't mutate to uncontested
-						if( District.uncontested.length > vtd_districts[b.id] && District.uncontested[vtd_districts[b.id]] ) {
+						if( Settings.ignore_uncontested && FeatureCollection.buncontested1.length > vtd_districts[b.id] && FeatureCollection.buncontested1[vtd_districts[b.id]] ) {
 				    		continue;
 				    	}
 						
@@ -850,7 +850,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			double totseats = 0;
 			for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
 				//if uncontested, ignore.
-				if( District.uncontested != null && District.uncontested.length > i && District.uncontested[i] && Settings.ignore_uncontested) {
+				if( FeatureCollection.buncontested1 != null && FeatureCollection.buncontested1.length > i && FeatureCollection.buncontested1[i] && Settings.ignore_uncontested) {
 					continue;
 				}
 				totseats++;
@@ -1150,10 +1150,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for(int i = 0; i < dist_pops.length; i++) {
                 voting_power[i] /= total_voting_power;
             }
-            if( Settings.ignore_uncontested && District.uncontested != null) {
+            if( Settings.ignore_uncontested && FeatureCollection.buncontested1 != null) {
                 int num_uncontested = 0;
-                for( int i = 0; i < District.uncontested.length; i++) {
-                	num_uncontested += District.uncontested[i] ? 1 : 0;
+                for( int i = 0; i < FeatureCollection.buncontested1.length; i++) {
+                	num_uncontested += FeatureCollection.buncontested1[i] ? 1 : 0;
                 }
                 	
             	double[] dq = new double[dist_pop_frac.length-num_uncontested];
@@ -1162,7 +1162,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             	double totp = 0;
             	double totq = 0;
                 for( int i = 0; i < dist_pop_frac.length; i++) {
-                	if(  District.uncontested.length > i &&  District.uncontested[i]) {
+                	if(  FeatureCollection.buncontested1.length > i &&  FeatureCollection.buncontested1[i]) {
                 		continue;
                 	}
                 	dq[ndx] = dist_pop_frac[i];
