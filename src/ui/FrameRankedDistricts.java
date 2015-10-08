@@ -61,7 +61,7 @@ public class FrameRankedDistricts extends JFrame {
 				double inc = 200.0/(double)seats_votes.size();
 				double y = 0;
 
-			    for( int i = 0; i < seats_votes.size(); i++) {
+			    for( int i = seats_votes.size()-1; i >= 0; i--) {
 			    	double[] dd = seats_votes.get(i);
 			    	int w = (int)(dd[0]*100);
 			    	int x = 100;
