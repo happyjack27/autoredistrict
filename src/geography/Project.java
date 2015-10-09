@@ -157,7 +157,7 @@ public class Project extends ReflectionJSONObject<Project> {
 			MainFrame.mainframe.sliderWastedVotesTotal.setValue((int)(100.0*Double.parseDouble(getString("wasted_votes_total_weight").trim())));
 		}
 		if( containsKey("wasted_votes_imbalance_weight")) {
-			MainFrame.mainframe.sliderWastedVotesImbalance.setValue((int)(100.0*Double.parseDouble(getString("wasted_votes_imbalance_weight").trim())));
+			//MainFrame.mainframe.sliderWastedVotesImbalance.setValue((int)(100.0*Double.parseDouble(getString("wasted_votes_imbalance_weight").trim())));
 		}
 		if( containsKey("representation_weight")) {
 			MainFrame.mainframe.sliderRepresentation.setValue((int)(100.0*Double.parseDouble(getString("representation_weight").trim())));

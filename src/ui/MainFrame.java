@@ -1304,8 +1304,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
 	public final JSlider sliderWastedVotesTotal = new JSlider();
 	public final JLabel lblWastedVotes = new JLabel("Wasted votes (total)");
-	public JLabel lblWastedVotesimbalance;
-	public JSlider sliderWastedVotesImbalance;
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
@@ -3294,7 +3292,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
-		Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
 		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
 		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
@@ -4732,7 +4729,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 274, 200, 344);
+		panel_4.setBounds(400, 274, 200, 287);
 		panel.add(panel_4);
 		
 		lblFairnessCriteria = new JLabel("Fairness criteria");
@@ -4742,14 +4739,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
 		lblContiguency.setBounds(10, 38, 172, 16);
+		lblContiguency.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(lblContiguency);
 		sliderRepresentation.setBounds(10, 63, 180, 29);
+		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(sliderRepresentation);
 		
 		JLabel lblVotingPowerBalance = new JLabel("Voting power balance");
 		lblVotingPowerBalance.setBounds(10, 104, 172, 16);
+		lblVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
 		panel_4.add(lblVotingPowerBalance);
 		sliderVotingPowerBalance.setBounds(10, 125, 180, 29);
+		sliderVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
 		panel_4.add(sliderVotingPowerBalance);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -4757,27 +4758,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderWastedVotesTotal.setBounds(10, 186, 180, 29);
+		sliderWastedVotesTotal.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(sliderWastedVotesTotal);
 		lblWastedVotes.setBounds(10, 165, 172, 16);
+		lblWastedVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(lblWastedVotes);
 		
-		lblWastedVotesimbalance = new JLabel("Wasted votes (imbalance)");
-		lblWastedVotesimbalance.setBounds(10, 226, 172, 16);
-		panel_4.add(lblWastedVotesimbalance);
-		
-		sliderWastedVotesImbalance = new JSlider();
-		sliderWastedVotesImbalance.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				Settings.wasted_votes_imbalance_weight = sliderWastedVotesImbalance.getValue()/100.0;
-			}
-		});
-		sliderWastedVotesImbalance.setBounds(10, 247, 180, 29);
-		panel_4.add(sliderWastedVotesImbalance);
-		
 		lblSeatsVotes = new JLabel("Seats / votes asymmetry");
-		lblSeatsVotes.setBounds(10, 283, 172, 16);
+		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
+		lblSeatsVotes.setBounds(10, 226, 172, 16);
 		panel_4.add(lblSeatsVotes);
 		
 		sliderSeatsVotes = new JSlider();
@@ -4786,7 +4777,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
 			}
 		});
-		sliderSeatsVotes.setBounds(10, 304, 180, 29);
+		sliderSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
+		sliderSeatsVotes.setBounds(10, 247, 180, 29);
 		panel_4.add(sliderSeatsVotes);
 		
 		btnElectionColumns = new JButton("Election columns");
