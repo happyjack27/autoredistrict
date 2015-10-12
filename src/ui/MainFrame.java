@@ -2596,7 +2596,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				panelStats.getStats();
 				featureCollection.findUncontested();
 				panelStats.getStats();
-				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0) {
+				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0 && !hush) {
 					System.out.println("uncontested found!");
 					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
 						try {
@@ -2636,7 +2636,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					Settings.ignore_uncontested = false;
 				}
 			}
-
+			hush = false;
 			mapPanel.invalidate();
 			mapPanel.repaint();
 		}
@@ -4744,7 +4744,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderRepresentation.setBounds(10, 63, 180, 29);
 		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(sliderRepresentation);
-		
+		 
 		JLabel lblVotingPowerBalance = new JLabel("Voting power balance");
 		lblVotingPowerBalance.setBounds(10, 104, 172, 16);
 		lblVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");

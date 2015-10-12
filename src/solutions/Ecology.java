@@ -440,6 +440,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            var /= ((double)population.size()-1.0); //subtract 1 to make it an "unbiased estimator".
 
 	            if( var == 0) { var = 0.001; }
+	            if( var != var) { var = fairnessScoreEmaVars[i]; }
+	            if( avg != avg) { avg = fairnessScoreEmaMeans[i]; }
 	            if( fairnessScoreEmaVars[i] == 0) {
 	            	fairnessScoreEmaVars[i] = var;
 	            	fairnessScoreEmaMeans[i] = avg;
