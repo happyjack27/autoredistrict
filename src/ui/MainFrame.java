@@ -4988,7 +4988,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					return;
 				}
 				btnElection2Columns.setEnabled(b);
-				btnElection3Columns.setEnabled(b);
 				chckbxThirdElection.setEnabled(b);
 				//Settings.substitute_uncontested = b;
 				if( b) {
