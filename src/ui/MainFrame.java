@@ -2975,6 +2975,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		if( is_evolving) { featureCollection.ecology.startEvolving(); }
 	}
+	public void setMaxElections() {
+		int imax = chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
+		for( Feature f : featureCollection.features) {
+			VTD b = f.vtd;
+			while( b.demographics.size() > imax) {
+				b.demographics.remove(imax-1);//.add(new Vector<Demographic>());
+			}
+			b.resetOutcomes();
+		}
+	}
 	
 	public void selectLayers3() {
 		boolean is_evolving = this.evolving;
@@ -4978,6 +4988,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					return;
 				}
 				btnElection2Columns.setEnabled(b);
+				btnElection3Columns.setEnabled(b);
 				chckbxThirdElection.setEnabled(b);
 				//Settings.substitute_uncontested = b;
 				if( b) {
@@ -4987,6 +4998,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					} else {
 						btnElection2Columns.doClick();
 					}
+				} else {
+					setMaxElections();					
 				}
 			}
 		});
@@ -5013,6 +5026,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					} else {
 						btnElection3Columns.doClick();
 					}
+				} else {
+					setMaxElections();					
 				}
 			}
 		});
