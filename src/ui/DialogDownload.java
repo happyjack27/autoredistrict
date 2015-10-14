@@ -51,8 +51,7 @@ public class DialogDownload extends JDialog {
 				JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 				
 				Download.downloadState(
-						list.getSelectedIndex(), Integer.parseInt((String)comboBoxCensusYear.getSelectedItem()), Integer.parseInt((String)comboBoxElectionYear.getSelectedItem()), 
-						MainFrame.mainframe.dlg, MainFrame.mainframe.dlbl
+						list.getSelectedIndex(), Integer.parseInt((String)comboBoxCensusYear.getSelectedItem()), Integer.parseInt((String)comboBoxElectionYear.getSelectedItem()) 
 						);
 			}
 		});

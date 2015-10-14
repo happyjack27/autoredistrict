@@ -53,14 +53,17 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	public static Vector<Integer> vuncontested1 = new Vector<Integer>();
 	public static Vector<Integer> vuncontested2 = new Vector<Integer>();
+	public static Vector<Integer> vuncontested3 = new Vector<Integer>();
 	public static boolean[] buncontested1 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested2 = new boolean[Settings.num_districts];
+	public static boolean[] buncontested3 = new boolean[Settings.num_districts];
 	
 	public void findUncontested() {
 		DistrictMap dm = ecology.population.get(0);
 		
 		Vector<Integer> uncontested1_swap = new Vector<Integer>();
 		Vector<Integer> uncontested2_swap = new Vector<Integer>();
+		Vector<Integer> uncontested3_swap = new Vector<Integer>();
 		
 		int[][] counts1 = new int[Settings.num_districts][2];
 		for(int i = 0; i < Settings.num_districts; i++) {
@@ -75,6 +78,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			counts2[i] = new int[2];
 			for( int j = 0; j < counts2[i].length; j++) {
 				counts2[i][j] = 0;
+			}
+		}
+		
+		int[][] counts3 = new int[Settings.num_districts][2];
+		for(int i = 0; i < Settings.num_districts; i++) {
+			counts3[i] = new int[2];
+			for( int j = 0; j < counts3[i].length; j++) {
+				counts3[i][j] = 0;
 			}
 		}
 		
@@ -95,12 +106,19 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						counts2[dist][1] += dem.population*dem.turnout_probability*dem.vote_prob[1];
 					}
 				}
+				if(features.get(j).vtd.demographics.size() > 2) {
+					Vector<Demographic> vdem = features.get(j).vtd.demographics.get(2);
+					for( Demographic dem : vdem) {
+						counts3[dist][0] += dem.population*dem.turnout_probability*dem.vote_prob[0];
+						counts3[dist][1] += dem.population*dem.turnout_probability*dem.vote_prob[1];
+					}
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
+		
 		buncontested1 = new boolean[Settings.num_districts];
-		buncontested2 = new boolean[Settings.num_districts];
 		for( int i = 0; i < Settings.num_districts; i++) {
 			double thres = (counts1[i][0]+counts1[i][1])*Settings.uncontested_threshold;
 			if( (double)counts1[i][0] < thres || (double)counts1[i][1] < thres) {
@@ -111,6 +129,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			
 		}
+		vuncontested1 = uncontested1_swap;
+		
+		buncontested2 = new boolean[Settings.num_districts];
 		for( int i = 0; i < Settings.num_districts; i++) {
 			double thres = (counts2[i][0]+counts2[i][1])*Settings.uncontested_threshold;
 			if( (double)counts2[i][0] < thres || (double)counts2[i][1] < thres) {
@@ -121,9 +142,22 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			
 		}
-		vuncontested1 = uncontested1_swap;
 		vuncontested2 = uncontested2_swap;	
-		System.out.println("find uncontested found "+vuncontested1.size()+ " "+vuncontested2.size());
+		
+		buncontested3 = new boolean[Settings.num_districts];
+		for( int i = 0; i < Settings.num_districts; i++) {
+			double thres = (counts3[i][0]+counts3[i][1])*Settings.uncontested_threshold;
+			if( (double)counts3[i][0] < thres || (double)counts3[i][1] < thres) {
+				buncontested3[i] = true;
+				uncontested3_swap.add(i+1);
+			} else {
+				buncontested3[i] = false;
+			}
+			
+		}
+		vuncontested3 = uncontested3_swap;	
+		
+		System.out.println("find uncontested found "+vuncontested1.size()+ " "+vuncontested2.size()+ " "+vuncontested3.size());
 	}
 
 	

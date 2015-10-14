@@ -17,8 +17,6 @@ public class Download extends Thread {
 	public static boolean census_merge_working = true;
 	public static boolean census_merge_old = true;
 	public static Thread nextThread = null;
-	public static JDialog dlg = null;
-	public static JLabel lbl = null;
 	static boolean download_census = true;
 	static boolean download_vtd = true;
 	static String census_tract_path = null;
@@ -36,7 +34,7 @@ public class Download extends Thread {
 	public static File census_tract_file = null;
 	
 	public static void main(String[] args) {
-		downloadState(1,2010,2012,null,null);
+		downloadState(1,2010,2012);
 	}
 	public static String getBasePath() {
 		File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
@@ -55,9 +53,7 @@ public class Download extends Thread {
 		if( istate < 0) return getBasePath();
 		return getBasePath()+states[istate]+File.separator+cyear+File.separator;
 	}
-	public static boolean downloadData(JDialog _dlg, JLabel _lbl) {
-		dlg =_dlg;
-		lbl = _lbl;
+	public static boolean downloadData() {
 		istate = -1;
 		//String state = (String)JOptionPane.showInputDialog(MainFrame.mainframe, "Select the state", "Select state.", 0, null, states, states[0]);
 		String state = (String)JOptionPane.showInputDialog(null, "Select the state", "Select state.", JOptionPane.QUESTION_MESSAGE, null, states, states[0]);
@@ -91,12 +87,12 @@ public class Download extends Thread {
 		
 		JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 
-		if( !downloadState( istate,cyear,vyear, dlg,lbl)) {
+		if( !downloadState( istate,cyear,vyear)) {
 			return false;
 		} 
 		return true;
 	}
-	public static boolean downloadState(int _state, int _census_year, int _election_year, JDialog dlg, JLabel lbl) {
+	public static boolean downloadState(int _state, int _census_year, int _election_year) {
 		istate = _state;
 		cyear = _census_year;
 		vyear = _election_year;
@@ -129,54 +125,64 @@ public class Download extends Thread {
 	}
 	public void run() {
 
-		if( dlg != null) { dlg.show(); }
+		if( MainFrame.dlg != null) { MainFrame.dlg.show(); }
 		try {
 			if( download_vtd) {
-				if( lbl != null) { lbl.setText("Downloading vtd shapfile..."); }
+				System.out.println("Downloading vtd shapfile...");
+				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading vtd shapfile..."); }
 				download(census_vtd_url(istate,cyear,vyear),census_vtd_path,"vtds.zip");
 			}
 			if( download_census && census_merge_working) {
 				if( !census_merge_old) {
-					if( lbl != null) { lbl.setText("Downloading census population..."); }
+					System.out.println("Downloading census population...");
+					if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading census population..."); }
 					download(census_tract_url(istate,cyear),census_tract_path,census_tract_filename(istate,cyear));
 				} else {
-					if( lbl != null) { lbl.setText("Downloading census population..."); }
+					System.out.println("Downloading census population...");
+					if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading census population..."); }
 					download(census_pop_url(istate,cyear),census_pop_path,"block_pops.zip");
-					if( lbl != null) { lbl.setText("Downloading census block centroids..."); }
+					System.out.println("Downloading census block centroids...");
+					if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading census block centroids..."); }
 					download(census_centroid_url(istate,cyear),census_centroid_path,"block_centroids.zip");
 				}
 			}
 		} catch (Exception ex) {
+			System.out.println("ex "+ex);
 			ex.printStackTrace();
-			if( dlg != null) { dlg.hide(); }
+			if( MainFrame.dlg != null) { MainFrame.dlg.hide(); }
 			return;
 		}
 		System.out.println("done downloading. extracting...");
 		try {
 			if( download_vtd) {
-				if( lbl != null) { lbl.setText("Extracting vtd shapfile..."); }
+				System.out.println("Extracting vtd shapfile...");
+				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting vtd shapfile..."); }
 				unzip(census_vtd_path+"vtds.zip", census_vtd_path);
 			}
 			if( census_merge_working && census_merge_old && download_census) {
-				if( lbl != null) { lbl.setText("Extracting census population..."); }
+				System.out.println("Extracting census population...");
+				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting census population..."); }
 				unzip(census_pop_path+"block_pops.zip", census_pop_path);
-				if( lbl != null) { lbl.setText("Extracting census block centroids..."); }
+				System.out.println("Extracting census centroids...");
+				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting census block centroids..."); }
 				unzip(census_centroid_path+"block_centroids.zip", census_centroid_path);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			if( dlg != null) { dlg.hide(); }
+			if( MainFrame.dlg != null) { MainFrame.dlg.hide(); }
 			return;
 		}
+		System.out.println("done extracting.");
 		census_centroid_file = new File(census_centroid_path+census_centroid_filename(istate,cyear));
 		census_pop_file = new File(census_pop_path+census_pop_filename(istate,cyear));
 		vtd_file = new File(census_vtd_path+census_vtd_filename(istate,cyear,vyear));
 		census_tract_file = new File(census_tract_path+census_tract_filename(istate,cyear));
 
-		if( dlg != null) { dlg.hide(); }
+		if( MainFrame.dlg != null) { MainFrame.dlg.hide(); }
 		System.out.println("done extracting.");
 		if( nextThread != null) {
+			System.out.println("Starting next thread.");
 			nextThread.start();
 		}
 		return;

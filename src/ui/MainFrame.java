@@ -84,9 +84,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	
 	//========CONTAINERS
-    final JDialog dlg = new JDialog(mainframe, "Working", true);
-    JProgressBar dpb = new JProgressBar(0, 500);
-    JLabel dlbl = new JLabel();
+    public static JDialog dlg = new JDialog(mainframe, "Working", true);
+    public static JProgressBar dpb = new JProgressBar(0, 500);
+    public static JLabel dlbl = new JLabel();
 	public MapPanel mapPanel = new MapPanel(); 
 	JFrame frameStats = new JFrame();
 	public PanelStats panelStats = new PanelStats();
@@ -1349,6 +1349,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenu mnWindows = new JMenu("Windows");
 	public final JButton btnElection2Columns = new JButton("Election 2 columns");
 	public final JCheckBox chckbxSecondElection = new JCheckBox("Second election");
+	public JCheckBox chckbxThirdElection;
+	public JButton btnElection3Columns;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2760,11 +2762,65 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setEnableds();	
 	}
 
+	public void setDemographicColumns3() {
+		if( chckbxSubstituteColumns.isSelected()) {
+			chckbxSubstituteColumns.doClick();
+		}
+		
+		for( VTD b : featureCollection.vtds) {
+			b.resetOutcomes();
+			b.has_election_results = true;
+		}
+		
+		for( Feature f : featureCollection.features) {
+			VTD b = f.vtd;
+			b.resetOutcomes();
+			double[] dd = new double[Settings.num_candidates];
+			for( int i = 0; i < project.demographic_columns_3.size(); i++) {
+				try {
+					dd[i] = Double.parseDouble(f.properties.get(project.demographic_columns_3.get(i)).toString().replaceAll(",",""));
+				} catch (Exception ex) {
+					
+					dd[i] = 0;
+					f.properties.put(project.demographic_columns_3.get(i),"0");
+				}
+			}
+		
+			while( b.demographics.size() < 3) {
+				b.demographics.add(new Vector<Demographic>());
+			}
+			b.demographics.get(2).clear();
+			
+			for( int j = 0; j < Settings.num_candidates; j++) {
+				Demographic d = new Demographic();
+				//d.ward_id = b.id;
+				d.turnout_probability = 1;
+				d.population = (int) dd[j];
+				d.vote_prob = new double[Settings.num_candidates];
+				for( int i = 0; i < d.vote_prob.length; i++) {
+					d.vote_prob[i] = 0;
+				}
+				d.vote_prob[j] = 1;
+				while( b.demographics.size() < 3) {
+					b.demographics.add(new Vector<Demographic>());
+				}
+
+				b.demographics.get(2).add(d);
+				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+			}
+		}
+		
+		featureCollection.ecology.reset();
+		election_loaded = true;
+		
+		setEnableds();	
+	}
+
 	
 	public void setSubstituteColumns() {
-		int max = chckbxSecondElection.isSelected() ? 2 : 1;
-		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2};
-		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.demographic_columns, project.demographic_columns_2};
+		int max = chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
+		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2, FeatureCollection.buncontested3};
+		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.demographic_columns, project.demographic_columns_2, project.demographic_columns_3};
 		
 		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
@@ -2907,6 +2963,42 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			} else {
 				//set as demographics
 				setDemographicColumns2();
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+		//mntmShowDemographics.setSelected(true);
+		//Feature.display_mode = 1;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		
+		if( is_evolving) { featureCollection.ecology.startEvolving(); }
+	}
+	
+	public void selectLayers3() {
+		boolean is_evolving = this.evolving;
+		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
+		setDistrictColumn(project.district_column);
+		//featureCollection.loadDistrictsFromProperties(project.district_column);
+		DialogSelectLayers dlg = new DialogSelectLayers();
+		dlg.setData(featureCollection,project.demographic_columns_3);
+		dlg.show();
+		if( !dlg.ok) {
+			if( is_evolving) { featureCollection.ecology.startEvolving(); }
+			return;
+		}
+		
+
+		try {
+			project.demographic_columns_3 = dlg.in;
+			if( project.demographic_columns_3.size() != project.demographic_columns.size()) {
+				JOptionPane.showMessageDialog(mainframe, "Election columns and second election columns must match one-to-one.");
+				chckbxThirdElection.doClick();//.setSelected(false);
+				//remove from demographics
+			} else {
+				//set as demographics
+				setDemographicColumns3();
 			}
 		} catch (Exception ex) {
 			System.out.println("ex "+ex);
@@ -4713,7 +4805,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(6, 360, 182, 16);
+		lblDistrictColumn.setBounds(8, 431, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -4723,7 +4815,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(6, 379, 178, 20);
+		comboBoxDistrictColumn.setBounds(8, 450, 178, 20);
 		panel.add(comboBoxDistrictColumn);
 		
 		panel_4 = new JPanel();
@@ -4842,7 +4934,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		});
 		btnSubstituteColumns.setEnabled(false);
-		btnSubstituteColumns.setBounds(4, 326, 184, 23);
+		btnSubstituteColumns.setBounds(6, 397, 184, 23);
 		panel.add(btnSubstituteColumns);
 		
 		chckbxSubstituteColumns = new JCheckBox("Substitute uncontested");
@@ -4866,7 +4958,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		chckbxSubstituteColumns.setBounds(4, 296, 178, 23);
+		chckbxSubstituteColumns.setBounds(6, 367, 178, 23);
 		panel.add(chckbxSubstituteColumns);
 		btnElection2Columns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -4886,6 +4978,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					return;
 				}
 				btnElection2Columns.setEnabled(b);
+				chckbxThirdElection.setEnabled(b);
 				//Settings.substitute_uncontested = b;
 				if( b) {
 					if( project.demographic_columns == null || project.demographic_columns.size() < 1) {
@@ -4900,6 +4993,41 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxSecondElection.setBounds(6, 229, 178, 23);
 		
 		panel.add(chckbxSecondElection);
+		
+		chckbxThirdElection = new JCheckBox("Third election");
+		chckbxThirdElection.setEnabled(false);
+		chckbxThirdElection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				boolean b = chckbxThirdElection.isSelected();
+				if( b && false) {
+					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
+					chckbxThirdElection.setSelected(false);
+					return;
+				}
+				btnElection3Columns.setEnabled(b);
+				//Settings.substitute_uncontested = b;
+				if( b) {
+					if( project.demographic_columns_2 == null || project.demographic_columns_2.size() < 1) {
+						JOptionPane.showMessageDialog(mainframe, "Must select second election columns first.");
+						chckbxThirdElection.doClick();
+					} else {
+						btnElection3Columns.doClick();
+					}
+				}
+			}
+		});
+		chckbxThirdElection.setBounds(6, 301, 178, 23);
+		panel.add(chckbxThirdElection);
+		
+		btnElection3Columns = new JButton("Election 3 columns");
+		btnElection3Columns.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				selectLayers3();
+			}
+		});
+		btnElection3Columns.setEnabled(false);
+		btnElection3Columns.setBounds(7, 333, 184, 23);
+		panel.add(btnElection3Columns);
 		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {

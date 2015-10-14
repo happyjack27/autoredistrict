@@ -31,6 +31,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	
 	public Vector<String> demographic_columns = new Vector<String>();
 	public Vector<String> demographic_columns_2 = new Vector<String>();
+	public Vector<String> demographic_columns_3 = new Vector<String>();
 	public Vector<String> substitute_columns = new Vector<String>();
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
 	
