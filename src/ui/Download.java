@@ -34,8 +34,14 @@ public class Download extends Thread {
 	public static File census_tract_file = null;
 	
 	public static void main(String[] args) {
-		downloadState(1,2010,2012);
+		System.out.println(census_pop_url(51,2015));
+		System.out.println(census_centroid_url(51,2015));
 	}
+
+	/*
+	public static void main(String[] args) {
+		downloadState(1,2010,2012);
+	}*/
 	public static String getBasePath() {
 		File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
 		String start_path = f.getAbsolutePath();
@@ -123,6 +129,7 @@ public class Download extends Thread {
 		new Download().start();
 		return true;
 	}
+	
 	public void run() {
 
 		if( MainFrame.dlg != null) { MainFrame.dlg.show(); }
@@ -233,7 +240,6 @@ public class Download extends Thread {
 		if( s.length() < 2) { s = "0"+s; }
 		return s;
 	}
-	
 	
 	
 	
