@@ -34,8 +34,8 @@ public class Download extends Thread {
 	public static File census_tract_file = null;
 	
 	public static void main(String[] args) {
-		System.out.println(census_pop_url(51,2015));
-		System.out.println(census_centroid_url(51,2015));
+		System.out.println(census_pop_url(51,2010));
+		System.out.println(census_centroid_url(51,2010));
 	}
 
 	/*
