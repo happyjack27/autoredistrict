@@ -1351,6 +1351,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JCheckBox chckbxSecondElection = new JCheckBox("Second election");
 	public JCheckBox chckbxThirdElection;
 	public JButton btnElection3Columns;
+	public JMenuItem mntmPublicMappingProject;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3535,6 +3536,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmHarvardElectionData);
+		
+		mntmPublicMappingProject = new JMenuItem("Public Mapping Project data...");
+		mntmPublicMappingProject.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Applet.browseTo("http://www.publicmapping.org/resources/data");
+			}
+		});
+		mnFile.add(mntmPublicMappingProject);
 		
 		mnFile.add(separator_7);
 		//mnFile.add(separator);
