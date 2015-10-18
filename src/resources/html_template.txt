@@ -1,0 +1,72 @@
+<html>
+<body>
+<a href="[[shapefile]]">shapefile</a><br/>
+<table>
+ <tr>
+ <td bgcolor="B0B0B0"><b>category</b></td>
+ <td bgcolor="B0B0B0"><b>measure</b></td>
+ {{<td bgcolor="B0B0B0"><b>[[column name]]</b></td>}}
+ </tr>
+ <tr>
+ <td>compact</td><td>isoperimetric quotent</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr><td>contiguous</td><td>disconnected population</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>population</td><td>population imbalance %</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>proportional</td><td>representation imbalance bits</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>equal</td><td>voting power imbalance bits</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>competitive</td>
+ <td>wasted votes</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>competitive</td>
+ <td>avg. PVI</td>
+{{<td>[[compactness]]</td>}}
+</tr>
+ <tr>
+ <td>competitive</td><td>elections w/in 5% PVI</td>
+{{<td>[[compactness]]</td>}}
+ </tr>
+<tr>
+<td>equal</td><td>seats / vote asymmetry</td>
+{{<td>[[compactness]]</td>}}
+ <tr>
+ <td>&nbsp;</td>
+ <td>map data</td>
+ <td><a href="images/VI/starting_data.txt">vtd level data (DISTRICT)</a></td>
+ <td><a href="images/VI/proposal_vtd_assignments.txt">vtd level data (DISTRICT)</a></td>
+ </tr>
+ <tr>
+ <td>&nbsp;</td>
+ <td>seats vs. votes</td>
+ {{<td><img width=100 src="[[seats image]]"></td>}}
+ </tr>
+ <tr>
+ <td>&nbsp;</td><td>seats/votes curve</td>
+ {{<td><img width=100 src="[[seats votes image]]"></td>}}
+ </tr>
+ <tr>
+ <td>&nbsp;</td><td>wasted votes</td>
+ {{<td><a href="[[wasted image]]"><img width=100 border=0 src="[[wasted image]]"></a></td>}}
+ </tr>
+ <tr>
+ <td>&nbsp;</td><td>districts</td>
+ {{<td><a href="[[districts image]]"><img width=100 border=0 src="[[districts image]]"></a></td>}}
+ </tr>
+</table>
+</body>
+</html>
+
