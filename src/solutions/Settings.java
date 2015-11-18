@@ -59,7 +59,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
        	if( new_rate <= 0.0001) {
     		new_rate = 0.0001;
     	}
-    	double e = max_mutation*Math.exp(-0.00033*(double)generation); // reaches -0.0005 0.000005 at 4000
+    	double e = max_mutation*Math.exp(-0.000666*(double)generation); // reaches -0.0005 0.000005 at 4000
     	if( new_rate < e) {
     		new_rate = e;
     	}
