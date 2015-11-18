@@ -868,7 +868,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	calcSeatsVotesCurve();
     	double total = 0;
     	//double rln2 = 1.0/Math.log(2);
-    	double weight = 1.0/(double)seats_votes.size();
+    	double weight = 100.0/(double)seats_votes.size();
 	    for( int i = 0; i < seats_votes.size(); i++) {
 	    	double[] dd = seats_votes.get(i);
 	    	
