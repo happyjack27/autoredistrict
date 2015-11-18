@@ -967,7 +967,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double[] q = new double[Settings.num_candidates];
         double disproportional_representation = 0;
         double wasted_vote_imbalance = 0;
-    	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0) {
+    	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0 || Settings.seats_votes_asymmetry_weight > 0 || Settings.wasted_votes_total_weight > 0) {
     		for(District d : districts) {
     			d.generateOutcomes(Settings.num_elections_simulated);
     		}
