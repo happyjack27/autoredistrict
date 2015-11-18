@@ -843,7 +843,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		
 		//now sample it at different vote ratios
-		for( double dempct = 0; dempct <= 1; dempct += 0.0025) {
+		for( double dempct = 0; dempct <= 1; dempct += 0.005) {
 			double reppct = 1-dempct;
 			double votes = dempct;
 			double demseats = 0;
@@ -870,7 +870,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double rln2 = 1.0/Math.log(2);
 	    for( int i = 0; i < seats_votes.size(); i++) {
 	    	double[] dd = seats_votes.get(i);
-	    	double weight = 0.0025;
+	    	double weight = 0.005;
 	    	
 	    	//don't count if vote is <25% or >75%
 	    	/*.

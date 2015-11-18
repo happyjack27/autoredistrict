@@ -2602,6 +2602,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0 && !hush) {
 					System.out.println("uncontested found!");
 					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
+						hush = true;
 						try {
 							System.out.println("setting substitutes");
 							setSubstituteColumns();
@@ -2610,12 +2611,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 						Settings.ignore_uncontested = false;
 						panelStats.getStats();
-						if( !hush) {
-							hush = true;
-							project.district_column = "";
-							setDistrictColumn(district);
-							hush = false;
-						}
+						hush = true;
+						project.district_column = "";
+						setDistrictColumn(district);
+						hush = false;
 					} else {
 						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
 						if( opt == JOptionPane.YES_OPTION) {
@@ -2887,6 +2886,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					
 					for( int j = 0; j < Settings.num_candidates; j++) {
 						Demographic d = new Demographic();
+						//added 2015.11.18 - write back so substitutes are part of data export.
+						f.properties.put(project.demographic_columns.get(j),""+((int)dd[j]));
+						
 						//d.ward_id = b.id;
 						d.turnout_probability = 1;
 						d.population = (int) dd[j];

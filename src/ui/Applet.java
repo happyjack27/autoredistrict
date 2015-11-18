@@ -17,6 +17,9 @@ import solutions.StaticFunctions;
  */
 /*
  * 
+ * TODO: substitute uncontested should ask for district column, and then substitute it then, and then afterwards when a district column is selected (even after a new data merge?), that data isn't re-substituted.
+ *    Does this means substitute uncontested should write back to the original data columns? (so it gets populated in a data save) 
+ * 
  * TODO: make substitute columsn work with second eleciotn by haivng uncontested look at raw demographics, na dDistrict.uncontested by a vector matching demographcis
  * 
  * TODO: make reset al stuff on load.
