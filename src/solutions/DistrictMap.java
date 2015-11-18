@@ -843,7 +843,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		
 		//now sample it at different vote ratios
-		for( double dempct = 0; dempct <= 1; dempct += 0.005) {
+		for( double dempct = 0; dempct <= 1; dempct += 0.0025) {
 			double reppct = 1-dempct;
 			double votes = dempct;
 			double demseats = 0;
