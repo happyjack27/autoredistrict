@@ -870,7 +870,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double rln2 = 1.0/Math.log(2);
 	    for( int i = 0; i < seats_votes.size(); i++) {
 	    	double[] dd = seats_votes.get(i);
-	    	double weight = 1;
+	    	double weight = 0.0025;
 	    	
 	    	//don't count if vote is <25% or >75%
 	    	/*.
