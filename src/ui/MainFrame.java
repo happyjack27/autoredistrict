@@ -3392,6 +3392,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mainframe = this;
 		jbInit();
 		
+		sliderVotingPowerBalance.setValue(0);
+		sliderRepresentation.setValue(0);
+		sliderSeatsVotes.setValue(100);
+		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
 		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
