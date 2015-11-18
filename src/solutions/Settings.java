@@ -71,7 +71,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		if (new_rate <= 0.0001) {
 			new_rate = 0.0001;
 		}
-		double e = max_mutation * Math.exp(-0.000666 * (double) generation); // reaches
+		double e = max_mutation * Math.exp(-0.0005 * (double) generation); // reaches
 																				// -0.0005
 																				// 0.000005
 																				// at
@@ -136,7 +136,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 
 	public static double mutation_rate = 0.5;
 	public static double mutation_boundary_rate = 0.5;
-	public static int population = 64;
+	public static int population = 128;
 	public static int num_elections_simulated = 3;
 	public static int num_districts = 4;
 	// geometry
