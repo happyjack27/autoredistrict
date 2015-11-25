@@ -5174,9 +5174,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		frameGraph.setSize(dim);
 		
 		frameGraph.move(this.getWidth(), this.getX());
-		frameStats.move(this.getWidth(), this.getX()+frameGraph.getHeight());
-		frameStats.show();
 		frameGraph.show();
+		frameSeatsVotesChart.move(this.getWidth(), this.getX()+frameGraph.getHeight());
+		frameSeatsVotesChart.show();
+		frameStats.move(this.getWidth()+frameSeatsVotesChart.getWidth(), this.getX()+frameGraph.getHeight());
+		frameStats.show();
+		
 	}
 	public StringBuffer getFile(File f) {		
 		StringBuffer sb = new StringBuffer();
