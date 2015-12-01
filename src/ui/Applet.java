@@ -9,6 +9,12 @@ import javax.swing.*;
 import solutions.Gaussian;
 import solutions.StaticFunctions;
 
+
+
+/*
+TOP PRIOIRTY TODO: multi-member isn't counting wasted votes right.  should look at how they'd be assigned if there were no wasted votes, and then take the difference, and then total the positive ones.		
+*/
+		
 /*
  * 
  * convert shapefile to geojson:
