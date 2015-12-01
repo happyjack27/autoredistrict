@@ -1017,25 +1017,36 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	tot += res[0][j];
                     }
                     int unit = tot/Settings.members_per_district;
+                    
                     for(int j = 0; j < popular_vote.length; j++) {
                     	//make amt as if there was one vote w/pop 0 to unit
                     	if( res[0][j] < 0) {
                     		System.out.println("res < 0");
                     	}
-                    	double amt = res[0][j] % unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+                    	double amt = 0;
+                    	if( Settings.members_per_district > 1) {
+                        	amt = res[0][j] - unit*res[1][j];//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+	                    	if( amt < 0) {
+	                    		amt = 0;
+	                    	}
+	                    } else {
+                        	amt = res[0][j];//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+                        	if (amt > unit/2){
+                        		amt -= unit/2; //overvote
+                        	} else {
+                        		if( amt > unit/4) {
+                            		amt = unit/2 - amt; //votes short
+                            		amt = 0; //or just not count these...
+                        		}
+                        	}
+	                    }
                     	/*
                     	if( amt < unit/4) {
                     		amt = amt; // if less than1/4, all votes are wasted.
                     	} else 
                     		*/
-                    	if (amt > unit/2){
-                    		amt -= unit/2; //overvote
-                    	} else {
-                    		if( amt > unit/4) {
-                        		amt = unit/2 - amt; //votes short
-                        		amt = 0; //or just not count these...
-                    		}
-                    	}
+                    	
+                    	
 
                     	wasted_votes += amt;
                     	wasted_votes_by_party[j] += amt;
