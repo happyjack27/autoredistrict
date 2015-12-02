@@ -471,6 +471,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 Settings.voting_power_balance_weight    *1.0,
                 Settings.wasted_votes_total_weight      *1.0,
                 Settings.wasted_votes_imbalance_weight  *1.0,
+                Settings.seats_votes_asymmetry_weight   *1.0,
                 Settings.diagonalization_weight   *1.0,
         };
         double geo_total = weights[0]+weights[2]+weights[3];
