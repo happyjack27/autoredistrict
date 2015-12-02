@@ -853,9 +853,27 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				if( FeatureCollection.buncontested1 != null && FeatureCollection.buncontested1.length > i && FeatureCollection.buncontested1[i] && Settings.ignore_uncontested) {
 					continue;
 				}
-				totseats++;
-				if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
-					demseats++;
+				totseats += Settings.members_per_district;
+				if( Settings.members_per_district == 1) {
+					if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
+						demseats++;
+					}
+				} else {
+					double demvote =  vote_count_districts[i][0]*dempct;
+					double repvote = vote_count_districts[i][1]*reppct;
+					double totvote = demvote+repvote;
+					double unit = totvote / Settings.members_per_district;
+					while( demvote > unit) {
+						demseats++;
+						demvote -= unit;
+					}
+					while( repvote > unit) {
+						repvote -= unit;
+					}
+					if( demvote > repvote && demvote != 0) {
+						demseats++;
+					}
+					
 				}
 			}
 			double demseatpct = demseats/totseats;
