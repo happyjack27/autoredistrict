@@ -489,12 +489,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		weights[5]*fairness_mult,
         		weights[6]*fairness_mult,
         		weights[7]*fairness_mult,
+        		weights[8]*fairness_mult,
         };
 
         for( int j = 0; j < population.size(); j++) {
             DistrictMap map = population.get(j);
             map.fitness_score = 0;
-            for( int i = 0; i < 7; i++) {
+            for( int i = 0; i < map.fairnessScores.length; i++) {
             	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
             		map.fairnessScores[i] = 0;
             	}
