@@ -816,8 +816,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return -div;
     }
+    double deviation_from_diagonal = 0;
     public void calcSeatsVotesCurve() {
-		
+    	deviation_from_diagonal = 0;
 		Vector<double[]> swap = new Vector<double[]>();
 		double[] vote_count_totals = new double[2];
 		vote_count_totals[0] = 0;
@@ -877,6 +878,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				}
 			}
 			double demseatpct = demseats/totseats;
+			deviation_from_diagonal += Math.abs(demseatpct-dempct)/(double)totseats;
 			swap.add(new double[]{demseatpct,dempct});
 		}
 		seats_votes = swap;
@@ -1233,7 +1235,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time5 = System.currentTimeMillis();
     	
         //System.out.println(""+wasted_votes+", "+wasted_vote_imbalance);
-        
+    	double sva = calcSeatsVoteAsymmetry();
         fairnessScores = new double[]{
         		length
         		,disproportional_representation
@@ -1242,7 +1244,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,power_fairness
         		,wasted_votes
         		,wasted_vote_imbalance
-        		,calcSeatsVoteAsymmetry()
+        		,sva
+        		,deviation_from_diagonal
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;

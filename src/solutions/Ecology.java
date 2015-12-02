@@ -35,8 +35,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	static int num_threads = 8;
 
-	public static double[] fairnessScoreEmaVars = new double[8];
-	public static double[] fairnessScoreEmaMeans = new double[8];
+	public static double[] fairnessScoreEmaVars = new double[9];
+	public static double[] fairnessScoreEmaMeans = new double[9];
 
     int cutoff;
     int speciation_cutoff;
@@ -471,10 +471,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
                 Settings.voting_power_balance_weight    *1.0,
                 Settings.wasted_votes_total_weight      *1.0,
                 Settings.wasted_votes_imbalance_weight  *1.0,
-                Settings.seats_votes_asymmetry_weight   *1.0,
+                Settings.diagonalization_weight   *1.0,
         };
         double geo_total = weights[0]+weights[2]+weights[3];
-        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7];
+        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7]+weights[8];
         
         double geometric_mult = 2.0*(geometry_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/geo_total);
         double fairness_mult = fairness_weight_multiplier*(Settings.geo_or_fair_balance_weight)/fair_total;

@@ -3393,7 +3393,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		jbInit();
 		
 		sliderVotingPowerBalance.setValue(0);
-		sliderRepresentation.setValue(0);
+		sliderRepresentation.setValue(50);
 		sliderSeatsVotes.setValue(100);
 		
 		Settings.mutation_rate = 0; 
@@ -3402,7 +3402,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
-		Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+		//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+		Settings.diagonalization_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
@@ -5066,7 +5067,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderRepresentation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+				//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
+				Settings.diagonalization_weight = sliderRepresentation.getValue()/100.0;
 
 			}
 		});

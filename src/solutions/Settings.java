@@ -131,6 +131,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double wasted_votes_total_weight = 1;
 	public static double wasted_votes_imbalance_weight = 0;
 	public static double seats_votes_asymmetry_weight = 1;
+	public static double diagonalization_weight = 0;
 
 	// public static double replace_fraction = 0.5;
 
