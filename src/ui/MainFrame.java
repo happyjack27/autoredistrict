@@ -4804,6 +4804,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					Settings.members_per_district = Integer.parseInt(textFieldMembersPerDistrict.getText());
+					panelStats.getStats();
 				} catch (Exception ex) { }
 			}
 		});
