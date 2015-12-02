@@ -34,7 +34,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				
 				Settings.mutation_boundary_rate,
 				
-				dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
+				dm.fairnessScores[8]*conversion_to_bits, //REP IMBALANCE
 				dm.fairnessScores[4], //POWER IMBALANCE
 				dm.fairnessScores[5], //WASTED VOTES TOTAL
 				dm.fairnessScores[6], //WASTED VOTES IMBALANCE
@@ -131,7 +131,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						), //BORDER LENGTH
 					dm.fairnessScores[3], //DISCONNECTED POP
 					dm.fairnessScores[2], //POP IMBALANCE
-					0,
+					dm.fairnessScores[8], //diag error
 					0,
 					
 			});

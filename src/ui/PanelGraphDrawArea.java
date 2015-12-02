@@ -35,7 +35,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Compactness",
     		"Contiguity",
     		"Equal population",
-    		"",
+    		"Diagonalization error",
     		"",
     };
 
