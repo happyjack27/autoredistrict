@@ -22,7 +22,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Mutation rate",
     		
     		//4
-    		"Representation (local)",
+    		"Proportionalness (local)",
     		"Voting power imbalance",
     		"Wasted votes (total)",
     		"Wasted votes (imbalance)",
@@ -35,7 +35,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Compactness",
     		"Contiguity",
     		"Equal population",
-    		"Representation (global)",
+    		"Proportionalness (global)",
     		"",
     };
 

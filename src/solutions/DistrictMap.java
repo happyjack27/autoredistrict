@@ -1047,6 +1047,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	if( Settings.members_per_district > 1) {
                         	amt = res[0][j] - unit*res[1][j];//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
 	                    	if( amt < 0) {
+	                    		amt += unit;
+                        		amt -= unit/2; //overvote
+	                    	} else {
 	                    		amt = 0;
 	                    	}
 	                    } else {
