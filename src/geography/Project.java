@@ -92,8 +92,8 @@ public class Project extends ReflectionJSONObject<Project> {
 		} else { System.out.println("initial_population not found"); }
 
 		if( containsKey("simulated_elections")) {
-			MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("simulated_elections").trim());
-			MainFrame.mainframe.textFieldElectionsSimulated.postActionEvent();
+			//MainFrame.mainframe.textFieldElectionsSimulated.setText(getString("simulated_elections").trim());
+			//MainFrame.mainframe.textFieldElectionsSimulated.postActionEvent();
 		} else { System.out.println("simulated_elections not found"); }
 		
 		if( !containsKey("primary_key_column")) {

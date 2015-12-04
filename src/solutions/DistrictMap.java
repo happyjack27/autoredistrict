@@ -1010,7 +1010,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	    	wasted_votes_by_district_and_party[i][j] = 0;
 	    	    }
     	    }
- 
+    	    if( !District.use_simulated_elections) {
+    	    	Settings.num_elections_simulated = 1;
+    	    }
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
                 double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
@@ -1045,13 +1047,25 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	}
                     	double amt = 0;
                     	if( Settings.members_per_district > 1) {
+                    		int c = ((int)res[0][j]) / unit;
+                        	amt = res[0][j] - c*unit;//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
+                        	if( res[1][j] > c) { //this means that we won the remaining majority election
+                        		if( amt > unit/2) {
+                        			amt -= unit/2;
+                        		}
+                        	} else {
+                        		
+                        	}
+                        	/*
                         	amt = res[0][j] - unit*res[1][j];//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
 	                    	if( amt < 0) {
 	                    		amt += unit;
                         		amt -= unit/2; //overvote
 	                    	} else {
-	                    		amt = 0;
+                        		amt -= unit/2; //overvote
 	                    	}
+	                    	amt /= 2;
+	                    	*/
 	                    } else {
                         	amt = res[0][j];//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
                         	if (amt > unit/2){

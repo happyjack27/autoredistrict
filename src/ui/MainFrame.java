@@ -135,7 +135,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JComboBox comboBoxPopulation = new JComboBox();
 	public JComboBox comboBoxDistrictColumn = new JComboBox();
     public JTextField textFieldNumDistricts = new JTextField();
-    public JTextField textFieldElectionsSimulated = new JTextField();
     public JTextField textField = new JTextField();
 	public JTextField textFieldMembersPerDistrict;
 
@@ -3394,7 +3393,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		sliderVotingPowerBalance.setValue(0);
 		sliderRepresentation.setValue(50);
-		sliderSeatsVotes.setValue(100);
+		sliderSeatsVotes.setValue(50);
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
@@ -4632,30 +4631,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_3.add(lblBorderMutation);
 		slider_mutation.setBounds(6, 130, 190, 29);
 		panel_3.add(slider_mutation);
-		
-		JLabel lblTrials = new JLabel("Elections simulated");
-		lblTrials.setBounds(6, 74, 134, 16);
-		panel_3.add(lblTrials);
-		textFieldElectionsSimulated.setBounds(138, 68, 58, 28);
-		panel_3.add(textFieldElectionsSimulated);
-		textFieldElectionsSimulated.addFocusListener(new FocusAdapter() {
-			@Override
-			public void focusLost(FocusEvent e) {
-				textFieldElectionsSimulated.postActionEvent();
-			}
-		});
-		textFieldElectionsSimulated.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				 try {
-					 Settings.num_elections_simulated = new Integer(textFieldElectionsSimulated.getText());
-				 } catch (Exception ex) {
-					 
-				 }
-			}
-		});
-		
-		textFieldElectionsSimulated.setText(""+Settings.num_elections_simulated);
-		textFieldElectionsSimulated.setColumns(10);
 		
 		lblElitism = new JLabel("% elitism");
 		lblElitism.setBounds(6, 181, 69, 16);

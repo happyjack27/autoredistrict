@@ -163,40 +163,60 @@ public class VTD extends ReflectionJSONObject<VTD> {
     }
     
     public void generateOutComes() {
-    	outcomes = new double[Settings.num_ward_outcomes][];
-    	for( int out = 0; out < outcomes.length; out++) {
-    		outcomes[out] = new double[Settings.num_candidates];
+    	if( !District.use_simulated_elections) {
+        	outcomes = new double[1][];
+    		outcomes[0] = new double[Settings.num_candidates];
     	    
     		//aggregate and normalize voting probs
-        	double[] probs = new double[Settings.num_candidates];
-            for(int i = 0; i < probs.length; i++) {
-            	probs[i] = 0;
+            for(int i = 0; i < outcomes[0].length; i++) {
+            	outcomes[0][i] = 0;
             }
-            int elec = (int)(Math.random()*(double)demographics.size());
-            for( Demographic d : demographics.get(elec)) {
-                for( int j = 0; j < d.vote_prob.length; j++) {
-                	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
-                }
+            for( int elec = 0; elec < demographics.size(); elec++) {
+		        for( Demographic d : demographics.get(elec)) {
+		            for( int j = 0; j < d.vote_prob.length; j++) {
+		            	outcomes[0][j] += d.population * d.vote_prob[j]*d.turnout_probability;//d.vote_prob[j];
+		            }
+		        }
             }
-            double total_population = 0;
-            for(int i = 0; i < probs.length; i++) {
-            	total_population += probs[i];
-            }
-            double r_tot_prob  = 1.0/total_population;
-            for(int i = 0; i < probs.length; i++) {
-            	probs[i] *= r_tot_prob;
-            }
-
-            for(int j = 0; j < total_population; j++) {
-                double p = Math.random();
-                for( int k = 0; k < probs.length; k++) {
-                    p -=  probs[k];
-                    if( p <= 0) {
-                    	outcomes[out][k]++;
-                        break;
-                    }
-                }
-    		}
+            for(int i = 0; i < outcomes[0].length; i++) {
+            	outcomes[0][i] /= demographics.size();
+            }    		
+    	} else {
+	    	outcomes = new double[Settings.num_ward_outcomes][];
+	    	for( int out = 0; out < outcomes.length; out++) {
+	    		outcomes[out] = new double[Settings.num_candidates];
+	    	    
+	    		//aggregate and normalize voting probs
+	        	double[] probs = new double[Settings.num_candidates];
+	            for(int i = 0; i < probs.length; i++) {
+	            	probs[i] = 0;
+	            }
+	            int elec = (int)(Math.random()*(double)demographics.size());
+	            for( Demographic d : demographics.get(elec)) {
+	                for( int j = 0; j < d.vote_prob.length; j++) {
+	                	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
+	                }
+	            }
+	            double total_population = 0;
+	            for(int i = 0; i < probs.length; i++) {
+	            	total_population += probs[i];
+	            }
+	            double r_tot_prob  = 1.0/total_population;
+	            for(int i = 0; i < probs.length; i++) {
+	            	probs[i] *= r_tot_prob;
+	            }
+	
+	            for(int j = 0; j < total_population; j++) {
+	                double p = Math.random();
+	                for( int k = 0; k < probs.length; k++) {
+	                    p -=  probs[k];
+	                    if( p <= 0) {
+	                    	outcomes[out][k]++;
+	                        break;
+	                    }
+	                }
+	    		}
+	    	}
     	}
     }
 }

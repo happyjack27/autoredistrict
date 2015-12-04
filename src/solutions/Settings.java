@@ -138,7 +138,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double mutation_rate = 0.5;
 	public static double mutation_boundary_rate = 0.5;
 	public static int population = 128;
-	public static int num_elections_simulated = 3;
+	public static int num_elections_simulated = 1;
 	public static int num_districts = 4;
 	// geometry
 	// demographics

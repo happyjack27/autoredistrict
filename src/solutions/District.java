@@ -13,6 +13,8 @@ public class District extends JSONObject {
     double[][] outcomes;
     double[][] pop_balanced_outcomes;
     
+    public static boolean use_simulated_elections = false;
+    
     private double population = -1;
     
     public double area = -1;
