@@ -30,6 +30,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public int[] wasted_votes_by_party;
     public int[] wasted_votes_by_district;
     public int[][] wasted_votes_by_district_and_party;
+    public int[] vote_gap_by_district;
+    public int total_vote_gap = 0;
     
     
     public void invalidate() {
@@ -998,12 +1000,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	//===fairness score: proportional representation
     		wasted_votes_by_party = new int[Settings.num_candidates];
     	    wasted_votes_by_district = new int[districts.size()];
+    	    vote_gap_by_district = new int[districts.size()];
     	    wasted_votes_by_district_and_party = new int[districts.size()][Settings.num_candidates];
     	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
     	    	wasted_votes_by_party[i] = 0;
     	    }
     	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
     	    	wasted_votes_by_district[i] = 0;
+    	    }
+    	    for( int i = 0; i < vote_gap_by_district.length; i++) {
+    	    	vote_gap_by_district[i] = 0;
     	    }
     	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
 	    	    for( int j = 0; j < wasted_votes_by_party.length; j++) {
@@ -1013,6 +1019,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	    if( !District.use_simulated_elections) {
     	    	Settings.num_elections_simulated = 1;
     	    }
+    	    total_vote_gap = 0;
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
                 double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
@@ -1053,6 +1060,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                         		if( amt > unit/2) {
                         			amt -= unit/2;
                         		}
+                            	vote_gap_by_district[k] = (int)amt*2;
                         	} else {
                         		
                         	}
@@ -1071,10 +1079,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                         	if (amt > unit/2){
                         		amt -= unit/2; //overvote
                         	} else {
+                        		/*
                         		if( amt > unit/4) {
                             		amt = unit/2 - amt; //votes short
                             		amt = 0; //or just not count these...
                         		}
+                        		*/
                         	}
 	                    }
                     	/*
@@ -1090,6 +1100,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	wasted_votes_by_district[k] += amt;
                     	wasted_votes_by_district_and_party[k][j] += amt; 
                     }
+                    if( Settings.members_per_district == 1) {
+                    	vote_gap_by_district[k] = (int)Math.abs(res[0][0]-res[0][1]);
+                    }
+                    total_vote_gap += vote_gap_by_district[k];
                 	} catch (Exception ex) {
                 		System.out.println("ex aa "+ex);
                 		ex.printStackTrace();
@@ -1272,7 +1286,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,getPopVariance()/*population_imbalance*2.0*/ //getMaxPopDiff()
         		,disconnected_pops
         		,power_fairness
-        		,wasted_votes
+        		,total_vote_gap//wasted_votes
         		,wasted_vote_imbalance
         		,sva
         		,deviation_from_diagonal
@@ -1472,6 +1486,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 			Color c = getComplement(FeatureCollection.standard_district_colors[j]);
 			double d = ((double)amts0[j]) / tot;//amts1[j];
+			d /= 2;
 			//System.out.println(""+j+": "+amts0[j]+" "+amts1[j]+" "+d+" "+tot);
 			if( d > 1) { d = 1; }
 			if( d < 0) { d = 0; }

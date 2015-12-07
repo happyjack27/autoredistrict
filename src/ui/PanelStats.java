@@ -153,7 +153,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_1 = 0;
 			
 			//=== by district
-			String[] dcolumns = new String[9+Settings.num_candidates*2];
+			String[] dcolumns = new String[11+Settings.num_candidates*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			if( dmcolors == null || dmcolors.length != dm.districts.size()) {
 				dmcolors = new Color[dm.districts.size()];
@@ -162,11 +162,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dcolumns[1] = "Population";
 			dcolumns[2] = "Winner";
 			dcolumns[3] = "PVI"; //
-			dcolumns[4] = "Self-entropy";
-			dcolumns[5] = "Compactness";
-			dcolumns[6] = "Area";
-			dcolumns[7] = "Paired edge length";
-			dcolumns[8] = "Unpaired edge length";
+			
+			dcolumns[4] = "Vote gap";
+			dcolumns[5] = "Wasted votes";
+			
+			//vote_gap_by_district
+			
+			dcolumns[6] = "Self-entropy";
+			dcolumns[7] = "Compactness";
+			dcolumns[8] = "Area";
+			dcolumns[9] = "Paired edge length";
+			dcolumns[10] = "Unpaired edge length";
 			
 			
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
@@ -178,8 +184,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			for( int i = 0; i < Settings.num_candidates; i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
-				dcolumns[i+9] = ""+i+" vote %";
-				dcolumns[i+9+Settings.num_candidates] = ""+i+" votes";
+				dcolumns[i+11] = ""+i+" vote %";
+				dcolumns[i+11+Settings.num_candidates] = ""+i+" votes";
 			}
 			
 			double total_population = 0;
@@ -260,19 +266,23 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+pviw;
-				ddata[i][4] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
-				ddata[i][5] = ""+d.iso_quotient;
-				ddata[i][6] = ""+d.area;
-				ddata[i][7] = ""+d.paired_edge_length;
-				ddata[i][8] = ""+d.unpaired_edge_length;
-				for( int j = 9; j < ddata[i].length; j++) {
+				
+				ddata[i][4] = ""+dm.vote_gap_by_district[i];
+				ddata[i][5] = ""+dm.wasted_votes_by_district[i];
+				
+				ddata[i][6] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][7] = ""+d.iso_quotient;
+				ddata[i][8] = ""+d.area;
+				ddata[i][9] = ""+d.paired_edge_length;
+				ddata[i][10] = ""+d.unpaired_edge_length;
+				for( int j = 11; j < ddata[i].length; j++) {
 					ddata[i][j] = "";
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+9] = ""+(result[0][j]/total);
+					ddata[i][j+11] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+9+Settings.num_candidates] = ""+integer.format(result[0][j]);
+					ddata[i][j+11+Settings.num_candidates] = ""+integer.format(result[0][j]);
 				}	
 				} catch (Exception ex) {
 					System.out.println("ex stats 1 "+ex);
@@ -292,15 +302,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
 					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
 					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population imbalance (%)"},
-					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (local)"},
+					new String[]{"",""},					
 					new String[]{""+decimal.format(dm.fairnessScores[8]),"Representation imbalance (global)"},
-					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
-					new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
+					new String[]{""+integer.format(dm.total_vote_gap),"Wasted votes (count)"},
+					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
+					new String[]{"",""},
+					//new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
+					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (local)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
 					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
-					new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
-					new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
-					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
+					//new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
+					//new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
+					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
+					new String[]{"",""},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
 					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
 					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
