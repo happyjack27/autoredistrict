@@ -1302,7 +1302,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
 	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
 	public final JSlider sliderWastedVotesTotal = new JSlider();
-	public final JLabel lblWastedVotes = new JLabel("Wasted votes (total)");
+	public final JLabel lblWastedVotes = new JLabel("Competitiveness (victory margin)");
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
@@ -4860,7 +4860,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		panel_4.add(lblWastedVotes);
 		
-		lblSeatsVotes = new JLabel("Seats-votes curve asymmetry");
+		lblSeatsVotes = new JLabel("Partisan symmetry");
 		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
 		lblSeatsVotes.setBounds(10, 38, 179, 16);
 		panel_4.add(lblSeatsVotes);
