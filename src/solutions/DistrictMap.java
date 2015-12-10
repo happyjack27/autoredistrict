@@ -17,6 +17,7 @@
 package solutions;
 
 import geography.*;
+import ui.MainFrame;
 
 import java.awt.Color;
 import java.util.*;
@@ -834,6 +835,32 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return -div;
     }
+    /*
+    public double[][] calcDemographicStatistics() {
+    	String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
+		double total_population = 0;
+		
+		double[] pop_by_dem = new double[dem_col_names.length];
+		for( int i = 0; i < pop_by_dem.length; i++) { pop_by_dem[i] = 0; }
+		double[] votes_by_dem = new double[dem_col_names.length];
+		for( int i = 0; i < votes_by_dem.length; i++) { votes_by_dem[i] = 0; }
+		double[] vote_margins_by_dem = new double[dem_col_names.length];
+		for( int i = 0; i < vote_margins_by_dem.length; i++) { vote_margins_by_dem[i] = 0; }
+		double[][] demo = getDemographicsByDistrict();
+		double[][] demo_pct = new double[demo.length][];
+		for( int i = 0; i < demo_pct.length; i++) {
+			double total = 0;
+			for( int j = 0; j < demo[i].length; j++) {
+				pop_by_dem[j] += demo[i][j];
+				total += demo[i][j];
+			}
+			total = 1.0/total;
+			demo_pct[i] = new double[demo[i].length];
+			for( int j = 0; j < demo[i].length; j++) {
+				demo_pct[i][j] = demo[i][j]*total;
+			}
+		}
+    }*/
     
     public double[][] getDemographicsByDistrict() {
     	double[][] ddd = new double[districts.size()][];
