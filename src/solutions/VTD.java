@@ -17,7 +17,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
     public Vector<VTD> neighbors = new Vector<VTD>();
     public double[] neighbor_lengths;
     public double unpaired_edge_length = 0;
-    public Vector<Vector<Demographic>> demographics = new Vector<Vector<Demographic>>();
+    public Vector<Vector<Election>> elections = new Vector<Vector<Election>>();
     //private double[][] mu_sigma_n = null;
     
     public boolean has_census_results = false;
@@ -65,6 +65,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
     */
     
 	double[][] outcomes;
+	public double[] demographics = new double[]{};
 
     public VTD() {
     	super();
@@ -171,15 +172,15 @@ public class VTD extends ReflectionJSONObject<VTD> {
             for(int i = 0; i < outcomes[0].length; i++) {
             	outcomes[0][i] = 0;
             }
-            for( int elec = 0; elec < demographics.size(); elec++) {
-		        for( Demographic d : demographics.get(elec)) {
+            for( int elec = 0; elec < elections.size(); elec++) {
+		        for( Election d : elections.get(elec)) {
 		            for( int j = 0; j < d.vote_prob.length; j++) {
 		            	outcomes[0][j] += d.population * d.vote_prob[j]*d.turnout_probability;//d.vote_prob[j];
 		            }
 		        }
             }
             for(int i = 0; i < outcomes[0].length; i++) {
-            	outcomes[0][i] /= demographics.size();
+            	outcomes[0][i] /= elections.size();
             }    		
     	} else {
 	    	outcomes = new double[Settings.num_ward_outcomes][];
@@ -191,8 +192,8 @@ public class VTD extends ReflectionJSONObject<VTD> {
 	            for(int i = 0; i < probs.length; i++) {
 	            	probs[i] = 0;
 	            }
-	            int elec = (int)(Math.random()*(double)demographics.size());
-	            for( Demographic d : demographics.get(elec)) {
+	            int elec = (int)(Math.random()*(double)elections.size());
+	            for( Election d : elections.get(elec)) {
 	                for( int j = 0; j < d.vote_prob.length; j++) {
 	                	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
 	                }

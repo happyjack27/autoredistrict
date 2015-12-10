@@ -4,7 +4,7 @@ import java.util.Vector;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
-import solutions.Demographic;
+import solutions.Election;
 
 public class DemographicSet extends ReflectionJSONObject<DemographicSet> {
 	public String name = "";

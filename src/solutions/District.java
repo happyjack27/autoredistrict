@@ -4,9 +4,10 @@ import geography.FeatureCollection;
 import java.util.*;
 
 import serialization.JSONObject;
+import ui.MainFrame;
 
 public class District extends JSONObject {
-    Vector<VTD> wards = new Vector<VTD>();
+    Vector<VTD> vtds = new Vector<VTD>();
     
     public static int id = -1;
     
@@ -42,13 +43,29 @@ public class District extends JSONObject {
     		return population;
     	}
         double pop = 0;
-        for( VTD ward : wards) {
-        	if( ward.has_census_results) {
-        		pop += ward.population;
+        for( VTD vtd : vtds) {
+        	if( vtd.has_census_results) {
+        		pop += vtd.population;
         	} 
         }
         population = pop;
         return pop;
+    }
+    public double[] getDemographics() {
+    	String[] cols = MainFrame.mainframe.project.demographic_columns_as_array();
+    	double[] dd = new double[cols.length];
+    	if( dd.length == 0) {
+    		return dd;
+    	}
+    	for(int i = 0; i < cols.length; i++) {
+    		dd[i] = 0;
+    	}
+    	for( VTD vtd : vtds) {
+        	for(int i = 0; i < cols.length; i++) {
+        		dd[i] += vtd.demographics[i];
+        	}
+    	}
+    	return dd;
     }
     public static double[][] getPropRepOutcome(double[] district_vote,int members_per_district) {
     	double[] prop_rep = new double[district_vote.length];
@@ -100,26 +117,14 @@ public class District extends JSONObject {
         }
         int result = (int)Math.floor(Math.random()*(double)outcomes.length);
         double total_pop = 0;
-   		//for( int i = 0; i < outcomes.length; i++) {
    	       	try {
-   	            //double[] popular_vote = new double[Settings.num_candidates];
-   	    		//int n = (int)Math.floor(Math.random()*(double)outcomes.length);
-   	            //double[] prop_rep = new double[Settings.num_candidates];
    	            double[] district_vote = outcomes[result];
    	            double[] pop_district_vote = pop_balanced_outcomes[result];
-   	            //System.out.println("candidates "+Settings.num_candidates+" outcomes: "+district_vote.length);
    	            if( district_vote == null) {
    	            	int i = 0;
    	            	while( district_vote == null && i < 2) {
    	   	            	outcomes[result] = getAnOutcome();
    	   	            	district_vote = outcomes[result];
-   	   	            	/*
-   	   	            	System.out.println("district still null district_vote "+i+" "+result);
-   	            		result = (int)Math.floor(Math.random()*(double)outcomes.length);
-   	    	            district_vote = outcomes[result];
-   	    	            this.getAnOutcome();
-   	    	            pop_district_vote = pop_balanced_outcomes[result];
-   	    	            */
    	            		i++;
    	            	}
    	   	            if( district_vote == null) {
@@ -144,13 +149,6 @@ public class District extends JSONObject {
    	    		System.out.println("ex get election result "+ex);
    	    		ex.printStackTrace();
    	    	}
-    	//}
-   		/*
-   		for( int j = 0; j < tot_popular_vote.length; j++) {
-        	tot_elected_vote[j] /= (double)outcomes.length;
-        	tot_popular_vote[j] /= (double)outcomes.length;
-        	residual_popular_vote[j] /= (double)outcomes.length;
-        }*/
    	    if( Settings.ignore_uncontested && tot_popular_vote.length >=2 && FeatureCollection.buncontested1.length > id && id >= 0 && FeatureCollection.buncontested1[id]) {//(tot_popular_vote[0] == 0 || tot_popular_vote[1] == 0)) {
    	    	for( int i = 0; i < tot_popular_vote.length; i++) {
    	    		tot_popular_vote[i] = 0;
@@ -324,17 +322,17 @@ public class District extends JSONObject {
     
     public double[] getAnOutcome() {
         double[] district_vote = new double[Settings.num_candidates]; //inited to 0
-        if( wards.size() == 0) {
+        if( vtds.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {//most_value) {
                 district_vote[i] = 0;
             }
             return district_vote;
         }
-        for( VTD ward : wards) {
-            double[] ward_vote = ward.getOutcome();
-            if( ward_vote != null) {
-                for( int i = 0; i < ward_vote.length; i++) {//most_value) {
-                    district_vote[i] += ward_vote[i];
+        for( VTD vtd : vtds) {
+            double[] vtd_vote = vtd.getOutcome();
+            if( vtd_vote != null) {
+                for( int i = 0; i < vtd_vote.length; i++) {//most_value) {
+                    district_vote[i] += vtd_vote[i];
                 }
             }
         }
@@ -344,13 +342,13 @@ public class District extends JSONObject {
     	try {
         double[] district_vote = new double[Settings.num_candidates]; //inited to 0
         double[] pop_district_vote = new double[Settings.num_candidates]; //inited to 0
-        if( wards.size() == 0) {
+        if( vtds.size() == 0) {
             for( int i = 0; i < district_vote.length; i++) {
                 district_vote[i] = 0;
             }
             return new double[][]{district_vote,district_vote};
         }
-        for( VTD ward : wards) {
+        for( VTD ward : vtds) {
             double[] ward_vote = ward.getOutcome();
             if( ward_vote != null) {
             	double tot = 0;
@@ -425,7 +423,7 @@ public class District extends JSONObject {
     	}*/
         Hashtable<Integer,Vector<VTD>> region_hash = new Hashtable<Integer,Vector<VTD>>();
         regions = new Vector<Vector<VTD>>();
-        for( VTD ward : wards) {
+        for( VTD ward : vtds) {
             if( region_hash.get(ward.id) != null)
                 continue;
             Vector<VTD> region = new Vector<VTD>();

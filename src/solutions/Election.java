@@ -4,7 +4,7 @@ import java.util.Vector;
 
 import serialization.ReflectionJSONObject;
 
-public class Demographic  {//extends ReflectionJSONObject<Demographic> {
+public class Election  {//extends ReflectionJSONObject<Demographic> {
 	//public int ward_id;
 	public int population;
 	public double turnout_probability;

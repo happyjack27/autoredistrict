@@ -30,10 +30,20 @@ public class Project extends ReflectionJSONObject<Project> {
 	public String county_column = "";
 	
 	public Vector<String> demographic_columns = new Vector<String>();
-	public Vector<String> demographic_columns_2 = new Vector<String>();
-	public Vector<String> demographic_columns_3 = new Vector<String>();
+	public Vector<String> election_columns = new Vector<String>();
+	public Vector<String> election_columns_2 = new Vector<String>();
+	public Vector<String> election_columns_3 = new Vector<String>();
 	public Vector<String> substitute_columns = new Vector<String>();
 	public Vector<DemographicSet> demographics = new Vector<DemographicSet>();
+	
+	public String[] demographic_columns_as_array() {
+    	Vector<String> demo_cols = demographic_columns;
+    	String[] cols = new String[demo_cols.size()];
+    	for(int i = 0; i < demo_cols.size(); i++) {
+    		cols[i] = demo_cols.get(i);
+    	}
+    	return cols;
+	}
 	
 	public String active_demographic_set = "";
 	public double disconnected_weight = 0.5;
@@ -124,22 +134,22 @@ public class Project extends ReflectionJSONObject<Project> {
 		
 		if( containsKey("demographic_columns")) {
 			Vector v = getVector("demographic_columns");
-			demographic_columns = v;
+			election_columns = v;
 			Vector<String> vs = new Vector<String>();
 			for( int i = 0; i < v.size(); i++) {
 				vs.add((String)v.get(i));
 			}
-			MainFrame.mainframe.setDemographicColumns();
+			MainFrame.mainframe.setElectionColumns();
 		} else { System.out.println("demographic_columns not found"); }
 		
 		if( containsKey("demographic_columns_2")) {
 			Vector v = getVector("demographic_columns_2");
-			demographic_columns_2 = v;
+			election_columns_2 = v;
 			Vector<String> vs = new Vector<String>();
 			for( int i = 0; i < v.size(); i++) {
 				vs.add((String)v.get(i));
 			}
-			MainFrame.mainframe.setDemographicColumns2();
+			MainFrame.mainframe.setElectionColumns2();
 		}
 
 		if( containsKey("disconnected_weight")) {
@@ -192,7 +202,7 @@ public class Project extends ReflectionJSONObject<Project> {
 				primary_key_column = "REC_NUM";
 		}
 		
-		put("demographic_columns",demographic_columns);
+		put("demographic_columns",election_columns);
 		//initial_population = Integer.parseInt(((String)MainFrame.mainframe.textField.getText()).trim()));
 		super.pre_serialize();
 	}

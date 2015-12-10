@@ -143,6 +143,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			ex.printStackTrace();
 		}
 		
+		Vector<String> cands = MainFrame.mainframe.project.election_columns;
+		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
 		
 		try {
 			double total_pvi = 0;
@@ -153,7 +155,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_1 = 0;
 			
 			//=== by district
-			String[] dcolumns = new String[11+Settings.num_candidates*2];
+			String[] dcolumns = new String[11+Settings.num_candidates*2+dem_col_names.length*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			if( dmcolors == null || dmcolors.length != dm.districts.size()) {
 				dmcolors = new Color[dm.districts.size()];
@@ -184,11 +186,36 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			for( int i = 0; i < Settings.num_candidates; i++) {
 				elec_counts[i] = 0;
 				vote_counts[i] = 0;
-				dcolumns[i+11] = ""+i+" vote %";
-				dcolumns[i+11+Settings.num_candidates] = ""+i+" votes";
+				dcolumns[i+11] = ""+cands.get(i)+" vote %";
+				dcolumns[i+11+Settings.num_candidates] = ""+cands.get(i)+" votes";
+			}
+			for( int i = 0; i < dem_col_names.length; i++) {
+				dcolumns[i+11+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
+				dcolumns[i+11+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
 			}
 			
 			double total_population = 0;
+			
+			double[] pop_by_dem = new double[dem_col_names.length];
+			for( int i = 0; i < pop_by_dem.length; i++) { pop_by_dem[i] = 0; }
+			double[] votes_by_dem = new double[dem_col_names.length];
+			for( int i = 0; i < votes_by_dem.length; i++) { votes_by_dem[i] = 0; }
+			double[] vote_margins_by_dem = new double[dem_col_names.length];
+			for( int i = 0; i < vote_margins_by_dem.length; i++) { vote_margins_by_dem[i] = 0; }
+			double[][] demo = dm.getDemographicsByDistrict();
+			double[][] demo_pct = new double[demo.length][];
+			for( int i = 0; i < demo_pct.length; i++) {
+				double total = 0;
+				for( int j = 0; j < demo[i].length; j++) {
+					pop_by_dem[j] += demo[i][j];
+					total += demo[i][j];
+				}
+				total = 1.0/total;
+				demo_pct[i] = new double[demo[i].length];
+				for( int j = 0; j < demo[i].length; j++) {
+					demo_pct[i][j] = demo[i][j]*total;
+				}
+			}
 	
 			for( int i = 0; i < dm.districts.size(); i++) {
 				try {
@@ -284,11 +311,61 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				for( int j = 0; j < result[0].length; j++) {
 					ddata[i][j+11+Settings.num_candidates] = ""+integer.format(result[0][j]);
 				}	
+				for( int j = 0; j < dem_col_names.length; j++) {
+					ddata[i][j+11+Settings.num_candidates*2] = ""+decimal.format(demo_pct[i][j]);
+					votes_by_dem[j] += total_votes*demo_pct[i][j];
+					vote_margins_by_dem[j] += dm.vote_gap_by_district[i]*demo_pct[i][j];
+				}	
+				for( int j = 0; j < dem_col_names.length; j++) {
+					ddata[i][j+11+Settings.num_candidates*2+dem_col_names.length] = ""+integer.format(demo[i][j]);
+				}	
 				} catch (Exception ex) {
 					System.out.println("ex stats 1 "+ex);
 					ex.printStackTrace();
 				}
 			}
+			
+			double tot_pop = 0;
+			double tot_vote = 0;
+			double tot_margin = 0;
+			for( int i = 0; i < dem_col_names.length; i++) {
+				tot_pop += pop_by_dem[i];
+				tot_vote += votes_by_dem[i];
+				tot_margin += vote_margins_by_dem[i];
+			}
+			if( tot_margin == 0) {
+				tot_margin = 1;
+			}
+			if( tot_vote == 0) {
+				tot_vote = 1;
+			}
+			double ravg = 1.0 / (tot_margin / tot_vote);
+			
+			String[] ecolumns = new String[]{"Ethnicity","Population","Uncompetitiveness","% Wasted votes","Votes","Victory margins"};
+			String[][] edata = new String[dem_col_names.length+1][];
+			for( int i = 0; i < dem_col_names.length; i++) {
+				edata[i] = new String[]{
+						dem_col_names[i],
+						integer.format(pop_by_dem[i]),
+						decimal.format(ravg*vote_margins_by_dem[i]/votes_by_dem[i]),
+						decimal.format(vote_margins_by_dem[i]/votes_by_dem[i]),
+						decimal.format(votes_by_dem[i]),
+						decimal.format(vote_margins_by_dem[i]),
+				};
+			}
+			edata[dem_col_names.length] = new String[]{
+					"TOTAL",
+					integer.format(tot_pop),
+					"1",
+					decimal.format(1.0/ravg),
+					decimal.format(tot_vote),
+					decimal.format(tot_margin),
+			};
+
+			TableModel tm0 = new DefaultTableModel(edata,ecolumns);
+			ethnicityTable.setModel(tm0);
+			//ethnicityTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
+
 			
 			//=== summary
 			int wasted_votes = 0;
@@ -324,7 +401,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			summaryTable.getColumnModel().getColumn(0).setCellRenderer(rightRenderer);
 
-			Vector<String> cands = MainFrame.mainframe.project.demographic_columns;
 
 
 			//=== by party
@@ -372,19 +448,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	private void initComponents() {
 		this.setLayout(null);
 		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(443, 788));
+		this.setPreferredSize(new Dimension(838, 650));
 		
 		rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(26, 332, 390, 223);
+		scrollPane.setBounds(26, 384, 791, 223);
 		add(scrollPane);
 		
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(26, 604, 390, 155);
+		scrollPane_1.setBounds(427, 45, 390, 87);
 		add(scrollPane_1);
 		
 		table_1 = new JTable();
@@ -399,7 +475,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		btnCopy.setBounds(327, 298, 89, 23);
+		btnCopy.setBounds(728, 350, 89, 23);
 		add(btnCopy);
 		
 		button = new JButton("copy");
@@ -410,7 +486,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				table_1.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
-		button.setBounds(327, 570, 89, 23);
+		button.setBounds(728, 11, 89, 23);
 		add(button);
 		
 		button_1 = new JButton("copy");
@@ -425,7 +501,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_1);
 		
 		scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(26, 45, 390, 241);
+		scrollPane_2.setBounds(26, 45, 390, 294);
 		add(scrollPane_2);
 		
 		summaryTable = new JTable();
@@ -436,12 +512,34 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(lblSummary);
 		
 		lblByDistrict = new JLabel("By district");
-		lblByDistrict.setBounds(26, 307, 226, 14);
+		lblByDistrict.setBounds(26, 359, 226, 14);
 		add(lblByDistrict);
 		
 		lblByParty = new JLabel("By party");
-		lblByParty.setBounds(26, 579, 226, 14);
+		lblByParty.setBounds(427, 20, 226, 14);
 		add(lblByParty);
+		
+		lblByEthnicity = new JLabel("By ethnicity");
+		lblByEthnicity.setBounds(427, 152, 226, 14);
+		add(lblByEthnicity);
+		
+		scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBounds(427, 177, 390, 162);
+		add(scrollPane_3);
+		
+		ethnicityTable = new JTable();
+		scrollPane_3.setViewportView(ethnicityTable);
+		
+		button_2 = new JButton("copy");
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ActionEvent nev = new ActionEvent(ethnicityTable, ActionEvent.ACTION_PERFORMED, "copy");
+				ethnicityTable.selectAll();
+				ethnicityTable.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+			}
+		});
+		button_2.setBounds(728, 143, 89, 23);
+		add(button_2);
 	}
 	public FeatureCollection featureCollection;
 	private JTable table;
@@ -454,6 +552,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JLabel lblSummary;
 	public JLabel lblByDistrict;
 	public JLabel lblByParty;
+	public JLabel lblByEthnicity;
+	public JScrollPane scrollPane_3;
+	public JButton button_2;
+	public JTable ethnicityTable;
 	
     public class MyTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
 

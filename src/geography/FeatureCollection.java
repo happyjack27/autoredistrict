@@ -18,7 +18,7 @@ import com.hexiong.jdbf.DBFReader;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
-import solutions.Demographic;
+import solutions.Election;
 import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
@@ -92,23 +92,23 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( int j = 0; j < dm.vtd_districts.length; j++) {
 			try {
 				int dist = dm.vtd_districts[j];
-				if(features.get(j).vtd.demographics.size() > 0) {
-					Vector<Demographic> vdem = features.get(j).vtd.demographics.get(0);
-					for( Demographic dem : vdem) {
+				if(features.get(j).vtd.elections.size() > 0) {
+					Vector<Election> vdem = features.get(j).vtd.elections.get(0);
+					for( Election dem : vdem) {
 						counts1[dist][0] += dem.population*dem.turnout_probability*dem.vote_prob[0];
 						counts1[dist][1] += dem.population*dem.turnout_probability*dem.vote_prob[1];
 					}
 				}
-				if(features.get(j).vtd.demographics.size() > 1) {
-					Vector<Demographic> vdem = features.get(j).vtd.demographics.get(1);
-					for( Demographic dem : vdem) {
+				if(features.get(j).vtd.elections.size() > 1) {
+					Vector<Election> vdem = features.get(j).vtd.elections.get(1);
+					for( Election dem : vdem) {
 						counts2[dist][0] += dem.population*dem.turnout_probability*dem.vote_prob[0];
 						counts2[dist][1] += dem.population*dem.turnout_probability*dem.vote_prob[1];
 					}
 				}
-				if(features.get(j).vtd.demographics.size() > 2) {
-					Vector<Demographic> vdem = features.get(j).vtd.demographics.get(2);
-					for( Demographic dem : vdem) {
+				if(features.get(j).vtd.elections.size() > 2) {
+					Vector<Election> vdem = features.get(j).vtd.elections.get(2);
+					for( Election dem : vdem) {
 						counts3[dist][0] += dem.population*dem.turnout_probability*dem.vote_prob[0];
 						counts3[dist][1] += dem.population*dem.turnout_probability*dem.vote_prob[1];
 					}
@@ -456,8 +456,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[b.id];
 					
-					for( int k = 0; k < b.demographics.size(); k++) {
-						Vector<Demographic> dem = b.demographics.get(k);
+					for( int k = 0; k < b.elections.size(); k++) {
+						Vector<Election> dem = b.elections.get(k);
 						for( int j = 0; j < dem.size() && j < standard_district_colors.length; j++) {
 							int pop = dem.get(j).population;
 							tot[di] += pop;

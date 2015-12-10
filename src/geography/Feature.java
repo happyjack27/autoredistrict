@@ -10,7 +10,7 @@ import com.hexiong.jdbf.JDBField;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
-import solutions.Demographic;
+import solutions.Election;
 import solutions.Settings;
 import solutions.VTD;
 
@@ -19,11 +19,12 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static final int DISPLAY_MODE_NORMAL = 0;
 	public static final int DISPLAY_MODE_TEST1 = 1;
 	public static final int DISPLAY_MODE_TEST2 = 2;
-	public static final int DISPLAY_MODE_DEMOGRAPHICS = 3;
+	public static final int DISPLAY_MODE_VOTES = 3;
 	public static final int DISPLAY_MODE_DIST_POP = 4;
 	public static final int DISPLAY_MODE_DIST_DEMO = 5;
 	public static final int DISPLAY_MODE_COMPACTNESS = 6;
 	public static final int DISPLAY_MODE_WASTED_VOTES = 7;
+	public static final int DISPLAY_MODE_DEMOGRAPHICS = 8;
 	public static boolean show_seats = true;
 	
 	public Vector<JDBField> dbfFields = new Vector<JDBField>();
@@ -300,10 +301,10 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		if( geometry.fillColor != null || vtd.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);
 			if( display_mode == DISPLAY_MODE_TEST1) {
-				g.setColor(vtd.demographics != null && vtd.demographics.size() > 0 ? Color.white :  Color.black);
+				g.setColor(vtd.elections != null && vtd.elections.size() > 0 ? Color.white :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_TEST2) {
 				g.setColor(vtd.has_census_results ? Color.white :  Color.black);
-			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
+			} else if( display_mode == DISPLAY_MODE_VOTES) {
 				Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 				int max_col = -1;
 				int max_num = 0;
@@ -311,8 +312,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				for( int k = 0; k < vtd.demographics.size(); k++) {
-					Vector<Demographic> dem = vtd.demographics.get(k);
+				for( int k = 0; k < vtd.elections.size(); k++) {
+					Vector<Election> dem = vtd.elections.get(k);
 					for( int i = 0; i < dem.size() && i < colors.length; i++) {
 						int pop = dem.get(i).population;
 						tot += pop;
