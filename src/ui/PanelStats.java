@@ -341,7 +341,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			double ravg = 1.0 / (tot_margin / tot_vote);
 			
-			String[] ecolumns = new String[]{"Ethnicity","Population","Uncompetitiveness","% Wasted votes","Votes","Victory margins"};
+			String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Votes","Victory margins"};
 			String[][] edata = new String[dem_col_names.length+1][];
 			for( int i = 0; i < dem_col_names.length; i++) {
 				edata[i] = new String[]{

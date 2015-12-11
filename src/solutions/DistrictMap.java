@@ -1376,6 +1376,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,wasted_vote_imbalance
         		,sva
         		,deviation_from_diagonal
+        		,Settings.reduce_splits ? countSplits() : 0
+        				,0 //reserved for reduce ethnicity imbalance
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;

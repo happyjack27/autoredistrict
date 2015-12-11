@@ -152,6 +152,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean ignore_uncontested = false;
 	public static boolean substitute_uncontested = false;
 	public static boolean reduce_splits;
+	public static double vote_dilution_weight = 0;
 
 	public static void setPopulation(double i) {
 		population = (int) i;

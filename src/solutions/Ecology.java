@@ -35,8 +35,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	static int num_threads = 8;
 
-	public static double[] fairnessScoreEmaVars = new double[9];
-	public static double[] fairnessScoreEmaMeans = new double[9];
+	public static double[] fairnessScoreEmaVars = new double[11];
+	public static double[] fairnessScoreEmaMeans = new double[11];
 
     int cutoff;
     int speciation_cutoff;
@@ -464,18 +464,20 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         double geometry_weight_multiplier = 1;
 
         double[] weights = new double[]{
-        		Settings.geometry_weight                *1.0, 
+        		Settings.geometry_weight                *1.0,  //0
         		Settings.disenfranchise_weight          *1.0, 
-        		Settings.population_balance_weight      *1.0,
+        		Settings.population_balance_weight      *1.0, //2
                 Settings.disconnected_population_weight *1.0,
-                Settings.voting_power_balance_weight    *1.0,
+                Settings.voting_power_balance_weight    *1.0, //4
                 Settings.wasted_votes_total_weight      *1.0,
-                Settings.wasted_votes_imbalance_weight  *1.0,
+                Settings.wasted_votes_imbalance_weight  *1.0, //6
                 Settings.seats_votes_asymmetry_weight   *1.0,
-                Settings.diagonalization_weight   *1.0,
+                Settings.diagonalization_weight   *1.0, //8
+                Settings.reduce_splits ? Settings.split_reduction_weight   *1.0 : 0,
+               MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.vote_dilution_weight *1.0 //10
         };
-        double geo_total = weights[0]+weights[2]+weights[3];
-        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7]+weights[8];
+        double geo_total = weights[0]+weights[2]+weights[3]+weights[9];
+        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7]+weights[8]+weights[10];
         
         double geometric_mult = 2.0*(geometry_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/geo_total);
         double fairness_mult = fairness_weight_multiplier*(Settings.geo_or_fair_balance_weight)/fair_total;
@@ -490,6 +492,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		weights[6]*fairness_mult,
         		weights[7]*fairness_mult,
         		weights[8]*fairness_mult,
+        		weights[9]*geometric_mult,
+        		weights[10]*fairness_mult,
         };
 
         for( int j = 0; j < population.size(); j++) {
