@@ -1360,6 +1360,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBox chckbxReduceSplits;
 	public final JLabel lblFairnessCriteria = new JLabel("Fairness criteria");
 	public JButton btnEthnicityColumns;
+	private boolean hushcomboBoxCountyColumn;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -2355,6 +2356,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			ex.printStackTrace();
 		}
 		System.out.println("pkey..");
+		try {
+			hushcomboBoxCountyColumn = true;
+			srcomboBoxCountyColumn.removeAllItems();
+			srcomboBoxCountyColumn.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				srcomboBoxCountyColumn.addItem(map_headers[i]);
+			}
+			hushcomboBoxCountyColumn = false;
+			if( project.county_column != null && project.county_column.length() > 0) {
+				srcomboBoxCountyColumn.setSelectedItem(project.county_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
 
 		try {
 			/*
@@ -2678,7 +2694,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					f.properties.put(project.demographic_columns.get(i),"0");
 				}
 			}
+		}
+	}
+	public void setCountyColumn() {
 		
+		for( Feature f : featureCollection.features) {
+			VTD v = f.vtd;
+			try {
+				v.county = f.properties.get(project.county_column).toString();
+			} catch (Exception ex) {
+			}
 		}
 	}
 	
@@ -5102,6 +5127,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_5.add(lblSplitReduction);
 		
 		srcomboBoxCountyColumn = new JComboBox();
+		srcomboBoxCountyColumn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if( hushcomboBoxCountyColumn) {
+					return;
+				}
+				MainFrame.mainframe.project.county_column = (String)srcomboBoxCountyColumn.getSelectedItem();
+				setCountyColumn();
+			}
+		});
 		srcomboBoxCountyColumn.setBounds(10, 93, 178, 20);
 		panel_5.add(srcomboBoxCountyColumn);
 		

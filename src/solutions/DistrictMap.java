@@ -899,7 +899,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				}
 				
 			}
-			splits += nonzeros + (least/total) - 1;	
+			least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+			splits += nonzeros + least - 1;	
 		}
 		return splits;
     }
