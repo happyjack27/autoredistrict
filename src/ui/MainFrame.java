@@ -1361,6 +1361,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JLabel lblFairnessCriteria = new JLabel("Fairness criteria");
 	public JButton btnEthnicityColumns;
 	private boolean hushcomboBoxCountyColumn;
+	public final JLabel lblRacialVoteDilution = new JLabel("Racial vote dilution");
+	public final JSlider sliderVoteDilution = new JSlider();
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3451,6 +3453,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblFairnessCriteria.setBounds(9, 11, 179, 16);
 		
 		panel_4.add(lblFairnessCriteria);
+		lblRacialVoteDilution.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
+		lblRacialVoteDilution.setBounds(9, 225, 172, 16);
+		
+		panel_4.add(lblRacialVoteDilution);
+		sliderVoteDilution.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.vote_dilution_weight = sliderVoteDilution.getValue()/100.0;
+			}
+		});
+		sliderVoteDilution.setValue(50);
+		sliderVoteDilution.setBounds(9, 246, 180, 29);
+		
+		panel_4.add(sliderVoteDilution);
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
@@ -3463,7 +3478,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
-		Settings.split_reduction_weight = this.sliderSplitReduction.getValue()/100.0;
+		Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
+		Settings.vote_dilution_weight = sliderVoteDilution.getValue()/100.0;
 		Settings.mutate_all = true;
 		
 		Settings.mutation_rateChangeListeners.add(this);
@@ -4107,7 +4123,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnEvolution.add(mntmResetAnnealFloor);
 		mnEvolution.add(new JSeparator());
 		
-		mnConstraints = new JMenu("Constraints");
+		mnConstraints = new JMenu("Communities of interest");
 		menuBar.add(mnConstraints);
 		
 		mntmWholeCounties = new JMenuItem("Manage Locks");
@@ -4892,7 +4908,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 274, 200, 302);
+		panel_4.setBounds(400, 274, 200, 350);
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
@@ -4904,10 +4920,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(sliderRepresentation);
 		 
 		JLabel lblVotingPowerBalance = new JLabel("Voting power balance");
-		lblVotingPowerBalance.setBounds(9, 225, 172, 16);
+		lblVotingPowerBalance.setBounds(9, 286, 172, 16);
 		lblVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
 		panel_4.add(lblVotingPowerBalance);
-		sliderVotingPowerBalance.setBounds(9, 246, 180, 29);
+		sliderVotingPowerBalance.setBounds(9, 307, 180, 29);
 		sliderVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
 		panel_4.add(sliderVotingPowerBalance);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
@@ -5120,7 +5136,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderSplitReduction.setBounds(10, 139, 180, 29);
 		panel_5.add(sliderSplitReduction);
 		sliderSplitReduction.setValue(0);
-		sliderSplitReduction.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		lblSplitReduction.setFont(new Font("Tahoma", Font.BOLD, 14));
 		lblSplitReduction.setBounds(10, 11, 179, 16);
 		

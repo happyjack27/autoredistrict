@@ -835,10 +835,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         return -div;
     }
-    /*
+    
     public double[][] calcDemographicStatistics() {
     	String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
-		double total_population = 0;
 		
 		double[] pop_by_dem = new double[dem_col_names.length];
 		for( int i = 0; i < pop_by_dem.length; i++) { pop_by_dem[i] = 0; }
@@ -860,7 +859,82 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				demo_pct[i][j] = demo[i][j]*total;
 			}
 		}
-    }*/
+		
+		//---insert vote and vote margin finding
+		for( int i = 0; i < districts.size(); i++) {
+			try {
+			District d = districts.get(i);
+
+			double[][] result = d.getElectionResults();
+			double total_votes = result[0][0]+result[0][1];
+			if( total_votes == 0) {
+				total_votes = 1;
+			}
+			
+			for( int j = 0; j < dem_col_names.length; j++) {
+				votes_by_dem[j] += total_votes*demo_pct[i][j];
+				vote_margins_by_dem[j] += vote_gap_by_district[i]*demo_pct[i][j];
+			}	
+			} catch (Exception ex) {
+				System.out.println("ex stats 1 "+ex);
+				ex.printStackTrace();
+			}
+		}
+		//--end insert vote and vote margin finding
+		
+		double tot_pop = 0;
+		double tot_vote = 0;
+		double tot_margin = 0;
+		for( int i = 0; i < dem_col_names.length; i++) {
+			tot_pop += pop_by_dem[i];
+			tot_vote += votes_by_dem[i];
+			tot_margin += vote_margins_by_dem[i];
+		}
+		if( tot_margin == 0) {
+			tot_margin = 1;
+		}
+		if( tot_vote == 0) {
+			tot_vote = 1;
+		}
+		double ravg = 1.0 / (tot_margin / tot_vote);
+		
+		//String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Votes","Victory margins"};
+		double[][] edata = new double[dem_col_names.length+1][];
+		for( int i = 0; i < dem_col_names.length; i++) {
+			edata[i] = new double[]{
+					pop_by_dem[i],
+					(ravg*vote_margins_by_dem[i]/votes_by_dem[i]),
+					(vote_margins_by_dem[i]/votes_by_dem[i]),
+					(votes_by_dem[i]),
+					(vote_margins_by_dem[i]),
+			};
+		}
+		edata[dem_col_names.length] = new double[]{
+				tot_pop,
+				1,
+				(1.0/ravg),
+				(tot_vote),
+				(tot_margin),
+		};
+		
+		return edata;
+    }
+    
+    public double getRacialVoteDilution() {
+    	//returns population-weighted mean absolute deviation.
+    	double[][] ddd = calcDemographicStatistics();
+    	double tot = 0;
+    	double tot_score = 0;
+    	for( int i = 0; i < ddd.length-1; i++) {
+    		double pop = ddd[i][0];
+    		double score = ddd[i][1];
+    		score = Math.log(score);
+    		tot_score += Math.abs(score)*pop;
+    		tot += pop;
+    	}
+    	tot_score /= tot;
+    	return tot_score;
+    }
     
     public double[][] getDemographicsByDistrict() {
     	double[][] ddd = new double[districts.size()][];
@@ -900,7 +974,35 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				
 			}
 			least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-			splits += nonzeros + least - 1;	
+			splits += nonzeros + least - 2;	
+		}
+		return splits;
+    }
+    
+    public double countSplitsInteger() {
+    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+		for( int i = 0; i < vtds.size(); i++) {
+			VTD vtd = vtds.get(i);
+			int[] dists = counties.get(vtd.county);
+			if( dists == null) {
+				dists = new int[Settings.num_districts];
+				counties.put(vtd.county, dists);
+			}
+			dists[vtd_districts[i]]++;
+		}
+		Collection<int[]> vii = counties.values();
+		
+		double splits = 0;
+		for(int[] ii : vii) {
+			double nonzeros = 0;
+			for( int i = 0; i < ii.length; i++) {
+				if( ii[i] == 0) {
+					continue;
+				}
+				nonzeros++;
+			}
+			//least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+			splits += nonzeros - 1;	
 		}
 		return splits;
     }
@@ -1378,7 +1480,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,sva
         		,deviation_from_diagonal
         		,Settings.reduce_splits ? countSplits() : 0
-        				,0 //reserved for reduce ethnicity imbalance
+        		,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
