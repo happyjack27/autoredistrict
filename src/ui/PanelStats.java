@@ -115,11 +115,21 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					
 					Settings.mutation_boundary_rate,
 					
-					dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
-					dm.fairnessScores[4], //POWER IMBALANCE
+					dm.fairnessScores[8], //diag error
 					dm.fairnessScores[5], //WASTED VOTES TOTAL
-					dm.fairnessScores[6], //WASTED VOTES IMBALANCE
+					//dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
+					//dm.fairnessScores[6], //WASTED VOTES IMBALANCE
 					dm.fairnessScores[7], //seats / votes asymmetry
+					dm.fairnessScores[10],
+					dm.fairnessScores[4], //POWER IMBALANCE
+					/*
+					 *    		"Proportionalness (global)",
+    		"Competitiveness (victory margin)",
+    		"Partisan symmetry",
+    		"Racial vote dilution",
+    		"Voting power imbalance",
+
+					 */
 					
 
 					Settings.getAnnealingFloor( featureCollection.ecology.generation),
@@ -131,7 +141,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						), //BORDER LENGTH
 					dm.fairnessScores[3], //DISCONNECTED POP
 					dm.fairnessScores[2], //POP IMBALANCE
-					dm.fairnessScores[8], //diag error
+					dm.fairnessScores[9],//dm.fairnessScores[8], //diag error
 					0,
 					
 			});

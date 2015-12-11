@@ -22,11 +22,11 @@ public class PanelGraphDrawArea extends JPanel {
     		"Mutation rate",
     		
     		//4
-    		"Proportionalness (local)",
-    		"Voting power imbalance",
+    		"Proportionalness (global)",
     		"Competitiveness (victory margin)",
-    		"Wasted votes (imbalance)",
     		"Partisan symmetry",
+    		"Racial vote dilution",
+    		"Voting power imbalance",
 
     		//9
     		"Annealing floor",
@@ -35,7 +35,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Compactness",
     		"Contiguity",
     		"Equal population",
-    		"Proportionalness (global)",
+    		"Splits",
     		"",
     };
 
@@ -43,7 +43,7 @@ public class PanelGraphDrawArea extends JPanel {
     public boolean[] b_draw = new boolean[]{
     		false,false,false,
     		true,
-    		false,false,true,false,true,
+    		true,true,true,true,false,
     		true,
     		true,true,true,true,
     		false,
