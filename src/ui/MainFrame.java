@@ -3438,6 +3438,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
+		Settings.split_reduction_weight = this.sliderSplitReduction.getValue()/100.0;
 		Settings.mutate_all = true;
 		
 		Settings.mutation_rateChangeListeners.add(this);
@@ -5086,6 +5087,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		srlblSplitReduction.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		
 		sliderSplitReduction = new JSlider();
+		sliderSplitReduction.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
+			}
+		});
 		sliderSplitReduction.setBounds(10, 139, 180, 29);
 		panel_5.add(sliderSplitReduction);
 		sliderSplitReduction.setValue(0);
@@ -5106,9 +5112,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxReduceSplits = new JCheckBox("Reduce splits");
 		chckbxReduceSplits.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if( true) {
+				if( false) {
 					JOptionPane.showMessageDialog(null, ""
-							+"\nNot yet implemented."
+							+"\nNot implemented."
 							+"\n\nUse Constraints, Manage locks instead."
 							);
 					chckbxReduceSplits.setSelected(false);
