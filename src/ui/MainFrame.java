@@ -5079,7 +5079,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_5.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_5.setLayout(null);
 		panel.add(panel_5);
-		panel_5.setVisible(false);
+		//panel_5.setVisible(false);
 		
 		srlblSplitReduction = new JLabel("Split reduction");
 		srlblSplitReduction.setBounds(10, 118, 172, 16);
