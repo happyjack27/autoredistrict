@@ -9,6 +9,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
 	public int state = 0;
 	public int temp = -1;
 	public double area = 0;
+	String county = "";
 	
 	//public String name = "";
 

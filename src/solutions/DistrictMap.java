@@ -870,6 +870,40 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	return ddd;
     }
     
+    public double countSplits() {
+    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+		for( int i = 0; i < vtds.size(); i++) {
+			VTD vtd = vtds.get(i);
+			int[] dists = counties.get(vtd.county);
+			if( dists == null) {
+				dists = new int[Settings.num_districts];
+				counties.put(vtd.county, dists);
+			}
+			dists[vtd_districts[i]]++;
+		}
+		Collection<int[]> vii = counties.values();
+		
+		double splits = 0;
+		for(int[] ii : vii) {
+			double total = 0;
+			double nonzeros = 0;
+			double least = -1;
+			for( int i = 0; i < ii.length; i++) {
+				if( ii[i] == 0) {
+					continue;
+				}
+				nonzeros++;
+				total += ii[i];
+				if( least < 0 || ii[i] < least) {
+					least = ii[i];
+				}
+				
+			}
+			splits += nonzeros + (least/total) - 1;	
+		}
+		return splits;
+    }
+    
     double deviation_from_diagonal = 0;
     public void calcSeatsVotesCurve() {
     	deviation_from_diagonal = 0;

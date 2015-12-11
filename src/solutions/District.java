@@ -106,6 +106,21 @@ public class District extends JSONObject {
 		}
 		return new double[][]{prop_rep,residual_popular_vote,residual_popular_vote2, new double[]{votes_per_seat}};
 	}
+    Collection<Pair<String,Integer>> vcounties = new Vector<Pair<String,Integer>>();
+    public Collection getCounties() {
+    	HashMap<String,Pair<String,Integer>> counties = new HashMap<String,Pair<String,Integer>>();
+    	for( VTD vtd : vtds) {
+    		Pair<String,Integer> pair = counties.get(vtd.county);
+    		if( pair == null) {
+    			pair = new Pair<String,Integer>(vtd.county,1);
+    			counties.put(vtd.county, pair);
+    		} else {
+    			pair.b++;
+    		}
+    	}
+    	vcounties = counties.values();
+    	return vcounties;
+    }
     
     public double[][] getElectionResults() {
         double[] tot_popular_vote = new double[Settings.num_candidates];
