@@ -5418,8 +5418,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		if( is_total) {
 			textFieldSeatsPerDistrict.setText("");
 			if( !was_total) {
-				textFieldTotalSeats.setText(""+prev_total_seats);
-				Settings.seats_number_total = prev_total_seats;
+				textFieldTotalSeats.setText(""+(int)(prev_total_seats*5));
+				Settings.seats_number_total = prev_total_seats*5;
 			}
 			try {
 				int seats = Integer.parseInt(textFieldTotalSeats.getText());

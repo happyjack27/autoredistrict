@@ -1520,10 +1520,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double getMaxPopDiff() {
     	double min = -1;
     	double max = -1;
-        for(District district : districts) {
+   	  for(int i = 0; i < Settings.num_districts; i++) {
+  		  District district = districts.get(i);
+		  district.id = i;
         	double pop = district.getPopulation();
         	if( Settings.population_is_per_seat) {
-        		pop /= Settings.seats_in_district(district.id);
+        		pop /= Settings.seats_in_district(i);
         	}
         	if( min < 0 || pop < min) {
         		min = pop;
@@ -1542,19 +1544,22 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double tot = 0;
     	double tot2 = 0;
     	double N = (double) districts.size();
-        for(District district : districts) {
-        	double pop = district.getPopulation();
+ 	  for(int i = 0; i < Settings.num_districts; i++) {
+  		  District district = districts.get(i);
+		  district.id = i;
+  		  double pop = district.getPopulation();
         	if( Settings.population_is_per_seat) {
-        		pop /= Settings.seats_in_district(district.id);
+        		pop /= Settings.seats_in_district(i);
         	}
         	tot += pop;
         	tot2 += pop*pop;
         }
         double avg = tot / N;
-        for(District district : districts) {
+   	  for(int i = 0; i < Settings.num_districts; i++) {
+  		  District district = districts.get(i);
         	int pop = (int)district.getPopulation();
         	if( Settings.population_is_per_seat) {
-        		pop /= Settings.seats_in_district(district.id);
+        		pop /= Settings.seats_in_district(i);
         	}
         	district.excess_pop = (int) (pop-avg);
         }

@@ -180,7 +180,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			//vote_gap_by_district
 			
-			dcolumns[6] = "Seats";//"Self-entropy";
+			dcolumns[6] = "Pop per seats";//"Self-entropy";
 			dcolumns[7] = "Compactness";
 			dcolumns[8] = "Area";
 			dcolumns[9] = "Paired edge length";
@@ -309,7 +309,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][4] = ""+dm.vote_gap_by_district[i];
 				ddata[i][5] = ""+dm.wasted_votes_by_district[i];
 				
-				ddata[i][6] = ""+integer.format(Settings.seats_in_district(d.id));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][6] = ""+integer.format(d.getPopulation()/Settings.seats_in_district(i));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
 				ddata[i][7] = ""+d.iso_quotient;
 				ddata[i][8] = ""+d.area;
 				ddata[i][9] = ""+d.paired_edge_length;
