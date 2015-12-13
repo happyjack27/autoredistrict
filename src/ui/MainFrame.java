@@ -1367,7 +1367,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JSlider sliderVoteDilution = new JSlider();
 	public final JTextField textFieldTotalSeats = new JTextField();
 	public final JRadioButton lblTotalSeats = new JRadioButton("Total seats");
-	protected boolean hush_tot_seats_field = false;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -5263,17 +5262,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		textFieldTotalSeats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if( hush_tot_seats_field ) {
-					return;
-				}
-				hush_tot_seats_field = true;
-				
 				try {
 					Settings.seats_number_total = Integer.parseInt(textFieldTotalSeats.getText());
 					setSeatsMode();
 					panelStats.getStats();
 				} catch (Exception ex) { }
-				hush_tot_seats_field = false;
 			}
 		});
 		
@@ -5444,6 +5437,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			textFieldSeatsPerDistrict.setText("");
 			if( !was_total) {
 				textFieldTotalSeats.setText(""+prev_total_seats);
+				Settings.seats_number_total = prev_total_seats;
 			}
 			try {
 				int seats = Integer.parseInt(textFieldTotalSeats.getText());
@@ -5453,6 +5447,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					tot += sc[i];
 				}
 				textFieldNumDistricts.setText(""+tot);
+				Settings.num_districts = tot;
 			} catch (Exception ex) {
 				
 			}
@@ -5460,9 +5455,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( was_total) {
 				textFieldSeatsPerDistrict.setText("1");
 				textFieldNumDistricts.setText(""+prev_total_seats);
+				Settings.num_districts = prev_total_seats;
 			} else {
 				//textFieldTotalSeats.setText(""+(Settings.num_districts*Settings.seats_number_per_district));
 			}
+		}
+		try {
+			featureCollection.ecology.resize_districts();
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 		panelStats.getStats();
 		hush_setSeatsMode = false;

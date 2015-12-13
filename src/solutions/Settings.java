@@ -44,23 +44,30 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean annealing_has_started = false;
 	public static int seats_in_district(int n) {
 		if( seats_mode == 0) {
+			//System.out.println(" seats_in_district 0 mode: "+seats_number_per_district);
 			return seats_number_per_district;
 		} else {
 			int test = 0;
+			//System.out.println("seats_number_total: "+seats_number_total);
 			int[] sc = getSeatDistribution(seats_number_total);
 			for(int i = sc.length-1; i > 0; i--) {
 				test += sc[i];
+				//System.out.println("i: "+i+" sc[i]: "+sc[i]+" test: "+test+" n: "+n);
 				if( n < test) {
+					//System.out.println(" seats_in_district test: "+test+" "+n+": "+i);
 					return i;
 				}
 			}
+			//System.out.println(" seats_in_district fall "+seats_number_total+" "+test+" "+n+" : 1");
+			return 1;
 		}
-		return 1;
 	}
 	public static int total_seats() {
 		if( seats_mode == 1) {
+			//System.out.println("total_seats 1 mode: "+seats_number_total);
 			return seats_number_total;
 		} else {
+			//System.out.println("total_seats 0 mode: "+(num_districts*seats_number_per_district));
 			return num_districts*seats_number_per_district;
 		}
 		/*
@@ -274,8 +281,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			int tot = s5+s4+s3;
 			int totseat = s5*5+s4*4+s3*3;
 			getSeatDistribution_cached = new int[]{0,0,0,s3,s4,s5};
+			getSeatDistribution_last_seats = seats;
+			//System.out.println("s5: "+s5+" s4: "+s4+" s3: "+s3+" tot: "+tot+" totseat: "+totseat);
 		}
-		//System.out.println("s5: "+s5+" s3: "+s3+" tot: "+tot+" totseat: "+totseat);
 		return getSeatDistribution_cached;
 	}
 }

@@ -389,7 +389,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
 					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
 					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population imbalance (%)"},
-					new String[]{""+integer.format(dm.countSplitsInteger()),"Splits"},
+					Settings.reduce_splits ? new String[]{""+integer.format(dm.countSplitsInteger()),"Splits"}
+					: new String[]{"",""},	
 					new String[]{"",""},					
 					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
 					new String[]{""+integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},

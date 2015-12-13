@@ -327,9 +327,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
     					VTD b = ward.neighbors.get(j);
-
-    					District dfrom = this.districts.get(vtd_districts[i]); //coming from
-						District dto = this.districts.get(vtd_districts[b.id]); //going to
+    					int d1 = vtd_districts[i];
+    					int d2 = vtd_districts[b.id];
+    					if( d1 >= districts.size()) {
+    						d1 = (int)(Math.random()*(double)districts.size());
+    					}
+    					if( d2 >= districts.size()) {
+    						d2 = (int)(Math.random()*(double)districts.size());
+    					}
+    					District dfrom = this.districts.get(d1); //coming from
+						District dto = this.districts.get(d2); //going to
 						
 				    	//don't mutate to uncontested
 						if( Settings.ignore_uncontested && FeatureCollection.buncontested1.length > vtd_districts[b.id] && FeatureCollection.buncontested1[vtd_districts[b.id]] ) {
@@ -946,6 +953,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     public double countSplits() {
     	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+    	try { 
 		for( int i = 0; i < vtds.size(); i++) {
 			VTD vtd = vtds.get(i);
 			int[] dists = counties.get(vtd.county);
@@ -953,8 +961,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				dists = new int[Settings.num_districts];
 				counties.put(vtd.county, dists);
 			}
-			dists[vtd_districts[i]]++;
+			int dist = vtd_districts[i];
+			if( dist >= dists.length) {
+				dist = (int)(Math.random()*(double)dists.length);
+			}
+			dists[dist]++;
 		}
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    	}
 		Collection<int[]> vii = counties.values();
 		
 		double splits = 0;
