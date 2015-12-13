@@ -38,7 +38,11 @@ public class PanelSeats extends JPanel {
 	        double tot_votes = 0;
 	        double tot_seats = 0;
 	        for( District d : dm.districts) {
-	        	double[][] result = d.getElectionResults();
+				double[][] result = new double[2][];//d.getElectionResults();
+				result[0] = d.getAnOutcome();
+				result[1] = District.popular_vote_to_elected(result[0], d.id);
+
+	        	//double[][] result = d.getElectionResults();
 	        	for( int i = 0; i < result[0].length; i++) {
 	        		votes[i] += result[0][i];
 	        		tot_votes += result[0][i];

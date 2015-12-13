@@ -67,7 +67,7 @@ public class District extends JSONObject {
     	}
     	return dd;
     }
-    public static double[][] getPropRepOutcome(double[] district_vote,int members_per_district) {
+    public static double[][] getPropRepOutcome_deadcode(double[] district_vote,int members_per_district) {
     	double[] prop_rep = new double[district_vote.length];
     	double[] residual_popular_vote = new double[district_vote.length];
     	double[] residual_popular_vote2 = new double[district_vote.length];
@@ -104,6 +104,7 @@ public class District extends JSONObject {
 	        prop_rep[max_res_ind]++;
 	        total_votes++;
 		}
+		
 		return new double[][]{prop_rep,residual_popular_vote,residual_popular_vote2, new double[]{votes_per_seat}};
 	}
     Collection<Pair<String,Integer>> vcounties = new Vector<Pair<String,Integer>>();
@@ -122,7 +123,7 @@ public class District extends JSONObject {
     	return vcounties;
     }
     
-    public double[][] getElectionResults() {
+    public double[][] getElectionResults_deadcode() {
         double[] tot_popular_vote = new double[Settings.num_candidates];
         double[] tot_elected_vote = new double[Settings.num_candidates];
         double[] residual_popular_vote = new double[Settings.num_candidates];
@@ -147,7 +148,7 @@ public class District extends JSONObject {
    	   	            
    	            }
    	            
-   	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.seats_in_district(this.id));
+   	            double[][] prop_rep_results = getPropRepOutcome_deadcode(district_vote,Settings.seats_in_district(this.id));
    	            if( prop_rep_results == null) {
    	            	System.out.println("district null prop results");
    	            }
@@ -488,6 +489,32 @@ public class District extends JSONObject {
 	public JSONObject instantiateObject(String key) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static double[] popular_vote_to_elected(double[] ds, int i) {
+		double[] res = new double[ds.length];
+
+		double totvote = 0;
+		for( int j = 0; j < ds.length; j++) {
+			totvote += ds[j];
+		}
+		double unit = totvote / Settings.seats_in_district(i);
+		for( int j = 0; j < ds.length; j++) {
+			while( ds[j]-unit*res[j] > unit) {
+				res[j]++;
+			}
+		}			
+
+		int n = 0;
+		double max = -1;
+		for( int j = 0; j < ds.length; j++) {
+			if( max < 0 || ds[j]-unit*res[j] > max) {
+				n = j;
+				max = ds[j]-unit*res[j];
+			}
+		}
+		res[n]++;
+		return res;
 	}
 
 

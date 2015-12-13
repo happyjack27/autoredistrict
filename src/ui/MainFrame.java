@@ -145,7 +145,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderDisconnected = new JSlider();
 	public JSlider sliderBorderLength = new JSlider();
 	public JSlider sliderPopulationBalance = new JSlider();
-	public JSlider sliderVotingPowerBalance = new JSlider();
 	public JSlider sliderRepresentation = new JSlider();
 	
 	public JLabel lblDistrictColumn;
@@ -3449,8 +3448,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public MainFrame() {
 		mainframe = this;
 		jbInit();
-		
-		sliderVotingPowerBalance.setValue(0);
 		sliderRepresentation.setValue(50);
 		sliderSeatsVotes.setValue(50);
 		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -3473,7 +3470,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
-		Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
@@ -4921,7 +4917,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 274, 200, 350);
+		panel_4.setBounds(400, 274, 200, 302);
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
@@ -4931,14 +4927,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderRepresentation.setBounds(9, 185, 180, 29);
 		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(sliderRepresentation);
-		 
-		JLabel lblVotingPowerBalance = new JLabel("Voting power balance");
-		lblVotingPowerBalance.setBounds(9, 286, 172, 16);
-		lblVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
-		panel_4.add(lblVotingPowerBalance);
-		sliderVotingPowerBalance.setBounds(9, 307, 180, 29);
-		sliderVotingPowerBalance.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/voting_power.png") + "\">");
-		panel_4.add(sliderVotingPowerBalance);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
@@ -5292,12 +5280,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxNewCheckBox.setBounds(16, 180, 172, 23);
 		
 		panel.add(chckbxNewCheckBox);
-		
-		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				Settings.voting_power_balance_weight = sliderVotingPowerBalance.getValue()/100.0;
-			}
-		});
 		sliderRepresentation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;

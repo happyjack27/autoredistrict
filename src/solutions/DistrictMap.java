@@ -872,7 +872,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			try {
 			District d = districts.get(i);
 
-			double[][] result = d.getElectionResults();
+			//double[][] result = d.getElectionResults();
+			double[][] result = new double[2][];//d.getElectionResults();
+			result[0] = d.getAnOutcome();
+			result[1] = District.popular_vote_to_elected(result[0], i);
+
 			double total_votes = result[0][0]+result[0][1];
 			if( total_votes == 0) {
 				total_votes = 1;
@@ -1035,7 +1039,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		//aggregate all the votes
 		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
 			District d = districts.get(i);
-			double[][] result = d.getElectionResults();
+			//double[][] result = d.getElectionResults();
+			double[][] result = new double[2][];//d.getElectionResults();
+			result[0] = d.getAnOutcome();
+			//result[1] = District.popular_vote_to_elected(result[0], i);
+
 			for( int j = 0; j < 2; j++) {
 				vote_count_totals[j] += result[0][j];
 				vote_count_districts[i][j] += result[0][j];
@@ -1052,7 +1060,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		//now sample it at different vote ratios
 		for( double dempct = 0; dempct <= 1; dempct += 0.0025) {
 			double reppct = 1-dempct;
-			double votes = dempct;
+			//double votes = dempct;
 			double demseats = 0;
 			double totseats = 0;
 			for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
@@ -1061,27 +1069,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					continue;
 				}
 				totseats += Settings.seats_in_district(i);
-				if( Settings.seats_in_district(i) == 1) {
-					if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
-						demseats++;
-					}
-				} else {
-					double demvote =  vote_count_districts[i][0]*dempct;
-					double repvote = vote_count_districts[i][1]*reppct;
-					double totvote = demvote+repvote;
-					double unit = totvote / Settings.seats_in_district(i);
-					while( demvote > unit) {
-						demseats++;
-						demvote -= unit;
-					}
-					while( repvote > unit) {
-						repvote -= unit;
-					}
-					if( demvote > repvote && demvote != 0) {
-						demseats++;
-					}
-					
-				}
+				double[] pv = new double[]{vote_count_districts[i][0]*dempct,vote_count_districts[i][1]*reppct};
+				double[] winners = District.popular_vote_to_elected( pv,i);
+				demseats += winners[0];
 			}
 			double demseatpct = demseats/totseats;
 			deviation_from_diagonal += Math.abs(demseatpct-dempct)/(double)totseats;
@@ -1227,17 +1217,22 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             for( int i = 0; i < Settings.num_elections_simulated; i++) {
                 double[] popular_vote = new double[Settings.num_candidates]; //inited to 0
                 double[] elected_vote = new double[Settings.num_candidates]; //inited to 0
-                double[][] residues = new double[districts.size()][];
-                double[] pops = new double[districts.size()];
+                //double[][] residues = new double[districts.size()][];
+                //double[] pops = new double[districts.size()];
                 for(int k = 0; k < districts.size(); k++) {
                 	/*
                 	if( Settings.ignore_uncontested && District.uncontested.length > k && District.uncontested[k]) {
                 		continue;
                 	}*/
                 	District district = districts.get(k);
-                	double[][] res = district.getElectionResults();
-                	pops[k] = res[4][0];
-                	residues[k] = res[3];
+                	//double[][] res = district.getElectionResults();
+            		double[][] res = new double[2][];//d.getElectionResults();
+            		res[0] = district.getAnOutcome();
+            		res[1] = District.popular_vote_to_elected(res[0], k);
+            		
+
+                	//pops[k] = res[4][0];
+                	//residues[k] = res[3];
                 	for( int j = 0; j < popular_vote.length; j++) {
                 		popular_vote[j] += res[0][j];
                 		elected_vote[j] += res[1][j];
@@ -1314,7 +1309,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 	}
  
                 }
-                
+                /*
+        		double[][] result = new double[2][];//d.getElectionResults();
+        		result[0] = d.getAnOutcome();
+        		result[1] = District.popular_vote_to_elected(result[0], i);
+        		*/
+        		/*
                 double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.total_seats());//Settings.seats_in_district*Settings.num_districts);
                 double[] ideal_vote = prop_rep_results[0];
                 int max_diff = -1, min_diff = -1;
@@ -1357,6 +1357,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             		elected_vote[max_diff] += avg;
             		elected_vote[min_diff] -= avg;
             	}
+            	*/
             	
 
                 for( int j = 0; j < Settings.num_candidates; j++) {
@@ -1409,7 +1410,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
             for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
-                voting_power[i] = district.getSelfEntropy(district.getElectionResults()[Settings.self_entropy_use_votecount?2:1]);
+                voting_power[i] = 1;//district.getSelfEntropy(district.getElectionResults()[Settings.self_entropy_use_votecount?2:1]);
                 total_voting_power += voting_power[i];
             }
 
@@ -1688,7 +1689,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public Color getWastedVoteColor(int i) {
 		double[] rgb = new double[]{0,0,0};
 		int[] amts0 = wasted_votes_by_district_and_party[i];
-		double[] amts1 = districts.get(i).getElectionResults()[0];
+		double[] amts1 = districts.get(i).getAnOutcome();//getElectionResults()[0];
+
 		double tot = 0;
 		for( int j = 0; j < amts1.length; j++) {
 			tot += amts1[j];

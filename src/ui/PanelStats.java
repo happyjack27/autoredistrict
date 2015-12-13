@@ -180,7 +180,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			//vote_gap_by_district
 			
-			dcolumns[6] = "Self-entropy";
+			dcolumns[6] = "Seats";//"Self-entropy";
 			dcolumns[7] = "Compactness";
 			dcolumns[8] = "Area";
 			dcolumns[9] = "Paired edge length";
@@ -234,8 +234,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				District d = dm.districts.get(i);
 				total_population += d.getPopulation();
 				//String population = ""+(int)d.getPopulation();
-				double[][] result = d.getElectionResults();
-				double self_entropy = d.getSelfEntropy(result[Settings.self_entropy_use_votecount?2:1]);
+				double[][] result = new double[2][];//d.getElectionResults();
+				result[0] = d.getAnOutcome();
+				result[1] = District.popular_vote_to_elected(result[0], i);
+				double self_entropy = 1;//d.getSelfEntropy(result[Settings.self_entropy_use_votecount?2:1]);
 				//String edge_length = ""+d.getEdgeLength();
 				//double [] dd = d.getVotes();
 				double total = 0;
@@ -307,7 +309,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][4] = ""+dm.vote_gap_by_district[i];
 				ddata[i][5] = ""+dm.wasted_votes_by_district[i];
 				
-				ddata[i][6] = ""+decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][6] = ""+integer.format(Settings.seats_in_district(d.id));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
 				ddata[i][7] = ""+d.iso_quotient;
 				ddata[i][8] = ""+d.area;
 				ddata[i][9] = ""+d.paired_edge_length;
@@ -398,7 +400,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.getRacialVoteDilution()),"Racial vote dilution"},
 					new String[]{"",""},
 					//new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
-					new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (local)"},
+					//new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (local)"},
 					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
 					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
 					//new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
