@@ -493,6 +493,9 @@ public class District extends JSONObject {
 
 	public static double[] popular_vote_to_elected(double[] ds, int i) {
 		double[] res = new double[ds.length];
+		for( int j = 0; j < res.length; j++) {
+			res[j] = 0;
+		}
 
 		double totvote = 0;
 		for( int j = 0; j < ds.length; j++) {
@@ -500,20 +503,24 @@ public class District extends JSONObject {
 		}
 		double unit = totvote / Settings.seats_in_district(i);
 		for( int j = 0; j < ds.length; j++) {
-			while( ds[j]-unit*res[j] > unit) {
+			double mod = ds[j];
+			while( mod >= unit) {
 				res[j]++;
+				mod -= unit;
 			}
 		}			
 
-		int n = 0;
+		int n = -1;
 		double max = -1;
 		for( int j = 0; j < ds.length; j++) {
-			if( max < 0 || ds[j]-unit*res[j] > max) {
+			if( n < 0 || ds[j]-unit*res[j] > max) {
 				n = j;
 				max = ds[j]-unit*res[j];
 			}
 		}
-		res[n]++;
+		if( max > 0) {
+			res[n]++;
+		}
 		return res;
 	}
 
