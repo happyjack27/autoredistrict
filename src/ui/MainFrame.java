@@ -45,6 +45,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
 	public FrameRankedDistricts frameRankedDist = new FrameRankedDistricts();
+	
+	public ButtonGroup seatsModeBG = new ButtonGroup();
 	 
 	
 
@@ -137,7 +139,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JComboBox comboBoxDistrictColumn = new JComboBox();
     public JTextField textFieldNumDistricts = new JTextField();
     public JTextField textField = new JTextField();
-	public JTextField textFieldMembersPerDistrict;
+	public JTextField textFieldSeatsPerDistrict;
 
 	public JSlider slider_mutation = new JSlider();
 	public JSlider sliderDisconnected = new JSlider();
@@ -1363,6 +1365,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	private boolean hushcomboBoxCountyColumn;
 	public final JLabel lblRacialVoteDilution = new JLabel("Racial vote dilution");
 	public final JSlider sliderVoteDilution = new JSlider();
+	public final JTextField textFieldTotalSeats = new JTextField();
+	public final JRadioButton lblTotalSeats = new JRadioButton("Total seats");
+	protected boolean hush_tot_seats_field = false;
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -4812,6 +4817,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					Settings.num_districts = Integer.parseInt(textFieldNumDistricts.getText());
+					setSeatsMode();
 				} catch (Exception ex) { }
 			}
 		});
@@ -4854,27 +4860,35 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		goButton.setBounds(109, 29, 83, 29);
 		panel.add(goButton);
 		
-		textFieldMembersPerDistrict = new JTextField();
-		textFieldMembersPerDistrict.addFocusListener(new FocusAdapter() {
+		textFieldSeatsPerDistrict = new JTextField();
+		textFieldSeatsPerDistrict.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				textFieldMembersPerDistrict.postActionEvent();
+				textFieldSeatsPerDistrict.postActionEvent();
 			}
 		});
-		textFieldMembersPerDistrict.addActionListener(new ActionListener() {
+		textFieldSeatsPerDistrict.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Settings.members_per_district = Integer.parseInt(textFieldMembersPerDistrict.getText());
+					Settings.seats_number_per_district = Integer.parseInt(textFieldSeatsPerDistrict.getText());
+					setSeatsMode();
 					panelStats.getStats();
 				} catch (Exception ex) { }
 			}
 		});
-		textFieldMembersPerDistrict.setText("1");
-		textFieldMembersPerDistrict.setColumns(10);
-		textFieldMembersPerDistrict.setBounds(132, 106, 52, 28);
-		panel.add(textFieldMembersPerDistrict);
+		textFieldSeatsPerDistrict.setText("1");
+		textFieldSeatsPerDistrict.setColumns(10);
+		textFieldSeatsPerDistrict.setBounds(132, 106, 52, 28);
+		panel.add(textFieldSeatsPerDistrict);
 		
-		JLabel lblMembersPerDistrict = new JLabel("Members per district");
+		JRadioButton lblMembersPerDistrict = new JRadioButton("Seats/district");
+		lblMembersPerDistrict.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setSeatsMode();
+			}
+		});
+		lblMembersPerDistrict.setSelected(true);
+		seatsModeBG.add(lblMembersPerDistrict);
 		lblMembersPerDistrict.setBounds(6, 112, 124, 16);
 		panel.add(lblMembersPerDistrict);
 		
@@ -4884,15 +4898,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
-		comboBoxPopulation.setBounds(8, 165, 178, 20);
+		comboBoxPopulation.setBounds(8, 237, 178, 20);
 		panel.add(comboBoxPopulation);
 		
 		JLabel lblPopulationColumn = new JLabel("Population column");
-		lblPopulationColumn.setBounds(8, 145, 182, 16);
+		lblPopulationColumn.setBounds(8, 217, 182, 16);
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
-		lblDistrictColumn.setBounds(8, 431, 182, 16);
+		lblDistrictColumn.setBounds(8, 503, 182, 16);
 		panel.add(lblDistrictColumn);
 		
 		comboBoxDistrictColumn = new JComboBox();
@@ -4902,7 +4916,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
-		comboBoxDistrictColumn.setBounds(8, 450, 178, 20);
+		comboBoxDistrictColumn.setBounds(8, 522, 178, 20);
 		panel.add(comboBoxDistrictColumn);
 		
 		panel_4 = new JPanel();
@@ -4961,7 +4975,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				selectLayers();
 			}
 		});
-		btnElectionColumns.setBounds(6, 196, 184, 23);
+		btnElectionColumns.setBounds(6, 268, 184, 23);
 		panel.add(btnElectionColumns);
 		
 		lblGeometricFairness = new JLabel("Geometric <===> Fairness");
@@ -5016,7 +5030,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		});
 		btnSubstituteColumns.setEnabled(false);
-		btnSubstituteColumns.setBounds(6, 397, 184, 23);
+		btnSubstituteColumns.setBounds(6, 469, 184, 23);
 		panel.add(btnSubstituteColumns);
 		
 		chckbxSubstituteColumns = new JCheckBox("Substitute uncontested");
@@ -5040,7 +5054,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		chckbxSubstituteColumns.setBounds(6, 367, 178, 23);
+		chckbxSubstituteColumns.setBounds(6, 439, 178, 23);
 		panel.add(chckbxSubstituteColumns);
 		btnElection2Columns.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -5048,7 +5062,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		btnElection2Columns.setEnabled(false);
-		btnElection2Columns.setBounds(7, 261, 184, 23);
+		btnElection2Columns.setBounds(7, 333, 184, 23);
 		
 		panel.add(btnElection2Columns);
 		chckbxSecondElection.addActionListener(new ActionListener() {
@@ -5074,7 +5088,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		chckbxSecondElection.setBounds(6, 229, 178, 23);
+		chckbxSecondElection.setBounds(6, 301, 178, 23);
 		
 		panel.add(chckbxSecondElection);
 		
@@ -5102,7 +5116,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		chckbxThirdElection.setBounds(6, 301, 178, 23);
+		chckbxThirdElection.setBounds(6, 373, 178, 23);
 		panel.add(chckbxThirdElection);
 		
 		btnElection3Columns = new JButton("Election 3 columns");
@@ -5112,7 +5126,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		btnElection3Columns.setEnabled(false);
-		btnElection3Columns.setBounds(7, 333, 184, 23);
+		btnElection3Columns.setBounds(7, 405, 184, 23);
 		panel.add(btnElection3Columns);
 		
 		panel_5 = new JPanel();
@@ -5236,8 +5250,55 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( is_evolving) { featureCollection.ecology.startEvolving(); }
 			}
 		});
-		btnEthnicityColumns.setBounds(8, 481, 184, 23);
+		btnEthnicityColumns.setBounds(8, 553, 184, 23);
 		panel.add(btnEthnicityColumns);
+		textFieldTotalSeats.setEnabled(false);
+		textFieldTotalSeats.setText("1");
+		textFieldTotalSeats.setBounds(132, 140, 52, 28);
+		textFieldTotalSeats.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				textFieldTotalSeats.postActionEvent();
+			}
+		});
+		textFieldTotalSeats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if( hush_tot_seats_field ) {
+					return;
+				}
+				hush_tot_seats_field = true;
+				
+				try {
+					Settings.seats_number_total = Integer.parseInt(textFieldTotalSeats.getText());
+					setSeatsMode();
+					panelStats.getStats();
+				} catch (Exception ex) { }
+				hush_tot_seats_field = false;
+			}
+		});
+		
+		
+		panel.add(textFieldTotalSeats);
+		lblTotalSeats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setSeatsMode();
+			}
+		});
+		seatsModeBG.add(lblTotalSeats);
+		lblTotalSeats.setBounds(6, 146, 124, 16);
+		
+		panel.add(lblTotalSeats);
+		chckbxNewCheckBox.setSelected(true);
+		chckbxNewCheckBox.setEnabled(false);
+		chckbxNewCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.setNo4s(chckbxNewCheckBox.isSelected());
+				setSeatsMode();
+			}
+		});
+		chckbxNewCheckBox.setBounds(16, 180, 172, 23);
+		
+		panel.add(chckbxNewCheckBox);
 		
 		sliderVotingPowerBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -5362,6 +5423,50 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		frameStats.move(this.getWidth()+frameSeatsVotesChart.getWidth(), this.getX()+frameGraph.getHeight());
 		frameStats.show();
 		
+	}
+	public boolean hush_setSeatsMode = false;
+	public final JCheckBox chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
+	public void setSeatsMode() {
+		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
+		if( hush_setSeatsMode) {
+			return;
+		}
+		hush_setSeatsMode = true;
+		boolean was_total = Settings.seats_mode  == Settings.SEATS_MODE_TOTAL;
+		int prev_total_seats = Settings.total_seats();
+		Settings.seats_mode = this.lblTotalSeats.isSelected() ? Settings.SEATS_MODE_TOTAL : Settings.SEATS_MODE_PER_DISTRICT;
+		boolean is_total = Settings.seats_mode  == Settings.SEATS_MODE_TOTAL;
+		textFieldTotalSeats.setEnabled(is_total);
+		textFieldSeatsPerDistrict.setEnabled(!is_total);
+		textFieldNumDistricts.setEnabled(!is_total);
+		chckbxNewCheckBox.setEnabled(is_total);
+		if( is_total) {
+			textFieldSeatsPerDistrict.setText("");
+			if( !was_total) {
+				textFieldTotalSeats.setText(""+prev_total_seats);
+			}
+			try {
+				int seats = Integer.parseInt(textFieldTotalSeats.getText());
+				int[] sc = Settings.getSeatDistribution(seats);
+				int tot = 0;
+				for( int i = 0; i < sc.length; i++) {
+					tot += sc[i];
+				}
+				textFieldNumDistricts.setText(""+tot);
+			} catch (Exception ex) {
+				
+			}
+		} else {
+			if( was_total) {
+				textFieldSeatsPerDistrict.setText("1");
+				textFieldNumDistricts.setText(""+prev_total_seats);
+			} else {
+				//textFieldTotalSeats.setText(""+(Settings.num_districts*Settings.seats_number_per_district));
+			}
+		}
+		panelStats.getStats();
+		hush_setSeatsMode = false;
+		System.out.println("setSeatsMode returned");
 	}
 	public StringBuffer getFile(File f) {		
 		StringBuffer sb = new StringBuffer();

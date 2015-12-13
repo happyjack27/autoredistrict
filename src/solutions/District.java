@@ -147,7 +147,7 @@ public class District extends JSONObject {
    	   	            
    	            }
    	            
-   	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.members_per_district);
+   	            double[][] prop_rep_results = getPropRepOutcome(district_vote,Settings.seats_in_district(this.id));
    	            if( prop_rep_results == null) {
    	            	System.out.println("district null prop results");
    	            }

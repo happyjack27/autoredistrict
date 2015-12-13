@@ -1045,8 +1045,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				if( FeatureCollection.buncontested1 != null && FeatureCollection.buncontested1.length > i && FeatureCollection.buncontested1[i] && Settings.ignore_uncontested) {
 					continue;
 				}
-				totseats += Settings.members_per_district;
-				if( Settings.members_per_district == 1) {
+				totseats += Settings.seats_in_district(i);
+				if( Settings.seats_in_district(i) == 1) {
 					if( vote_count_districts[i][0]*dempct > vote_count_districts[i][1]*reppct) {
 						demseats++;
 					}
@@ -1054,7 +1054,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					double demvote =  vote_count_districts[i][0]*dempct;
 					double repvote = vote_count_districts[i][1]*reppct;
 					double totvote = demvote+repvote;
-					double unit = totvote / Settings.members_per_district;
+					double unit = totvote / Settings.seats_in_district(i);
 					while( demvote > unit) {
 						demseats++;
 						demvote -= unit;
@@ -1234,7 +1234,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     for(int j = 0; j < popular_vote.length; j++) {
                     	tot += res[0][j];
                     }
-                    int unit = tot/Settings.members_per_district;
+                    int unit = tot/Settings.seats_in_district(k);
                     
                     for(int j = 0; j < popular_vote.length; j++) {
                     	//make amt as if there was one vote w/pop 0 to unit
@@ -1242,7 +1242,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     		System.out.println("res < 0");
                     	}
                     	double amt = 0;
-                    	if( Settings.members_per_district > 1) {
+                    	if( Settings.seats_in_district(k) > 1) {
                     		int c = ((int)res[0][j]) / unit;
                         	amt = res[0][j] - c*unit;//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;
                         	if( res[1][j] > c) { //this means that we won the remaining majority election
@@ -1289,7 +1289,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	wasted_votes_by_district[k] += amt;
                     	wasted_votes_by_district_and_party[k][j] += amt; 
                     }
-                    if( Settings.members_per_district == 1) {
+                    if( Settings.seats_in_district(k) == 1) {
                     	vote_gap_by_district[k] = (int)Math.abs(res[0][0]-res[0][1]);
                     }
                     total_vote_gap += vote_gap_by_district[k];
@@ -1300,7 +1300,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
  
                 }
                 
-                double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.members_per_district*Settings.num_districts);
+                double[][] prop_rep_results = District.getPropRepOutcome(popular_vote,Settings.total_seats());//Settings.seats_in_district*Settings.num_districts);
                 double[] ideal_vote = prop_rep_results[0];
                 int max_diff = -1, min_diff = -1;
                 double max_diff_amt = -1, min_diff_amt = 1;
@@ -1504,6 +1504,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double max = -1;
         for(District district : districts) {
         	double pop = district.getPopulation();
+        	if( Settings.population_is_per_seat) {
+        		pop /= Settings.seats_in_district(district.id);
+        	}
         	if( min < 0 || pop < min) {
         		min = pop;
         	}
@@ -1523,12 +1526,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double N = (double) districts.size();
         for(District district : districts) {
         	double pop = district.getPopulation();
+        	if( Settings.population_is_per_seat) {
+        		pop /= Settings.seats_in_district(district.id);
+        	}
         	tot += pop;
         	tot2 += pop*pop;
         }
         double avg = tot / N;
         for(District district : districts) {
-        	district.excess_pop = (int) (district.getPopulation()-avg);
+        	int pop = (int)district.getPopulation();
+        	if( Settings.population_is_per_seat) {
+        		pop /= Settings.seats_in_district(district.id);
+        	}
+        	district.excess_pop = (int) (pop-avg);
         }
         //tot /= (double) districts.size();
         double variance =  (tot2-tot*tot/N) / N;

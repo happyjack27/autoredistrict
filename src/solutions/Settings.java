@@ -42,7 +42,41 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 														// precinct count.
 	public static long annealing_starts_at = 0;
 	public static boolean annealing_has_started = false;
-	public static int members_per_district = 1;
+	public static int seats_in_district(int n) {
+		if( seats_mode == 0) {
+			return seats_number_per_district;
+		} else {
+			int test = 0;
+			int[] sc = getSeatDistribution(seats_number_total);
+			for(int i = sc.length-1; i > 0; i--) {
+				test += sc[i];
+				if( n < test) {
+					return i;
+				}
+			}
+		}
+		return 1;
+	}
+	public static int total_seats() {
+		if( seats_mode == 1) {
+			return seats_number_total;
+		} else {
+			return num_districts*seats_number_per_district;
+		}
+		/*
+		int seats = 0;
+		for( int i = 0; i < num_districts; i++) {
+			seats += seats_in_district(i);
+		}
+		return seats;
+		*/
+	}
+	public static int SEATS_MODE_PER_DISTRICT = 0;
+	public static int SEATS_MODE_TOTAL = 1;
+	public static int seats_mode = SEATS_MODE_PER_DISTRICT;
+	public static int seats_number_per_district = 1;
+	public static int seats_number_total = 1;
+	
 	public static int num_candidates = 2;
 
 	public static void resetAnnealing() {
@@ -166,5 +200,82 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		for (iChangeListener c : mutation_rateChangeListeners) {
 			c.valueChanged();
 		}
+	}
+	public static int[] getSeatDistribution_cached = null;
+	public static int getSeatDistribution_last_seats = -1;
+	
+	private static boolean no4s = true;
+	public static boolean population_is_per_seat = true;
+	public static void setNo4s(boolean b) {
+		if( no4s == b) {
+			return;
+		}
+		no4s = b;
+		getSeatDistribution_last_seats = -1;
+	}
+	public static int[] getSeatDistribution(int seats) {
+		if( seats != getSeatDistribution_last_seats) {
+			int sm5 = seats % 5;
+			int s5 = (seats-sm5) / 5;
+			int s4 = 0;
+			int s3 = 0;
+			if( no4s) {
+				switch( sm5) {
+				case 0:
+					s5 -= 0;
+					s3 = 0;
+					break;
+				case 1:
+					s5 -= 1;
+					s3 = 2;
+					break;
+				case 2:
+					s5 -= 2;
+					s3 = 4;
+					break;
+				case 3:
+					s5 -= 0;
+					s3 = 1;
+					break;
+				case 4:
+					s5 -= 1;
+					s3 = 3;
+					break;
+				}
+			} else {
+				switch( sm5) {
+				case 0:
+					s5 -= 0;
+					s4 = 0;
+					s3 = 0;
+					break;
+				case 1:
+					s5 -= 1;
+					s4 = 0;
+					s3 = 2;
+					break;
+				case 2:
+					s5 -= 1;
+					s4 = 1;
+					s3 = 1;
+					break;
+				case 3:
+					s5 -= 0;
+					s4 = 0;
+					s3 = 1;
+					break;
+				case 4:
+					s5 -= 0;
+					s4 = 1;
+					s3 = 0;
+					break;
+				}				
+			}
+			int tot = s5+s4+s3;
+			int totseat = s5*5+s4*4+s3*3;
+			getSeatDistribution_cached = new int[]{0,0,0,s3,s4,s5};
+		}
+		//System.out.println("s5: "+s5+" s3: "+s3+" tot: "+tot+" totseat: "+totseat);
+		return getSeatDistribution_cached;
 	}
 }

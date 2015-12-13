@@ -92,8 +92,8 @@ public class Project extends ReflectionJSONObject<Project> {
 			MainFrame.mainframe.textFieldNumDistricts.postActionEvent();
 		} else { System.out.println("number_of_districts not found"); }
 		if( containsKey("members_per_district")) {
-			MainFrame.mainframe.textFieldMembersPerDistrict.setText(getString("members_per_district").trim());
-			MainFrame.mainframe.textFieldMembersPerDistrict.postActionEvent();
+			//MainFrame.mainframe.textFieldMembersPerDistrict.setText(getString("members_per_district").trim());
+			//MainFrame.mainframe.textFieldMembersPerDistrict.postActionEvent();
 		} else { System.out.println("members_per_district not found"); }
 		
 		if( containsKey("initial_population")) {
@@ -190,12 +190,12 @@ public class Project extends ReflectionJSONObject<Project> {
 		
 		initial_population = Settings.population;
 		number_of_districts = Settings.num_districts;
-		members_per_district = Settings.members_per_district;
+		//members_per_district = Settings.seats_in_district;
 		simulated_elections = Settings.num_elections_simulated;
 		
 		equalize_turnout = Settings.adjust_vote_to_population;
 		
-		members_per_district = Settings.members_per_district;
+		//members_per_district = Settings.seats_in_district;
 		
 		if( primary_key_column == null || primary_key_column.length() == 0) {
 			if( isEsriSapefile())
