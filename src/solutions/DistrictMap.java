@@ -347,7 +347,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	   					if( !mutating_disconnected) {
     						if( Settings.mutate_excess_pop || Settings.mutate_good) {
 	    						double cur_delta = Math.abs(districts.get(vtd_districts[i]).excess_pop - districts.get(vtd_districts[b.id]).excess_pop);
-				        		double new_delta = Math.abs((districts.get(vtd_districts[i]).excess_pop-ward.population) - (districts.get(vtd_districts[b.id]).excess_pop+ward.population));
+				        		double new_delta = Math.abs(
+				        				(districts.get(vtd_districts[i]).excess_pop-ward.population/Settings.seats_in_district(vtd_districts[i])) 
+				        				- (districts.get(vtd_districts[b.id]).excess_pop+ward.population/Settings.seats_in_district(vtd_districts[i])));
 	    						if( new_delta > cur_delta) {
 	    							if( Settings.mutate_good) {
 	    								num_failures++;
