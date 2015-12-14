@@ -2577,10 +2577,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		project.primary_key_column = pkey;
 	}
 
+	boolean hushSetDistrict = false;
 	public void setDistrictColumn(String district) {
+		System.out.println("setDistrictColumn hush?"+hushSetDistrict);
+		if( hushSetDistrict) {
+			return;
+		}
 		boolean changed = !district.equals(project.district_column);
 		project.district_column = district;
-		boolean hush = false;
 		if( changed) {
 			Feature.compare_centroid = false;
 			Collections.sort(featureCollection.features);
@@ -2628,10 +2632,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				panelStats.getStats();
 				featureCollection.findUncontested();
 				panelStats.getStats();
-				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0 && !hush) {
+				if( featureCollection.vuncontested1.size() > 0 || featureCollection.vuncontested2.size() > 0 && !hushSetDistrict) {
 					System.out.println("uncontested found!");
 					if(project.substitute_columns.size() > 0 && Settings.substitute_uncontested) {
-						hush = true;
+						hushSetDistrict = true;
 						try {
 							System.out.println("setting substitutes");
 							setSubstituteColumns();
@@ -2640,10 +2644,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 						Settings.ignore_uncontested = false;
 						panelStats.getStats();
-						hush = true;
+						hushSetDistrict = true;
 						project.district_column = "";
 						setDistrictColumn(district);
-						hush = false;
+						hushSetDistrict = false;
 					} else {
 						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
 						if( opt == JOptionPane.YES_OPTION) {
@@ -2667,7 +2671,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					Settings.ignore_uncontested = false;
 				}
 			}
-			hush = false;
+			hushSetDistrict = false;
 			mapPanel.invalidate();
 			mapPanel.repaint();
 		}
