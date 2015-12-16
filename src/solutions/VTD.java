@@ -67,6 +67,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
     
 	double[][] outcomes;
 	public double[] demographics = new double[]{};
+	public String muni;
 
     public VTD() {
     	super();

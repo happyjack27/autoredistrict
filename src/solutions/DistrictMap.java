@@ -958,73 +958,142 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public double countSplits() {
-    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
-    	try { 
-		for( int i = 0; i < vtds.size(); i++) {
-			VTD vtd = vtds.get(i);
-			int[] dists = counties.get(vtd.county);
-			if( dists == null) {
-				dists = new int[Settings.num_districts];
-				counties.put(vtd.county, dists);
-			}
-			int dist = vtd_districts[i];
-			if( dist >= dists.length) {
-				dist = (int)(Math.random()*(double)dists.length);
-			}
-			dists[dist]++;
-		}
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    	}
-		Collection<int[]> vii = counties.values();
-		
 		double splits = 0;
-		for(int[] ii : vii) {
-			double total = 0;
-			double nonzeros = 0;
-			double least = -1;
-			for( int i = 0; i < ii.length; i++) {
-				if( ii[i] == 0) {
-					continue;
+    	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+	    	try { 
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.county);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.county, dists);
 				}
-				nonzeros++;
-				total += ii[i];
-				if( least < 0 || ii[i] < least) {
-					least = ii[i];
+				int dist = vtd_districts[i];
+				if( dist >= dists.length) {
+					dist = (int)(Math.random()*(double)dists.length);
 				}
-				
+				dists[dist]++;
 			}
-			least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-			splits += nonzeros + least - 2;	
-		}
+	    	} catch (Exception ex) {
+	    		ex.printStackTrace();
+	    	}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double total = 0;
+				double nonzeros = 0;
+				double least = -1;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+					total += ii[i];
+					if( least < 0 || ii[i] < least) {
+						least = ii[i];
+					}
+					
+				}
+				least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+				splits += nonzeros + least - 2;	
+			}
+    	}
+    	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+	    	try { 
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.muni);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.muni, dists);
+				}
+				int dist = vtd_districts[i];
+				if( dist >= dists.length) {
+					dist = (int)(Math.random()*(double)dists.length);
+				}
+				dists[dist]++;
+			}
+	    	} catch (Exception ex) {
+	    		ex.printStackTrace();
+	    	}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double total = 0;
+				double nonzeros = 0;
+				double least = -1;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+					total += ii[i];
+					if( least < 0 || ii[i] < least) {
+						least = ii[i];
+					}
+					
+				}
+				least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+				splits += nonzeros + least - 2;	
+			}
+    	}
 		return splits;
     }
     
     public double countSplitsInteger() {
-    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
-		for( int i = 0; i < vtds.size(); i++) {
-			VTD vtd = vtds.get(i);
-			int[] dists = counties.get(vtd.county);
-			if( dists == null) {
-				dists = new int[Settings.num_districts];
-				counties.put(vtd.county, dists);
-			}
-			dists[vtd_districts[i]]++;
-		}
-		Collection<int[]> vii = counties.values();
-		
 		double splits = 0;
-		for(int[] ii : vii) {
-			double nonzeros = 0;
-			for( int i = 0; i < ii.length; i++) {
-				if( ii[i] == 0) {
-					continue;
+    	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.county);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.county, dists);
 				}
-				nonzeros++;
+				dists[vtd_districts[i]]++;
 			}
-			//least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-			splits += nonzeros - 1;	
-		}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double nonzeros = 0;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+				}
+				//least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+				splits += nonzeros - 1;	
+			}
+    	}
+    	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.muni);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.muni, dists);
+				}
+				dists[vtd_districts[i]]++;
+			}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double nonzeros = 0;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+				}
+				//least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+				splits += nonzeros - 1;	
+			}
+    	}
 		return splits;
     }
     
@@ -1086,7 +1155,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	calcSeatsVotesCurve();
     	double total = 0;
     	//double rln2 = 1.0/Math.log(2);
-    	double weight = 100.0/(double)seats_votes.size();
+    	double weight = 1.0/(double)seats_votes.size();
 	    for( int i = 0; i < seats_votes.size(); i++) {
 	    	double[] dd = seats_votes.get(i);
 	    	

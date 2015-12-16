@@ -501,6 +501,9 @@ public class District extends JSONObject {
 		for( int j = 0; j < ds.length; j++) {
 			totvote += ds[j];
 		}
+		if( totvote <= 0) {
+			return ds;
+		}
 		double unit = totvote / Settings.seats_in_district(i);
 		if( unit == 0) {
 			unit = 1;

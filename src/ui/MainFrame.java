@@ -1355,7 +1355,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JPanel panel_5;
 	public JLabel srlblSplitReduction;
 	public JSlider sliderSplitReduction;
-	public final JLabel lblSplitReduction = new JLabel("Split reduction");
 	public JComboBox srcomboBoxCountyColumn;
 	public JLabel srlblCountyColumn;
 	public JCheckBox chckbxReduceSplits;
@@ -2378,6 +2377,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 
 		try {
+			hushcomboBoxMuniColumn = true;
+			srcomboBoxMuniColumn.removeAllItems();
+			srcomboBoxMuniColumn.addItem("");
+			for( int i = 0; i < map_headers.length; i++) {
+				srcomboBoxMuniColumn.addItem(map_headers[i]);
+			}
+			hushcomboBoxMuniColumn = false;
+			if( project.muni_column != null && project.muni_column.length() > 0) {
+				srcomboBoxMuniColumn.setSelectedItem(project.muni_column);
+			}
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
+
+		try {
 			/*
 			hushcomboBoxPrimaryKey = true;
 			comboBoxPrimaryKey.removeAllItems();
@@ -2578,6 +2593,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	boolean hushSetDistrict = false;
+	protected boolean hushcomboBoxMuniColumn;
 	public void setDistrictColumn(String district) {
 		System.out.println("setDistrictColumn hush?"+hushSetDistrict);
 		if( hushSetDistrict) {
@@ -2711,6 +2727,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			VTD v = f.vtd;
 			try {
 				v.county = f.properties.get(project.county_column).toString();
+			} catch (Exception ex) {
+			}
+		}
+	}
+	
+	public void setMuniColumn() {
+		
+		for( Feature f : featureCollection.features) {
+			VTD v = f.vtd;
+			try {
+				v.muni = f.properties.get(project.muni_column).toString();
 			} catch (Exception ex) {
 			}
 		}
@@ -4844,6 +4871,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		stopButton.setBorder(BorderFactory.createRaisedBevelBorder());
 		goButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/*
+				if( project.election_columns == null || project.election_columns.size() == 0) {
+					JOptionPane.showMessageDialog(mainframe, "Must select election columns");
+					return;
+				}*/
 				Ecology.invert = 1;
 				addEcologyListeners();
 				featureCollection.ecology.startEvolving();
@@ -5121,14 +5153,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(btnElection3Columns);
 		
 		panel_5 = new JPanel();
-		panel_5.setBounds(200, 397, 200, 179);
+		panel_5.setBounds(200, 397, 200, 210);
 		panel_5.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_5.setLayout(null);
 		panel.add(panel_5);
 		//panel_5.setVisible(false);
 		
 		srlblSplitReduction = new JLabel("Split reduction");
-		srlblSplitReduction.setBounds(10, 118, 172, 16);
+		srlblSplitReduction.setBounds(10, 136, 172, 16);
 		panel_5.add(srlblSplitReduction);
 		srlblSplitReduction.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		
@@ -5138,13 +5170,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
 			}
 		});
-		sliderSplitReduction.setBounds(10, 139, 180, 29);
+		sliderSplitReduction.setBounds(10, 157, 180, 29);
 		panel_5.add(sliderSplitReduction);
 		sliderSplitReduction.setValue(0);
-		lblSplitReduction.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblSplitReduction.setBounds(10, 11, 179, 16);
-		
-		panel_5.add(lblSplitReduction);
 		
 		srcomboBoxCountyColumn = new JComboBox();
 		srcomboBoxCountyColumn.addActionListener(new ActionListener() {
@@ -5156,14 +5184,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setCountyColumn();
 			}
 		});
-		srcomboBoxCountyColumn.setBounds(10, 93, 178, 20);
+		srcomboBoxCountyColumn.setBounds(8, 56, 178, 20);
 		panel_5.add(srcomboBoxCountyColumn);
 		
 		srlblCountyColumn = new JLabel("County column");
-		srlblCountyColumn.setBounds(10, 74, 182, 16);
+		srlblCountyColumn.setBounds(8, 37, 182, 16);
 		panel_5.add(srlblCountyColumn);
 		
 		chckbxReduceSplits = new JCheckBox("Reduce splits");
+		chckbxReduceSplits.setFont(new Font("Tahoma", Font.BOLD, 14));
 		chckbxReduceSplits.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if( false) {
@@ -5174,6 +5203,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					chckbxReduceSplits.setSelected(false);
 					return;
 				}
+				/*
 				if( chckbxReduceSplits.isSelected()) {
 					int opt = JOptionPane.showConfirmDialog(null, ""
 							+"\nThis will negatively impact ALL criteria, both geometric and fairness."
@@ -5191,20 +5221,39 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						chckbxReduceSplits.setSelected(false);
 						return;
 					}
-				}
+				}*/
 				Settings.reduce_splits = chckbxReduceSplits.isSelected();
-				srlblCountyColumn.setEnabled(Settings.reduce_splits);
 				sliderSplitReduction.setEnabled(Settings.reduce_splits);
-				srcomboBoxCountyColumn.setEnabled(Settings.reduce_splits);
 				srlblSplitReduction.setEnabled(Settings.reduce_splits);
+				srlblCountyColumn.setEnabled(Settings.reduce_splits);
+				srcomboBoxCountyColumn.setEnabled(Settings.reduce_splits);
+				srlblMuniColumn.setEnabled(Settings.reduce_splits);
+				srcomboBoxMuniColumn.setEnabled(Settings.reduce_splits);
 			}
 		});
-		chckbxReduceSplits.setBounds(6, 44, 176, 23);
+		chckbxReduceSplits.setBounds(6, 7, 176, 23);
 		panel_5.add(chckbxReduceSplits);
 		srlblCountyColumn.setEnabled(Settings.reduce_splits);
 		sliderSplitReduction.setEnabled(Settings.reduce_splits);
 		srcomboBoxCountyColumn.setEnabled(Settings.reduce_splits);
 		srlblSplitReduction.setEnabled(Settings.reduce_splits);
+		srlblMuniColumn.setEnabled(false);
+		srlblMuniColumn.setBounds(8, 87, 182, 16);
+		
+		panel_5.add(srlblMuniColumn);
+		srcomboBoxMuniColumn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if( hushcomboBoxMuniColumn) {
+					return;
+				}
+				MainFrame.mainframe.project.muni_column = (String)srcomboBoxMuniColumn.getSelectedItem();
+				setMuniColumn();
+			}
+		});
+		srcomboBoxMuniColumn.setEnabled(false);
+		srcomboBoxMuniColumn.setBounds(8, 106, 178, 20);
+		
+		panel_5.add(srcomboBoxMuniColumn);
 		
 		btnEthnicityColumns = new JButton("Ethnicity columns");
 		btnEthnicityColumns.addActionListener(new ActionListener() {
@@ -5405,6 +5454,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	public boolean hush_setSeatsMode = false;
 	public final JCheckBox chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
+	public final JLabel srlblMuniColumn = new JLabel("Muni column");
+	public final JComboBox srcomboBoxMuniColumn = new JComboBox();
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

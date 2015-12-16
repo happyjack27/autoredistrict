@@ -53,6 +53,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	public double geo_or_fair_balance_weight = 0.5;
 	public double representation_weight = 0.5;
 	public boolean equalize_turnout = false;
+	public String muni_column;
 	
 
 	public void post_deserialize() {
