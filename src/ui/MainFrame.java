@@ -5182,6 +5182,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				MainFrame.mainframe.project.county_column = (String)srcomboBoxCountyColumn.getSelectedItem();
 				setCountyColumn();
+				panelStats.getStats();
 			}
 		});
 		srcomboBoxCountyColumn.setBounds(8, 56, 178, 20);
@@ -5248,6 +5249,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				MainFrame.mainframe.project.muni_column = (String)srcomboBoxMuniColumn.getSelectedItem();
 				setMuniColumn();
+				panelStats.getStats();
 			}
 		});
 		srcomboBoxMuniColumn.setEnabled(false);
