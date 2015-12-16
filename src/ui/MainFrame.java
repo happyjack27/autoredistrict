@@ -4218,6 +4218,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmSimplifyPolygons.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.b_make_simplifiied_polys = chckbxmntmSimplifyPolygons.isSelected();
+				mapPanel.invalidate();
+				mapPanel.repaint();
 			}
 		});
 		chckbxmntmSimplifyPolygons.setToolTipText("This makes the map draw considerably faster by reducing the number of lines in each polygon.");
