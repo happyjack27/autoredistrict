@@ -1036,7 +1036,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					
 				}
 				least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-				splits += nonzeros + least - 2;	
+				splits += (nonzeros + least - 2.0) / 2.0; //count muni splits at half the value of a county split.	
 			}
     	}
 		return splits;
