@@ -1043,6 +1043,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public double countSplitsInteger() {
+    	return countMuniSplitsInteger()+countCountySplitsInteger();
+    }
+    public double countCountySplitsInteger() {
 		double splits = 0;
     	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
@@ -1069,6 +1072,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				splits += nonzeros - 1;	
 			}
     	}
+		return splits;
+    }
+    public double countMuniSplitsInteger() {
+		double splits = 0;
     	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 			for( int i = 0; i < vtds.size(); i++) {
