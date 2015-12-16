@@ -4214,6 +4214,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(chckbxmntmHideMapLines);
 		
+		chckbxmntmSimplifyPolygons = new JCheckBoxMenuItem("Simplify polygons");
+		chckbxmntmSimplifyPolygons.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.b_make_simplifiied_polys = chckbxmntmSimplifyPolygons.isSelected();
+			}
+		});
+		mnView.add(chckbxmntmSimplifyPolygons);
+		
 		
 		separator_6 = new JSeparator();
 		mnView.add(separator_6);
@@ -5458,6 +5466,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JCheckBox chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
 	public final JLabel srlblMuniColumn = new JLabel("Muni column");
 	public final JComboBox srcomboBoxMuniColumn = new JComboBox();
+	public JCheckBoxMenuItem chckbxmntmSimplifyPolygons;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
