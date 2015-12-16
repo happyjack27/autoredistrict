@@ -2,6 +2,7 @@ package geography;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
+import solutions.Settings;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -30,6 +31,10 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 
 	
 	public static double shiftx=0,shifty=0,scalex=1,scaley=1;
+	
+	public double min_squared_distance = 2*2;
+	public int min_point_frac = 16;
+	
 	public void makePolys() {
 		if( scalex == 0 || scalex != scalex) scalex = 1;
 		if( scaley == 0 || scaley != scaley) scaley = 1;
@@ -38,13 +43,46 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		
 		polygons = new Polygon[coordinates.length];
 		for( int i = 0; i < coordinates.length; i++) {
-			xpolys = new int[coordinates[i].length];
-			ypolys = new int[coordinates[i].length];
-			for( int j = 0; j < coordinates[i].length; j++) {
-				xpolys[j] = (int)((coordinates[i][j][0]-shiftx)*scalex);
-			}
-			for( int j = 0; j < coordinates[i].length; j++) {
-				ypolys[j] = (int)((coordinates[i][j][1]-shifty)*scaley);
+			if(Settings.b_make_simplifiied_polys ) {
+				int point_count = coordinates[i].length/min_point_frac;
+				if( point_count < 1) {
+					point_count = 1;
+				}
+				int last_i = 0;
+				double first_x = ((coordinates[i][0][0]-shiftx)*scalex);
+				double first_y = ((coordinates[i][0][1]-shifty)*scaley);
+				double last_x = first_x;
+				double last_y = first_y;
+				Vector<double[]> points = new Vector<double[]>();
+				points.add(new double[]{last_x,last_y});
+				
+				for( int j = 1; j < coordinates[i].length; j++) {
+					double xtest = ((coordinates[i][j][0]-shiftx)*scalex);
+					double ytest = ((coordinates[i][j][1]-shifty)*scaley);
+					double xdelta = xtest-last_x;
+					double ydelta = ytest-last_y;
+					if( xdelta*xdelta+ydelta*ydelta >= min_squared_distance || i-last_i >= point_count) {
+						last_x = xtest;
+						last_y = ytest;
+						points.add(new double[]{last_x,last_y});
+					}
+				}
+				xpolys = new int[points.size()];
+				ypolys = new int[points.size()];
+				for( int j = 0; j < points.size(); j++) {
+					double[] p  = points.get(j);
+					xpolys[j] = (int)p[0];
+					ypolys[j] = (int)p[1];
+				}
+			} else {
+				xpolys = new int[coordinates[i].length];
+				ypolys = new int[coordinates[i].length];
+				for( int j = 0; j < coordinates[i].length; j++) {
+					xpolys[j] = (int)((coordinates[i][j][0]-shiftx)*scalex);
+				}
+				for( int j = 0; j < coordinates[i].length; j++) {
+					ypolys[j] = (int)((coordinates[i][j][1]-shifty)*scaley);
+				}
 			}
 			polygons[i] = new Polygon(xpolys, ypolys, xpolys.length);
 		}
