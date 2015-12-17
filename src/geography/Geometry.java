@@ -32,7 +32,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	
 	public static double shiftx=0,shifty=0,scalex=1,scaley=1;
 	
-	public double min_squared_distance = 2*2;
+	public double min_squared_distance = 1;
 	public int min_point_frac = 16;
 	
 	public void makePolys() {
