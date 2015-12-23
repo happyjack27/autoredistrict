@@ -58,6 +58,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	}
 	
 	public void getStats() {
+		try {
 		Vector<Double> ranked_dists = new Vector<Double>();
 
 		try {
@@ -455,6 +456,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
 			MainFrame.mainframe.frameSeatsVotesChart.setData(featureCollection.ecology.population.get(0));
 			MainFrame.mainframe.frameRankedDist.setData(ranked_dists);
+		}
+		} catch (Exception ex) {
+			System.out.println("ex in PanelStats.getStats: "+ex);
+			ex.printStackTrace();
 		}
 	}
 	public PanelStats() {

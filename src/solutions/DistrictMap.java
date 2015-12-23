@@ -233,7 +233,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
         if( Settings.mutate_disconnected && prob >= 0) { 
-        	mutate_all_disconnected(0.2);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
+        	mutate_all_disconnected(0.5);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }
     public void mutate_all_disconnected(double prob) {
@@ -247,7 +247,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        for( int i = 0; i < districts.size(); i++) {
 	        	Vector<VTD> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
 	        	double pop = districts.get(i).getRegionPopulation(vw);
-	        	if( pop < 25000 || vw == null || vw.size() < 5) {
+	        	if( pop < 20000 || vw == null || vw.size() < 5) {
 	        		for(int j = 0; j < vtd_districts.length; j++) {
 	        			ward_connected[j] |=  vtd_districts[j] == i;
 	        		}
