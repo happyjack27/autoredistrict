@@ -155,7 +155,12 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             	    		}
         				//}
         			}
+        			try {
         			evolveWithSpeciation(); 
+        			} catch (Exception ex) {
+        				System.out.println("ex evolveWithSpeciation "+ex);
+        				ex.printStackTrace();
+        			}
         			if( verbosity > 0) {
             			System.out.print("time metrics: ");
             			for( int i = 0; i < DistrictMap.metrics.length; i++) {
@@ -184,7 +189,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         				System.out.println("stats panel is null");
         			}*/
     			} catch (Exception ex) {
-    				System.out.println("ex "+ex);
+    				System.out.println("ex abc "+ex);
     				ex.printStackTrace();
     			}
     		}
@@ -392,7 +397,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		try {
     			scoringLatch.await();
     		} catch (InterruptedException e) {
-    			System.out.println("ex");
+    			System.out.println("ex abd"+e);
     			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
@@ -682,7 +687,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		try {
     			matingLatch.await();
     		} catch (InterruptedException e) {
-    			System.out.println("ex");
+    			System.out.println("ex abe "+e);
     			// TODO Auto-generated catch ward
     			e.printStackTrace();
     		}
@@ -724,7 +729,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        		try {
 	        			matingLatch.await();
 	        		} catch (InterruptedException e) {
-	        			System.out.println("ex");
+	        			System.out.println("ex abf "+e);
 	        			// TODO Auto-generated catch ward
 	        			e.printStackTrace();
 	        		}
