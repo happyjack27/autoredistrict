@@ -35,7 +35,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public Vector<District> districts = new Vector<District>();
     
     public int[] vtd_districts = new int[]{};
-    public double[] fairnessScores = new double[8];
+    public double[] fairnessScores = new double[11];
     public double fitness_score = 0;
     
     public static double[] metrics = new double[10];
