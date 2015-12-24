@@ -434,14 +434,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 			
 			TableModel tm1 = new DefaultTableModel(ddata,dcolumns);
-			table.setModel(tm1);
-			Enumeration<TableColumn> en = table.getColumnModel().getColumns();
+			districtsTable.setModel(tm1);
+			Enumeration<TableColumn> en = districtsTable.getColumnModel().getColumns();
 	        while (en.hasMoreElements()) {
 	            TableColumn tc = en.nextElement();
 	            tc.setCellRenderer(new MyTableCellRenderer());
 	        }			
 			TableModel tm2 = new DefaultTableModel(cdata,ccolumns);
-			table_1.setModel(tm2);
+			partiesTable.setModel(tm2);
 		} catch (Exception ex) {
 			System.out.println("ex ad "+ex);
 			ex.printStackTrace();
@@ -477,23 +477,23 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		scrollPane.setBounds(26, 384, 791, 223);
 		add(scrollPane);
 		
-		table = new JTable();
-		scrollPane.setViewportView(table);
+		districtsTable = new JTable();
+		scrollPane.setViewportView(districtsTable);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(427, 45, 390, 87);
 		add(scrollPane_1);
 		
-		table_1 = new JTable();
-		scrollPane_1.setViewportView(table_1);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		partiesTable = new JTable();
+		scrollPane_1.setViewportView(partiesTable);
+		districtsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		
 		btnCopy = new JButton("copy");
 		btnCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ActionEvent nev = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "copy");
-				table.selectAll();
-				table.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+				ActionEvent nev = new ActionEvent(districtsTable, ActionEvent.ACTION_PERFORMED, "copy");
+				districtsTable.selectAll();
+				districtsTable.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
 		btnCopy.setBounds(728, 350, 89, 23);
@@ -502,9 +502,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		button = new JButton("copy");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ActionEvent nev = new ActionEvent(table_1, ActionEvent.ACTION_PERFORMED, "copy");
-				table_1.selectAll();
-				table_1.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
+				ActionEvent nev = new ActionEvent(partiesTable, ActionEvent.ACTION_PERFORMED, "copy");
+				partiesTable.selectAll();
+				partiesTable.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);
 			}
 		});
 		button.setBounds(728, 11, 89, 23);
@@ -561,10 +561,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		});
 		button_2.setBounds(728, 143, 89, 23);
 		add(button_2);
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				excel.ExportThread thread = new excel.ExportThread();
+				thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
+			}
+		});
+		btnNewButton.setBounds(199, 8, 117, 29);
+		
+		add(btnNewButton);
 	}
 	public FeatureCollection featureCollection;
-	private JTable table;
-	private JTable table_1;
+	private JTable districtsTable;
+	private JTable partiesTable;
 	public JButton btnCopy;
 	public JButton button;
 	public JTable summaryTable;
@@ -577,6 +586,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JScrollPane scrollPane_3;
 	public JButton button_2;
 	public JTable ethnicityTable;
+	public final JButton btnNewButton = new JButton("To Excel");
 	
     public class MyTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
 

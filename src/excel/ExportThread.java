@@ -3,7 +3,7 @@ package excel;
 import java.util.*;
 import java.applet.Applet;
 import java.awt.*;
-import java.io.InputStream;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -51,21 +51,58 @@ public class ExportThread extends Thread {
 	public void run() {
 		ExcelObj app = new ExcelObj();
 		app.init();
-		InputStream is = Applet.class.getResourceAsStream("/resources/export_template.xls");
-		try {
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		InputStream initialStream = Applet.class.getResourceAsStream("/resources/export_template.xls");
+		String tmpdir = System.getProperty("java.io.tmpdir");
+		
+		//File f = javax.swing.filechooser.FileSystemView.getFileSystemView().getDefaultDirectory();
+
+		String targetFileName = tmpdir+"autoredistrict_export.xls";
+	    File targetFile = new File(targetFileName);//"src/main/resources/targetFile.tmp");
+	    
+	    try {
+		    OutputStream outStream = new FileOutputStream(targetFile);
+			while( initialStream.available() > 0) {
+			    byte[] buffer = new byte[initialStream.available()];
+			    initialStream.read(buffer);
+			    outStream.write(buffer);
+			}
+		    outStream.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		ExcelObj wb = app.Workbooks();
+	    
+		ExcelObj wb = app.Open(targetFileName);
 		
-		
-		exportTableToSheet(wb.Worksheets(1),summary);
-		exportTableToSheet(wb.Worksheets(2),districts);
-		exportTableToSheet(wb.Worksheets(3),parties);
-		exportTableToSheet(wb.Worksheets(4),demo);
-		exportTableToSheet(wb.Worksheets(5),seats);
+	    try {
+	    	progressbar.sourceTF1.setText("Exporting summary...");
+			exportTableToSheet(wb.Worksheets(1),summary);
+	    	progressbar.sourceTF1.setText("Exporting districts...");
+			exportTableToSheet(wb.Worksheets(2),districts);
+	    	progressbar.sourceTF1.setText("Exporting parties...");
+			exportTableToSheet(wb.Worksheets(3),parties);
+	    	progressbar.sourceTF1.setText("Exporting demo...");
+			exportTableToSheet(wb.Worksheets(4),demo);
+	    	progressbar.sourceTF1.setText("Exporting seats...");
+			exportTableToSheet(wb.Worksheets(5),seats);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	    app.setVisible(true);
+	    /*
+		try {		
+			wb.Close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			app.Quit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
+		progressbar.hide();
 
 	}
-
+	public static void main(String[] ss) {
+		System.out.println(System.getProperty("java.io.tmpdir"));
+	}
 }
