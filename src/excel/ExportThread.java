@@ -47,7 +47,8 @@ public class ExportThread extends Thread {
 		progressbar.taskLabel.setText("Exporting...");
 		progressbar.show();
 		//loadJarDll("/resources/jcom.dll");
-		loadJarDll("/resources/jcom.dll");
+		loadJarDll("/resources/jcom.dll","jcom.dll");
+		//loadJarDll("/resources/jcom.lib","jcom.so");
 		start();
 	}
 	public void run() {
@@ -109,14 +110,14 @@ public class ExportThread extends Thread {
 		new ExportThread().export(null,null,null,null,null);
 	}
 	
-	public static void loadJarDll(String name) {
+	public static void loadJarDll(String name,String saveas) {
 		try {
 			//System.loadLibrary(name);
 			
 	    InputStream in = Applet.class.getResourceAsStream(name);
 	    byte[] buffer = new byte[1024];
 	    int read = -1;
-	    File temp = new File(System.getProperty("java.io.tmpdir")+"jcom.dll");//File.createTempFile(name, "");
+	    File temp = new File(System.getProperty("java.io.tmpdir")+saveas);//File.createTempFile(name, "");
 	    FileOutputStream fos = new FileOutputStream(temp);
 
 	    while((read = in.read(buffer)) != -1) {
