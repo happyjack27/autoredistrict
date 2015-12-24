@@ -44,8 +44,10 @@ public class ExportThread extends Thread {
 		this.demo = demo;
 		this.seats = seats;
 		this.progressbar = new DialogProgressBar();
-		progressbar.sourceTF1.setText("Exporting...");
+		progressbar.taskLabel.setText("Exporting...");
 		progressbar.show();
+		//loadJarDll("/resources/jcom.dll");
+		loadJarDll("/resources/jcom.dll");
 		start();
 	}
 	public void run() {
@@ -74,15 +76,15 @@ public class ExportThread extends Thread {
 		ExcelObj wb = app.Open(targetFileName);
 		
 	    try {
-	    	progressbar.sourceTF1.setText("Exporting summary...");
+	    	progressbar.taskLabel.setText("Exporting summary...");
 			exportTableToSheet(wb.Worksheets(1),summary);
-	    	progressbar.sourceTF1.setText("Exporting districts...");
+	    	progressbar.taskLabel.setText("Exporting districts...");
 			exportTableToSheet(wb.Worksheets(2),districts);
-	    	progressbar.sourceTF1.setText("Exporting parties...");
+	    	progressbar.taskLabel.setText("Exporting parties...");
 			exportTableToSheet(wb.Worksheets(3),parties);
-	    	progressbar.sourceTF1.setText("Exporting demo...");
+	    	progressbar.taskLabel.setText("Exporting demo...");
 			exportTableToSheet(wb.Worksheets(4),demo);
-	    	progressbar.sourceTF1.setText("Exporting seats...");
+	    	progressbar.taskLabel.setText("Exporting seats...");
 			exportTableToSheet(wb.Worksheets(5),seats);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -104,5 +106,33 @@ public class ExportThread extends Thread {
 	}
 	public static void main(String[] ss) {
 		System.out.println(System.getProperty("java.io.tmpdir"));
+		new ExportThread().export(null,null,null,null,null);
+	}
+	
+	public static void loadJarDll(String name) {
+		try {
+			//System.loadLibrary(name);
+			
+	    InputStream in = Applet.class.getResourceAsStream(name);
+	    byte[] buffer = new byte[1024];
+	    int read = -1;
+	    File temp = new File(System.getProperty("java.io.tmpdir")+"jcom.dll");//File.createTempFile(name, "");
+	    FileOutputStream fos = new FileOutputStream(temp);
+
+	    while((read = in.read(buffer)) != -1) {
+	        fos.write(buffer, 0, read);
+	    }
+	    fos.close();
+	    in.close();
+
+	    try { 
+	    	System.load(temp.getAbsolutePath());
+	    } catch (Exception ex) {
+	    	JOptionPane.showMessageDialog(null, "This feature only works in Windows.");
+	    }
+	    
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }

@@ -17,7 +17,7 @@ public class DialogProgressBar extends JDialog{
 	int max;
 	JTextField sourceTF1 = new JTextField();
 	ButtonGroup buttonGroup1 = new ButtonGroup();
-	private JLabel taskLabel = new JLabel();
+	public JLabel taskLabel = new JLabel();
 	private JProgressBar progressBar = new JProgressBar();
 	public DialogProgressBar(){
 		setTitle("Progress");
