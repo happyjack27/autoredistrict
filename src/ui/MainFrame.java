@@ -5429,6 +5429,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnEvolution.add(chckbxmntmMutateAnyAbove);
+		
+		rdbtnTruncationSelection.setVisible(false);
+		rdbtnRankSelection.setVisible(false);
+		rdbtnRouletteSelection.setVisible(false);
+		rdbtnTournamentSelection.setVisible(false);
+		
 
 
 
