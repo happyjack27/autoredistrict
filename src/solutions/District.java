@@ -61,9 +61,14 @@ public class District extends JSONObject {
     		dd[i] = 0;
     	}
     	for( VTD vtd : vtds) {
-        	for(int i = 0; i < cols.length; i++) {
-        		dd[i] += vtd.demographics[i];
+    		try {
+        	for(int i = 0; i < cols.length && i <  vtd.demographics.length; i++) {
+        			dd[i] += vtd.demographics[i];
         	}
+    		} catch (Exception ex) {
+    			System.out.println("ex getdemo "+ex);
+    			ex.printStackTrace();
+    		}
     	}
     	return dd;
     }

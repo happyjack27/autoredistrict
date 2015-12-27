@@ -5164,7 +5164,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(btnElection3Columns);
 		
 		panel_5 = new JPanel();
-		panel_5.setBounds(200, 397, 200, 210);
+		panel_5.setBounds(200, 397, 200, 252);
 		panel_5.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_5.setLayout(null);
 		panel.add(panel_5);
@@ -5267,6 +5267,25 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		srcomboBoxMuniColumn.setBounds(8, 106, 178, 20);
 		
 		panel_5.add(srcomboBoxMuniColumn);
+		rdbtnReduceTotalSplits.setSelected(true);
+		rdbtnReduceTotalSplits.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.minimize_number_of_counties_split = rdbtnReduceSplitCounties.isSelected();
+			}
+		});
+		rdbtnReduceTotalSplits.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		rdbtnReduceTotalSplits.setBounds(10, 198, 172, 23);
+		
+		panel_5.add(rdbtnReduceTotalSplits);
+		rdbtnReduceSplitCounties.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.minimize_number_of_counties_split = rdbtnReduceSplitCounties.isSelected();
+			}
+		});
+		rdbtnReduceSplitCounties.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		rdbtnReduceSplitCounties.setBounds(10, 223, 172, 23);
+		
+		panel_5.add(rdbtnReduceSplitCounties);
 		
 		btnEthnicityColumns = new JButton("Ethnicity columns");
 		btnEthnicityColumns.addActionListener(new ActionListener() {
@@ -5428,6 +5447,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				chckbxmntmMutateExcessPop.setEnabled(!Settings.mutate_good);
 			}
 		});
+		splitReductionType.add(rdbtnReduceTotalSplits);
+		splitReductionType.add(rdbtnReduceSplitCounties);
+
 		mnEvolution.add(chckbxmntmMutateAnyAbove);
 		
 		rdbtnTruncationSelection.setVisible(false);
@@ -5476,6 +5498,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JLabel srlblMuniColumn = new JLabel("Muni column");
 	public final JComboBox srcomboBoxMuniColumn = new JComboBox();
 	public JCheckBoxMenuItem chckbxmntmSimplifyPolygons;
+	public final JRadioButton rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
+	public final JRadioButton rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
+	public ButtonGroup splitReductionType = new ButtonGroup();
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

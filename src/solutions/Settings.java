@@ -214,6 +214,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	private static boolean no4s = true;
 	public static boolean population_is_per_seat = true;
 	public static boolean b_make_simplifiied_polys = false;
+	public static boolean minimize_number_of_counties_split = false;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

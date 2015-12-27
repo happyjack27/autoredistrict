@@ -995,8 +995,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					}
 					
 				}
-				least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-				splits += nonzeros + least - 2;	
+				if( Settings.minimize_number_of_counties_split) {
+					if( nonzeros > 1) {
+						splits += least;
+					}
+				} else {
+					least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+					splits += nonzeros + least - 2;	
+				}
 			}
     	}
     	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
@@ -1035,8 +1041,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					}
 					
 				}
-				least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
-				splits += (nonzeros + least - 2.0) / 2.0; //count muni splits at half the value of a county split.	
+				if( Settings.minimize_number_of_counties_split) {
+					if( nonzeros > 1) {
+						splits += least/2.0; //count muni splits at half the value of a county split.	
+					}
+				} else {
+					least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+					splits += (nonzeros + least - 2.0) / 2.0; //count muni splits at half the value of a county split.	
+				}
 			}
     	}
 		return splits;
