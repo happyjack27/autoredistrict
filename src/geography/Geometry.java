@@ -33,6 +33,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public static double shiftx=0,shifty=0,scalex=1,scaley=1;
 	
 	public double min_squared_distance = 1;
+	public double min_squared_distance_unsimplified = 0.1;
 	public int min_point_frac = 16;
 	
 	public void makePolys() {
@@ -43,8 +44,8 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		
 		polygons = new Polygon[coordinates.length];
 		for( int i = 0; i < coordinates.length; i++) {
-			if(Settings.b_make_simplifiied_polys ) {
-				int point_count = coordinates[i].length/min_point_frac;
+			if(Settings.b_make_simplified_polys || true ) {
+				int point_count = coordinates[i].length/( min_point_frac );
 				if( point_count < 1) {
 					point_count = 1;
 				}
@@ -61,7 +62,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 					double ytest = ((coordinates[i][j][1]-shifty)*scaley);
 					double xdelta = xtest-last_x;
 					double ydelta = ytest-last_y;
-					if( xdelta*xdelta+ydelta*ydelta >= min_squared_distance || i-last_i >= point_count) {
+					if( xdelta*xdelta+ydelta*ydelta >= (Settings.b_make_simplified_polys ? min_squared_distance : min_squared_distance_unsimplified) || i-last_i >= point_count) {
 						last_x = xtest;
 						last_y = ytest;
 						points.add(new double[]{last_x,last_y});

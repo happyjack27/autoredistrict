@@ -4205,7 +4205,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmSimplifyPolygons = new JCheckBoxMenuItem("Simplify polygons");
 		chckbxmntmSimplifyPolygons.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.b_make_simplifiied_polys = chckbxmntmSimplifyPolygons.isSelected();
+				Settings.b_make_simplified_polys = chckbxmntmSimplifyPolygons.isSelected();
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
