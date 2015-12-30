@@ -104,7 +104,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 	JCheckBoxMenuItem chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
-	JCheckBoxMenuItem chckbxmntmAutoAnneal = new JCheckBoxMenuItem("Auto anneal");
 	JCheckBoxMenuItem chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
 	JMenuItem mntmSaveProjectFile = new JMenuItem("Save project file");
 	JMenuItem mntmSaveData = new JMenuItem("Save data");
@@ -1329,15 +1328,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByCompactness;
 	public JLabel lblElitism;
 	public JSlider sliderElitism;
-	public JCheckBox chckbxMutateElite;
 	public JRadioButton rdbtnTruncationSelection;
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
 	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
 	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 	public final JSeparator separator_7 = new JSeparator();
-	public final JRadioButton rdbtnTournamentSelection = new JRadioButton("Tournament selection");
-	public final JSlider tournamentSlider = new JSlider();
 	public JMenuItem mntmHarvardElectionData;
 	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
 	public final JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
@@ -4127,14 +4123,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		menuBar.add(mnEvolution);
-		chckbxmntmAutoAnneal.setSelected(true);
-		
-		chckbxmntmAutoAnneal.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.auto_anneal = chckbxmntmAutoAnneal.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmAutoAnneal);
 		
 		chckbxmntmUseAnnealFloor = new JCheckBoxMenuItem("Use anneal floor");
 		chckbxmntmUseAnnealFloor.setSelected(Settings.use_annealing_floor);
@@ -4760,7 +4748,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_3.add(slider_mutation);
 		
 		lblElitism = new JLabel("% elitism");
-		lblElitism.setBounds(6, 181, 69, 16);
+		lblElitism.setBounds(6, 171, 69, 16);
 		panel_3.add(lblElitism);
 		
 		sliderElitism = new JSlider();
@@ -4770,26 +4758,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderElitism.setValue((int)(Settings.elite_fraction*100.0));
-		sliderElitism.setBounds(6, 208, 190, 29);
+		sliderElitism.setBounds(6, 198, 190, 29);
 		panel_3.add(sliderElitism);
 		
-		chckbxMutateElite = new JCheckBox("mutate elite");
-		chckbxMutateElite.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.mutate_all = chckbxMutateElite.isSelected();
-			}
-		});
-		chckbxMutateElite.setBounds(81, 178, 115, 23);
-		chckbxMutateElite.setSelected(Settings.mutate_all);
-		panel_3.add(chckbxMutateElite);
-		
 		rdbtnTruncationSelection = new JRadioButton("Truncation selection");
-		rdbtnTruncationSelection.setBounds(6, 244, 188, 23);
+		rdbtnTruncationSelection.setBounds(6, 316, 188, 23);
 		panel_3.add(rdbtnTruncationSelection);
 		rdbtnTruncationSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
-				tournamentSlider.setVisible(false);
+				//tournamentSlider.setVisible(false);
 			}
 		});
 		
@@ -4798,49 +4776,49 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		selectionType.add(rdbtnTruncationSelection);
 		
 		rdbtnRankSelection = new JRadioButton("Rank selection");
-		rdbtnRankSelection.setBounds(6, 270, 188, 23);
+		rdbtnRankSelection.setBounds(6, 342, 188, 23);
 		panel_3.add(rdbtnRankSelection);
 		rdbtnRankSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
-				tournamentSlider.setVisible(false);
+				//tournamentSlider.setVisible(false);
 			}
 		});
 		rdbtnRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
 		selectionType.add(rdbtnRankSelection);
 		
 		rdbtnRouletteSelection = new JRadioButton("Roulette selection");
-		rdbtnRouletteSelection.setBounds(6, 298, 188, 23);
+		rdbtnRouletteSelection.setBounds(6, 370, 188, 23);
 		panel_3.add(rdbtnRouletteSelection);
 		rdbtnRouletteSelection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
-				tournamentSlider.setVisible(false);
+				//tournamentSlider.setVisible(false);
 			}
 		});
 		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
 		selectionType.add(rdbtnRouletteSelection);
-		rdbtnTournamentSelection.addActionListener(new ActionListener() {
+		chckbxAutoAnneal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.SELECTION_MODE = Settings.TOURNAMENT_SELECTION;
-				tournamentSlider.setVisible(true);
+				Settings.auto_anneal = chckbxAutoAnneal.isSelected();
 			}
 		});
-		rdbtnTournamentSelection.setBounds(6, 326, 172, 23);
-		selectionType.add(rdbtnTournamentSelection);
+		chckbxAutoAnneal.setSelected(true);
+		chckbxAutoAnneal.setBounds(79, 74, 115, 23);
 		
-		panel_3.add(rdbtnTournamentSelection);
-		tournamentSlider.addChangeListener(new ChangeListener() {
+		panel_3.add(chckbxAutoAnneal);
+		lblElitisesMutated.setBounds(6, 238, 172, 16);
+		
+		panel_3.add(lblElitisesMutated);
+		sliderElitesMutated.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.tournament_exponent = Settings.tournament_exponent_max*(100.0-(double)tournamentSlider.getValue())/100.0;
+				Settings.elite_mutate_fraction = ((double)sliderElitesMutated.getValue())/100.0;
 			}
 		});
-		tournamentSlider.setBounds(6, 361, 190, 29);
-		tournamentSlider.setVisible(false);
-		tournamentSlider.setValue((int)(100.0-100.0*(Settings.tournament_exponent/Settings.tournament_exponent_max)));
+		sliderElitesMutated.setValue(100);
+		sliderElitesMutated.setBounds(6, 265, 190, 29);
 		
-		
-		panel_3.add(tournamentSlider);
+		panel_3.add(sliderElitesMutated);
 		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
@@ -5455,7 +5433,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnTruncationSelection.setVisible(false);
 		rdbtnRankSelection.setVisible(false);
 		rdbtnRouletteSelection.setVisible(false);
-		rdbtnTournamentSelection.setVisible(false);
 		
 
 
@@ -5501,6 +5478,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JRadioButton rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
 	public final JRadioButton rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
 	public ButtonGroup splitReductionType = new ButtonGroup();
+	public final JCheckBox chckbxAutoAnneal = new JCheckBox("auto anneal");
+	public final JLabel lblElitisesMutated = new JLabel("% elites mutated");
+	public final JSlider sliderElitesMutated = new JSlider();
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -5547,6 +5527,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		double num_features = featureCollection.features.size();
+		double combinations = num_features * Math.log((double)Settings.num_districts);
+		System.out.println("log combinations: "+combinations);
 		panelStats.getStats();
 		hush_setSeatsMode = false;
 		System.out.println("setSeatsMode returned");

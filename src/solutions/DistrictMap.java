@@ -957,6 +957,103 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	return ddd;
     }
     
+    public double countCountiesSplitInteger() {
+		double splits = 0;
+    	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+	    	try { 
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.county);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.county, dists);
+				}
+				int dist = vtd_districts[i];
+				if( dist >= dists.length) {
+					dist = (int)(Math.random()*(double)dists.length);
+				}
+				dists[dist]++;
+			}
+	    	} catch (Exception ex) {
+	    		ex.printStackTrace();
+	    	}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double total = 0;
+				double nonzeros = 0;
+				double least = -1;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+					total += ii[i];
+					if( least < 0 || ii[i] < least) {
+						least = ii[i];
+					}
+					
+				}
+				if( true || Settings.minimize_number_of_counties_split) {
+					if( nonzeros > 1) {
+						splits++;//splits += least;
+					}
+				} else {
+					least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+					splits += nonzeros + least - 2;	
+				}
+			}
+    	}
+    	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
+	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
+	    	try { 
+			for( int i = 0; i < vtds.size(); i++) {
+				VTD vtd = vtds.get(i);
+				int[] dists = counties.get(vtd.muni);
+				if( dists == null) {
+					dists = new int[Settings.num_districts];
+					counties.put(vtd.muni, dists);
+				}
+				int dist = vtd_districts[i];
+				if( dist >= dists.length) {
+					dist = (int)(Math.random()*(double)dists.length);
+				}
+				dists[dist]++;
+			}
+	    	} catch (Exception ex) {
+	    		ex.printStackTrace();
+	    	}
+			Collection<int[]> vii = counties.values();
+			
+			for(int[] ii : vii) {
+				double total = 0;
+				double nonzeros = 0;
+				double least = -1;
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] == 0) {
+						continue;
+					}
+					nonzeros++;
+					total += ii[i];
+					if( least < 0 || ii[i] < least) {
+						least = ii[i];
+					}
+					
+				}
+				if( true || Settings.minimize_number_of_counties_split) {
+					if( nonzeros > 1) {
+						splits++;//splits += least/2.0; //count muni splits at half the value of a county split.	
+					}
+				} else {
+					least = least*nonzeros/total; //normalizes this to a range of 0 to 1.
+					splits += (nonzeros + least - 2.0) / 2.0; //count muni splits at half the value of a county split.	
+				}
+			}
+    	}
+		return splits;
+
+    }
     public double countSplits() {
 		double splits = 0;
     	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {

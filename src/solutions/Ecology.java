@@ -745,7 +745,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("  applying mutation...");
 
-        for(int i = Settings.mutate_all ? 0 : cutoff; i < population.size(); i++) {
+        for(int i = /*Settings.mutate_all ? 0 :*/ (int)(((double)cutoff)*(1.0-Settings.elite_mutate_fraction)); i < population.size(); i++) {
             DistrictMap dm = population.get(i);
             if(Settings.mutation_rate > 0)
             	dm.mutate(Settings.mutation_rate);

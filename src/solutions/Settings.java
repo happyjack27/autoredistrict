@@ -3,6 +3,7 @@ package solutions;
 import java.util.Vector;
 
 import serialization.JSONObject;
+import ui.MainFrame;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double uncontested_threshold = 0.02;
@@ -112,7 +113,14 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		if (new_rate <= 0.0001) {
 			new_rate = 0.0001;
 		}
-		double e = max_mutation * Math.exp(-0.0006 * (double) generation); // reaches
+		
+		//adjust anneal rate to be proportional to the logarithm of the number of total possible maps.
+		double num_features = MainFrame.mainframe.featureCollection.features.size();
+		double combinations = num_features * Math.log((double)Settings.num_districts);
+		double g = generation;
+		g *= (30484.02508579287/combinations);
+
+		double e = max_mutation * Math.exp(-0.0006 * (double) g); // reaches
 																				// -0.0005
 																				// 0.000005
 																				// at
@@ -215,6 +223,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean population_is_per_seat = true;
 	public static boolean b_make_simplifiied_polys = false;
 	public static boolean minimize_number_of_counties_split = false;
+	public static double elite_mutate_fraction = 1;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;
