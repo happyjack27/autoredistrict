@@ -1724,6 +1724,30 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         return d1 > d2 ? d1 : d2;
     }
     
+    public double getMeanPopDiff() {
+    	double tot = 0;
+    	double mad = 0;
+    	double seats = 0;
+    	for(int i = 0; i < Settings.num_districts; i++) {
+    		District district = districts.get(i);
+    		district.id = i;
+			double pop = district.getPopulation();
+			tot += pop;
+			seats +=  Settings.seats_in_district(i);
+		}
+    	tot /= seats;
+    	System.out.println("tot = "+tot);
+    	for(int i = 0; i < Settings.num_districts; i++) {
+    		District district = districts.get(i);
+    		district.id = i;
+			double pop = district.getPopulation();
+			pop /= Settings.seats_in_district(i);
+			mad += Math.abs(pop-tot)*Settings.seats_in_district(i);
+		}
+    	mad /= seats;
+        return mad/tot;
+    }
+    
     //needs to be variance, not sqrt variance, so that delta is linear
     public double getPopVariance() {
     	double tot = 0;

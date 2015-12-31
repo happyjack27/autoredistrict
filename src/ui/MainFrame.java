@@ -2611,13 +2611,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				for( Feature feat : featureCollection.features) {
 					int d = 0;
 					try {
+
 						d = Integer.parseInt((String)feat.properties.get(district) );
 					} catch (Exception ex) {
+						System.out.println("ex aa "+ex);
 						d = 0;
 						feat.properties.put(district,"0");
-						System.out.println("missing district ");
+						System.out.println("missing district "+district );
 						try {
 							System.out.println((String)feat.properties.get("GEOID10"));
+						} catch (Exception ex2) {
+							
+						}
+						try {
+							System.out.println((String)feat.properties.get(district));
 						} catch (Exception ex2) {
 							
 						}
