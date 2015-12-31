@@ -1675,7 +1675,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         fairnessScores = new double[]{
         		length
         		,disproportional_representation
-        		,getPopVariance()/*population_imbalance*2.0*/ //getMaxPopDiff()
+        		,Settings.minimize_absolute_deviation ? getMeanPopDiff() : getPopVariance()/*population_imbalance*2.0*/ //getMaxPopDiff()
         		,disconnected_pops
         		,power_fairness
         		,total_vote_gap//wasted_votes

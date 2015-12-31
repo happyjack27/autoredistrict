@@ -2590,6 +2590,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	boolean hushSetDistrict = false;
 	protected boolean hushcomboBoxMuniColumn;
+	ButtonGroup buttonGroupPopMinMethod = new ButtonGroup();
 	public void setDistrictColumn(String district) {
 		System.out.println("setDistrictColumn hush?"+hushSetDistrict);
 		if( hushSetDistrict) {
@@ -3485,7 +3486,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderRepresentation.setValue(50);
 		sliderSeatsVotes.setValue(50);
 		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
-		lblFairnessCriteria.setBounds(9, 11, 179, 16);
+		lblFairnessCriteria.setBounds(10, 10, 179, 16);
 		
 		panel_4.add(lblFairnessCriteria);
 		lblRacialVoteDilution.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
@@ -4679,7 +4680,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(400, 55, 200, 221);
+		panel_2.setBounds(400, 55, 200, 301);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -4712,6 +4713,27 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderDisconnected.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderDisconnected);
+		rdbtnMinimizeMaxDev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.minimize_absolute_deviation = !rdbtnMinimizeMaxDev.isSelected();
+			}
+		});
+		rdbtnMinimizeMaxDev.setSelected(true);
+		rdbtnMinimizeMaxDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		rdbtnMinimizeMaxDev.setBounds(16, 220, 169, 23);
+		
+		panel_2.add(rdbtnMinimizeMaxDev);
+		rdbtnMinimizeMeanDev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.minimize_absolute_deviation = !rdbtnMinimizeMaxDev.isSelected();
+			}
+		});
+		rdbtnMinimizeMeanDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		rdbtnMinimizeMeanDev.setBounds(16, 255, 169, 23);
+		
+		panel_2.add(rdbtnMinimizeMeanDev);
+		buttonGroupPopMinMethod.add(rdbtnMinimizeMeanDev);
+		buttonGroupPopMinMethod.add(rdbtnMinimizeMaxDev);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -4949,7 +4971,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 274, 200, 302);
+		panel_4.setBounds(400, 358, 200, 291);
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
@@ -5490,6 +5512,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public final JCheckBox chckbxAutoAnneal = new JCheckBox("auto anneal");
 	public final JLabel lblElitisesMutated = new JLabel("% elites mutated");
 	public final JSlider sliderElitesMutated = new JSlider();
+	public final JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
+	public final JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
