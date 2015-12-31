@@ -34,7 +34,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean use_rectangularized_compactness = true;
 
 	public static boolean squared_compactness = true;
-	public static boolean squared_pop_variance = false;
+	public static boolean squared_pop_variance = true;
 
 	// public static boolean border_length_area_weighted = true;
 	public static final boolean make_unique = false; // not the cost of this is

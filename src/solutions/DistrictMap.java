@@ -1736,7 +1736,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			seats +=  Settings.seats_in_district(i);
 		}
     	tot /= seats;
-    	System.out.println("tot = "+tot);
+    	//System.out.println("tot = "+tot);
     	for(int i = 0; i < Settings.num_districts; i++) {
     		District district = districts.get(i);
     		district.id = i;
