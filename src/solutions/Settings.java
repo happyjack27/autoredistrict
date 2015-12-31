@@ -224,6 +224,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean b_make_simplified_polys = false;
 	public static boolean minimize_number_of_counties_split = false;
 	public static double elite_mutate_fraction = 1;
+	public static double exp_mutate_factor = 20.0;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

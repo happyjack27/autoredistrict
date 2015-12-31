@@ -73,7 +73,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public boolean hushcomboBoxCounty = false;
 
 	double mutation_rate_multiplier = 0.1;
-	public static double boundary_mutation_rate_multiplier = 0.2;
+	public static double boundary_mutation_rate_multiplier = 1.0;//0.2;
 	long load_wait = 100;
 	
 	double minx,maxx;
@@ -3503,7 +3503,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(sliderVoteDilution);
 		
 		Settings.mutation_rate = 0; 
-		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
+		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*Math.exp(-(100-slider_mutation.getValue())/Settings.exp_mutate_factor);
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
 		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
@@ -5359,7 +5359,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		slider_mutation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
+				//Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
+				Settings.mutation_boundary_rate = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
+
 			}
 		});
 		sliderPopulationBalance.addChangeListener(new ChangeListener() {
@@ -5564,8 +5566,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	@Override
 	public void valueChanged() {
  		textField.setText(""+Settings.population);
+ 		double e = Math.log(Settings.mutation_boundary_rate)*Settings.exp_mutate_factor+100;
+ 		//double d = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
 		//System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
-		slider_mutation.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
+		slider_mutation.setValue((int)e);
+		//slider_mutation.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
 		invalidate();
 		repaint();
 	}
