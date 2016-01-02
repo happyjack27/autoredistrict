@@ -4285,7 +4285,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnView.add(mntmShowVoteBalance);
 		mntmShowDemographics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if( true) {
+				if( false) {
 					JOptionPane.showMessageDialog(null,"Not implemented");
 					return;
 				}

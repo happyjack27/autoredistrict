@@ -15,6 +15,35 @@ public class DialogMultiColumnSelect extends JDialog {
 	public Vector<String> not_in = new Vector<String>();
 	public Vector<String> in = new Vector<String>();
 	//public String[] right_side = null;
+	public void repaint() {
+		System.out.println("repaint");
+		super.repaint();
+		paint(this.getGraphics());
+		//this.p
+	}
+	
+    public void paint(Graphics graphics0) {
+		System.out.println("paint");
+    	super.paint(graphics0);
+    	try {
+    		Graphics2D g = (Graphics2D)graphics0;
+    		for(int i = 0; i < Feature.colors.length; i++) {
+    			/*
+    			 * 286
+    			 * 11
+    			 * 182
+    			 * 361
+    			 */
+    			g.setColor(Feature.colors[i]);
+    			//g.fillOval(286+182+5, 11+2+i*12, 9, 9);
+    			g.fillOval(286-12, 11+27+i*17, 10, 10);
+    		}
+    	} catch (Exception ex) {
+    		System.out.println("ex "+ex);
+    		ex.printStackTrace();
+    		
+    	}
+	}
 	
 	public DialogMultiColumnSelect(String title, String[] all, String[] right_side) {
 		setTitle(title);
