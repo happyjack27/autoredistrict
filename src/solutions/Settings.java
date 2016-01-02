@@ -100,7 +100,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	}
 
 	public static double max_mutation = 0.20;
-
+	public static double getAnnealingCeiling(long generation) {
+		return getAnnealingFloor(generation)*1.2;
+	}
 	public static double getAnnealingFloor(long generation) {
 		if (!use_annealing_floor) {
 			return 0;

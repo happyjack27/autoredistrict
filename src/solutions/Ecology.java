@@ -558,8 +558,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	if( new_rate < Settings.getAnnealingFloor(generation) ){
         		new_rate = Settings.getAnnealingFloor(generation);
         	}
-        	if( new_rate > Settings.getAnnealingFloor(generation)*2 ){
-        		new_rate = Settings.getAnnealingFloor(generation)*2;
+        	if( new_rate > Settings.getAnnealingCeiling(generation) ){
+        		new_rate = Settings.getAnnealingCeiling(generation);
         	}
         	Settings.mutation_boundary_rate += (new_rate-Settings.mutation_boundary_rate)*Settings.auto_anneal_Frac;
         	/*
