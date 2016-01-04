@@ -3154,12 +3154,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
         System.out.println("filename: "+filename);
         
 		for( int i = 0; i < headers.length; i++) {
-			Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
-			System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
 			try {
+				Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
+				System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
 				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], (char)(int)q.d, q.b,q.c);
 				//fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
 			} catch (JDBFException e) {
+				try {
+					fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
+				} catch (JDBFException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				System.out.println("e "+i+": "+e);
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -3216,7 +3223,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		dh.header = new String[dbfreader.getFieldCount()];
 		for( int i = 0; i < dh.header.length; i++) {
-			dh.header[i] = dbfreader.getField(i).getName();
+			try {
+				dh.header[i] = dbfreader.getField(i).getName();
+				System.out.println("i: "+dh.header[i]);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 		Vector<String[]> vd = new Vector<String[]>();
 
@@ -3887,7 +3899,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						if( f == null)  {
 							return;
 						}
-						filename = f.getName().trim();
+						filename = f.getAbsolutePath().trim();
 					}
 					if( !filename.toLowerCase().substring(filename.length()-4).equals(".dbf")) {
 						filename += ".dbf";

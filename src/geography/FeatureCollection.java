@@ -169,15 +169,18 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			return null;
 		}
 		Set<String> keyset = features.get(0).properties.keySet(); 
-		headers = new String[keyset.size()];
 		
 		Vector<String> v_headers = new Vector<String>();
 		for( String s : keyset) {
+			if( s == null || s.trim().length() == 0) {
+				continue;
+			}
 			v_headers.add(s);
 		}
 		
 		Collections.sort(v_headers);
 		
+		headers = new String[v_headers.size()];
 		for( int i = 0; i < v_headers.size(); i++) {
 			headers[i] = v_headers.get(i);
 		}
