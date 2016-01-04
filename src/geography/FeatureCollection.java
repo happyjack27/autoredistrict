@@ -32,6 +32,8 @@ import ui.MapPanel;
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
+	public HashMap<String,Integer> header_lengths = new HashMap<String,Integer>();
+	public HashMap<String,String> header_types = new HashMap<String,String>();
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
 	public Vector<VTD> vtds;
@@ -960,5 +962,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		System.out.println("vertex_xs: "+vertex_x);
 		System.out.println("vertex_all: "+vertex_all);
+	}
+
+
+	public int[] getLengths(String[] headers) {
+		int[] h = new int[headers.length];
+		for( int i = 0; i < h.length; i++) {
+			h[i] = 20;
+		}
+		// TODO Auto-generated method stub
+		return h;
+	}
+
+
+	public char[] getTypes(String[] headers) {
+		char[] h = new char[headers.length];
+		for( int i = 0; i < h.length; i++) {
+			h[i] = 20;
+		}
+		// TODO Auto-generated method stub
+		return h;
 	}
 }

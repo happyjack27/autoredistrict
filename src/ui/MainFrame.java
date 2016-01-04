@@ -261,11 +261,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int col_lon = -1;
 				int col_geoid = -1;
 				
+				featureCollection.header_lengths = new HashMap<String,Integer>();
+				featureCollection.header_types = new HashMap<String,String>();
+				
 	    		dlbl.setText("Reading header...");
 
 				dh.header = new String[dbfreader.getFieldCount()];
+				dh.lengths = new int[dbfreader.getFieldCount()];
+				dh.types = new char[dbfreader.getFieldCount()];
+				
 				for( int i = 0; i < dh.header.length; i++) {
 					dh.header[i] = dbfreader.getField(i).getName();
+					dh.lengths[i] = dbfreader.getField(i).getLength();
+					dh.types[i] = dbfreader.getField(i).getType();
+					featureCollection.header_lengths.put(dh.header[i],dh.lengths[i]);
+					featureCollection.header_types.put(dh.header[i],""+dh.types[i]);
+
 					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid = i;
 					}
@@ -3137,12 +3148,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		return dh;
 	}
-	public void writeDBF(String filename, String[] headers, String[][] data) {
+	public void writeDBF(String filename, String[] headers, int[] lengths, char[] types, String[][] data) {
         JDBField[] fields = new JDBField[headers.length];
         
 		for( int i = 0; i < headers.length; i++) {
 			try {
-				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 64, 0);
+				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
 			} catch (JDBFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -3825,7 +3836,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent arg0) {
 				String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
 				if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
-					options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)"};//,".dbf (in separate dbase file)",".dbf (in original shapefile)"};
+					//options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)"};//,".dbf (in separate dbase file)",".dbf (in original shapefile)"};
 				}
 				int opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
 				if( opt < 0) {
@@ -3837,12 +3848,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				featureCollection.storeDistrictsToProperties(project.district_column);
 				System.out.println("getting headers...");
 				String[] headers = featureCollection.getHeaders();
+				int[] lengths = featureCollection.getLengths(headers);
+				char[] types = featureCollection.getTypes(headers);
+				
 				System.out.println("getting data...");
 				String[][] data = featureCollection.getData(headers);
 				
 				if( opt == 3 || opt == 2) {
 					String filename = "";
 					File f = null;
+					opt = 2;
 					if( opt == 3) {
 						filename = project.source_file.substring(0,project.source_file.length()-3)+"dbf";
 						f = new File(filename);
