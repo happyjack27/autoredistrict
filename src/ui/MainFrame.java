@@ -261,21 +261,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int col_lon = -1;
 				int col_geoid = -1;
 				
-				featureCollection.header_lengths = new HashMap<String,Integer>();
-				featureCollection.header_types = new HashMap<String,String>();
+				featureCollection.header_data = new HashMap<String,Quadruplet<String,Integer,Integer,Byte>>();
 				
 	    		dlbl.setText("Reading header...");
 
 				dh.header = new String[dbfreader.getFieldCount()];
-				dh.lengths = new int[dbfreader.getFieldCount()];
-				dh.types = new char[dbfreader.getFieldCount()];
-				
 				for( int i = 0; i < dh.header.length; i++) {
 					dh.header[i] = dbfreader.getField(i).getName();
-					dh.lengths[i] = dbfreader.getField(i).getLength();
-					dh.types[i] = dbfreader.getField(i).getType();
-					featureCollection.header_lengths.put(dh.header[i],dh.lengths[i]);
-					featureCollection.header_types.put(dh.header[i],""+dh.types[i]);
+					featureCollection.header_data.put(
+						dh.header[i],
+						new Quadruplet<String,Integer,Integer,Byte>(
+							dh.header[i],
+							dbfreader.getField(i).getLength(),
+							dbfreader.getField(i).getDecimalCount(),
+							(byte)dbfreader.getField(i).getType()
+						)
+					);
 
 					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid = i;
@@ -3148,12 +3149,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		return dh;
 	}
-	public void writeDBF(String filename, String[] headers, int[] lengths, char[] types, String[][] data) {
+	public void writeDBF(String filename, String[] headers, String[][] data) {
         JDBField[] fields = new JDBField[headers.length];
+        System.out.println("filename: "+filename);
         
 		for( int i = 0; i < headers.length; i++) {
+			Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
+			System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
 			try {
-				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
+				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], (char)(int)q.d, q.b,q.c);
+				//fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
 			} catch (JDBFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -3173,8 +3178,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					data[i][j] = data[i][j].substring(0,64);
 				}
 			}
+			Object[] oo = new Object[data[i].length];
+			for( int j = 0; j < fields.length; j++) {
+				if( fields[j].getType() == 'N') {
+					oo[j] = Double.parseDouble(data[i][j]);
+				} else {
+					oo[j] = data[i][j];
+				}
+				
+			}
 			try {
-				dbfwriter.addRecord(data[i]);
+				//dbfwriter.addRecord(data[i]);
+				dbfwriter.addRecord(oo);
 			} catch (JDBFException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -3182,6 +3197,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		try {
 			dbfwriter.close();
+			System.out.println("dbfwriter closed");
 		} catch (JDBFException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -3848,8 +3864,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				featureCollection.storeDistrictsToProperties(project.district_column);
 				System.out.println("getting headers...");
 				String[] headers = featureCollection.getHeaders();
-				int[] lengths = featureCollection.getLengths(headers);
-				char[] types = featureCollection.getTypes(headers);
 				
 				System.out.println("getting data...");
 				String[][] data = featureCollection.getData(headers);
@@ -3873,7 +3887,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						if( f == null)  {
 							return;
 						}
-						filename = f.getName();
+						filename = f.getName().trim();
+					}
+					if( !filename.toLowerCase().substring(filename.length()-4).equals(".dbf")) {
+						filename += ".dbf";
 					}
 					System.out.println("writedbf start.");
 					writeDBF(filename,headers,data);					

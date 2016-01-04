@@ -23,6 +23,7 @@ import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
 import solutions.Edge;
+import solutions.Quadruplet;
 import solutions.Settings;
 import solutions.Vertex;
 import solutions.VTD;
@@ -32,8 +33,7 @@ import ui.MapPanel;
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
-	public HashMap<String,Integer> header_lengths = new HashMap<String,Integer>();
-	public HashMap<String,String> header_types = new HashMap<String,String>();
+	public HashMap<String,Quadruplet<String,Integer,Integer,Byte>> header_data = new HashMap<String,Quadruplet<String,Integer,Integer,Byte>>();
 	public String type;
 	public Vector<Feature> features = new Vector<Feature>();
 	public Vector<VTD> vtds;
@@ -964,23 +964,65 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		System.out.println("vertex_all: "+vertex_all);
 	}
 
-
-	public int[] getLengths(String[] headers) {
-		int[] h = new int[headers.length];
-		for( int i = 0; i < h.length; i++) {
-			h[i] = 20;
+	public Quadruplet<String, Integer, Integer, Byte> getHeaderData( String s) {
+		Quadruplet<String,Integer,Integer,Byte> q = header_data.get(s);
+		if( q != null) {
+			return q;
 		}
-		// TODO Auto-generated method stub
-		return h;
-	}
+		q = new Quadruplet<String,Integer,Integer,Byte>(s,20,0,(byte)'C');
+		int maxlen = 1;
+		int maxdec = 0;
+		boolean isnumeric = true;
+		for( int i = 0; i < features.size(); i++) {
+			Feature f = features.get(i);
+			Object o = f.properties.get(s);
+			if( o == null) {
+				continue;
+			}
 
+			String s2 = "";
+			try {
+				 s2 = (String)o;
+			} catch (Exception ex) {
+				//System.out.println("couldn't get object as string. trying as number "+o);
+				try {
+					s2 = ""+ (Integer)o;
+				} catch (Exception ex2) {
+					System.out.println("couldn't get object as number.  using default length of 16");
+					maxlen = 16;
+				}
+			}
 
-	public char[] getTypes(String[] headers) {
-		char[] h = new char[headers.length];
-		for( int i = 0; i < h.length; i++) {
-			h[i] = 20;
+			 if( s2.length() > maxlen) {
+				 maxlen = s2.length();
+			 }
+			 try {
+				 Double.parseDouble(s2);
+				 if( s2.indexOf(".") >= 0) {
+					 int l = s2.substring(s2.indexOf(".")+1).length();
+					 if( l > maxdec) {
+						 maxdec = l;
+					 }
+				 }
+			 } catch (Exception ex) {
+				 isnumeric = false;
+			 }
+			 /*
+			 if( !s2.matches("^[+-]?(\\d*\\.)?\\d+$")) {
+			 } else {
+				 if( s2.indexOf(".") >= 0) {
+					 int l = s2.substring(s2.indexOf(".")+1).length();
+					 if( l > maxdec) {
+						 maxdec = l;
+					 }
+				 }
+			 }*/
 		}
-		// TODO Auto-generated method stub
-		return h;
+		q.b = maxlen;
+		if( isnumeric) {
+			q.c = maxdec;
+			q.d = 'N';
+		}
+		return q;
 	}
 }
