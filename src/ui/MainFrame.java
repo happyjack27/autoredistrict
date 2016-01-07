@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.*; 
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
@@ -140,11 +141,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     public JTextField textField = new JTextField();
 	public JTextField textFieldSeatsPerDistrict;
 
-	public JSlider slider_mutation = new JSlider();
-	public JSlider sliderDisconnected = new JSlider();
-	public JSlider sliderBorderLength = new JSlider();
-	public JSlider sliderPopulationBalance = new JSlider();
-	public JSlider sliderRepresentation = new JSlider();
+	public JSlider slider_mutation;
+	public JSlider sliderDisconnected;
+	public JSlider sliderBorderLength;
+	public JSlider sliderPopulationBalance;
+	public JSlider sliderRepresentation;
 	
 	public JLabel lblDistrictColumn;
 	
@@ -155,12 +156,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton btnElectionColumns;
 	public JMenuItem mntmImportCensusData;
 	public JMenuItem mntmExportToBlock;
-	public final JSeparator separator_1 = new JSeparator();
-	public final JSeparator separator_2 = new JSeparator();
-	public final JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
-	public final JMenuItem mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
-	public final JMenuItem mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
+	public JSeparator separator_1 = new JSeparator();
+	public JSeparator separator_2 = new JSeparator();
+	public JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
+	public JMenuItem mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
+	public JMenuItem mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 	
+	
+	/**
+	 * Returns the class name of the installed LookAndFeel with a name
+	 * containing the name snippet or null if none found.
+	 * 
+	 * @param nameSnippet a snippet contained in the Laf's name
+	 * @return the class name if installed, or null
+	 */
+	public static String getLookAndFeelClassName(String nameSnippet) {
+	    LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
+	    for (LookAndFeelInfo info : plafs) {
+	        if (info.getName().contains(nameSnippet)) {
+	            return info.getClassName();
+	        }
+	    }
+	    return null;
+	}
+
 	//=========CLASSES
 	class FileThread extends Thread {
     	public File f = null;
@@ -1309,12 +1328,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 	public int hits = 0;
 	public int misses = 0;
-	public final JSeparator separator_3 = new JSeparator();
-	public final JMenuItem mntmAntialiasingOff = new JMenuItem("Antialiasing off");
-	public final JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
-	public final JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
-	public final JSlider sliderWastedVotesTotal = new JSlider();
-	public final JLabel lblWastedVotes = new JLabel("Competitiveness (victory margin)");
+	public JSeparator separator_3 = new JSeparator();
+	public JMenuItem mntmAntialiasingOff = new JMenuItem("Antialiasing off");
+	public JMenuItem mntmxAntialiasing = new JMenuItem("2x antialiasing");
+	public JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
+	public JSlider sliderWastedVotesTotal = new JSlider();
+	public JLabel lblWastedVotes = new JLabel("Competitiveness (victory margin)");
 	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
@@ -1343,20 +1362,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnTruncationSelection;
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
-	public final JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
-	public final JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
-	public final JSeparator separator_7 = new JSeparator();
+	public JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
+	public JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
+	public JSeparator separator_7 = new JSeparator();
 	public JMenuItem mntmHarvardElectionData;
-	public final JMenuItem mntmDescramble = new JMenuItem("descramble");
-	public final JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
-	public final JMenuItem mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
+	public JMenuItem mntmDescramble = new JMenuItem("descramble");
+	public JMenuItem mntmShowSeats = new JMenuItem("Show seats / votes");
+	public JMenuItem mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
 	public JLabel lblSeatsVotes;
 	public JSlider sliderSeatsVotes;
 	public JButton btnSubstituteColumns;
 	public JCheckBox chckbxSubstituteColumns;
-	public final JMenu mnWindows = new JMenu("Windows");
-	public final JButton btnElection2Columns = new JButton("Election 2 columns");
-	public final JCheckBox chckbxSecondElection = new JCheckBox("Second election");
+	public JMenu mnWindows = new JMenu("Windows");
+	public JButton btnElection2Columns = new JButton("Election 2 columns");
+	public JCheckBox chckbxSecondElection = new JCheckBox("Second election");
 	public JCheckBox chckbxThirdElection;
 	public JButton btnElection3Columns;
 	public JMenuItem mntmPublicMappingProject;
@@ -1366,13 +1385,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JComboBox srcomboBoxCountyColumn;
 	public JLabel srlblCountyColumn;
 	public JCheckBox chckbxReduceSplits;
-	public final JLabel lblFairnessCriteria = new JLabel("Fairness criteria");
+	public JLabel lblFairnessCriteria = new JLabel("Fairness criteria");
 	public JButton btnEthnicityColumns;
 	private boolean hushcomboBoxCountyColumn;
-	public final JLabel lblRacialVoteDilution = new JLabel("Racial vote dilution");
-	public final JSlider sliderVoteDilution = new JSlider();
-	public final JTextField textFieldTotalSeats = new JTextField();
-	public final JRadioButton lblTotalSeats = new JRadioButton("Total seats");
+	public JLabel lblRacialVoteDilution = new JLabel("Racial vote dilution");
+	public JSlider sliderVoteDilution = new JSlider();
+	public JTextField textFieldTotalSeats = new JTextField();
+	public JRadioButton lblTotalSeats = new JRadioButton("Total seats");
 	Feature getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
@@ -3520,8 +3539,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	public MainFrame() {
+
+		String className = getLookAndFeelClassName("Nimbus");
+		try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+
 		mainframe = this;
 		jbInit();
+		try {
+			UIManager.setLookAndFeel(className);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+		
 		sliderRepresentation.setValue(50);
 		sliderSeatsVotes.setValue(50);
 		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -3578,6 +3613,156 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
 		this.setSize(new Dimension(1021, 779));
+		
+		sliderWastedVotesTotal = new JSlider();
+		lblWastedVotes = new JLabel("Competitiveness (victory margin)");
+		goButton = new JButton();
+		stopButton = new JButton();
+		
+		lblFairnessCriteria = new JLabel("Fairness criteria");
+		lblRacialVoteDilution = new JLabel("Racial vote dilution");
+		sliderVoteDilution = new JSlider();
+		textFieldTotalSeats = new JTextField();
+		lblTotalSeats = new JRadioButton("Total seats");
+		chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
+		srlblMuniColumn = new JLabel("Muni column");
+		srcomboBoxMuniColumn = new JComboBox();
+		rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
+		rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
+		splitReductionType = new ButtonGroup();
+		chckbxAutoAnneal = new JCheckBox("auto anneal");
+		lblElitisesMutated = new JLabel("% elites mutated");
+		sliderElitesMutated = new JSlider();
+		rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
+		rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
+		
+		mntmColorByWasted = new JMenuItem("Color by wasted votes");
+		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
+		separator_7 = new JSeparator();
+		mntmDescramble = new JMenuItem("descramble");
+		mntmShowSeats = new JMenuItem("Show seats / votes");
+		mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
+		mnWindows = new JMenu("Windows");
+		btnElection2Columns = new JButton("Election 2 columns");
+		chckbxSecondElection = new JCheckBox("Second election");
+		
+		
+		//========CONTAINERS
+	    dlg = new JDialog(mainframe, "Working", true);
+	    dpb = new JProgressBar(0, 500);
+	    dlbl = new JLabel();
+		mapPanel = new MapPanel(); 
+		frameStats = new JFrame();
+		panelStats = new PanelStats();
+		frameGraph = new JFrame();
+		df = new DialogShowProperties();
+		panelGraph = new PanelGraph();
+
+		//===========COMPONENTS - MENU ITEMS
+		selectionType = new ButtonGroup();
+		mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
+		mntmShowDemographics = new JMenuItem("Color by demographic");;
+		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
+		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+		chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+		chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
+		mntmSaveProjectFile = new JMenuItem("Save project file");
+		mntmSaveData = new JMenuItem("Save data");
+		mntmMergeData = new JMenuItem("Merge data");
+		mntmRenumber = new JMenuItem("Renumber districts");
+
+		mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
+		chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
+		
+		mntmOpenElectionResults = new JMenuItem("Open Election results");
+		mnEvolution = new JMenu("Evolution");
+		mnHelp = new JMenu("Help");
+		mntmWebsite = new JMenuItem("Website");
+		mntmSourceCode = new JMenuItem("Source code");
+		mntmLicense = new JMenuItem("License");
+		mntmExportcsv = new JMenuItem("Export results .csv");
+		mntmImportcsv = new JMenuItem("Import results .csv");
+		mntmShowStats = new JMenuItem("Show stats");
+		mntmShowData = new JMenuItem("Show data");
+		
+		mnImportExport = new JMenu("Aggregate/Deaggregate");
+
+		mntmExportPopulation = new JMenuItem("Export population");
+		mntmImportPopulation = new JMenuItem("Import population");
+		mntmResetZoom = new JMenuItem("Reset zoom");
+		mntmZoomIn = new JMenuItem("Zoom in");
+		mntmUndoZoom = new JMenuItem("Undo zoom");
+		mntmShowGraph = new JMenuItem("Show graph");
+		mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+		comboBoxPopulation = new JComboBox();
+		comboBoxDistrictColumn = new JComboBox();
+	    textFieldNumDistricts = new JTextField();
+	    textField = new JTextField();
+
+		manageLocks = new DialogManageLocks();
+		seatsPanel = new PanelSeats();
+		progressBar = new JProgressBar();
+		frameSeatsVotesChart = new FrameSeatsVotesChart();
+		frameRankedDist = new FrameRankedDistricts();
+
+		mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
+		mntmShowDemographics = new JMenuItem("Color by demographic");;
+		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
+		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
+		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
+		chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
+		chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
+		mntmSaveProjectFile = new JMenuItem("Save project file");
+		mntmSaveData = new JMenuItem("Save data");
+		mntmMergeData = new JMenuItem("Merge data");
+		mntmRenumber = new JMenuItem("Renumber districts");
+
+		//mnGeography = new JMenu("Geography");
+		mntmOpenGeojson = new JMenuItem("Open GeoJSON file");
+		//mnDemographics = new JMenu("Demographics");
+		chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
+		mntmOpenElectionResults = new JMenuItem("Open Election results");
+		mnEvolution = new JMenu("Evolution");
+		mnHelp = new JMenu("Help");
+		mntmWebsite = new JMenuItem("Website");
+		mntmSourceCode = new JMenuItem("Source code");
+		mntmLicense = new JMenuItem("License");
+		mntmExportcsv = new JMenuItem("Export results .csv");
+		mntmImportcsv = new JMenuItem("Import results .csv");
+		mntmShowStats = new JMenuItem("Show stats");
+		mntmShowData = new JMenuItem("Show data");
+		
+		mnImportExport = new JMenu("Aggregate/Deaggregate");
+
+		mntmExportPopulation = new JMenuItem("Export population");
+		mntmImportPopulation = new JMenuItem("Import population");
+		mntmResetZoom = new JMenuItem("Reset zoom");
+		mntmZoomIn = new JMenuItem("Zoom in");
+		mntmUndoZoom = new JMenuItem("Undo zoom");
+		mntmShowGraph = new JMenuItem("Show graph");
+		mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
+		comboBoxPopulation = new JComboBox();
+		comboBoxDistrictColumn = new JComboBox();
+	    textFieldNumDistricts = new JTextField();
+	    textField = new JTextField();
+
+
+		separator_1 = new JSeparator();
+		separator_2 = new JSeparator();
+		mntmImportAggregate = new JMenuItem("Import & aggregate custom");
+		mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
+		mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
+
+	    dlg = new JDialog(mainframe, "Working", true);
+
+
+		
+		slider_mutation = new JSlider();		
+		sliderDisconnected = new JSlider();
+		sliderBorderLength = new JSlider();
+		sliderPopulationBalance = new JSlider();
+		sliderRepresentation = new JSlider();
 		
 		dlg.setModal(false);
 	    dpb.setIndeterminate(true);
@@ -5546,18 +5731,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 	}
 	public boolean hush_setSeatsMode = false;
-	public final JCheckBox chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
-	public final JLabel srlblMuniColumn = new JLabel("Muni column");
-	public final JComboBox srcomboBoxMuniColumn = new JComboBox();
+	public JCheckBox chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
+	public JLabel srlblMuniColumn = new JLabel("Muni column");
+	public JComboBox srcomboBoxMuniColumn = new JComboBox();
 	public JCheckBoxMenuItem chckbxmntmSimplifyPolygons;
-	public final JRadioButton rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
-	public final JRadioButton rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
+	public JRadioButton rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
+	public JRadioButton rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
 	public ButtonGroup splitReductionType = new ButtonGroup();
-	public final JCheckBox chckbxAutoAnneal = new JCheckBox("auto anneal");
-	public final JLabel lblElitisesMutated = new JLabel("% elites mutated");
-	public final JSlider sliderElitesMutated = new JSlider();
-	public final JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
-	public final JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
+	public JCheckBox chckbxAutoAnneal = new JCheckBox("auto anneal");
+	public JLabel lblElitisesMutated = new JLabel("% elites mutated");
+	public JSlider sliderElitesMutated = new JSlider();
+	public JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
+	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
