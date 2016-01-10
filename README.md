@@ -3,6 +3,8 @@ written in java, open source.
 
 CONTRIBUTION GUIDELINES:
 * I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.
+it is currently impossible to use the program to gerrymander and it will stay that way.  this means that an otherwise "good" feature might get rejected - so be it.  
+this is the #1 rule and it trumps all other considerations.
 * I'll only merge it if it's a definite improvement.
 * keep the code simple and clean - i won't merge if it makes the code unneccessarily complicated or difficult to compile.  (e.g. tons of dependancies)  i don't want code bloat, i want to keep it easy to maintain.
 
