@@ -1,9 +1,10 @@
 FULLY AUTOMATED REDISTICTING SOFTWARE
 written in java, open source.
 
-for theory of how it works, see:https://github.com/happyjack27/autoredistrict/blob/master/tutorials/in_theory.docx?raw=true
-for a sample screenshot, see: https://github.com/happyjack27/autoredistrict/blob/master/screenshots/screen_shot_WI_ASM_parital.png
-
+CONTRIBUTION GUIDELINES:
+* I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.
+* I'll only merge it if it's a definite improvement.
+* keep the code simple and clean - i won't merge if it makes the code unneccessarily complicated or difficult to compile.  (e.g. tons of dependancies)  i don't want code bloat, i want to keep it easy to maintain.
 
 HOW TO RUN:
 
