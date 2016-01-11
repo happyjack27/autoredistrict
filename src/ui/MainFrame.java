@@ -2598,6 +2598,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmSaveData.setEnabled(geo_loaded);
 		mntmRenumber.setEnabled(geo_loaded);
 		mntmSaveProjectFile.setEnabled(geo_loaded);
+		mntmCopyColumn.setEnabled(geo_loaded);
 
 		
 	}
@@ -4145,6 +4146,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmSaveData);
+		
+		separator_9 = new JSeparator();
+		mnFile.add(separator_9);
+		
+		mntmCopyColumn = new JMenuItem("Copy column");
+		mntmCopyColumn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(mainframe, "Not implemented yet.");
+			}
+		});
+		mntmCopyColumn.setEnabled(false);
+		mnFile.add(mntmCopyColumn);
 		
 		separator_4 = new JSeparator();
 		mnFile.add(separator_4);
@@ -5743,6 +5756,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderElitesMutated = new JSlider();
 	public JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
 	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
+	public JMenuItem mntmCopyColumn;
+	public JSeparator separator_9;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
