@@ -8,15 +8,11 @@ import javax.swing.table.*;
 
 import solutions.*;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Vector;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.text.*;
+import java.util.*;
+import java.awt.event.*;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -568,9 +564,45 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
 			}
 		});
-		btnNewButton.setBounds(199, 8, 117, 29);
+		btnNewButton.setBounds(89, 8, 117, 29);
 		
 		add(btnNewButton);
+		
+		btnHtml = new JButton("html");
+		btnHtml.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyAsHtml(partiesTable);
+			}
+		});
+		btnHtml.setBounds(629, 11, 89, 23);
+		add(btnHtml);
+		
+		button_3 = new JButton("html");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyAsHtml(ethnicityTable);
+			}
+		});
+		button_3.setBounds(629, 143, 89, 23);
+		add(button_3);
+		
+		button_4 = new JButton("html");
+		button_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyAsHtml(partiesTable);
+			}
+		});
+		button_4.setBounds(629, 350, 89, 23);
+		add(button_4);
+		
+		button_5 = new JButton("html");
+		button_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				copyAsHtml(summaryTable);
+			}
+		});
+		button_5.setBounds(228, 11, 89, 23);
+		add(button_5);
 	}
 	public FeatureCollection featureCollection;
 	private JTable districtsTable;
@@ -588,6 +620,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JButton button_2;
 	public JTable ethnicityTable;
 	public final JButton btnNewButton = new JButton("To Excel");
+	public JButton btnHtml;
+	public JButton button_3;
+	public JButton button_4;
+	public JButton button_5;
 	
     public class MyTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
 
@@ -613,6 +649,34 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
             return this;
         }
 
+    }
+    
+    public void copyAsHtml(JTable t) {
+    	String str = "";
+    	int cc = t.getColumnCount();
+    	int rc = t.getRowCount();
+
+    	str += "<table>\n";
+    	str += "  <tr>\n";
+    	for( int i = 0; i < cc; i++) {
+    		str += "    <th>"+t.getColumnName(i)+"</th>\n";
+    	}
+    	str +="  </tr>\n";
+    	//String[][] rows = new String[t.getRowCount()][];
+    	for( int i = 0; i < rc; i++) {
+        	str +="  <tr>\n";
+        	for( int j = 0; j < cc; j++) {
+        		str += "    <td>"+(String)t.getValueAt(i, j)+"</td>\n";
+        	}
+        	str +="  </tr>\n";
+    		
+    	}
+    	str += "</table>\n";
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Clipboard clipboard = toolkit.getSystemClipboard();
+		StringSelection strSel = new StringSelection(str);
+		clipboard.setContents(strSel, null);    	
     }
 
 
