@@ -1,22 +1,37 @@
 FULLY AUTOMATED REDISTICTING SOFTWARE
 written in java, open source.
 
+HOW TO RUN:
+
+Requires Java Runtime Environment (JRE) version 7 or greater.
+
+Open a command prompt. Change to the directory containing the jar:
+```
+java -jar autoredistrict.jar -Xmx4096M -Xms1024M
+```
+
+```autoredistrict.jar``` is in the ```jar``` folder along with a script file for windows and one for linux/mac.
+The -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
+
+HOW TO BUILD AND RUN:
+
+Requires Java Development Kit (JDK) version 7 or greater.
+Open a command prompt. Change to the directory that you cloned the repo to. Make a ```bin``` directory here. Run:
+
+```
+javac -encoding UTF-8 -d bin -cp 'src:jcom.jar' src/ui/Applet.java
+```
+
+To start the newly-compiled app, change to the bin directory and run:
+```
+java -Xmx4096M -Xms1024M -classpath autoredistrict.jar:../jcom.jar ui/Applet
+```
+
 CONTRIBUTION GUIDELINES:
 * I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.
 it is currently impossible to use the program to gerrymander and it will stay that way.  this means that an otherwise "good" feature might get rejected - so be it.  this is the #1 rule and it trumps all other considerations.
 * I'll only merge it if it's a definite improvement.
 * keep the code simple and clean - i won't merge if it makes the code unneccessarily complicated or difficult to compile.  (e.g. tons of dependancies)  i don't want code bloat, i want to keep it easy to maintain.
-
-HOW TO RUN:
-
-requires java runtime environment (if you don't have it, just google "java")
-
-java -jar autoredistrict.jar -Xmx4096M -Xms1024M
-
-where, of course, autoredistrict.jar is in the present working directory.
-autoredistrict.jar is in the "jar" folder along with a script file for windows and one for linux/mac.
-the -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
-
 
 TODO:
 * is .dbf save working?  seems to not be - need to save column widths and types!
