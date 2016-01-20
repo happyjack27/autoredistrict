@@ -22,7 +22,12 @@ Open a command prompt. Change to the directory that you cloned the repo to. Make
 javac -encoding UTF-8 -d bin -cp 'src:jcom.jar' src/ui/Applet.java
 ```
 
-To start the newly-compiled app, change to the bin directory and run:
+Now create a jar by changing to the ```bin``` directory and running:
+```
+jar cf autoredistrict.jar .
+```
+
+To start the newly-compiled app from the bin directory, run:
 ```
 java -Xmx4096M -Xms1024M -classpath autoredistrict.jar:../jcom.jar ui/Applet
 ```
