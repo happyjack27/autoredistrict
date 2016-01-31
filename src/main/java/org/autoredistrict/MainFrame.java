@@ -1349,6 +1349,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmNoMap;
 	public JMenuItem mntmOneMap;
 	public JMenuItem mntmFourMaps;
+	public JMenuItem mntmNineMaps;
+	public JMenuItem mntmSixteenMaps;
 	public JSeparator separator_5;
 	public JCheckBoxMenuItem chckbxmntmUseAnnealFloor;
 	public JMenuItem mntmResetAnnealFloor;
@@ -4630,6 +4632,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(mntmFourMaps);
+		
+		mntmNineMaps = new JMenuItem("Nine maps");
+		mntmNineMaps.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.num_maps_to_draw = 9;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmNineMaps);
+		
+		mntmSixteenMaps = new JMenuItem("Sixteen maps");
+		mntmSixteenMaps.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.num_maps_to_draw = 16;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmSixteenMaps);
 		
 		//JMenu mnResults = new JMenu("Results");
 		//menuBar.add(mnResults);
