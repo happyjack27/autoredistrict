@@ -223,6 +223,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					demo_pct[i][j] = demo[i][j]*total;
 				}
 			}
+			double[] winners_by_ethnicity = new double[dem_col_names.length];
 	
 			for( int i = 0; i < dm.districts.size(); i++) {
 				try {
@@ -234,6 +235,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				double[][] result = new double[2][];//d.getElectionResults();
 				result[0] = d.getAnOutcome();
 				result[1] = District.popular_vote_to_elected(result[0], i);
+				
+				double[] demo_result = District.popular_vote_to_elected(demo[i], i);
+				for( int j = 0; j < demo_result.length; j++) {
+					winners_by_ethnicity[j] += demo_result[j];
+				}
+				
 				double self_entropy = 1;//d.getSelfEntropy(result[Settings.self_entropy_use_votecount?2:1]);
 				//String edge_length = ""+d.getEdgeLength();
 				//double [] dd = d.getVotes();
@@ -350,7 +357,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			double ravg = 1.0 / (tot_margin / tot_vote);
 			
-			String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Victory margins","Votes"};
+			String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Victory margins","Votes","Straight vote descr. rep."};
 			String[][] edata = new String[dem_col_names.length+1][];
 			for( int i = 0; i < dem_col_names.length; i++) {
 				edata[i] = new String[]{
@@ -360,6 +367,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						decimal.format(vote_margins_by_dem[i]/votes_by_dem[i]),
 						decimal.format(vote_margins_by_dem[i]),
 						decimal.format(votes_by_dem[i]),
+						integer.format(winners_by_ethnicity[i]),
 				};
 			}
 			edata[dem_col_names.length] = new String[]{
