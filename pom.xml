@@ -67,4 +67,26 @@
         </snapshotRepository>
     </distributionManagement>
     -->
+    <dependencies>
+        <dependency>
+            <groupId>jp.ne.so_net.no_ji</groupId>
+            <artifactId>jcom</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/jcom.jar</systemPath>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+    </build>
 </project>
