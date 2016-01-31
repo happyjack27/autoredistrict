@@ -1,4 +1,6 @@
 package solutions;
+import geography.Feature;
+
 import java.util.*;
 
 import serialization.*;
@@ -6,6 +8,7 @@ import serialization.*;
 public class VTD extends ReflectionJSONObject<VTD> {
     public int id;
 	public static int id_enumerator = 0;
+	public Feature feature = null;
 	public int state = 0;
 	public int temp = -1;
 	public double area = 0;
@@ -68,6 +71,7 @@ public class VTD extends ReflectionJSONObject<VTD> {
 	double[][] outcomes;
 	public double[] demographics = new double[]{};
 	public String muni;
+	public boolean temp_bool;
 
     public VTD() {
     	super();

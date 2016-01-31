@@ -33,6 +33,8 @@ it is currently impossible to use the program to gerrymander and it will stay th
 * I'll only merge it if it's a definite improvement.
 * keep the code simple and clean - i won't merge if it makes the code unneccessarily complicated or difficult to compile.  (e.g. tons of dependancies)  i don't want code bloat, i want to keep it easy to maintain.
 
+https://travis-ci.org/happyjack27/autoredistrict.svg?branch=master
+
 TODO:
 * is .dbf save working?  seems to not be - need to save column widths and types!
 * make project files load/save other files relative to woring directory of project file. (and make taht the default in file selection dialog)

@@ -1,5 +1,7 @@
 package ui;
 
+import geography.FeatureCollection;
+
 import java.util.Vector;
 
 import javax.swing.*;
@@ -12,10 +14,13 @@ import solutions.Settings;
 
 import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 public class FrameSeatsVotesChart extends JFrame {
 	public JPanel panel;
@@ -41,11 +46,27 @@ public class FrameSeatsVotesChart extends JFrame {
 		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
+	    		double FSAA = 2;
+	    		int iFSAA = 2;
+	            Dimension d = this.getSize();
+                Graphics2D graphics = (Graphics2D)graphics0;
+    	        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    	        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+    	        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
+		        BufferedImage off_Image =
+		        		  new BufferedImage(
+		        				  (int) (d.getWidth()*FSAA), 
+		        				  (int) (d.getHeight()*FSAA), 
+		        		          BufferedImage.TYPE_INT_ARGB
+		        		          );
+		        Graphics2D g = off_Image.createGraphics();
+
+	    		
 	    		int l1 = 128+64+32;
 	    		int l2 = 128+64;
 	    		int l3 = 128;
 	    		
-				Graphics2D g = (Graphics2D)graphics0;
 			    super.paintComponent(g);
 
 			    //calculate balanced sesats-votes curve
@@ -60,11 +81,11 @@ public class FrameSeatsVotesChart extends JFrame {
 			    
 			    //first do basic background
 			    g.setColor(Color.white);
-			    g.fillRect(0, 0, 200, 200);
+			    g.fillRect(0, 0, 200*iFSAA, 200*iFSAA);
 			    g.setColor(new Color(l1,l1,255));
-			    g.fillPolygon(new int[]{scale(0),scale(200),0}, new int[]{0,0,200}, 3);
+			    g.fillPolygon(new int[]{scale(0)*iFSAA,scale(200)*iFSAA,0}, new int[]{0,0,200*iFSAA}, 3);
 			    g.setColor(new Color(255,l1,l1));
-			    g.fillPolygon(new int[]{scale(0),scale(200),200}, new int[]{200,0,200}, 3);
+			    g.fillPolygon(new int[]{scale(0)*iFSAA,scale(200)*iFSAA,200*iFSAA}, new int[]{200*iFSAA,0,200*iFSAA}, 3);
 
 			    
 			    //now do excess seats background
@@ -91,19 +112,19 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		g.setColor(y0>0 ? new Color(l2,l2,255) : new Color(255,l2,l2));
 				    		int[] xs = new int[i-last_cross_ndx+2];
 				    		int[] ys = new int[i-last_cross_ndx+2];
-				    		xs[0] = scale(last_cross_x);
-				    		ys[0] = last_cross_y;//scale(last_cross_y);
+				    		xs[0] = scale(last_cross_x)*iFSAA;
+				    		ys[0] = last_cross_y*iFSAA;//scale(last_cross_y);
 				    		
 				    		for( int j = last_cross_ndx; j <= i; j++) {
 				    			int xindex = j-last_cross_ndx+1;
 						    	double[] dd0 = seats_votes.get(j);
 						    	int x = (int)(Math.round(dd0[1]*200.0)); 
 						    	int y = (int)(Math.round(200.0-dd0[0]*200.0));				    			
-				    			xs[xindex] = scale(x);
-				    			ys[xindex] = y;
+				    			xs[xindex] = scale(x)*iFSAA;
+				    			ys[xindex] = y*iFSAA;
 				    		}
-				    		xs[xs.length-1] = scale(new_cross_x);
-				    		ys[xs.length-1] = new_cross_y;
+				    		xs[xs.length-1] = scale(new_cross_x)*iFSAA;
+				    		ys[xs.length-1] = new_cross_y*iFSAA;
 	
 						    g.fillPolygon(xs,ys,xs.length);
 				    		last_cross_x = new_cross_x;
@@ -152,26 +173,26 @@ public class FrameSeatsVotesChart extends JFrame {
 				    		//System.out.println(""+i+" "+last_cross_ndx+" "+(2+i-last_cross_ndx));
 				    		int[] xs = new int[2*(1+i-last_cross_ndx)];
 				    		int[] ys = new int[2*(1+i-last_cross_ndx)];
-				    		xs[0] = scale((int)Math.round(200.0*last_cross_x));
-				    		ys[0] = (int)Math.round(200.0-200.0*last_cross_y);
+				    		xs[0] = scale((int)Math.round(200.0*last_cross_x))*iFSAA;
+				    		ys[0] = (int)Math.round(200.0-200.0*last_cross_y)*iFSAA;
 				    		
 				    		int ndx = 1;
 				    		for(int j = last_cross_ndx; j < i; j++) {
 				    			double[] ee = seats_votes.get(j);
-				    			xs[ndx] = scale((int)Math.round(200.0*ee[1]));
-				    			ys[ndx] = (int)Math.round(200.0-200.0*ee[0]);
+				    			xs[ndx] = scale((int)Math.round(200.0*ee[1]))*iFSAA;
+				    			ys[ndx] = (int)Math.round(200.0-200.0*ee[0])*iFSAA;
 				    			ndx++;
 				    		}
 				    		
-				    		xs[ndx] = scale((int)Math.round(200.0*intersect[0]));
-				    		ys[ndx] = (int)Math.round(200.0-200.0*intersect[1]);
+				    		xs[ndx] = scale((int)Math.round(200.0*intersect[0]))*iFSAA;
+				    		ys[ndx] = (int)Math.round(200.0-200.0*intersect[1])*iFSAA;
 				    		last_cross_x = intersect[0];
 				    		last_cross_y = intersect[1];
 				    		ndx++;
 				    		
 				    		for(int j = i-1; j >= last_cross_ndx; j--) {
-				    			xs[ndx] = scale((int)Math.round(200.0*mid_x[j]));
-				    			ys[ndx] = (int)Math.round(200.0-200.0*mid_y[j]);
+				    			xs[ndx] = scale((int)Math.round(200.0*mid_x[j]))*iFSAA;
+				    			ys[ndx] = (int)Math.round(200.0-200.0*mid_y[j])*iFSAA;
 				    			ndx++;
 				    		}
 				    		
@@ -192,8 +213,8 @@ public class FrameSeatsVotesChart extends JFrame {
 
 			    //draw diagonal line and mid line
 			    g.setColor(Color.gray);
-			    g.drawLine(scale(0),200, scale(200), 0);
-			    g.drawLine(100,0, 100, 200);
+			    g.drawLine(scale(0)*iFSAA,200*iFSAA, scale(200)*iFSAA, 0);
+			    g.drawLine(100*iFSAA,0, 100*iFSAA, 200*iFSAA);
 
 			    //draw seats votes curve
 			    int oldx = scale(0);
@@ -207,7 +228,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
-			    	g.drawLine(scale(oldx),oldy,scale(x),y);
+			    	g.drawLine(scale(oldx)*iFSAA,oldy*iFSAA,scale(x)*iFSAA,y*iFSAA);
 				    oldx = x;
 				    oldy = y;
 			    }
@@ -223,10 +244,17 @@ public class FrameSeatsVotesChart extends JFrame {
 			    	//if( y == 0) { y++; }
 			    	//if( x == 200) { x--; }
 			    	if( y == 200) { y--; }
-			    	g.drawLine(scale(oldx),oldy,scale(x),y);
+			    	g.drawLine(scale(oldx)*iFSAA,oldy*iFSAA,scale(x)*iFSAA,y*iFSAA);
 				    oldx = x;
 				    oldy = y;
 			    }
+			    
+		        graphics.drawImage(off_Image,
+		                0,
+		                0,
+		        		(int)d.getWidth(), (int)d.getHeight(), 
+		        		null);
+
 
 
 	    	} catch (Exception ex) {
