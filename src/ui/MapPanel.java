@@ -56,10 +56,24 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         }
         FeatureCollection.shown_map = 0;
         Dimension d = this.getSize();
+        if( Settings.num_maps_to_draw > 1) {
+	    	int m = (int)Math.sqrt(Settings.num_maps_to_draw);
+	    	d.setSize(d.width/m, d.height/m);
+        }
+/*
         if( Settings.num_maps_to_draw == 4) {
         	d.setSize(d.width/2, d.height/2);
         }
+        if( Settings.num_maps_to_draw == 9) {
+        	d.setSize(d.width/3, d.height/3);
+        }
+        if( Settings.num_maps_to_draw == 16) {
+        	d.setSize(d.width/4, d.height/4);
+        }
+        */
         for( int i = 0; i < Settings.num_maps_to_draw; i++) {
+    	    int m = (int)Math.sqrt(Settings.num_maps_to_draw);
+
             FeatureCollection.shown_map = i;
             BufferedImage off_Image = null;
 	        //graphics.setComposite(AlphaComposite.Src);
@@ -130,15 +144,15 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 		        g2.dispose();
 	
 		        graphics.drawImage(off_Image2, 
-		                (i%2)*d.width,
-		                ((i-i%2)/2)*d.height,
+		                (i%m)*d.width,
+		                ((i-i%m)/m)*d.height,
 		        		(int)d.getWidth(), (int)d.getHeight(), 
 		        		null);
 	
 	        } else if( FSAA == 2 || true) {
 		        graphics.drawImage(off_Image,
-		                (i%2)*d.width,
-		                ((i-i%2)/2)*d.height,
+		                (i%m)*d.width,
+		                ((i-i%m)/m)*d.height,
 		        		(int)d.getWidth(), (int)d.getHeight(), 
 		        		null);
 	        }
@@ -279,19 +293,20 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 			}
 		}
 
-        if( Settings.num_maps_to_draw == 4) {
+        if( Settings.num_maps_to_draw > 1) {
+        	int m = (int)Math.sqrt(Settings.num_maps_to_draw);
         	int x = (r.x+r.width);
         	int y = (r.y+r.height);
         	
-        	x %= d.width/2;
-        	y %= d.height/2;
-        	x *= 2;
-        	y *= 2;
+        	x %= d.width/m;
+        	y %= d.height/m;
+        	x *= m;
+        	y *= m;
 
-        	r.x %= d.width/2;
-        	r.y %= d.height/2;
-        	r.x *= 2;
-        	r.y *= 2;
+        	r.x %= d.width/m;
+        	r.y %= d.height/m;
+        	r.x *= m;
+        	r.y *= m;
         	
         	r.width = x-r.x;
         	r.height = y-r.y;
