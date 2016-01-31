@@ -655,6 +655,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		collectVertexes();
 		collectEdges();
 		for( Feature f : features) {
+			f.vtd.feature = f;
+		}
+		for( Feature f : features) {
 			f.vtd.collectNeighbors();
 		}
 		for( Feature f : features) {
@@ -666,9 +669,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		for( Feature f : features) {
 			f.calcArea();
 		}
-		
 		Geometry.shiftx = Geometry.shifty = 0;
 		Geometry.scalex = Geometry.scaley = 1;
+		for( Feature f : features) {
+			f.geometry.makePolysFull();
+		}
 		
 		//now if has no neighbors, add nearest.
 		for( Feature f : features) {
@@ -717,6 +722,108 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				*/
 			}
 		}
+		
+		//TODO: connect everything to largest region
+		System.out.println("connecting islands...");
+		Vector<VTD> unassigned = new Vector<VTD>();
+		unassigned.addAll(vtds);
+		System.out.println("total "+unassigned.size()+" vtds");
+		for( VTD vtd : vtds) {
+			vtd.temp_bool = false;
+		}
+		
+		//first find all the islands (breadth-first, queue-based "island" is the queue.)
+		Vector<Vector<VTD>> islands = new Vector<Vector<VTD>>();
+		while( unassigned.size() > 0) {
+			Vector<VTD> island = new Vector<VTD>();
+			VTD v0 = unassigned.remove(0);
+			v0.temp_bool = true;
+			island.add(v0);
+			for( int i = 0; i < island.size(); i++) {
+				VTD v1 = island.get(i);
+				for( VTD v2 : v1.neighbors) {
+					if( !v2.temp_bool) {
+						v2.temp_bool = true;
+						unassigned.remove(v2);
+						island.add(v2);
+					}
+				}
+			}
+			System.out.println("found island "+island.size()+" vtds");
+			islands.add(island);
+		}
+		System.out.println("found "+islands.size()+" islands...");
+
+		for( VTD vtd : vtds) {
+			vtd.temp_bool = false;
+		}
+
+		
+		int max_count = 0;
+		int max_index = -1;
+		for( int i = 0; i < islands.size(); i++) {
+			if( islands.get(i).size() > max_count) {
+				max_count = islands.get(i).size();
+				max_index = i;
+			}
+		}
+		Vector<VTD> core = islands.remove(max_index);
+		for( VTD vtd : core) {
+			vtd.temp_bool = true;
+		}
+		while( islands.size() > 0) {
+			VTD closest_inland_VTD = null;
+			double closest_distance = -1;
+			int closest_island = -1;
+			VTD closest_island_VTD = null;
+			for( int icore = 0; icore < core.size(); icore++) {
+				VTD vtd0 = core.get(icore);
+				double[] c0 =  vtd0.feature.geometry.full_centroid;
+				for( int iisland = 0; iisland < islands.size(); iisland++) {
+					Vector<VTD> vtds2 = islands.get(iisland);
+					for( int ivtd = 0; ivtd < vtds2.size(); ivtd++) {
+						VTD vtd2 = vtds2.get(ivtd);
+						double[] c2 = vtd2.feature.geometry.full_centroid;
+						double dx = c2[0]-c0[0];
+						double dy = c2[1]-c0[1];
+						double distance = dx*dx+dy*dy;
+						if( closest_distance < 0 || distance < closest_distance) {
+							closest_distance = distance;
+							closest_inland_VTD = vtd0;
+							closest_island = iisland;
+							closest_island_VTD = vtd2; 
+						}
+					}
+				}
+			}
+			Vector<VTD> adding = islands.remove(closest_island);
+			System.out.println("found closest island: "+closest_island);
+			for( VTD vtd : adding) {
+				vtd.temp_bool = true;
+				core.add(vtd);
+			}
+			//now join the two VTD's: closest_inland_VTD & closest_island_VTD
+			{
+				Feature f = closest_inland_VTD.feature;
+				Feature nearest = closest_island_VTD.feature;
+				double[] new_neighbbor_lengths = new double[nearest.vtd.neighbor_lengths.length+1];
+				for( int i = 0; i < nearest.vtd.neighbor_lengths.length; i++) {
+					new_neighbbor_lengths[i] = nearest.vtd.neighbor_lengths[i]; 
+				}
+				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.vtd.unpaired_edge_length;
+				
+				nearest.vtd.neighbors.add(f.vtd);
+				nearest.vtd.neighbor_lengths = new_neighbbor_lengths;
+				
+				f.vtd.neighbors.add(nearest.vtd);
+				f.vtd.neighbor_lengths = new double[]{f.vtd.unpaired_edge_length};
+				f.vtd.unpaired_edge_length = 0;
+			}
+		}
+		
+		
+		
+		
 		
 		//initialize locked_wards array.
 		locked_wards = new boolean[vtds.size()];
