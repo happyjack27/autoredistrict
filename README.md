@@ -15,16 +15,21 @@ The -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow 
 
 HOW TO BUILD AND RUN:
 
-Requires Java Development Kit (JDK) version 7 or greater, and Apache Maven version 3 or greater.
-Open a command prompt. Change to the directory that you cloned the repo to. Run
+Requires Java Development Kit (JDK) version 7 or greater.
+Open a command prompt. Change to the directory that you cloned the repo to. Make a ```bin``` directory here. Run:
 
 ```
-mvn clean package
+javac -encoding UTF-8 -d bin -cp 'src:jcom.jar' src/ui/Applet.java
 ```
 
-To start the newly-compiled app, run:
+Now create a jar by changing to the ```bin``` directory and running:
 ```
-java -Xmx4096M -Xms1024M -jar target/autoredistrict*.jar
+jar cf autoredistrict.jar .
+```
+
+To start the newly-compiled app from the bin directory, run:
+```
+java -Xmx4096M -Xms1024M -classpath autoredistrict.jar:../jcom.jar ui/Applet
 ```
 
 CONTRIBUTION GUIDELINES:
