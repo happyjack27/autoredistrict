@@ -535,5 +535,44 @@ public class District extends JSONObject {
 		return res;
 	}
 
+	public static double[] popular_vote_to_FV_stats(double[] ds, int i) {
+		double[] res = new double[ds.length];
+		for( int j = 0; j < res.length; j++) {
+			res[j] = 0;
+		}
+
+		double totvote = 0;
+		for( int j = 0; j < ds.length; j++) {
+			totvote += ds[j];
+		}
+		if( totvote <= 0) {
+			return ds;
+		}
+		double unit = totvote / (Settings.seats_in_district(i)+1);
+		if( unit == 0) {
+			unit = 1;
+		}
+		for( int j = 0; j < ds.length; j++) {
+			double mod = ds[j];
+			while( mod >= unit) {
+				res[j]++;
+				mod -= unit;
+			}
+		}			
+
+		int n = -1;
+		double max = -1;
+		for( int j = 0; j < ds.length; j++) {
+			if( n < 0 || ds[j]-unit*res[j] > max) {
+				n = j;
+				max = ds[j]-unit*res[j];
+			}
+		}
+		if( max > 0) {
+			res[n]++;
+		}
+		return res;
+	}
+
 
 }
