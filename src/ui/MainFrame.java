@@ -1243,6 +1243,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlbl.setText("Doing hit tests...");
 				Feature.compare_centroid = true;
 				Collections.sort(featureCollection.features);
+				/*
+				for(Feature f : featureCollection.features) {
+					System.out.println("centroid: "+f.geometry.full_centroid[0]+","+f.geometry.full_centroid[0]);
+				}
+				JOptionPane.showConfirmDialog(null, "continue.");
+				*/
 
 
 	    		hits = 0;
@@ -1278,7 +1284,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		Feature feat = getHit(dlon,dlat);
 			    		if( feat == null) {
 			    			System.out.print("x");
-				    		System.out.println("miss "+dlon+","+dlat+" ");
+				    		System.out.println("miss "+dlon+","+dlat+" "+ilat+","+ilon);
 			    		} else {
 	    					feat.vtd.population += pop18;
 	    					feat.vtd.has_census_results = true;
