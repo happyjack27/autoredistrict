@@ -21,6 +21,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 public class FrameSeatsVotesChart extends JFrame {
 	public JPanel panel;
@@ -32,7 +33,7 @@ public class FrameSeatsVotesChart extends JFrame {
 	public JButton btnCopy;
 	public final JButton btnx = new JButton("1x");
 	public final JButton btnx_1 = new JButton("5x");
-	double multiplier = 2;
+	double multiplier = 1;
 	public JButton btnx_2;
 	public PanelRankedDistricts panelRanked;
 	public JTextField baasTF;
@@ -358,6 +359,8 @@ public class FrameSeatsVotesChart extends JFrame {
 		getContentPane().add(btnx_2);
 		
 		panelRanked = new PanelRankedDistricts();
+		panelRanked.lblSeats.setBounds(10, 67, 20, 144);
+		panelRanked.lblSeats.setText("Sorted districts  -->");
 		panelRanked.scrollPane.setLocation(40, 329);
 		panelRanked.setBounds(284, 0, 267, 540);
 		getContentPane().add(panelRanked);
@@ -365,49 +368,67 @@ public class FrameSeatsVotesChart extends JFrame {
 		baasTF = new JTextField();
 		baasTF.setHorizontalAlignment(SwingConstants.RIGHT);
 		baasTF.setEditable(false);
-		baasTF.setBounds(154, 260, 86, 20);
+		baasTF.setBounds(171, 250, 69, 25);
 		getContentPane().add(baasTF);
 		baasTF.setColumns(10);
 		
-		lblNewLabel = new JLabel("Baas asymmetry");
+		lblNewLabel = new JLabel("Baas asym.");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblNewLabel.setBounds(13, 260, 131, 14);
+		lblNewLabel.setBounds(13, 255, 148, 14);
 		getContentPane().add(lblNewLabel);
 		
-		lblGrofmankingAsymmetry = new JLabel("Grofman/King asymmetry");
+		lblGrofmankingAsymmetry = new JLabel("Grofman/King asym.");
 		lblGrofmankingAsymmetry.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblGrofmankingAsymmetry.setBounds(13, 280, 131, 14);
+		lblGrofmankingAsymmetry.setBounds(13, 280, 148, 14);
 		getContentPane().add(lblGrofmankingAsymmetry);
 		
 		grofmanTF = new JTextField();
 		grofmanTF.setHorizontalAlignment(SwingConstants.RIGHT);
 		grofmanTF.setEditable(false);
 		grofmanTF.setColumns(10);
-		grofmanTF.setBounds(154, 280, 86, 20);
+		grofmanTF.setBounds(171, 275, 69, 25);
 		getContentPane().add(grofmanTF);
 		
 		lblMedianMinusMean = new JLabel("Median minus mean");
 		lblMedianMinusMean.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblMedianMinusMean.setBounds(43, 300, 101, 14);
+		lblMedianMinusMean.setBounds(10, 305, 151, 14);
 		getContentPane().add(lblMedianMinusMean);
 		
 		wangTF = new JTextField();
 		wangTF.setHorizontalAlignment(SwingConstants.RIGHT);
 		wangTF.setEditable(false);
 		wangTF.setColumns(10);
-		wangTF.setBounds(154, 300, 86, 20);
+		wangTF.setBounds(171, 300, 69, 25);
 		getContentPane().add(wangTF);
 	}
 	public void setData(DistrictMap dm) {
 		dm.calcSeatsVotesCurve();
+		double d = dm.calcSeatsVoteAsymmetry();
 		seats_votes = dm.seats_votes;
 		
+		double min = 1;
+		double median = 0.5;
 		//now set the table
 		String[][] sd = new String[seats_votes.size()][2];
 		for( int i = 0; i < sd.length; i++) {
 			double[] dd = seats_votes.get(i);
 			sd[i] = new String[]{""+dd[0],""+dd[1]};
+			if( Math.abs(dd[0]-0.5) < min) {
+				min = Math.abs(dd[0]-0.5);
+				median = dd[1];
+			}
 		}
+		try {
+			
+			DecimalFormat decimal = new DecimalFormat("#0.00000");
+			baasTF.setText(decimal.format(d));
+			double[] mid = seats_votes.get(seats_votes.size()/2);
+			grofmanTF.setText(decimal.format(mid[0]));
+			wangTF.setText(decimal.format(median-0.5));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
 		TableModel tm1 = new DefaultTableModel(sd,new String[]{"Seats","Votes"});
 		table.setModel(tm1);
 		panel.invalidate();
