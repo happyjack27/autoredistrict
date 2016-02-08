@@ -34,6 +34,13 @@ public class FrameSeatsVotesChart extends JFrame {
 	public final JButton btnx_1 = new JButton("5x");
 	double multiplier = 2;
 	public JButton btnx_2;
+	public PanelRankedDistricts panelRanked;
+	public JTextField baasTF;
+	public JLabel lblNewLabel;
+	public JLabel lblGrofmankingAsymmetry;
+	public JTextField grofmanTF;
+	public JLabel lblMedianMinusMean;
+	public JTextField wangTF;
 	//label.setUI(new VerticalLabelUI());
 	public FrameSeatsVotesChart() {
 		super();
@@ -282,7 +289,7 @@ public class FrameSeatsVotesChart extends JFrame {
 	
 	private void initComponents() {
 		getContentPane().setLayout(null);
-		setSize(300,524);
+		setSize(570,575);
 		setTitle("Seats / Votes");
 		
 		panel = new SeatPanel();
@@ -290,7 +297,7 @@ public class FrameSeatsVotesChart extends JFrame {
 		getContentPane().add(panel);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(40, 257, 200, 200);
+		scrollPane.setBounds(40, 329, 200, 200);
 		getContentPane().add(scrollPane);
 		
 		table = new JTable();
@@ -349,6 +356,47 @@ public class FrameSeatsVotesChart extends JFrame {
 		btnx_2.setBorder(BorderFactory.createLineBorder(Color.black));
 		btnx_2.setBounds(241, 110, 33, 29);
 		getContentPane().add(btnx_2);
+		
+		panelRanked = new PanelRankedDistricts();
+		panelRanked.scrollPane.setLocation(40, 329);
+		panelRanked.setBounds(284, 0, 267, 540);
+		getContentPane().add(panelRanked);
+		
+		baasTF = new JTextField();
+		baasTF.setHorizontalAlignment(SwingConstants.RIGHT);
+		baasTF.setEditable(false);
+		baasTF.setBounds(154, 260, 86, 20);
+		getContentPane().add(baasTF);
+		baasTF.setColumns(10);
+		
+		lblNewLabel = new JLabel("Baas asymmetry");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblNewLabel.setBounds(13, 260, 131, 14);
+		getContentPane().add(lblNewLabel);
+		
+		lblGrofmankingAsymmetry = new JLabel("Grofman/King asymmetry");
+		lblGrofmankingAsymmetry.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblGrofmankingAsymmetry.setBounds(13, 280, 131, 14);
+		getContentPane().add(lblGrofmankingAsymmetry);
+		
+		grofmanTF = new JTextField();
+		grofmanTF.setHorizontalAlignment(SwingConstants.RIGHT);
+		grofmanTF.setEditable(false);
+		grofmanTF.setColumns(10);
+		grofmanTF.setBounds(154, 280, 86, 20);
+		getContentPane().add(grofmanTF);
+		
+		lblMedianMinusMean = new JLabel("Median minus mean");
+		lblMedianMinusMean.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblMedianMinusMean.setBounds(43, 300, 101, 14);
+		getContentPane().add(lblMedianMinusMean);
+		
+		wangTF = new JTextField();
+		wangTF.setHorizontalAlignment(SwingConstants.RIGHT);
+		wangTF.setEditable(false);
+		wangTF.setColumns(10);
+		wangTF.setBounds(154, 300, 86, 20);
+		getContentPane().add(wangTF);
 	}
 	public void setData(DistrictMap dm) {
 		dm.calcSeatsVotesCurve();

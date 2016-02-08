@@ -460,7 +460,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		}
 		if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
 			MainFrame.mainframe.frameSeatsVotesChart.setData(featureCollection.ecology.population.get(0));
-			MainFrame.mainframe.frameRankedDist.setData(ranked_dists);
+			MainFrame.mainframe.frameSeatsVotesChart.panelRanked.setData(ranked_dists);
 		}
 		} catch (Exception ex) {
 			System.out.println("ex in PanelStats.getStats: "+ex);

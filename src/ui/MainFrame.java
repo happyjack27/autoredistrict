@@ -45,7 +45,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelSeats seatsPanel = new PanelSeats();
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
-	public FrameRankedDistricts frameRankedDist = new FrameRankedDistricts();
 	
 	public ButtonGroup seatsModeBG = new ButtonGroup();
 	 
@@ -3644,7 +3643,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		separator_7 = new JSeparator();
 		mntmDescramble = new JMenuItem("descramble");
 		mntmShowSeats = new JMenuItem("Show seats / votes");
-		mntmShowRankedDistricts = new JMenuItem("Show ranked districts");
 		mnWindows = new JMenu("Windows");
 		btnElection2Columns = new JButton("Election 2 columns");
 		chckbxSecondElection = new JCheckBox("Second election");
@@ -3707,7 +3705,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		seatsPanel = new PanelSeats();
 		progressBar = new JProgressBar();
 		frameSeatsVotesChart = new FrameSeatsVotesChart();
-		frameRankedDist = new FrameRankedDistricts();
 
 		mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
 		mntmShowDemographics = new JMenuItem("Color by demographic");;
@@ -4882,16 +4879,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnWindows.add(mntmShowStats);
 		mnWindows.add(mntmShowGraph);
 		mnWindows.add(mntmShowData);
-		
-				JSeparator separator_8 = new JSeparator();
-				mnWindows.add(separator_8);
 		mnWindows.add(mntmShowSeats);
-		mnWindows.add(mntmShowRankedDistricts);
-		mntmShowRankedDistricts.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frameRankedDist.show();
-			}
-		});
 		mntmShowSeats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frameSeatsVotesChart.show();
