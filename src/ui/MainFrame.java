@@ -3645,8 +3645,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderElitesMutated.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
 		rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
 		rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
-		
-		mntmColorByWasted = new JMenuItem("Color by wasted votes");
 		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 		separator_7 = new JSeparator();
 		mntmDescramble = new JMenuItem("descramble");
@@ -3714,8 +3712,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		progressBar = new JProgressBar();
 		frameSeatsVotesChart = new FrameSeatsVotesChart();
 
-		mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
-		mntmShowDemographics = new JMenuItem("Color by demographic");;
+		mntmShowVoteBalance = new JMenuItem("Color by vtd vote");;
+		mntmShowDemographics = new JMenuItem("Color by vtd demographic");;
 		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
@@ -4504,7 +4502,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByDistrict);
 		
-		mntmColorByPop = new JMenuItem("Color by pop imbalance");
+		mntmColorByPop = new JMenuItem("Color by district pop imbalance");
 		mntmColorByPop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;
@@ -4514,7 +4512,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByPop);
 		
-		mntmColorByVote = new JMenuItem("Color by vote");
+		mntmColorByVote = new JMenuItem("Color by district vote");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
@@ -4522,10 +4520,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mapPanel.repaint();
 			}
 		});
-		mnView.add(mntmColorByVote);
 		
 		
-		mntmColorByCompactness = new JMenuItem("Color by compactness");
+		mntmColorByCompactness = new JMenuItem("Color by district compactness");
 		mntmColorByCompactness.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;
@@ -4533,6 +4530,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mapPanel.repaint();
 			}
 		});
+		mnView.add(mntmColorByCompactness);
+		
+		mntmColorByWasted = new JMenuItem("Color by district wasted votes");
 		mntmColorByWasted.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;
@@ -4542,7 +4542,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnView.add(mntmColorByWasted);
-		mnView.add(mntmColorByCompactness);
+		mnView.add(mntmColorByVote);
 		
 		mntmShowVoteBalance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -4551,6 +4551,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mapPanel.repaint();
 			}
 		});
+		
+		separator_8 = new JSeparator();
+		mnView.add(separator_8);
 		mnView.add(mntmShowVoteBalance);
 		mntmShowDemographics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -5798,6 +5801,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
 	public JMenuItem mntmImportCensusData_1;
+	public JSeparator separator_8;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
