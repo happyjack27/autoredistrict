@@ -13,6 +13,9 @@ import java.awt.datatransfer.*;
 import java.text.*;
 import java.util.*;
 import java.awt.event.*;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -568,49 +571,60 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_2);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String partiesStr = getAsHtml(partiesTable);
+				String raceStr = getAsHtml(ethnicityTable);
+				String sumStr = getAsHtml(summaryTable);
+				String districtsStr = getAsHtml(districtsTable);
+				
+				URL header_path = Applet.class.getResource("/resources/header.php");
+				URL footer_path = Applet.class.getResource("/resources/footer.php");
+				URL style_sheet = Applet.class.getResource("/resources/styles2.css");
+				
+				String write_folder = Download.getStartPath();
+				saveURL(write_folder+"style.css",style_sheet);
+				
+				
+				String html = "";
+				//html += "<html>\n";
+				//html += "<body>\n";
+				html += getURLtext(header_path);
+				html +="<h3>Summary</h3>";
+				html += sumStr+"\n";
+				html +="<br/><br/>";
+				html +="<h3>By party</h3>";
+				html += partiesStr+"\n";
+				html +="<br/><br/>";
+				html +="<h3>By district</h3>";
+				html += districtsStr+"\n";
+				html +="<br/><br/>";
+				html +="<h3>By ethnicity</h3>";
+				html += raceStr+"\n";
+				html += getURLtext(footer_path);
+				//html += "</body>\n";
+				//html += "</html>\n";
+				System.out.println(html);
+				
+
+				try {
+					FileOutputStream fos = new FileOutputStream(write_folder+"stats.html");
+					fos.write(html.getBytes());
+					fos.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/");
+				Applet.browseTo(url);
+				
+
+				/*
 				excel.ExportThread thread = new excel.ExportThread();
 				thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
+				*/
 			}
 		});
 		btnNewButton.setBounds(89, 8, 117, 29);
 		
 		add(btnNewButton);
-		
-		btnHtml = new JButton("html");
-		btnHtml.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				copyAsHtml(partiesTable);
-			}
-		});
-		btnHtml.setBounds(629, 11, 89, 23);
-		add(btnHtml);
-		
-		button_3 = new JButton("html");
-		button_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				copyAsHtml(ethnicityTable);
-			}
-		});
-		button_3.setBounds(629, 143, 89, 23);
-		add(button_3);
-		
-		button_4 = new JButton("html");
-		button_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				copyAsHtml(partiesTable);
-			}
-		});
-		button_4.setBounds(629, 350, 89, 23);
-		add(button_4);
-		
-		button_5 = new JButton("html");
-		button_5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				copyAsHtml(summaryTable);
-			}
-		});
-		button_5.setBounds(228, 11, 89, 23);
-		add(button_5);
 	}
 	public FeatureCollection featureCollection;
 	private JTable districtsTable;
@@ -627,11 +641,57 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JScrollPane scrollPane_3;
 	public JButton button_2;
 	public JTable ethnicityTable;
-	public final JButton btnNewButton = new JButton("To Excel");
-	public JButton btnHtml;
-	public JButton button_3;
-	public JButton button_4;
-	public JButton button_5;
+	public final JButton btnNewButton = new JButton("To html");
+	
+	public void saveURL(final String filename, final URL url) {
+	    BufferedInputStream in = null;
+	    FileOutputStream fout = null;
+	    try {
+	        in = new BufferedInputStream(url.openStream());
+	        fout = new FileOutputStream(filename);
+
+	        final byte data[] = new byte[1024];
+	        int count;
+	        while ((count = in.read(data, 0, 1024)) != -1) {
+	            fout.write(data, 0, count);
+	        }
+	    } catch (Exception ex) {
+	    	ex.printStackTrace();
+	    } finally {
+            try {
+		        if (in != null) {
+					in.close();
+		        }
+		        if (fout != null) {
+		            fout.close();
+		        }
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	}
+    public static String getURLtext(URL url) {
+    	try {
+	        URLConnection connection = url.openConnection();
+	        BufferedReader in = new BufferedReader(
+	                                new InputStreamReader(
+	                                    connection.getInputStream()));
+	
+	        StringBuilder response = new StringBuilder();
+	        String inputLine;
+	
+	        while ((inputLine = in.readLine()) != null) 
+	            response.append(inputLine+"\n");
+	
+	        in.close();
+	
+	        return response.toString();
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		return "";
+    	}
+    }
 	
     public class MyTableCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
 
@@ -658,8 +718,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         }
 
     }
-    
-    public void copyAsHtml(JTable t) {
+    public String getAsHtml(JTable t) {
     	String str = "";
     	int cc = t.getColumnCount();
     	int rc = t.getRowCount();
@@ -680,11 +739,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
     		
     	}
     	str += "</table>\n";
-
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Clipboard clipboard = toolkit.getSystemClipboard();
-		StringSelection strSel = new StringSelection(str);
-		clipboard.setContents(strSel, null);    	
+    	return str;
     }
 
 
