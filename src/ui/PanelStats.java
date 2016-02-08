@@ -602,7 +602,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				html += getURLtext(footer_path);
 				//html += "</body>\n";
 				//html += "</html>\n";
-				System.out.println(html);
+				//System.out.println(html);
 				
 
 				try {

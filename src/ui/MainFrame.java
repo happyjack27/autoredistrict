@@ -126,6 +126,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmShowData = new JMenuItem("Show data");
 	
 	JMenu mnImportExport = new JMenu("Aggregate/Deaggregate");
+	private JMenu mnImportExport_1;
 
 	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
 	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
@@ -3635,6 +3636,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxAutoAnneal = new JCheckBox("auto anneal");
 		lblElitisesMutated = new JLabel("% elites mutated");
 		sliderElitesMutated = new JSlider();
+		sliderElitesMutated.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
 		rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
 		rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 		
@@ -3733,7 +3735,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmShowStats = new JMenuItem("Show stats");
 		mntmShowData = new JMenuItem("Show data");
 		
-		mnImportExport = new JMenu("Aggregate/Deaggregate");
+		mnImportExport_1 = new JMenu("Aggregate/Deaggregate");
 
 		mntmExportPopulation = new JMenuItem("Export population");
 		mntmImportPopulation = new JMenuItem("Import population");
@@ -3784,7 +3786,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		menuBar.add(mnFile);
-		menuBar.add(mnImportExport);
+		menuBar.add(mnImportExport_1);
 		
 		JMenuItem mntmOpenProjectFile = new JMenuItem("Open project file");
 		mntmOpenProjectFile.addActionListener(new ActionListener() {
@@ -3906,7 +3908,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnFile.add(mntmOpenEsriShapefile);
 		
-		mntmImportCensusData = new JMenuItem("Import Census Data");
+		mntmImportCensusData = new JMenuItem("Import Census Data from file");
 		mntmImportCensusData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new LoadCensusFileThread().init();
@@ -3921,7 +3923,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(mntmOpenWktTabdelimited);
 		
 		mnFile.add(separator_1);
-		mnImportExport.add(mntmImportCensusData);
+		mnImportExport_1.add(mntmImportCensusData);
 		
 		mntmExportToBlock = new JMenuItem("Export districts to block level");
 		mntmExportToBlock.addActionListener(new ActionListener() {
@@ -3949,10 +3951,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnImportExport.add(mntmImportAggregate);
+		mntmImportCensusData_1 = new JMenuItem("Import Census Data from census.gov");
+		mntmImportCensusData_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+				if( Download.census_merge_working) {
+					if( Download.census_merge_old) {
+						Download.nextThread = new ImportCensus2Thread(); 
+					} else {
+						Download.nextThread = new ImportGazzeterThread(); 
+						
+					}
+				}
+				//Download.nextThread = ost;
+				DialogDownload dd = new DialogDownload();
+				dd.setTitle("Download and aggregate census data from census.gov");
+				dd.show();
+			}
+		});
+		mnImportExport_1.add(mntmImportCensusData_1);
 		
-		mnImportExport.add(separator_2);
-		mnImportExport.add(mntmExportToBlock);
+		mnImportExport_1.add(mntmImportAggregate);
+		
+		mnImportExport_1.add(separator_2);
+		mnImportExport_1.add(mntmExportToBlock);
 		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -3969,8 +3991,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}				
 		});
 		
-		mnImportExport.add(mntmExportAndDeaggregate);
-		mnImportExport.add(new JSeparator());
+		mnImportExport_1.add(mntmExportAndDeaggregate);
+		mnImportExport_1.add(new JSeparator());
 
 
 		
@@ -4167,7 +4189,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				new WKTFileToCoordsThread().init();
 			}
 		});
-		mnImportExport.add(mntmConvertWktTo);
+		mnImportExport_1.add(mntmConvertWktTo);
 		mntmDescramble.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for( Feature feat : featureCollection.features) {
@@ -4190,7 +4212,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		mnImportExport.add(mntmDescramble);
+		mnImportExport_1.add(mntmDescramble);
 
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -5033,6 +5055,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_3.add(lblElitism);
 		
 		sliderElitism = new JSlider();
+		sliderElitism.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
 		sliderElitism.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.elite_fraction = ((double)sliderElitism.getValue())/100.0;
@@ -5768,6 +5791,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
+	public JMenuItem mntmImportCensusData_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
