@@ -55,7 +55,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			return (int)((x-100)*multiplier+100);
 		}
 		public int scale_width(double x) {
-			return (int)(x*(double)multiplier);
+			return (int)Math.round(x*(double)multiplier);
 		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
@@ -272,7 +272,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    g.drawLine(100*iFSAA,100*iFSAA, scale(100+(int)(wang*200))*iFSAA, 100*iFSAA);
 			    */
 			    g.setColor(Color.BLACK);
-			    g.fillRect(99*iFSAA,100*iFSAA, 3, ((int)(grofman*200))*iFSAA);
+			    g.fillRect(99*iFSAA,100*iFSAA, 3, ((int)Math.round(grofman*200))*iFSAA);
 			    
 			    //draw wang
 			    g.setColor(Color.BLACK);
@@ -318,6 +318,7 @@ public class FrameSeatsVotesChart extends JFrame {
 		panel = new SeatPanel();
 		panel.setBounds(40, 11, 200, 200);
 		getContentPane().add(panel);
+		panel.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_measures.png") + "\">");
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(40, 329, 200, 200);
