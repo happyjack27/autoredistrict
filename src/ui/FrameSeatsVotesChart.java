@@ -24,6 +24,8 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
 public class FrameSeatsVotesChart extends JFrame {
+	public double wang = 0;
+	public double grofman = 0;
 	public JPanel panel;
 	public JScrollPane scrollPane;
 	public JLabel lblVotes;
@@ -51,6 +53,9 @@ public class FrameSeatsVotesChart extends JFrame {
 	class SeatPanel extends JPanel {
 		public int scale(int x) {
 			return (int)((x-100)*multiplier+100);
+		}
+		public int scale_width(double x) {
+			return (int)(x*(double)multiplier);
 		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {
@@ -257,6 +262,23 @@ public class FrameSeatsVotesChart extends JFrame {
 				    oldy = y;
 			    }
 			    
+			    /*
+			    //draw grofman
+			    g.setColor(Color.BLACK);
+			    g.drawLine(100*iFSAA,100*iFSAA, 100*iFSAA, (100+(int)(grofman*200))*iFSAA);
+			    
+			    //draw wang
+			    g.setColor(Color.BLACK);
+			    g.drawLine(100*iFSAA,100*iFSAA, scale(100+(int)(wang*200))*iFSAA, 100*iFSAA);
+			    */
+			    g.setColor(Color.BLACK);
+			    g.fillRect(99*iFSAA,100*iFSAA, 3, ((int)(grofman*200))*iFSAA);
+			    
+			    //draw wang
+			    g.setColor(Color.BLACK);
+			    g.fillRect(100*iFSAA,99*iFSAA, scale_width(wang*200.0)*iFSAA, 3);
+
+			    
 		        graphics.drawImage(off_Image,
 		                0,
 		                0,
@@ -423,8 +445,11 @@ public class FrameSeatsVotesChart extends JFrame {
 			DecimalFormat decimal = new DecimalFormat("#0.00000");
 			baasTF.setText(decimal.format(d));
 			double[] mid = seats_votes.get(seats_votes.size()/2);
-			grofmanTF.setText(decimal.format(mid[0]));
-			wangTF.setText(decimal.format(median-0.5));
+			wang = median-0.5;
+			grofman = 0.5-mid[0];
+
+			grofmanTF.setText(decimal.format(grofman));
+			wangTF.setText(decimal.format(wang)); 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
