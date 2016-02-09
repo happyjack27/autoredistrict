@@ -3755,9 +3755,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 
 		separator_1 = new JSeparator();
-		separator_2 = new JSeparator();
 		mntmImportAggregate = new JMenuItem("Import & aggregate custom");
-		mntmExportAndDeaggregate = new JMenuItem("Export & de-aggregate custom");
 		mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 
 	    dlg = new JDialog(mainframe, "Working", true);
@@ -3974,11 +3972,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnImportExport_1.add(mntmImportCensusData_1);
-		
-		mnImportExport_1.add(mntmImportAggregate);
+		separator_2 = new JSeparator();
 		
 		mnImportExport_1.add(separator_2);
-		mnImportExport_1.add(mntmExportToBlock);
+		
+		mnImportExport_1.add(mntmImportAggregate);
+		mntmExportAndDeaggregate = new JMenuItem("Export & de-aggregate custom");
 		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
@@ -3996,6 +3995,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnImportExport_1.add(mntmExportAndDeaggregate);
+		
+		separator_10 = new JSeparator();
+		mnImportExport_1.add(separator_10);
+		mnImportExport_1.add(mntmExportToBlock);
 		mnImportExport_1.add(new JSeparator());
 
 
@@ -5802,6 +5805,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_9;
 	public JMenuItem mntmImportCensusData_1;
 	public JSeparator separator_8;
+	public JSeparator separator_10;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
