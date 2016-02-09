@@ -3757,7 +3757,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		separator_1 = new JSeparator();
 		separator_2 = new JSeparator();
 		mntmImportAggregate = new JMenuItem("Import & aggregate custom");
-		mntmExportAndDeaggregate = new JMenuItem("Export and de-aggregate custom");
+		mntmExportAndDeaggregate = new JMenuItem("Export & de-aggregate custom");
 		mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 
 	    dlg = new JDialog(mainframe, "Working", true);
