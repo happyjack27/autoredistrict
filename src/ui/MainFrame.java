@@ -3762,8 +3762,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 
 		
-		slider_mutation = new JSlider();		
-		slider_mutation.setValue(25);
+		slider_mutation = new JSlider();
 		sliderDisconnected = new JSlider();
 		sliderBorderLength = new JSlider();
 		sliderPopulationBalance = new JSlider();
