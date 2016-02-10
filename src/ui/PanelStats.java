@@ -40,7 +40,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				dm.fairnessScores[7], //seats votes asymmetry
 				
 
-				Settings.getAnnealingFloor( featureCollection.ecology.generation),
+				0,//Settings.getAnnealingFloor( featureCollection.ecology.generation),
 
 				(
 						//Settings.square_root_compactness 
@@ -93,7 +93,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					0,
 					
 
-					Settings.getAnnealingFloor( featureCollection.ecology.generation),
+					0,//Settings.getAnnealingFloor( featureCollection.ecology.generation),
 
 					(
 							//Settings.square_root_compactness 

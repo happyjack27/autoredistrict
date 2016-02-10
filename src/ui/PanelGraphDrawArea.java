@@ -29,7 +29,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"",//"Voting power imbalance",
 
     		//9
-    		"Annealing floor",
+    		"",//"Annealing floor",
     		
     		//10
     		"Compactness",
@@ -118,8 +118,10 @@ public class PanelGraphDrawArea extends JPanel {
             		}
             	}
             }
+            /*
             maxys[3] = maxys[3] > maxys[9] ? maxys[3] : maxys[9];
             maxys[9] = maxys[3];
+            */
         	for( int j = 0; j < maxys.length; j++) {
         		scaleys[j] = ((double)d.getHeight())/(maxys[j]-minys[j]);
         	}

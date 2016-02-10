@@ -3639,7 +3639,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
 		rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
 		splitReductionType = new ButtonGroup();
-		chckbxAutoAnneal = new JCheckBox("auto anneal");
+		chckbxAutoAnneal = new JCheckBox("anneal rate");
 		lblElitisesMutated = new JLabel("% elites mutated");
 		sliderElitesMutated = new JSlider();
 		sliderElitesMutated.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
@@ -3763,6 +3763,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		slider_mutation = new JSlider();		
+		slider_mutation.setValue(25);
 		sliderDisconnected = new JSlider();
 		sliderBorderLength = new JSlider();
 		sliderPopulationBalance = new JSlider();
@@ -5057,13 +5058,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
 		JLabel lblBorderMutation = new JLabel("% mutation");
-		lblBorderMutation.setBounds(6, 103, 172, 16);
+		lblBorderMutation.setBounds(6, 138, 172, 16);
 		panel_3.add(lblBorderMutation);
-		slider_mutation.setBounds(6, 130, 190, 29);
+		slider_mutation.setBounds(6, 165, 190, 29);
 		panel_3.add(slider_mutation);
 		
 		lblElitism = new JLabel("% elitism");
-		lblElitism.setBounds(6, 171, 69, 16);
+		lblElitism.setBounds(6, 265, 69, 16);
 		panel_3.add(lblElitism);
 		
 		sliderElitism = new JSlider();
@@ -5074,56 +5075,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderElitism.setValue((int)(Settings.elite_fraction*100.0));
-		sliderElitism.setBounds(6, 198, 190, 29);
+		sliderElitism.setBounds(6, 292, 190, 29);
 		panel_3.add(sliderElitism);
-		
-		rdbtnTruncationSelection = new JRadioButton("Truncation selection");
-		rdbtnTruncationSelection.setBounds(6, 316, 188, 23);
-		panel_3.add(rdbtnTruncationSelection);
-		rdbtnTruncationSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
-				//tournamentSlider.setVisible(false);
-			}
-		});
-		
-		rdbtnTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
-		
-		selectionType.add(rdbtnTruncationSelection);
-		
-		rdbtnRankSelection = new JRadioButton("Rank selection");
-		rdbtnRankSelection.setBounds(6, 342, 188, 23);
-		panel_3.add(rdbtnRankSelection);
-		rdbtnRankSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
-				//tournamentSlider.setVisible(false);
-			}
-		});
-		rdbtnRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
-		selectionType.add(rdbtnRankSelection);
-		
-		rdbtnRouletteSelection = new JRadioButton("Roulette selection");
-		rdbtnRouletteSelection.setBounds(6, 370, 188, 23);
-		panel_3.add(rdbtnRouletteSelection);
-		rdbtnRouletteSelection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
-				//tournamentSlider.setVisible(false);
-			}
-		});
-		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
-		selectionType.add(rdbtnRouletteSelection);
 		chckbxAutoAnneal.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.auto_anneal = chckbxAutoAnneal.isSelected();
+				slider_anneal.setEnabled(Settings.auto_anneal);
 			}
 		});
 		chckbxAutoAnneal.setSelected(true);
-		chckbxAutoAnneal.setBounds(79, 74, 115, 23);
+		chckbxAutoAnneal.setBounds(6, 67, 159, 23);
 		
 		panel_3.add(chckbxAutoAnneal);
-		lblElitisesMutated.setBounds(6, 238, 172, 16);
+		lblElitisesMutated.setBounds(6, 332, 172, 16);
 		
 		panel_3.add(lblElitisesMutated);
 		sliderElitesMutated.addChangeListener(new ChangeListener() {
@@ -5132,9 +5096,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderElitesMutated.setValue(100);
-		sliderElitesMutated.setBounds(6, 265, 190, 29);
+		sliderElitesMutated.setBounds(6, 359, 190, 29);
 		
 		panel_3.add(sliderElitesMutated);
+		
+		slider_anneal = new JSlider();
+		slider_anneal.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				Settings.anneal_rate = Math.exp(3.0*((double)slider_anneal.getValue()-50.0)/50.0);
+				//System.out.println("anneal rate set to: "+Settings.anneal_rate);
+			}
+		});
+		slider_anneal.setBounds(6, 97, 190, 29);
+		panel_3.add(slider_anneal);
 		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
@@ -5258,7 +5232,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 358, 200, 291);
+		panel_4.setBounds(400, 356, 200, 293);
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
@@ -5745,12 +5719,50 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		splitReductionType.add(rdbtnReduceTotalSplits);
 		splitReductionType.add(rdbtnReduceSplitCounties);
-
-		mnEvolution.add(chckbxmntmMutateAnyAbove);
+		
+		rdbtnTruncationSelection = new JRadioButton("Truncation");
+		rdbtnTruncationSelection.setBounds(6, 634, 188, 23);
+		panel.add(rdbtnTruncationSelection);
+		rdbtnTruncationSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.TRUNCATION_SELECTION;
+				//tournamentSlider.setVisible(false);
+			}
+		});
+		
+		rdbtnTruncationSelection.setSelected(Settings.SELECTION_MODE == Settings.TRUNCATION_SELECTION);
+		
+		selectionType.add(rdbtnTruncationSelection);
+		
+		rdbtnRankSelection = new JRadioButton("Rank");
+		rdbtnRankSelection.setBounds(6, 660, 188, 23);
+		panel.add(rdbtnRankSelection);
+		rdbtnRankSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.RANK_SELECTION;
+				//tournamentSlider.setVisible(false);
+			}
+		});
+		rdbtnRankSelection.setSelected(Settings.SELECTION_MODE == Settings.RANK_SELECTION);
+		selectionType.add(rdbtnRankSelection);
+		
+		rdbtnRouletteSelection = new JRadioButton("Roulette");
+		rdbtnRouletteSelection.setBounds(6, 688, 188, 23);
+		panel.add(rdbtnRouletteSelection);
+		rdbtnRouletteSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.SELECTION_MODE = Settings.ROULETTE_SELECTION;
+				//tournamentSlider.setVisible(false);
+			}
+		});
+		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
+		selectionType.add(rdbtnRouletteSelection);
+		rdbtnRouletteSelection.setVisible(false);
+		rdbtnRankSelection.setVisible(false);
 		
 		rdbtnTruncationSelection.setVisible(false);
-		rdbtnRankSelection.setVisible(false);
-		rdbtnRouletteSelection.setVisible(false);
+
+		mnEvolution.add(chckbxmntmMutateAnyAbove);
 		
 
 
@@ -5806,6 +5818,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmImportCensusData_1;
 	public JSeparator separator_8;
 	public JSeparator separator_10;
+	public JSlider slider_anneal;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -5881,11 +5894,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	@Override
 	public void valueChanged() {
+		double d = Settings.mutation_boundary_rate;
  		textField.setText(""+Settings.population);
  		double e = Math.log(Settings.mutation_boundary_rate)*Settings.exp_mutate_factor+100;
  		//double d = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
 		//System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);
 		slider_mutation.setValue((int)e);
+		Settings.mutation_boundary_rate = d;
 		//slider_mutation.setValue((int)(Settings.mutation_boundary_rate*100.0/MainFrame.boundary_mutation_rate_multiplier));
 		invalidate();
 		repaint();

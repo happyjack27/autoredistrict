@@ -551,7 +551,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	        if( new_rate < Settings.max_mutation) {
 	        	Settings.startAnnealing(generation);
 	        }
-
+	        /*
         	if( total != total || new_rate == 0 || new_rate != new_rate) {
         		new_rate = Settings.mutation_boundary_rate;
         	}
@@ -562,6 +562,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		new_rate = Settings.getAnnealingCeiling(generation);
         	}
         	Settings.mutation_boundary_rate += (new_rate-Settings.mutation_boundary_rate)*Settings.auto_anneal_Frac;
+        	*/
+	        //System.out.println("old rate: "+Settings.mutation_boundary_rate);
+        	Settings.mutation_boundary_rate *= Settings.getAnnealingPerGeneration();
+	        //System.out.println("new rate: "+Settings.mutation_boundary_rate);
         	/*
         	//grow population if under a threshold
         	if( Settings.mutation_boundary_rate < 0.33333/(double)Settings.population) {
@@ -570,6 +574,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	}
         	*/
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
+	        //System.out.println("new rate2:"+Settings.mutation_boundary_rate);
         }
         
 

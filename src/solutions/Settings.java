@@ -100,15 +100,20 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	}
 
 	public static double max_mutation = 0.20;
+	public static double anneal_rate = 1.0;
 	public static double getAnnealingCeiling(long generation) {
 		return getAnnealingFloor(generation)*1.2;
+	}
+	public static double getAnnealingPerGeneration() {
+		double e = Math.exp(-0.0006 * anneal_rate ); // reaches
+		return e;
 	}
 	public static double getAnnealingFloor(long generation) {
 		if (!use_annealing_floor) {
 			return 0;
 		}
 		if (!annealing_has_started || generation < 0) {
-			return max_mutation;
+			return max_mutation; 
 		}
 		generation -= annealing_starts_at;
 		double new_rate = 0;
