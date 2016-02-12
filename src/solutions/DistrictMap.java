@@ -1580,7 +1580,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             time20 = System.currentTimeMillis();
             disproportional_representation = getKLDiv(p,q,1.2);
             if( disproportional_representation != disproportional_representation) {
-            	System.out.println("disproportional_representation not a number");
+            	disproportional_representation = 0;
+            	//System.out.println("disproportional_representation not a number");
             }
             
             wasted_votes /= Settings.num_elections_simulated;
