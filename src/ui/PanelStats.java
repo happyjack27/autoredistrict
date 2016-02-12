@@ -155,6 +155,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		Vector<String> cands = MainFrame.mainframe.project.election_columns;
 		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
+		double[] pop_by_dem = new double[dem_col_names.length];
+		double[] votes_by_dem = new double[dem_col_names.length];
+		double[] vote_margins_by_dem = new double[dem_col_names.length];
+		double[][] demo = dm.getDemographicsByDistrict();
+		double[][] demo_pct = new double[demo.length][];
+		double[] winners_by_ethnicity = new double[dem_col_names.length];
 		
 		try {
 			double total_pvi = 0;
@@ -164,9 +170,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_0 = 0;
 			double wasted_1 = 0;
 			
-			//=== by district
 			String[] dcolumns = new String[11+Settings.num_candidates*2+dem_col_names.length*2];
 			String[][] ddata = new String[dm.districts.size()][];
+			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
+			String[][] cdata = new String[Settings.num_candidates][];
+			double[] elec_counts = new double[Settings.num_candidates];
+			double[] vote_counts = new double[Settings.num_candidates];
+			double tot_votes = 0;
+			//=== by district
+			try {
 			if( dmcolors == null || dmcolors.length != dm.districts.size()) {
 				dmcolors = new Color[dm.districts.size()];
 			}
@@ -187,12 +199,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dcolumns[10] = "Unpaired edge length";
 			
 			
-			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
-			String[][] cdata = new String[Settings.num_candidates][];
-			
-			double[] elec_counts = new double[Settings.num_candidates];
-			double[] vote_counts = new double[Settings.num_candidates];
-			double tot_votes = 0;
 			for( int i = 0; i < Settings.num_candidates; i++) {
 				try {
 					elec_counts[i] = 0;
@@ -210,14 +216,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			
 			double total_population = 0;
 			
-			double[] pop_by_dem = new double[dem_col_names.length];
 			for( int i = 0; i < pop_by_dem.length; i++) { pop_by_dem[i] = 0; }
-			double[] votes_by_dem = new double[dem_col_names.length];
 			for( int i = 0; i < votes_by_dem.length; i++) { votes_by_dem[i] = 0; }
-			double[] vote_margins_by_dem = new double[dem_col_names.length];
 			for( int i = 0; i < vote_margins_by_dem.length; i++) { vote_margins_by_dem[i] = 0; }
-			double[][] demo = dm.getDemographicsByDistrict();
-			double[][] demo_pct = new double[demo.length][];
 			for( int i = 0; i < demo_pct.length; i++) {
 				double total = 0;
 				for( int j = 0; j < demo[i].length; j++) {
@@ -230,7 +231,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					demo_pct[i][j] = demo[i][j]*total;
 				}
 			}
-			double[] winners_by_ethnicity = new double[dem_col_names.length];
 	
 			for( int i = 0; i < dm.districts.size(); i++) {
 				try {
@@ -346,6 +346,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					System.out.println("ex stats 1 "+ex);
 					ex.printStackTrace();
 				}
+			}
+			} catch (Exception ex) {
+				System.out.println("by district exception "+ex);
+				ex.printStackTrace();
 			}
 			
 			double tot_pop = 0;
