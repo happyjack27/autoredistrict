@@ -194,14 +194,18 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double[] vote_counts = new double[Settings.num_candidates];
 			double tot_votes = 0;
 			for( int i = 0; i < Settings.num_candidates; i++) {
-				elec_counts[i] = 0;
-				vote_counts[i] = 0;
-				dcolumns[i+11] = ""+cands.get(i)+" vote %";
-				dcolumns[i+11+Settings.num_candidates] = ""+cands.get(i)+" votes";
+				try {
+					elec_counts[i] = 0;
+					vote_counts[i] = 0;
+					dcolumns[i+11] = ""+cands.get(i)+" vote %";
+					dcolumns[i+11+Settings.num_candidates] = ""+cands.get(i)+" votes";
+				} catch (Exception ex) { }
 			}
 			for( int i = 0; i < dem_col_names.length; i++) {
+				try {
 				dcolumns[i+11+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
 				dcolumns[i+11+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
+			} catch (Exception ex) { }
 			}
 			
 			double total_population = 0;
@@ -430,6 +434,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double tot_seats = Settings.total_seats();
 			//=== by party
 			for( int i = 0; i < Settings.num_candidates; i++) {
+				try {
 				cdata[i] = new String[]{
 						""+cands.get(i),
 						""+integer.format(elec_counts[i]),
@@ -438,6 +443,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						""+(elec_counts[i]/((double)tot_seats)),
 						""+(vote_counts[i]/tot_votes)
 				};
+				} catch (Exception ex) { }
 			}
 
 			
