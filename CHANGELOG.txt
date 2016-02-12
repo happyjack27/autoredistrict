@@ -1,5 +1,9 @@
 Changelog:
 
+V. 1.20
+* added slider for anneal rate, made annealing follow anneal rate exactly
+* fixed bug where stats panel didn't refresh if there was no vote count data (geometry only optimization).
+
 V. 1.19
 
 added ability to aggregate census data from census.gov
