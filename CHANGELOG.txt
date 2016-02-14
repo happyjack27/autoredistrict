@@ -1,6 +1,14 @@
 Changelog:
 
+V. 1.21
+
+* renamed and re-ordered fairness sliders
+* cleaned obsolete items from the evolution menu
+* added images to html export
+* switched normalization from exponential moving average to rank.
+
 V. 1.20
+
 * added slider for anneal rate, made annealing follow anneal rate exactly
 * fixed bug where stats panel didn't refresh if there was no vote count data (geometry only optimization).
 
