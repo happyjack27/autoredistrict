@@ -24,6 +24,7 @@ improvements to seats/votes curve window:
 - now shows partisan asymmetry stats
 - visualized asymmetry stats on curve
 - added tooltip to curve to show the different measures
+
 V. 1.18
 
 added "straight vote descr. rep." to ethnicity stats. (this is what'd happen if you swapped out parties and ethnicities, and everyone voted for their ethnicity, and every ethnicity had the same turnout. note, in single winner elections this in theory is not proportional, but sigmoidal like the seats-votes curve.)
