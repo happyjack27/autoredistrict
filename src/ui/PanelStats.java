@@ -614,6 +614,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				
 
 				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
+				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
 				
 				int num_maps_temp = Settings.num_maps_to_draw;
 				int display_mode_temp = Feature.display_mode;
@@ -634,9 +635,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//html += "<body>\n";
 				html += getURLtext(header_path);
 				html +="<h3>Map</h3><br/>";
-				html +="<center><img src='map_districts.png'> <img src='map_district_votes.png'></center>";
-				html +="<h3>Seats / votes curve</h3><br/>";
-				html +="<center><img src='seats_votes.png'>";
+				html +="<center><img src='./map_districts.png'> <img src='./map_district_votes.png'></center><br/>";
+				html +="<h3>Seats / votes curve - Sorted districts</h3><br/>";
+				html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>";
 				html +="<h3>Summary</h3>";
 				html += sumStr+"\n";
 				html +="<br/><br/>";
