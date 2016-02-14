@@ -621,9 +621,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				Settings.num_maps_to_draw = 1;
 				
 				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
-				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",200,300);
+				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png");
 				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
-				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",200,300);
+				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png");
 
 				
 				Settings.num_maps_to_draw = num_maps_temp;
@@ -635,7 +635,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//html += "<body>\n";
 				html += getURLtext(header_path);
 				html +="<h3>Map</h3><br/>";
-				html +="<center><img src='./map_districts.png'> <img src='./map_district_votes.png'></center><br/>";
+				html +="<center><img src='./map_districts.png' width=400> <img src='./map_district_votes.png' width=400></center><br/>";
 				html +="<h3>Seats / votes curve - Sorted districts</h3><br/>";
 				html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>";
 				html +="<h3>Summary</h3>";
@@ -691,7 +691,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JScrollPane scrollPane_3;
 	public JButton button_2;
 	public JTable ethnicityTable;
-	public final JButton btnNewButton = new JButton("To html");
+	public final JButton btnNewButton = new JButton("to html");
 	
 	public void saveURL(final String filename, final URL url) {
 	    BufferedInputStream in = null;

@@ -11,7 +11,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean use_annealing_floor = true;
 	public static int RANK = 0;
 	public static int EMA = 1;
-	public static int LINEARIZE_MODE = EMA;
+	public static int LINEARIZE_MODE = RANK;
 	public static int TRUNCATION_SELECTION = 0;
 	public static int ROULETTE_SELECTION = 1;
 	public static int RANK_SELECTION = 2;
