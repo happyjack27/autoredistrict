@@ -439,7 +439,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_DEMO) {
+		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_VOTE) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				int total = 0;

@@ -3,6 +3,7 @@ package ui;
 import geography.Feature;
 import geography.FeatureCollection;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -13,6 +14,7 @@ import java.awt.datatransfer.*;
 import java.text.*;
 import java.util.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -20,6 +22,23 @@ import java.net.URLConnection;
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
+	
+	public void saveAsPng(JComponent component, String path) {
+		saveAsPng( component, path,component.getWidth(), component.getHeight());
+  	}
+	public void saveAsPng(JComponent component, String path, int width, int height) {
+		 BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = image.createGraphics(); 
+
+        component.paint(graphics2D);
+        try {
+            ImageIO.write(image,"png", new File(path));
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+	}
 
 	public void getNormalizedStats() {
 		DistrictMap dm = featureCollection.ecology.population.get(0);
@@ -593,11 +612,31 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				String write_folder = Download.getStartPath();
 				saveURL(write_folder+"style.css",style_sheet);
 				
+
+				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
+				
+				int num_maps_temp = Settings.num_maps_to_draw;
+				int display_mode_temp = Feature.display_mode;
+				Settings.num_maps_to_draw = 1;
+				
+				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
+				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",200,300);
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",200,300);
+
+				
+				Settings.num_maps_to_draw = num_maps_temp;
+				Feature.display_mode = display_mode_temp;
+				
 				
 				String html = "";
 				//html += "<html>\n";
 				//html += "<body>\n";
 				html += getURLtext(header_path);
+				html +="<h3>Map</h3><br/>";
+				html +="<center><img src='map_districts.png'> <img src='map_district_votes.png'></center>";
+				html +="<h3>Seats / votes curve</h3><br/>";
+				html +="<center><img src='seats_votes.png'>";
 				html +="<h3>Summary</h3>";
 				html += sumStr+"\n";
 				html +="<br/><br/>";

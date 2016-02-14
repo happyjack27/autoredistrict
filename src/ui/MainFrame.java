@@ -1358,8 +1358,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmNineMaps;
 	public JMenuItem mntmSixteenMaps;
 	public JSeparator separator_5;
-	public JCheckBoxMenuItem chckbxmntmUseAnnealFloor;
-	public JMenuItem mntmResetAnnealFloor;
 	public JSeparator separator_6;
 	public JMenuItem mntmColorByDistrict;
 	public JMenuItem mntmColorByPop;
@@ -3573,7 +3571,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		panel_4.add(lblFairnessCriteria);
 		lblRacialVoteDilution.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
-		lblRacialVoteDilution.setBounds(9, 225, 172, 16);
+		lblRacialVoteDilution.setBounds(10, 220, 172, 16);
 		
 		panel_4.add(lblRacialVoteDilution);
 		sliderVoteDilution.addChangeListener(new ChangeListener() {
@@ -3582,7 +3580,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderVoteDilution.setValue(50);
-		sliderVoteDilution.setBounds(9, 246, 180, 29);
+		sliderVoteDilution.setBounds(10, 240, 180, 29);
 		
 		panel_4.add(sliderVoteDilution);
 		
@@ -3624,12 +3622,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		this.setSize(new Dimension(1021, 779));
 		
 		sliderWastedVotesTotal = new JSlider();
-		lblWastedVotes = new JLabel("Competitiveness (victory margin)");
+		lblWastedVotes = new JLabel("Competitiveness");
 		goButton = new JButton();
 		stopButton = new JButton();
 		
-		lblFairnessCriteria = new JLabel("Fairness criteria");
-		lblRacialVoteDilution = new JLabel("Racial vote dilution");
+		lblFairnessCriteria = new JLabel("Equality criteria");
+		lblRacialVoteDilution = new JLabel("Anti-racial gerrymandering");
+		lblRacialVoteDilution.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		sliderVoteDilution = new JSlider();
 		textFieldTotalSeats = new JTextField();
 		lblTotalSeats = new JRadioButton("Total seats");
@@ -4402,24 +4401,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		menuBar.add(mnEvolution);
 		
-		chckbxmntmUseAnnealFloor = new JCheckBoxMenuItem("Use anneal floor");
-		chckbxmntmUseAnnealFloor.setSelected(Settings.use_annealing_floor);
-		chckbxmntmUseAnnealFloor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.use_annealing_floor = chckbxmntmUseAnnealFloor.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmUseAnnealFloor);
-		
-		mntmResetAnnealFloor = new JMenuItem("Reset anneal floor");
-		mntmResetAnnealFloor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.annealing_starts_at = featureCollection.ecology.generation;
-			}
-		});
-		mnEvolution.add(mntmResetAnnealFloor);
-		mnEvolution.add(new JSeparator());
-		
 		mnConstraints = new JMenu("Communities of interest");
 		menuBar.add(mnConstraints);
 		
@@ -4518,7 +4499,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByVote = new JMenuItem("Color by district vote");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
+				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5235,10 +5216,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Representativeness");
-		lblContiguency.setBounds(9, 160, 172, 16);
+		lblContiguency.setBounds(10, 100, 172, 16);
 		lblContiguency.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(lblContiguency);
-		sliderRepresentation.setBounds(9, 185, 180, 29);
+		sliderRepresentation.setBounds(10, 120, 180, 29);
 		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(sliderRepresentation);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
@@ -5246,18 +5227,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
 			}
 		});
-		sliderWastedVotesTotal.setBounds(10, 120, 180, 29);
+		sliderWastedVotesTotal.setBounds(11, 60, 180, 29);
 		sliderWastedVotesTotal.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(sliderWastedVotesTotal);
-		lblWastedVotes.setBounds(10, 99, 172, 16);
+		lblWastedVotes.setBounds(11, 40, 172, 16);
 		lblWastedVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(lblWastedVotes);
 		
-		lblSeatsVotes = new JLabel("Partisan symmetry");
+		lblSeatsVotes = new JLabel("Anti-partisan gerrymandering");
+		lblSeatsVotes.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
-		lblSeatsVotes.setBounds(10, 38, 179, 16);
+		lblSeatsVotes.setBounds(10, 160, 179, 16);
 		panel_4.add(lblSeatsVotes);
 		
 		sliderSeatsVotes = new JSlider();
@@ -5267,7 +5249,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
-		sliderSeatsVotes.setBounds(10, 59, 180, 29);
+		sliderSeatsVotes.setBounds(10, 180, 180, 29);
 		panel_4.add(sliderSeatsVotes);
 		
 		btnElectionColumns = new JButton("Election columns");
