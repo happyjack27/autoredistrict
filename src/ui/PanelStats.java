@@ -620,12 +620,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				int display_mode_temp = Feature.display_mode;
 				Settings.num_maps_to_draw = 1;
 				
+				boolean maplines = Feature.draw_lines;
+				Feature.draw_lines = true;
+				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+				
 				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
 				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png");
 				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
 				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png");
 
-				
+				Feature.draw_lines = maplines;
+				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
 				Settings.num_maps_to_draw = num_maps_temp;
 				Feature.display_mode = display_mode_temp;
 				
@@ -635,7 +640,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//html += "<body>\n";
 				html += getURLtext(header_path);
 				html +="<h3>Map</h3><br/>";
-				html +="<center><img src='./map_districts.png' width=400> <img src='./map_district_votes.png' width=400></center><br/>";
+				html +="<center><img src='./map_districts.png' width=800><br/><br/><img src='./map_district_votes.png' width=800></center><br/>";
 				html +="<h3>Seats / votes curve - Sorted districts</h3><br/>";
 				html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>";
 				html +="<h3>Summary</h3>";

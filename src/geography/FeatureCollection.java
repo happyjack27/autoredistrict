@@ -42,6 +42,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	double snap_to_grid_resolution = 10000.0*10.0*10.0;
 	public static double xy = 1;
 	public static double dlonlat = 1;
+	public static Color BACKGROUND_COLOR = Color.WHITE;
+	public static Color DEFAULT_COLOR = new Color(254,230,121);//bureau of land management //new Color(204,204,16);
 	
 	public static boolean[] locked_wards = null;
 	public static int shown_map = 0;
@@ -211,6 +213,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 		
 	public void draw(Graphics g) {
+		//Graphics2D g2 = (Graphics2D)g;
+		g.setColor(BACKGROUND_COLOR);
+		g.fillRect(0, 0, 4000, 4000);
 		if( features == null) {
 			return;
 		}
@@ -370,7 +375,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						int shade = (int)(255.0*amt); 
 						district_colors[i] = new Color(255-shade,255,255-shade);
 					} else {
-						district_colors[i] = Color.WHITE;
+						district_colors[i] = DEFAULT_COLOR;
 					}
 				}
 				for( int i = 0; i < features.size(); i++) {
@@ -416,7 +421,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						int shade = (int)(255.0*amt); 
 						district_colors[i] = new Color(255,255-shade,255-shade);
 					} else {
-						district_colors[i] = Color.WHITE;
+						district_colors[i] = DEFAULT_COLOR;
 					}
 					/*
 					

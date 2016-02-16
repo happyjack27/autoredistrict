@@ -1340,12 +1340,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmxAntialiasing_1 = new JMenuItem("4x antialiasing");
 	public JSlider sliderWastedVotesTotal = new JSlider();
 	public JLabel lblWastedVotes = new JLabel("Competitiveness (victory margin)");
-	public JCheckBoxMenuItem chckbxmntmMutateDisconnected;
-	public JCheckBoxMenuItem chckbxmntmMutateExcessPop;
 	public JCheckBoxMenuItem chckbxmntmMutateExcessPopOnly;
-	public JCheckBoxMenuItem chckbxmntmMutateCompetitive;
 	public JCheckBoxMenuItem chckbxmntmMutateCompactness;
-	public JCheckBoxMenuItem chckbxmntmMutateAnyAbove;
 	public JMenu mnConstraints;
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
@@ -3557,6 +3553,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		mainframe = this;
 		jbInit();
+		chckbxmntmHideMapLines.setSelected(true);
+		Feature.draw_lines = chckbxmntmHideMapLines.isSelected();
+		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		mapPanel.invalidate();
+		mapPanel.repaint();
+		
 		try {
 			UIManager.setLookAndFeel(className);
 		} catch (Exception e1) {
@@ -3583,6 +3585,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderVoteDilution.setBounds(10, 240, 180, 29);
 		
 		panel_4.add(sliderVoteDilution);
+		
+		checkBox_1 = new JCheckBox("mutate");
+		checkBox_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.mutate_competitive = checkBox_1.isSelected();
+				Settings.mutate_good = checkBox.isSelected() && checkBox_1.isSelected();
+			}
+		});
+		checkBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		checkBox_1.setBounds(139, 37, 55, 23);
+		panel_4.add(checkBox_1);
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*Math.exp(-(100-slider_mutation.getValue())/Settings.exp_mutate_factor);
@@ -3622,13 +3635,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		this.setSize(new Dimension(1021, 779));
 		
 		sliderWastedVotesTotal = new JSlider();
-		lblWastedVotes = new JLabel("Competitiveness");
+		lblWastedVotes = new JLabel("Competitive");
+		lblWastedVotes.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		goButton = new JButton();
 		stopButton = new JButton();
 		
 		lblFairnessCriteria = new JLabel("Equality criteria");
 		lblRacialVoteDilution = new JLabel("Anti-racial gerrymandering");
-		lblRacialVoteDilution.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		lblRacialVoteDilution.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		sliderVoteDilution = new JSlider();
 		textFieldTotalSeats = new JTextField();
 		lblTotalSeats = new JRadioButton("Total seats");
@@ -3728,7 +3742,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//mnDemographics = new JMenu("Demographics");
 		chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 		mntmOpenElectionResults = new JMenuItem("Open Election results");
-		mnEvolution = new JMenu("Evolution");
 		mnHelp = new JMenu("Help");
 		mntmWebsite = new JMenuItem("Website");
 		mntmSourceCode = new JMenuItem("Source code");
@@ -4085,7 +4098,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					return;
 				}
 				
-				System.out.println("collection districts...");
+				System.out.println("collecting districts...");
 				featureCollection.storeDistrictsToProperties(project.district_column);
 				System.out.println("getting headers...");
 				String[] headers = featureCollection.getHeaders();
@@ -4398,8 +4411,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		
-		menuBar.add(mnEvolution);
 		
 		mnConstraints = new JMenu("Communities of interest");
 		menuBar.add(mnConstraints);
@@ -4952,7 +4963,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		JLabel lblCompactness = new JLabel("Compactness");
+		JLabel lblCompactness = new JLabel("Compact");
+		lblCompactness.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblCompactness.setBounds(6, 97, 90, 16);
 		panel_2.add(lblCompactness);
 		sliderBorderLength.setBounds(6, 118, 190, 29);
@@ -4964,13 +4976,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(lblEvolutionaryPressure);
 		
 		JLabel lblProportionalRepresentation = new JLabel("Equal population");
-		lblProportionalRepresentation.setBounds(6, 158, 172, 16);
+		lblProportionalRepresentation.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblProportionalRepresentation.setBounds(6, 158, 90, 16);
 		panel_2.add(lblProportionalRepresentation);
 		sliderPopulationBalance.setBounds(6, 179, 190, 29);
 		panel_2.add(sliderPopulationBalance);
 		
-		JLabel lblConnectedness = new JLabel("Contiguity");
-		lblConnectedness.setBounds(6, 36, 172, 16);
+		JLabel lblConnectedness = new JLabel("Contiguous");
+		lblConnectedness.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblConnectedness.setBounds(6, 36, 90, 16);
 		panel_2.add(lblConnectedness);
 		
 		sliderDisconnected.addChangeListener(new ChangeListener() {
@@ -5001,6 +5015,27 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_2.add(rdbtnMinimizeMeanDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMeanDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMaxDev);
+		
+		chckbxNewCheckBox_1 = new JCheckBox("mutate");
+		chckbxNewCheckBox_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.mutate_disconnected = chckbxNewCheckBox_1.isSelected();
+			}
+		});
+		chckbxNewCheckBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		chckbxNewCheckBox_1.setBounds(139, 32, 55, 23);
+		panel_2.add(chckbxNewCheckBox_1);
+		
+		checkBox = new JCheckBox("mutate");
+		checkBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.mutate_excess_pop = checkBox.isSelected();
+				Settings.mutate_good = checkBox.isSelected() && checkBox_1.isSelected();
+			}
+		});
+		checkBox.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		checkBox.setBounds(139, 154, 55, 23);
+		panel_2.add(checkBox);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -5215,8 +5250,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.setBounds(400, 356, 200, 293);
 		panel.add(panel_4);
 		
-		JLabel lblContiguency = new JLabel("Representativeness");
-		lblContiguency.setBounds(10, 100, 172, 16);
+		JLabel lblContiguency = new JLabel("Proportional");
+		lblContiguency.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblContiguency.setBounds(10, 100, 104, 16);
 		lblContiguency.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
 		panel_4.add(lblContiguency);
 		sliderRepresentation.setBounds(10, 120, 180, 29);
@@ -5231,13 +5267,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderWastedVotesTotal.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(sliderWastedVotesTotal);
-		lblWastedVotes.setBounds(11, 40, 172, 16);
+		lblWastedVotes.setBounds(11, 40, 84, 16);
 		lblWastedVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
 		
 		panel_4.add(lblWastedVotes);
 		
 		lblSeatsVotes = new JLabel("Anti-partisan gerrymandering");
-		lblSeatsVotes.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		lblSeatsVotes.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
 		lblSeatsVotes.setBounds(10, 160, 179, 16);
 		panel_4.add(lblSeatsVotes);
@@ -5638,26 +5674,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
 			}
 		});
-		
-		chckbxmntmMutateDisconnected = new JCheckBoxMenuItem("Mutate disconnected");
-		chckbxmntmMutateDisconnected.setSelected(Settings.mutate_disconnected );
-		chckbxmntmMutateDisconnected.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_disconnected = chckbxmntmMutateDisconnected.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmMutateDisconnected);
-		
-		mnEvolution.add(new JSeparator());
-		
-		chckbxmntmMutateExcessPop = new JCheckBoxMenuItem("Mutate towards equal pop only");
-		chckbxmntmMutateExcessPop.setSelected(Settings.mutate_excess_pop );
-		chckbxmntmMutateExcessPop.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_excess_pop = chckbxmntmMutateExcessPop.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmMutateExcessPop);
 
 		chckbxmntmMutateExcessPopOnly = new JCheckBoxMenuItem("Mutate overpopulated only");
 		chckbxmntmMutateExcessPopOnly.setSelected(Settings.mutate_overpopulated);
@@ -5666,16 +5682,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Settings.mutate_overpopulated = chckbxmntmMutateExcessPopOnly.isSelected();
 			}
 		});
-		//mnEvolution.add(chckbxmntmMutateExcessPopOnly);
-
-		chckbxmntmMutateCompetitive = new JCheckBoxMenuItem("Mutate towards competitive only");
-		chckbxmntmMutateCompetitive.setSelected(Settings.mutate_competitive );
-		chckbxmntmMutateCompetitive.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_competitive = chckbxmntmMutateCompetitive.isSelected();
-			}
-		});
-		mnEvolution.add(chckbxmntmMutateCompetitive);
 
 		chckbxmntmMutateCompactness = new JCheckBoxMenuItem("Mutate towards compactness only");
 		chckbxmntmMutateCompactness.setSelected(Settings.mutate_compactness );
@@ -5687,17 +5693,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		if( Settings.mutate_compactness_working) {
 			mnEvolution.add(chckbxmntmMutateCompactness);
 		}
-		
-		chckbxmntmMutateAnyAbove = new JCheckBoxMenuItem("Mutate towards any above only");
-		chckbxmntmMutateAnyAbove.setSelected(Settings.mutate_good );
-		chckbxmntmMutateAnyAbove.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_good = chckbxmntmMutateAnyAbove.isSelected();
-				chckbxmntmMutateCompactness.setEnabled(!Settings.mutate_good);
-				chckbxmntmMutateCompetitive.setEnabled(!Settings.mutate_good);
-				chckbxmntmMutateExcessPop.setEnabled(!Settings.mutate_good);
-			}
-		});
 		splitReductionType.add(rdbtnReduceTotalSplits);
 		splitReductionType.add(rdbtnReduceSplitCounties);
 		
@@ -5742,8 +5737,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnRankSelection.setVisible(false);
 		
 		rdbtnTruncationSelection.setVisible(false);
-
-		mnEvolution.add(chckbxmntmMutateAnyAbove);
 		
 
 
@@ -5800,6 +5793,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_8;
 	public JSeparator separator_10;
 	public JSlider slider_anneal;
+	public JCheckBox chckbxNewCheckBox_1;
+	public JCheckBox checkBox;
+	public JCheckBox checkBox_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -5890,7 +5886,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void eventOccured() {
 		if( project.num_generations > 0 && featureCollection.ecology.generation >= project.num_generations) {
 			stopEvolving();
-			System.out.println("collection districts...");
+			System.out.println("collecting districts...");
 			featureCollection.storeDistrictsToProperties(project.district_column);
 			System.out.println("getting headers...");
 			String[] headers = featureCollection.getHeaders();

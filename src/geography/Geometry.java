@@ -19,7 +19,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public Polygon[] polygons;
 	public Polygon[] polygons_full;
 	public Color outlineColor = Color.BLACK;
-	public Color fillColor = Color.WHITE;
+	public Color fillColor = FeatureCollection.DEFAULT_COLOR;
 	public boolean isDistrict = true;
 	public double[] full_centroid;
 

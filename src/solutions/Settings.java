@@ -109,6 +109,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		return e;
 	}
 	public static double getAnnealingFloor(long generation) {
+		if( true) {
+			return 0;
+		}
 		if (!use_annealing_floor) {
 			return 0;
 		}

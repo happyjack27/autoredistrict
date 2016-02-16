@@ -304,9 +304,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		if( geometry.fillColor != null || vtd.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);
 			if( display_mode == DISPLAY_MODE_TEST1) {
-				g.setColor(vtd.elections != null && vtd.elections.size() > 0 ? Color.white :  Color.black);
+				g.setColor(vtd.elections != null && vtd.elections.size() > 0 ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_TEST2) {
-				g.setColor(vtd.has_census_results ? Color.white :  Color.black);
+				g.setColor(vtd.has_census_results ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
 				double tot = 0;
 				double red = 0;
@@ -350,7 +350,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 					g.setColor(Color.blue);
 				}
 				if( vtd.state == 2) {
-					g.setColor(Color.white);
+					g.setColor(Color.gray);
 				}
 			}
 			for( int i = 0; i < geometry.polygons.length; i++) {
