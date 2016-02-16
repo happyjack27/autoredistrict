@@ -3586,16 +3586,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		panel_4.add(sliderVoteDilution);
 		
-		checkBox_1 = new JCheckBox("mutate");
-		checkBox_1.addActionListener(new ActionListener() {
+		chckbxConstrain_1 = new JCheckBox("constrain");
+		chckbxConstrain_1.setToolTipText("This rejects mutations that decrease competitiveness at the cost of slower evolution.");
+		chckbxConstrain_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.mutate_competitive = checkBox_1.isSelected();
-				Settings.mutate_good = checkBox.isSelected() && checkBox_1.isSelected();
+				Settings.mutate_competitive = chckbxConstrain_1.isSelected();
+				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
 			}
 		});
-		checkBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		checkBox_1.setBounds(139, 37, 55, 23);
-		panel_4.add(checkBox_1);
+		chckbxConstrain_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		chckbxConstrain_1.setBounds(133, 37, 61, 23);
+		panel_4.add(chckbxConstrain_1);
 		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*Math.exp(-(100-slider_mutation.getValue())/Settings.exp_mutate_factor);
@@ -4922,26 +4923,28 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMeanDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMaxDev);
 		
-		chckbxNewCheckBox_1 = new JCheckBox("mutate");
+		chckbxNewCheckBox_1 = new JCheckBox("constrain");
+		chckbxNewCheckBox_1.setToolTipText("This adds an extra mutation step to non-contiguous regions at the cost of slower evolution.");
 		chckbxNewCheckBox_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Settings.mutate_disconnected = chckbxNewCheckBox_1.isSelected();
 			}
 		});
 		chckbxNewCheckBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		chckbxNewCheckBox_1.setBounds(139, 32, 55, 23);
+		chckbxNewCheckBox_1.setBounds(132, 32, 62, 23);
 		panel_2.add(chckbxNewCheckBox_1);
 		
-		checkBox = new JCheckBox("mutate");
-		checkBox.addActionListener(new ActionListener() {
+		chckbxConstrain = new JCheckBox("constrain");
+		chckbxConstrain.setToolTipText("This rejects mutations that increase population imbalance at the cost of slower evolution.");
+		chckbxConstrain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.mutate_excess_pop = checkBox.isSelected();
-				Settings.mutate_good = checkBox.isSelected() && checkBox_1.isSelected();
+				Settings.mutate_excess_pop = chckbxConstrain.isSelected();
+				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
 			}
 		});
-		checkBox.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		checkBox.setBounds(139, 154, 55, 23);
-		panel_2.add(checkBox);
+		chckbxConstrain.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		chckbxConstrain.setBounds(132, 154, 62, 23);
+		panel_2.add(chckbxConstrain);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -5700,8 +5703,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_10;
 	public JSlider slider_anneal;
 	public JCheckBox chckbxNewCheckBox_1;
-	public JCheckBox checkBox;
-	public JCheckBox checkBox_1;
+	public JCheckBox chckbxConstrain;
+	public JCheckBox chckbxConstrain_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
