@@ -613,8 +613,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				saveURL(write_folder+"style.css",style_sheet);
 				
 
+				MapPanel.override_size = 1024;
 				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
 				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
+				MapPanel.override_size = -1;
 				
 				int num_maps_temp = Settings.num_maps_to_draw;
 				int display_mode_temp = Feature.display_mode;
@@ -634,11 +636,18 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				Settings.num_maps_to_draw = num_maps_temp;
 				Feature.display_mode = display_mode_temp;
 				
+				MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
+				MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+				
 				
 				String html = "";
 				//html += "<html>\n";
 				//html += "<body>\n";
 				html += getURLtext(header_path);
+				html +="<h3>VTD data</h3><br/>";
+				html +="<a href='./vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>";
+				html +="<a href='./vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>";
+				html +="<br/><br/>";
 				html +="<h3>Map</h3><br/>";
 				html +="<center><img src='./map_districts.png' width=800><br/><br/><img src='./map_district_votes.png' width=800></center><br/>";
 				html +="<h3>Seats / votes curve - Sorted districts</h3><br/>";

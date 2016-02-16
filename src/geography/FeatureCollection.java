@@ -215,7 +215,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public void draw(Graphics g) {
 		//Graphics2D g2 = (Graphics2D)g;
 		g.setColor(BACKGROUND_COLOR);
-		g.fillRect(0, 0, 4000, 4000);
+		g.fillRect(0, 0, 6000, 4000);
 		if( features == null) {
 			return;
 		}

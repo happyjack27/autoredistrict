@@ -62,7 +62,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	boolean geo_loaded = false;
 	boolean census_loaded = false;
 	boolean election_loaded = false;
-	boolean evolving = false;
+	public boolean evolving = false;
 	
 	boolean suppress_duplicates = false;
 	boolean use_sample = false;
@@ -4088,101 +4088,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mntmSaveData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
-				if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
-					//options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)"};//,".dbf (in separate dbase file)",".dbf (in original shapefile)"};
-				}
-				int opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
-				if( opt < 0) {
-					System.out.println("aborted.");
-					return;
-				}
-				
-				System.out.println("collecting districts...");
-				featureCollection.storeDistrictsToProperties(project.district_column);
-				System.out.println("getting headers...");
-				String[] headers = featureCollection.getHeaders();
-				
-				System.out.println("getting data...");
-				String[][] data = featureCollection.getData(headers);
-				
-				if( opt == 3 || opt == 2) {
-					String filename = "";
-					File f = null;
-					opt = 2;
-					if( opt == 3) {
-						filename = project.source_file.substring(0,project.source_file.length()-3)+"dbf";
-						f = new File(filename);
-						if( f == null)  {
-							return;
-						}
-					} else if( opt == 2) {
-						JFileChooser jfc = new JFileChooser();
-						jfc.setCurrentDirectory(new File(Download.getStartPath()));
-						jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbase file","dbf"));
-						jfc.showSaveDialog(null);
-						f = jfc.getSelectedFile();
-						if( f == null)  {
-							return;
-						}
-						filename = f.getAbsolutePath().trim();
-					}
-					if( !filename.toLowerCase().substring(filename.length()-4).equals(".dbf")) {
-						filename += ".dbf";
-					}
-					System.out.println("writedbf start.");
-					writeDBF(filename,headers,data);					
-					System.out.println("writedbf done.");
-				} else {
-					JFileChooser jfc = new JFileChooser();
-					jfc.setCurrentDirectory(new File(Download.getStartPath()));
-					String delimiter = ",";
-					if( opt == 0) { 
-						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
-					} else if( opt == 1) {
-						delimiter = "\t";
-						jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
-					}
-					jfc.showSaveDialog(null);
-					File f = jfc.getSelectedFile();
-					if( f == null)  {
-						System.out.println("f is null.");
-						return;
-					}
-					String s = f.getAbsolutePath();
-					if( !s.substring(s.length()-4).toLowerCase().equals(opt == 0 ? ".csv" : ".txt")) {
-						s += opt == 0 ? ".csv" : ".txt";
-						f = new File(s);
-					}
-					try {
-						System.out.println("creating...");
-						FileOutputStream fos = new FileOutputStream(f);
-						StringBuffer sb = new StringBuffer();
-						for(int i = 0; i < headers.length; i++) {
-							sb.append((i>0?delimiter:"")+headers[i]);
-						}
-						sb.append("\n");
-						
-						for(int j = 0; j < data.length; j++) {
-							for(int i = 0; i < headers.length; i++) {
-								sb.append((i>0?delimiter:"")+data[j][i]);
-							}
-							sb.append("\n");
-						}
-						System.out.println("writing...");
-						fos.write(sb.toString().getBytes());
-						
-						fos.flush();
-						System.out.println("closing...");
-						fos.close();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-						return;
-					} 
-				}
-				JOptionPane.showMessageDialog(mainframe,"File saved.");
+				saveData(null,-1,true);
 			}
 		});
 		mnFile.add(mntmSaveData);
@@ -5945,4 +5851,107 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		progressBar.setIndeterminate(false);
 		progressBar.setValue(0);
 	}
+	public void saveData(File f, int opt, boolean confirm) {
+		if( opt < 0) {
+			String[] options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)",".dbf (dbase file)"};
+			if( project.source_file.substring(project.source_file.length()-4).toLowerCase().equals(".shp")) {
+				//options = new String[]{".csv (comma-separated)",".txt (tab-deliminted)"};//,".dbf (in separate dbase file)",".dbf (in original shapefile)"};
+			}
+			opt = JOptionPane.showOptionDialog(mainframe, "Select desired format to save in.", "Select format", 0,0,null,options,options[0]);
+			if( opt < 0) {
+				System.out.println("aborted.");
+				return;
+			}
+		}
+		System.out.println("collecting districts...");
+		featureCollection.storeDistrictsToProperties(project.district_column);
+		System.out.println("getting headers...");
+		String[] headers = featureCollection.getHeaders();
+		
+		System.out.println("getting data...");
+		String[][] data = featureCollection.getData(headers);
+		
+		if( opt == 3 || opt == 2) {
+			String filename = "";
+			opt = 2;
+			if( opt == 3) {
+				filename = project.source_file.substring(0,project.source_file.length()-3)+"dbf";
+				f = new File(filename);
+				if( f == null)  {
+					return;
+				}
+			} else if( opt == 2) {
+				if( f == null) {
+					JFileChooser jfc = new JFileChooser();
+					jfc.setCurrentDirectory(new File(Download.getStartPath()));
+					jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbase file","dbf"));
+					jfc.showSaveDialog(null);
+					f = jfc.getSelectedFile();
+					if( f == null)  {
+						return;
+					}
+				}
+				filename = f.getAbsolutePath().trim();
+			}
+			if( !filename.toLowerCase().substring(filename.length()-4).equals(".dbf")) {
+				filename += ".dbf";
+			}
+			System.out.println("writedbf start.");
+			writeDBF(filename,headers,data);					
+			System.out.println("writedbf done.");
+		} else {
+			String delimiter = opt == 1 ? "\t" : ",";
+			if( f == null) {
+			JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
+				if( opt == 0) { 
+					jfc.addChoosableFileFilter(new FileNameExtensionFilter("Comma separated values","csv"));
+				} else if( opt == 1) {
+					jfc.addChoosableFileFilter(new FileNameExtensionFilter("Tab-delimited file","txt"));
+				}
+				jfc.showSaveDialog(null);
+				f = jfc.getSelectedFile();
+				if( f == null)  {
+					System.out.println("f is null.");
+					return;
+				}
+				String s = f.getAbsolutePath();
+				if( !s.substring(s.length()-4).toLowerCase().equals(opt == 0 ? ".csv" : ".txt")) {
+					s += opt == 0 ? ".csv" : ".txt";
+					f = new File(s);
+				}
+			}
+			try {
+				System.out.println("creating...");
+				FileOutputStream fos = new FileOutputStream(f);
+				StringBuffer sb = new StringBuffer();
+				for(int i = 0; i < headers.length; i++) {
+					sb.append((i>0?delimiter:"")+headers[i]);
+				}
+				sb.append("\n");
+				
+				for(int j = 0; j < data.length; j++) {
+					for(int i = 0; i < headers.length; i++) {
+						sb.append((i>0?delimiter:"")+data[j][i]);
+					}
+					sb.append("\n");
+				}
+				System.out.println("writing...");
+				fos.write(sb.toString().getBytes());
+				
+				fos.flush();
+				System.out.println("closing...");
+				fos.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
+				return;
+			} 
+		}
+		if( confirm) {
+			JOptionPane.showMessageDialog(mainframe,"File saved.");
+		}
+	}
+	
 }

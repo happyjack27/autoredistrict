@@ -13,6 +13,7 @@ import serialization.ReflectionJSONObject;
 import solutions.Election;
 import solutions.Settings;
 import solutions.VTD;
+import ui.MainFrame;
 
 public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
 	
@@ -357,7 +358,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				g.fillPolygon(geometry.polygons[i]);
 			}
 		}
-		if( geometry.outlineColor != null && draw_lines) {
+		if( geometry.outlineColor != null && draw_lines && !MainFrame.mainframe.evolving) {
 			g.setColor(geometry.outlineColor);
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);

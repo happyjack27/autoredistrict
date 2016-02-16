@@ -20,6 +20,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	boolean zooming = false;
 	Rectangle selection = null;
 	public JPanel seatsPanel;
+	public static int override_size = -1;
 	public static Stack<double[]> zoomStack = new Stack<double[]>();
 	
 	public static int FSAA = 1;
@@ -48,6 +49,10 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
     @Override
     public void paintComponent(Graphics graphics0) {
     	try {
+    		int fsaa = FSAA;
+    		if( MainFrame.mainframe.evolving) {
+    			fsaa = 0;
+    		}
     	Graphics2D graphics = (Graphics2D)graphics0;
     	Graphics2D g = null;
         super.paintComponent(graphics);
@@ -56,6 +61,9 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         }
         FeatureCollection.shown_map = 0;
         Dimension d = this.getSize();
+        if( override_size > 0) {
+        	d = new Dimension(override_size,override_size);
+        }
         if( Settings.num_maps_to_draw > 1) {
 	    	int m = (int)Math.sqrt(Settings.num_maps_to_draw);
 	    	d.setSize(d.width/m, d.height/m);
@@ -81,11 +89,11 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 	        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 	
-	        if( FSAA > 0) {
+	        if( fsaa > 0) {
 		        off_Image =
 		        		  new BufferedImage(
-		        				  (int) (d.getWidth()*FSAA), 
-		        				  (int) (d.getHeight()*FSAA), 
+		        				  (int) (d.getWidth()*fsaa), 
+		        				  (int) (d.getHeight()*fsaa), 
 		        		          BufferedImage.TYPE_INT_ARGB
 		        		          );
 		        g = off_Image.createGraphics();
@@ -99,8 +107,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 	        
 	        
-	        double scalex = ((double)d.getWidth()*FSAA)/(maxx-minx);
-	        double scaley = ((double)d.getHeight()*FSAA)/(maxy-miny);
+	        double scalex = ((double)d.getWidth()*fsaa)/(maxx-minx);
+	        double scaley = ((double)d.getHeight()*fsaa)/(maxy-miny);
 	        Geometry.shiftx = minx;
 	        Geometry.shifty = miny;
 	        Geometry.scalex = scalex;
@@ -112,17 +120,17 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	        	if( selection != null) {
 	        		//Color c = new Color();
 	        		g.setColor(new Color(128,128,128,128));
-	        		g.fillRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
+	        		g.fillRect(selection.x*fsaa, selection.y*fsaa, selection.width*fsaa, selection.height*fsaa);
 	           		g.setColor(new Color(255,255,255,255));
-	           		g.drawRect(selection.x*FSAA, selection.y*FSAA, selection.width*FSAA, selection.height*FSAA);
+	           		g.drawRect(selection.x*fsaa, selection.y*fsaa, selection.width*fsaa, selection.height*fsaa);
 	        	}
 	        }
 	        //System.out.println(".");
-	        if( FSAA > 0) {
+	        if( fsaa > 0) {
 	        	g.dispose();
 	        }
 	        //System.out.println("x");
-	        if( FSAA == 4) {
+	        if( fsaa == 4) {
 	            //Dimension d = this.getSize();
 	            //graphics.setComposite(AlphaComposite.Src);
 	
@@ -149,7 +157,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 		        		(int)d.getWidth(), (int)d.getHeight(), 
 		        		null);
 	
-	        } else if( FSAA == 2 || true) {
+	        } else if( fsaa == 2 || true) {
 		        graphics.drawImage(off_Image,
 		                (i%m)*d.width,
 		                ((i-i%m)/m)*d.height,
@@ -205,9 +213,14 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 		if( featureCollection == null || featureCollection.features == null) {
 			return null;
 		}
+		int fsaa = FSAA;
+		if( MainFrame.mainframe.evolving) {
+			fsaa = 0;
+		}
+		
 		for( Feature f : featureCollection.features) {
 			for( Polygon p : f.geometry.polygons) {
-				if( pnpoly(p,x*FSAA,y*FSAA)) {
+				if( pnpoly(p,x*fsaa,y*fsaa)) {
 					return f;
 				}
 			}
