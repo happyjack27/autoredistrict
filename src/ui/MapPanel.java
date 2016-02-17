@@ -51,7 +51,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
     	try {
     		int fsaa = FSAA;
     		if( MainFrame.mainframe.evolving) {
-    			fsaa = 0;
+    			fsaa = 1;
     		}
     	Graphics2D graphics = (Graphics2D)graphics0;
     	Graphics2D g = null;

@@ -73,7 +73,9 @@ public class PanelRankedDistricts extends JPanel {
 					    g.setColor(new Color(255,l3,l3));
 			    		
 			    	}
-			    	g.fillRect(x, (int)y, w, (int)Math.round(inc));
+			    	int iy = (int)Math.round(y);
+			    	int iyt = (int)Math.round(y+inc);
+			    	g.fillRect(x, iy, w, iyt-iy);
 			    	y += inc;
 			    }
 	
