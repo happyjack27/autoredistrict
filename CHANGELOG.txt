@@ -1,5 +1,16 @@
 Changelog:
 
+V. 1.22
+
+* election columns and substitute columns now clear when a new shapefile is loaded.
+* map anti-aliasing automatically turns off when evolution is started
+* map background is now white, and default map color is yellow-brown.
+* the "Evolution" menu has been moved into the main view, as new "constrain" checkboxes by the sliders
+* added the data files to the generated html 
+* fixed white lines in the ranked districts chart.
+* fixed html link to states with names with spaces (changed " " to "%20")
+
+
 V. 1.21
 
 * renamed and re-ordered fairness sliders
