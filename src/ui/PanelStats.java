@@ -644,7 +644,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//html += "<html>\n";
 				//html += "<body>\n";
 				html += getURLtext(header_path);
-				html +="<h3>VTD data</h3><br/>";
+				html +="This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.<br/>";
+				html +="<h3>VTD district assignments</h3><br/>";
 				html +="<a href='./vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>";
 				html +="<a href='./vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>";
 				html +="<br/><br/>";
