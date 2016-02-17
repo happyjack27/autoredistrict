@@ -474,7 +474,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         		Settings.population_balance_weight      *1.0, //2
                 Settings.disconnected_population_weight *1.0,
                 Settings.voting_power_balance_weight    *1.0, //4
-                Settings.wasted_votes_total_weight      *1.0,
+                Settings.competitiveness_weight      *1.0,
                 Settings.wasted_votes_imbalance_weight  *1.0, //6
                 Settings.seats_votes_asymmetry_weight   *1.0,
                 Settings.diagonalization_weight   *1.0, //8

@@ -1059,19 +1059,20 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 	    	try { 
-			for( int i = 0; i < vtds.size(); i++) {
-				VTD vtd = vtds.get(i);
-				int[] dists = counties.get(vtd.county);
-				if( dists == null) {
-					dists = new int[Settings.num_districts];
-					counties.put(vtd.county, dists);
+	    		//colllect vtds into counties
+				for( int i = 0; i < vtds.size(); i++) {
+					VTD vtd = vtds.get(i);
+					int[] dists = counties.get(vtd.county);
+					if( dists == null) {
+						dists = new int[Settings.num_districts];
+						counties.put(vtd.county, dists);
+					}
+					int dist = vtd_districts[i];
+					if( dist >= dists.length) {
+						dist = (int)(Math.random()*(double)dists.length);
+					}
+					dists[dist]++;
 				}
-				int dist = vtd_districts[i];
-				if( dist >= dists.length) {
-					dist = (int)(Math.random()*(double)dists.length);
-				}
-				dists[dist]++;
-			}
 	    	} catch (Exception ex) {
 	    		ex.printStackTrace();
 	    	}
@@ -1370,13 +1371,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double[] q = new double[Settings.num_candidates];
         double disproportional_representation = 0;
         double wasted_vote_imbalance = 0;
-    	if( Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0 || Settings.seats_votes_asymmetry_weight > 0 || Settings.wasted_votes_total_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
+    	if( true) { //Settings.disenfranchise_weight > 0 || Settings.voting_power_balance_weight > 0 || Settings.seats_votes_asymmetry_weight > 0 || Settings.competitiveness_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
     		for(District d : districts) {
     			d.generateOutcomes(Settings.num_elections_simulated);
     		}
     		
     	}
-    	if( Settings.disenfranchise_weight > 0 || Settings.wasted_votes_total_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
+    	if( true) { //Settings.disenfranchise_weight > 0 || Settings.competitiveness_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
     		wasted_votes_by_party = new int[Settings.num_candidates];
@@ -1905,6 +1906,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 	public Color getWastedVoteColor(int i) {
 		double[] rgb = new double[]{0,0,0};
+		if( wasted_votes_by_district_and_party == null) {
+			return Color.WHITE;
+		}
 		int[] amts0 = wasted_votes_by_district_and_party[i];
 		double[] amts1 = districts.get(i).getAnOutcome();//getElectionResults()[0];
 

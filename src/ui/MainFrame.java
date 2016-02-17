@@ -3611,7 +3611,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*Math.exp(-(100-slider_mutation.getValue())/Settings.exp_mutate_factor);
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
-		Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
+		Settings.competitiveness_weight = sliderWastedVotesTotal.getValue()/100.0;
 		Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
 		//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 		Settings.diagonalization_weight = sliderRepresentation.getValue()/100.0;
@@ -5179,7 +5179,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(sliderRepresentation);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				Settings.wasted_votes_total_weight = sliderWastedVotesTotal.getValue()/100.0;
+				Settings.competitiveness_weight = sliderWastedVotesTotal.getValue()/100.0;
 			}
 		});
 		sliderWastedVotesTotal.setBounds(11, 60, 180, 29);

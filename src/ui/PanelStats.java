@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -253,6 +254,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	
 			for( int i = 0; i < dm.districts.size(); i++) {
 				try {
+					dm.calcDemographicStatistics();
 				dmcolors[i] = dm.getWastedVoteColor(i);
 				ddata[i] = new String[dcolumns.length];
 				District d = dm.districts.get(i);
@@ -677,7 +679,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/");
+				String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/").replaceAll(" ", "%20");
+				//url = URLEncoder.encode(url);
 				Applet.browseTo(url);
 				
 
