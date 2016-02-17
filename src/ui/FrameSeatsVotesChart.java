@@ -439,6 +439,8 @@ public class FrameSeatsVotesChart extends JFrame {
 			if( Math.abs(dd[0]-0.5) < min) {
 				min = Math.abs(dd[0]-0.5);
 				median = dd[1];
+			} else if (Math.abs(dd[0]-0.5) == min) {
+				median = (median + dd[1])/2.0;
 			}
 		}
 		try {

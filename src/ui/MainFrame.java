@@ -2555,6 +2555,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		geo_loaded = true;
 		setEnableds();
+		project.demographic_columns.clear();
+		setDemographicColumns();
+		project.election_columns.clear();
+		setElectionColumns();
+		project.election_columns_2.clear();
+		setElectionColumns2();
+		project.election_columns_3.clear();
+		setElectionColumns3();
+		project.substitute_columns.clear();
+		setSubstituteColumns();
 	}
 	
 	public void openShapeFile(File f,boolean synchronous) {
