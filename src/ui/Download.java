@@ -29,6 +29,7 @@ public class Download extends Thread {
 	public static int vyear = -1;
 	
 	public static File vtd_file = null;
+	public static File vtd_dbf_file = null;
 	public static File census_pop_file = null;
 	public static File census_centroid_file = null;
 	public static File census_tract_file = null;
@@ -202,14 +203,20 @@ public class Download extends Thread {
 		download_vtd = true;
 		
 		if( ftest1.exists()) {
-			download_vtd = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
+			download_vtd = !prompt ? false : JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
 		}
 		if( ftest2.exists() && ftest3.exists()) {
-			download_census = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
+			download_census = !prompt ? false : JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
 		}
 		new Download().start();
 		return true;
 	}
+
+
+
+
+
+
 	
 	public void run() {
 
@@ -265,6 +272,7 @@ public class Download extends Thread {
 		census_centroid_file = new File(census_centroid_path+census_centroid_filename(istate,cyear));
 		census_pop_file = new File(census_pop_path+census_pop_filename(istate,cyear));
 		vtd_file = new File(census_vtd_path+census_vtd_filename(istate,cyear,vyear));
+		vtd_dbf_file = new File(census_vtd_path+census_vtd_dbf_filename(istate,cyear,vyear));
 		census_tract_file = new File(census_tract_path+census_tract_filename(istate,cyear));
 
 		if( MainFrame.dlg != null) { MainFrame.dlg.hide(); }
@@ -311,6 +319,10 @@ public class Download extends Thread {
 	public static String census_vtd_filename(int state, int year, int elec_year) {
 		return ""
 				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".shp";
+	}
+	public static String census_vtd_dbf_filename(int state, int year, int elec_year) {
+		return ""
+				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".dbf";
 	}
 	public static String shortyear(int year) {
 		String s = ""+year;
@@ -394,6 +406,7 @@ public class Download extends Thread {
 			*/
 
 			};
+	public static boolean prompt = true;
 	
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
 		System.out.println("downloading:");

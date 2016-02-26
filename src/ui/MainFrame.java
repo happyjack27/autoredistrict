@@ -188,6 +188,37 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		super();
     		this.f = f;
     	}
+    	
+	}
+	class CycleThread extends Thread {
+		public int cyear;
+		public int eyear;
+		int state = 0;
+		
+		public void run() {
+			if( state >+ Download.states.length ) {
+				Download.prompt = true;
+				JOptionPane.showMessageDialog(null, "Done downloading all states!");
+				return;
+			}
+			int next_state = state+1;
+			while( next_state < Download.states.length && Download.states[next_state].length() == 0) {
+				next_state++;
+			}
+			CycleThread ct = new CycleThread();
+			ct.cyear = cyear;
+			ct.eyear = eyear;
+			ct.state = next_state;		
+			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+			ImportCensus2Thread ir = new ImportCensus2Thread();
+			ImportTranslations it = new ImportTranslations();
+			ImportCountyLevel icl = new ImportCountyLevel();
+			icl.nextThread = ct;
+			it.nextThread = icl;
+			ir.nextThread =  it;
+			ost.nextThread = ir;
+			Download.downloadState(state,cyear,eyear);	
+		}
 	}
 
 	class ExportCustomThread extends Thread {
@@ -1024,7 +1055,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		comboBoxPopulation.setSelectedItem("POPULATION");
 	    		
 	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+	    		if( Download.prompt) {
+	    			JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+	    		}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -1981,7 +2014,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportCountyLevel extends Thread {
 		Thread nextThread = null;
 		public void run() {
-			System.out.println("import count level start");
+			System.out.println("import county level start");
 			String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
 			System.out.println("url: "+path);
 	    	System.out.println("0");
@@ -2098,7 +2131,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			trySetBasicColumns();
 			trySetGroupColumns();
 			System.out.println("done county data merge");
-			JOptionPane.showMessageDialog(null, "Import complete");
+			saveData(Download.vtd_dbf_file, 2,false);
+			if( Download.prompt) {
+				JOptionPane.showMessageDialog(null, "Import complete.");
+			}
 			if( nextThread != null) {
 				nextThread.start();
 				nextThread = null;
@@ -4087,8 +4123,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					//}
 				//}
 				Download.nextThread = ost;
+				Download.prompt = true;
 				DialogDownload dd = new DialogDownload();
 				dd.show();
+				if( dd.ok && dd.all) {
+					Download.prompt = false;
+
+					
+					CycleThread ct = new CycleThread();
+					ct.start();
+					ct.cyear = Integer.parseInt((String)dd.comboBoxCensusYear.getSelectedItem());
+					ct.eyear = Integer.parseInt((String)dd.comboBoxElectionYear.getSelectedItem());
+					ct.state = 0;
+				}
 				//!Download.downloadData(dlg, dlbl))
 			}
 		});

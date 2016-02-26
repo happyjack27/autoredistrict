@@ -1,7 +1,6 @@
 package ui;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.*;
 import java.util.*;
 
@@ -10,12 +9,14 @@ import javax.swing.*;
 public class DialogDownload extends JDialog {
 	JList<String> list = new JList<String>();
 	public boolean ok = false;
+	public boolean all = false;
 
 	public JLabel lblSelectState;
 	public JComboBox comboBoxCensusYear;
 	public JComboBox comboBoxElectionYear;
 	public JLabel lblSelectElectionYear;
 	public JLabel lblSelectCensusYear;
+	public final JButton btnDownloadAll = new JButton("Download all");
 	//public String[] right_side = null;
 	
 	public DialogDownload() {
@@ -34,6 +35,20 @@ public class DialogDownload extends JDialog {
 		}
 		comboBoxCensusYear.setSelectedIndex(0);
 		comboBoxElectionYear.setSelectedIndex(0);
+		btnDownloadAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean confirm = JOptionPane.showConfirmDialog(null, "This will take a very long time.\nAre you sure?") == JOptionPane.YES_OPTION;
+				if( !confirm) {
+					return;
+				}
+				all = true;
+				hide();
+				
+			}
+		});
+		btnDownloadAll.setBounds(164, 216, 144, 29);
+		
+		getContentPane().add(btnDownloadAll);
 	}
 	private void initComponents() {
 		setModal(true);
@@ -47,6 +62,7 @@ public class DialogDownload extends JDialog {
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ok = true;
+				all = false;
 				hide();
 				JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 				
@@ -61,6 +77,7 @@ public class DialogDownload extends JDialog {
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				all = false;
 				hide();
 			}
 		});
