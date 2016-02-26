@@ -1,5 +1,14 @@
 Changelog:
 
+V. 1.23
+
+* bugfix: when loading a new district column, will not reset the population of candidate proposals
+* bugfix: latitude-longitude aspect ratio is better now
+* feature: now downloadds  county name and county fips
+* feature: now automatically downloads county-resolution demographics and election counts.
+* feature: now automaticaly sets colmns: county, population, election & demographics
+ 
+
 V. 1.22
 
 * election columns and substitute columns now clear when a new shapefile is loaded.

@@ -226,7 +226,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double lon1 = MapPanel.maxx;//Geometry.features.get(0).geometry.coordinates[0][0][0];
 		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
 		
-		dlonlat = Math.cos((lat0+lat1)/2);
+		//dlonlat = Math.cos((lat0+lat1)/2);
+		dlonlat = Math.cos(Math.toRadians((lat0+lat1)/2.0));
 		double x0 = lon0 * dlonlat;
 		double y0 = lat0;
 		double x1 = lon1 * dlonlat;

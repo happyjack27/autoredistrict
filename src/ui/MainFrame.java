@@ -1124,6 +1124,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ImportCensus2Thread extends Thread {
+		protected Thread nextThread;
 		ImportCensus2Thread() { super(); }
     	public void run() { 
     		try {
@@ -1324,6 +1325,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
     		}
+    		trySetBasicColumns();
+    		trySetGroupColumns();
+    		
+			if( nextThread != null) {
+				nextThread.start();
+				nextThread = null;
+			}
+
     	}
 	}
 
@@ -1909,8 +1918,185 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
     		}
+    		trySetBasicColumns();
+    		trySetGroupColumns();
+
     	}
     }
+	
+	class ImportTranslations extends Thread {
+		Thread nextThread = null;
+		public void run() {
+			Hashtable<String,Feature> featmap = new Hashtable<String,Feature>();
+			String skey="GEOID";
+			String[] headers = featureCollection.getHeaders();
+			for( int i = 0; i < headers.length; i++) {
+				if( headers[i].indexOf(skey) == 0) {
+					skey = headers[i];
+					break;
+				}
+			}
+			String skey2="VTDST";
+			for( int i = 0; i < headers.length; i++) {
+				if( headers[i].indexOf(skey2) == 0) {
+					skey2 = headers[i];
+					break;
+				}
+			}
+			int ikey = 9;
+			Download.init();
+			String state_abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
+			System.out.println("state_abbr: |"+state_abbr+"|");
+			for(Feature feat : featureCollection.features) {
+				featmap.put((String) feat.properties.get(skey),feat);
+			}
+			Vector<String[]> v = processVTDrenameFile();
+			System.out.println("size: "+v.size());
+			String[] header = v.remove(0);
+			int[] care = new int[]{3,6};
+			for(String[] ss : v) {
+				if( !ss[0].equals(state_abbr)) {
+					//System.out.print(".");
+					continue;
+				}
+				Feature feat = featmap.get(ss[ikey]);
+				if( feat == null) {
+					System.out.println("no match found!: "+ss[ikey]);
+					continue;
+				}
+				//System.out.println("match found!: "+ss[ikey]);
+				for( int j = 0; j < care.length; j++) {
+					int k = care[j];
+					feat.properties.put(header[k],ss[k]);
+				}
+			}
+			System.out.println("done nextThred: "+nextThread);
+			if( nextThread != null) {
+				nextThread.start();
+				nextThread = null;
+			}
+		}
+	}
+
+	class ImportCountyLevel extends Thread {
+		Thread nextThread = null;
+		public void run() {
+			System.out.println("import count level start");
+			String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
+			System.out.println("url: "+path);
+	    	System.out.println("0");
+		    URL url;
+		    InputStream is = null;
+	    	System.out.println("0.0");
+
+		    BufferedReader br;
+		    String line;
+	    	System.out.println("0.1");
+
+	        Vector<String[]> v = new Vector<String[]>();
+
+		    try {
+		    	System.out.println("1");
+		        url = new URL(path);
+		    	System.out.println("2");
+		        is = url.openStream();  // throws an IOException
+		    	System.out.println("3");
+		        br = new BufferedReader(new InputStreamReader(is));
+		    	System.out.println("4");
+
+		        while ((line = br.readLine()) != null) {
+			    	System.out.print(".");
+		        	System.out.println(line);
+		        	String[] ss = line.split("\t");
+		        	for( int i = 0; i < ss.length; i++) {
+		        		ss[i] = ss[i].replaceAll("\"", "").replaceAll(",", "");
+		        	}
+		        	v.add(ss);
+		        }
+		    } catch (Exception mue) {
+		    	System.out.print("ex "+mue);
+		        mue.printStackTrace();
+		    }
+	        try {
+	            if (is != null) is.close();
+	        } catch (IOException ioe) {
+	            // nothing to see here
+	        }
+	        String[] headers = v.remove(0);
+			//todo: populate v with the data.
+			String county_column = "COUNTY_NAME";
+			int iCountyColumn = 0;
+			
+			//collect counties;
+			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+			HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
+			for( Feature feat : featureCollection.features) {
+				String county = (String) feat.properties.get(county_column);
+				county = county.trim().toUpperCase();
+				
+				Vector<Feature> vf = county_feats.get(county);
+				if( vf == null) { 
+					vf = new Vector<Feature>();
+					county_feats.put(county,vf);
+				}
+				vf.add(feat);
+				Integer i = county_pops.get(county);
+				if( i == null) { 
+					i = new Integer(0);
+					county_pops.put(county,i);
+				}
+				if( feat.properties.POPULATION == 0) {
+					Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
+					feat.properties.POPULATION = d.intValue();
+				}
+				i += feat.properties.POPULATION;
+				county_pops.put(county,i);
+			}
+			
+			//now deaggregate proportional
+			for( String[] ss : v) {
+				String incounty = ss[iCountyColumn].trim().toUpperCase();
+				Vector<Feature> vf = county_feats.get(incounty);
+				if( vf == null) {
+					incounty += " COUNTY";
+					vf = county_feats.get(incounty);
+					if( vf == null) {
+							System.out.println("not found!: "+incounty);
+							continue;
+					}
+				}
+				double total_pop = (double)county_pops.get(incounty);
+				System.out.println("found!: "+incounty+" "+total_pop);
+				double[] dd = new double[ss.length];
+				for( int i = 0; i < ss.length; i++) {
+					if( i == iCountyColumn || headers[i].equals("COUNTY_NAME") || headers[i].equals("COUNTY_FIPS")) {
+						continue;
+					}
+					dd[i] = Double.parseDouble(ss[i]);///total_pop;
+				}
+				for(Feature feat : vf) {
+					double feat_pop = feat.properties.POPULATION;
+					for( int i = 0; i < ss.length; i++) {
+						if( i == iCountyColumn || headers[i].equals("COUNTY_NAME") || headers[i].equals("COUNTY_FIPS")) {
+							continue;
+						}
+						feat.properties.put(headers[i], ""+(dd[i]*feat_pop/total_pop));
+					}
+				}
+			}
+			
+			
+			
+			trySetBasicColumns();
+			trySetGroupColumns();
+			System.out.println("done county data merge");
+			if( nextThread != null) {
+				nextThread.start();
+				nextThread = null;
+			}
+		}
+	}
+
 	
 	public void renumber() {
 		boolean[] used = new boolean[Settings.num_districts];
@@ -2691,6 +2877,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( featureCollection.ecology != null && featureCollection.ecology.population != null && featureCollection.ecology.population.size() > 0) {
+				while( featureCollection.ecology.population.size() > 1) {
+					featureCollection.ecology.population.remove(1);
+				}
 				Settings.ignore_uncontested = false;
 				featureCollection.ecology.population.get(0).calcFairnessScores();
 				panelStats.getStats();
@@ -3877,14 +4066,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmWizard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
-				if( Download.census_merge_working) {
-					if( Download.census_merge_old) {
-						ost.nextThread = new ImportCensus2Thread(); 
-					} else {
-						ost.nextThread = new ImportGazzeterThread(); 
-						
-					}
-				}
+				ImportCensus2Thread ir = new ImportCensus2Thread();
+				ImportTranslations it = new ImportTranslations();
+				it.nextThread = new ImportCountyLevel();
+				ir.nextThread =  it;
+				ost.nextThread = ir;
+				//if( Download.census_merge_working) {
+					//if( Download.census_merge_old) {
+					//} else {
+					//	ost.nextThread = new ImportGazzeterThread(); 
+					//}
+				//}
 				Download.nextThread = ost;
 				DialogDownload dd = new DialogDownload();
 				dd.show();
@@ -5387,7 +5579,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderSplitReduction.setBounds(10, 157, 180, 29);
 		panel_5.add(sliderSplitReduction);
-		sliderSplitReduction.setValue(0);
 		
 		srcomboBoxCountyColumn = new JComboBox();
 		srcomboBoxCountyColumn.addActionListener(new ActionListener() {
@@ -5966,5 +6157,126 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			JOptionPane.showMessageDialog(mainframe,"File saved.");
 		}
 	}
+	
+	public static Vector processVTDrenameFile() {
+		String path = "http://www2.census.gov/geo/docs/reference/codes/files/national_vtd.txt";
+	    URL url;
+	    InputStream is = null;
+	    BufferedReader br;
+	    String line;
+        Vector<String[]> v = new Vector<String[]>();
+
+	    try {
+	        url = new URL(path);
+	        is = url.openStream();  // throws an IOException
+	        br = new BufferedReader(new InputStreamReader(is));
+	        v.add( new String[]{"STATE","STATEFP","COUNTYFP","COUNTY_NAME","VTDST","VTDNAME","CTYFP_FUL","VTDST_FUL","VTDST_HLF","GEO"});
+	        int i = 0;
+
+	        while ((line = br.readLine()) != null) {
+	        	if( i == 0) { //skip first line
+	        		i++;
+	        		continue;
+	        	}
+	        	String[] row = line.split("\\|");//[|]");
+	        	if( row.length < 6) {
+	        		continue;
+	        	}
+	            //System.out.println(line);
+	        	String[] ss = new String[]{
+	        			row[0],
+	        			row[1],
+	        			row[2],
+	        			row[3],
+	        			row[4],
+	        			row[5],
+	        			row[1]+row[2],
+	        			row[1]+row[2]+row[4],
+	        			row[2]+row[4],
+	        			row[1]+row[2]+row[4],
+	        	};
+	        	
+	        	v.add(ss);
+        		i++;
+	        }
+	    } catch (Exception mue) {
+	    	System.out.print(mue);
+	         mue.printStackTrace();
+	    }
+        try {
+            if (is != null) is.close();
+        } catch (IOException ioe) {
+            // nothing to see here
+        }
+
+	    return v;
+	}
+	public void trySetBasicColumns() {
+		String[] trys = new String[]{"POP18","VAP","VAP_TOTAL","POPULATION"};
+		for( int i = 0; i < trys.length; i++) {
+			if(((DefaultComboBoxModel)comboBoxPopulation.getModel()).getIndexOf(trys[i]) >= 0 ) {
+				System.out.println(" found "+trys[i]);
+				comboBoxPopulation.setSelectedItem(trys[i]);
+				setPopulationColumn(trys[i]);
+				break;
+			}
+		}
+		trys = new String[]{"COUNTY","COUNTY_NAM","COUNTY_NAME","COUNTYFP","COUNTYFP10"};
+		for( int i = 0; i < trys.length; i++) {
+			if(((DefaultComboBoxModel)srcomboBoxCountyColumn.getModel()).getIndexOf(trys[i]) >= 0 ) {
+				System.out.println(" found "+trys[i]);
+				srcomboBoxCountyColumn.setSelectedItem(trys[i]);
+				chckbxReduceSplits.setSelected(true);
+				break;
+			}
+		}
+		//comboBoxDistrictColumn.setSelectedItem("AR_RESULT");
+		//setDistrictColumn("AR_RESULT");
+	}
+
+
+	public void trySetGroupColumns() {
+		project.demographic_columns.clear();
+		project.election_columns.clear();
+		project.election_columns_2.clear();
+		project.election_columns_3.clear();
+		project.substitute_columns.clear();
+		project.demographic_columns.add("");
+
+		String[] headers = featureCollection.getHeaders();
+		String[] demo = new String[]{
+				"CTY_VAP_WHITE","CTY_VAP_BLACK","CTY_VAP_HISPANIC","CTY_VAP_ASIAN","CTY_VAP_INDIAN","CTY_VAP_OTHER",
+				"VAP_WHITE","VAP_BLACK","VAP_HISPANIC","VAP_ASIAN","VAP_INDIAN","VAP_OTHER",
+				};
+		String[] elect = new String[]{
+				"CTY_PRES12_DEM","CTY_PRES12_REP",
+				"PRES12_DEM","PRES12_REP",
+				};
+
+		for( int i = 0; i < demo.length; i++) {
+			for( int j = 0; j < headers.length; j++) {
+				if( headers[j].equals(demo[i])) {
+					project.election_columns.add(demo[i]);
+				}
+			}
+		}
+
+		for( int i = 0; i < elect.length; i++) {
+			for( int j = 0; j < headers.length; j++) {
+				if( headers[j].equals(elect[i])) {
+					project.demographic_columns.add(elect[i]);
+				}
+			}
+		}
+
+		setDemographicColumns();
+		setElectionColumns();
+		setElectionColumns2();
+		setElectionColumns3();
+		setSubstituteColumns();
+	}
+
+
+
 	
 }

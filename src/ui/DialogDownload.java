@@ -21,7 +21,7 @@ public class DialogDownload extends JDialog {
 	public DialogDownload() {
 		setTitle("Download vtd shapefile & population");
 		initComponents();
-		int y = new Date().getYear()+1900;
+		int y = new Date().getYear()+1900-1;
 		int y10 = y - y % 10;
 		int y4 = y - y % 4;
 		String[] cyears = new String[]{""+y10,""+(y10-10)};

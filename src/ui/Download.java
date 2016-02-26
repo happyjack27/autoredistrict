@@ -3,7 +3,7 @@ package ui;
 import java.io.*;
 import java.net.*;
 import java.nio.channels.*;
-import java.util.Date;
+import java.util.*;
 import java.util.zip.*;
 
 import javax.swing.*;
@@ -32,6 +32,87 @@ public class Download extends Thread {
 	public static File census_pop_file = null;
 	public static File census_centroid_file = null;
 	public static File census_tract_file = null;
+	public static HashMap<String, String> state_to_abbr = null;
+	
+	public static void init() {
+		if( state_to_abbr != null) {
+			return;
+		}
+		state_to_abbr = new HashMap<String, String>();
+		state_to_abbr.put("Alabama","AL");
+		state_to_abbr.put("Alaska","AK");
+		state_to_abbr.put("Alberta","AB");
+		state_to_abbr.put("American Samoa","AS");
+		state_to_abbr.put("Arizona","AZ");
+		state_to_abbr.put("Arkansas","AR");
+		state_to_abbr.put("Armed Forces (AE)","AE");
+		state_to_abbr.put("Armed Forces Americas","AA");
+		state_to_abbr.put("Armed Forces Pacific","AP");
+		state_to_abbr.put("British Columbia","BC");
+		state_to_abbr.put("California","CA");
+		state_to_abbr.put("Colorado","CO");
+		state_to_abbr.put("Connecticut","CT");
+		state_to_abbr.put("Delaware","DE");
+		state_to_abbr.put("District Of Columbia","DC");
+		state_to_abbr.put("Florida","FL");
+		state_to_abbr.put("Georgia","GA");
+		state_to_abbr.put("Guam","GU");
+		state_to_abbr.put("Hawaii","HI");
+		state_to_abbr.put("Idaho","ID");
+		state_to_abbr.put("Illinois","IL");
+		state_to_abbr.put("Indiana","IN");
+		state_to_abbr.put("Iowa","IA");
+		state_to_abbr.put("Kansas","KS");
+		state_to_abbr.put("Kentucky","KY");
+		state_to_abbr.put("Louisiana","LA");
+		state_to_abbr.put("Maine","ME");
+		state_to_abbr.put("Manitoba","MB");
+		state_to_abbr.put("Maryland","MD");
+		state_to_abbr.put("Massachusetts","MA");
+		state_to_abbr.put("Michigan","MI");
+		state_to_abbr.put("Minnesota","MN");
+		state_to_abbr.put("Mississippi","MS");
+		state_to_abbr.put("Missouri","MO");
+		state_to_abbr.put("Montana","MT");
+		state_to_abbr.put("Nebraska","NE");
+		state_to_abbr.put("Nevada","NV");
+		state_to_abbr.put("New Brunswick","NB");
+		state_to_abbr.put("New Hampshire","NH");
+		state_to_abbr.put("New Jersey","NJ");
+		state_to_abbr.put("New Mexico","NM");
+		state_to_abbr.put("New York","NY");
+		state_to_abbr.put("Newfoundland","NF");
+		state_to_abbr.put("North Carolina","NC");
+		state_to_abbr.put("North Dakota","ND");
+		state_to_abbr.put("Northwest Territories","NT");
+		state_to_abbr.put("Nova Scotia","NS");
+		state_to_abbr.put("Nunavut","NU");
+		state_to_abbr.put("Ohio","OH");
+		state_to_abbr.put("Oklahoma","OK");
+		state_to_abbr.put("Ontario","ON");
+		state_to_abbr.put("Oregon","OR");
+		state_to_abbr.put("Pennsylvania","PA");
+		state_to_abbr.put("Prince Edward Island","PE");
+		state_to_abbr.put("Puerto Rico","PR");
+		state_to_abbr.put("Quebec","QC");
+		state_to_abbr.put("Rhode Island","RI");
+		state_to_abbr.put("Saskatchewan","SK");
+		state_to_abbr.put("South Carolina","SC");
+		state_to_abbr.put("South Dakota","SD");
+		state_to_abbr.put("Tennessee","TN");
+		state_to_abbr.put("Texas","TX");
+		state_to_abbr.put("Utah","UT");
+		state_to_abbr.put("Vermont","VT");
+		state_to_abbr.put("Virgin Islands","VI");
+		state_to_abbr.put("Virginia","VA");
+		state_to_abbr.put("Washington","WA");
+		state_to_abbr.put("West Virginia","WV");
+		state_to_abbr.put("Wisconsin","WI");
+		state_to_abbr.put("Wyoming","WY");
+		state_to_abbr.put("Yukon Territory","YT");
+
+	}
+
 	
 	public static void main(String[] args) {
 		System.out.println(census_pop_url(51,2010));
