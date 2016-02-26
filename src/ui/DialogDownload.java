@@ -37,11 +37,13 @@ public class DialogDownload extends JDialog {
 		comboBoxElectionYear.setSelectedIndex(0);
 		btnDownloadAll.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean confirm = JOptionPane.showConfirmDialog(null, "This will take a very long time.\nAre you sure?") == JOptionPane.YES_OPTION;
+				boolean confirm = JOptionPane.showConfirmDialog(null, "This isn't working yet.\nAre you sure?") == JOptionPane.YES_OPTION;
+				//boolean confirm = JOptionPane.showConfirmDialog(null, "This will take a very long time.\nAre you sure?") == JOptionPane.YES_OPTION;
 				if( !confirm) {
 					return;
 				}
 				all = true;
+				ok = true;
 				hide();
 				
 			}

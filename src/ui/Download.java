@@ -35,6 +35,8 @@ public class Download extends Thread {
 	public static File census_tract_file = null;
 	public static HashMap<String, String> state_to_abbr = null;
 	
+	public static boolean downloadAll = false;
+	
 	public static void init() {
 		if( state_to_abbr != null) {
 			return;

@@ -190,13 +190,51 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
     	
 	}
+	public void downloadNextState() {
+		try {
+			Download.istate++;
+			while( Download.istate < Download.states.length && Download.states[Download.istate].length() == 0) {
+				Download.istate++;
+			}		
+			System.out.println("downloadNextState run "+Download.istate+" "+Download.states[Download.istate]+"...");
+			//JOptionPane.showMessageDialog(null,"hi");
+			if( Download.istate >= Download.states.length ) {
+				Download.prompt = true;
+				Download.downloadAll = false;
+				JOptionPane.showMessageDialog(null, "Done downloading all states!");
+				return;
+			}
+	
+			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+			ImportCensus2Thread ir = new ImportCensus2Thread();
+			ImportTranslations it = new ImportTranslations();
+			ImportCountyLevel icl = new ImportCountyLevel();
+	
+			it.nextThread = icl;
+			ir.nextThread =  it;
+			ost.nextThread = ir;
+			Download.nextThread = ost;
+			
+			System.out.println("starting "+Download.states[Download.istate]+"...");
+			Download.downloadState(Download.istate,Download.cyear,Download.vyear);	
+			
+		} catch (Exception ex) {
+			System.out.println("ex in cyclehtread "+ex);
+			ex.printStackTrace();
+		}
+
+	}
+	
 	class CycleThread extends Thread {
 		public int cyear;
 		public int eyear;
 		int state = 0;
 		
 		public void run() {
-			if( state >+ Download.states.length ) {
+			try {
+			System.out.println("CycleThread run "+state+" "+Download.states[state]+"...");
+			//JOptionPane.showMessageDialog(null,"hi");
+			if( state >= Download.states.length ) {
 				Download.prompt = true;
 				JOptionPane.showMessageDialog(null, "Done downloading all states!");
 				return;
@@ -205,19 +243,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			while( next_state < Download.states.length && Download.states[next_state].length() == 0) {
 				next_state++;
 			}
-			CycleThread ct = new CycleThread();
-			ct.cyear = cyear;
-			ct.eyear = eyear;
-			ct.state = next_state;		
 			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 			ImportCensus2Thread ir = new ImportCensus2Thread();
 			ImportTranslations it = new ImportTranslations();
 			ImportCountyLevel icl = new ImportCountyLevel();
+			CycleThread ct = new CycleThread();
+			ct.cyear = cyear;
+			ct.eyear = eyear;
+			ct.state = next_state;		
+			if( ct == null) {
+				JOptionPane.showMessageDialog(null,"ct is null!");
+			}
 			icl.nextThread = ct;
 			it.nextThread = icl;
 			ir.nextThread =  it;
 			ost.nextThread = ir;
+			Download.nextThread = ost;
+
+			System.out.println("starting "+Download.states[state]+"...");
 			Download.downloadState(state,cyear,eyear);	
+			
+			} catch (Exception ex) {
+				System.out.println("ex in cyclehtread "+ex);
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -1152,7 +1201,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    setPopulationColumn("POPULATION");
     		
     		dlg.setVisible(false);
-    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+    		if( Download.prompt) {
+    			JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+    		}
     	}
 	}
 
@@ -1353,7 +1404,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    setPopulationColumn("POPULATION");
 	    		
 	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+	    		if( Download.prompt) {
+	    			JOptionPane.showMessageDialog(mainframe,"Done importing census data.\nHits: "+hits+"\nMisses: "+misses);
+	    		}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -2012,10 +2065,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ImportCountyLevel extends Thread {
-		Thread nextThread = null;
+		public Thread nextThread;
 		public void run() {
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
 			System.out.println("import county level start");
-			String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
+			//String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
+			String path = "http://autoredistrict.org/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
 			System.out.println("url: "+path);
 	    	System.out.println("0");
 		    URL url;
@@ -2035,7 +2093,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		        is = url.openStream();  // throws an IOException
 		    	System.out.println("3");
 		        br = new BufferedReader(new InputStreamReader(is));
-		    	System.out.println("4");
+		    	System.out.println("4..");
 
 		        while ((line = br.readLine()) != null) {
 			    	System.out.print(".");
@@ -2055,16 +2113,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	        } catch (IOException ioe) {
 	            // nothing to see here
 	        }
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+			System.out.println("5..");
+			
 	        String[] headers = v.remove(0);
 			//todo: populate v with the data.
-			String county_column = "COUNTY_NAME";
+			String county_column = "COUNTY_NAM";
+			String county_column2 = "COUNTY_NAME";
 			int iCountyColumn = 0;
 			
 			//collect counties;
 			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
 			HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
 			for( Feature feat : featureCollection.features) {
+				try {
 				String county = (String) feat.properties.get(county_column);
+				if(county == null) {
+					county = (String) feat.properties.get(county_column2);	
+				}
 				county = county.trim().toUpperCase();
 				
 				Vector<Feature> vf = county_feats.get(county);
@@ -2084,10 +2152,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				i += feat.properties.POPULATION;
 				county_pops.put(county,i);
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
 			}
 			
 			//now deaggregate proportional
 			System.out.println("deaggregating proportional...");
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
 
 			for( String[] ss : v) {
 				try {
@@ -2125,15 +2200,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			
-			
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
 			
 			System.out.println("setting columns final...");
 			trySetBasicColumns();
 			trySetGroupColumns();
 			System.out.println("done county data merge");
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
 			saveData(Download.vtd_dbf_file, 2,false);
+			System.out.println("done save "+nextThread);
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
 			if( Download.prompt) {
 				JOptionPane.showMessageDialog(null, "Import complete.");
+			}
+			if( Download.downloadAll) {
+				downloadNextState();
+				
 			}
 			if( nextThread != null) {
 				nextThread.start();
@@ -4116,30 +4207,34 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				it.nextThread = new ImportCountyLevel();
 				ir.nextThread =  it;
 				ost.nextThread = ir;
-				//if( Download.census_merge_working) {
-					//if( Download.census_merge_old) {
-					//} else {
-					//	ost.nextThread = new ImportGazzeterThread(); 
-					//}
-				//}
 				Download.nextThread = ost;
 				Download.prompt = true;
 				DialogDownload dd = new DialogDownload();
 				dd.show();
+				System.out.println("dd hidden "+dd.ok+" "+dd.all);
 				if( dd.ok && dd.all) {
-					Download.prompt = false;
+					System.out.println("download all");
+					//JOptionPane.showMessageDialog(null,"hi");
 
+					Download.prompt = false;
+					Download.downloadAll = true;
 					
+					Download.istate = 0;
+					Download.cyear = Integer.parseInt((String)dd.comboBoxCensusYear.getSelectedItem());
+					Download.vyear = Integer.parseInt((String)dd.comboBoxElectionYear.getSelectedItem());
+					downloadNextState();
+					/*
 					CycleThread ct = new CycleThread();
-					ct.start();
 					ct.cyear = Integer.parseInt((String)dd.comboBoxCensusYear.getSelectedItem());
 					ct.eyear = Integer.parseInt((String)dd.comboBoxElectionYear.getSelectedItem());
-					ct.state = 0;
+					ct.state = 1;
+					ct.start();
+					*/
 				}
 				//!Download.downloadData(dlg, dlbl))
 			}
 		});
-		
+
 		mnFile.add(mntmWizard);
 		
 		mntmHarvardElectionData = new JMenuItem("Harvard Election Data Archive...");
