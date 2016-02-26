@@ -2222,6 +2222,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( Download.prompt) {
 				JOptionPane.showMessageDialog(null, "Import complete.");
 			}
+			if( Download.exit_when_done) {
+				System.exit(0);
+			}
 			if( Download.downloadAll) {
 				downloadNextState();
 				

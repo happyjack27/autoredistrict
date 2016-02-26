@@ -409,6 +409,7 @@ public class Download extends Thread {
 
 			};
 	public static boolean prompt = true;
+	public static boolean exit_when_done = false;
 	
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
 		System.out.println("downloading:");

@@ -89,6 +89,7 @@ add selection mode: tournament (will have to add slider to that then)
  */
 
 public class Applet extends JApplet {
+	public static MainFrame mainFrame = null;
 	public static boolean no_gui = false;
 	public static String open_project = null;
 	
@@ -105,6 +106,16 @@ public class Applet extends JApplet {
     		}
     	}
 		new Applet();
+		if( args.length > 1 && args[0].equals("download")) {
+			Download.exit_when_done = true;
+			Download.cyear=2010;
+			Download.vyear=2012;
+			Download.istate = Integer.parseInt(args[1]);
+			if( Download.states[Download.istate].length() == 0) {
+				System.exit(0);
+			}
+			mainFrame.downloadNextState();
+		}
 	}
     public Applet() {
     	
@@ -132,7 +143,7 @@ public class Applet extends JApplet {
     	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.55));
 
 
-    	MainFrame mainFrame = new MainFrame();
+    	mainFrame = new MainFrame();
     	if( !no_gui) {
     		mainFrame.show();
     	}
