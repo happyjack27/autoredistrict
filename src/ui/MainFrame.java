@@ -2054,7 +2054,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			
 			//now deaggregate proportional
+			System.out.println("deaggregating proportional...");
+
 			for( String[] ss : v) {
+				try {
 				String incounty = ss[iCountyColumn].trim().toUpperCase();
 				Vector<Feature> vf = county_feats.get(incounty);
 				if( vf == null) {
@@ -2083,13 +2086,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						feat.properties.put(headers[i], ""+(dd[i]*feat_pop/total_pop));
 					}
 				}
+				} catch (Exception ex) {
+					System.out.println("ex: "+ex);
+					ex.printStackTrace();
+				}
 			}
 			
 			
 			
+			System.out.println("setting columns final...");
 			trySetBasicColumns();
 			trySetGroupColumns();
 			System.out.println("done county data merge");
+			JOptionPane.showMessageDialog(null, "Import complete");
 			if( nextThread != null) {
 				nextThread.start();
 				nextThread = null;
@@ -6253,18 +6262,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				"PRES12_DEM","PRES12_REP",
 				};
 
-		for( int i = 0; i < demo.length; i++) {
+		for( int i = 0; i < elect.length; i++) {
 			for( int j = 0; j < headers.length; j++) {
-				if( headers[j].equals(demo[i])) {
-					project.election_columns.add(demo[i]);
+				if( headers[j].equals(elect[i])) {
+					project.election_columns.add(elect[i]);
 				}
 			}
 		}
 
-		for( int i = 0; i < elect.length; i++) {
+		for( int i = 0; i < demo.length; i++) {
 			for( int j = 0; j < headers.length; j++) {
-				if( headers[j].equals(elect[i])) {
-					project.demographic_columns.add(elect[i]);
+				if( headers[j].equals(demo[i])) {
+					project.demographic_columns.add(demo[i]);
 				}
 			}
 		}
