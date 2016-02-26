@@ -5608,9 +5608,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_5.add(srlblCountyColumn);
 		
 		chckbxReduceSplits = new JCheckBox("Reduce splits");
-		chckbxReduceSplits.setFont(new Font("Tahoma", Font.BOLD, 14));
-		chckbxReduceSplits.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		chckbxReduceSplits.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
 				if( false) {
 					JOptionPane.showMessageDialog(null, ""
 							+"\nNot implemented."
@@ -5645,6 +5644,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				srcomboBoxCountyColumn.setEnabled(Settings.reduce_splits);
 				srlblMuniColumn.setEnabled(Settings.reduce_splits);
 				srcomboBoxMuniColumn.setEnabled(Settings.reduce_splits);
+			}
+		});
+		chckbxReduceSplits.setFont(new Font("Tahoma", Font.BOLD, 14));
+		chckbxReduceSplits.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
 			}
 		});
 		chckbxReduceSplits.setBounds(6, 7, 176, 23);
@@ -6236,6 +6240,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println(" found "+trys[i]);
 				srcomboBoxCountyColumn.setSelectedItem(trys[i]);
 				chckbxReduceSplits.setSelected(true);
+				//chckbxReduceSplits.postEvent(new ActionEvent(null, 0, ""));
 				break;
 			}
 		}
