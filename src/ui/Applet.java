@@ -209,6 +209,7 @@ public class Applet extends JApplet {
 			Download.istate = Integer.parseInt(args[1]);
 			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_centroids"));
 			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_pop"));
+			deleteRecursive(new File(Download.getStartPath()+File.separator+"2012"+File.separator+"vtds.zip"));
 			System.exit(0);
 		}
 		new Applet();
