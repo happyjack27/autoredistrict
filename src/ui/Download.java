@@ -353,7 +353,7 @@ public class Download extends Thread {
 			"Colorado",
 			"Connecticut",
 			"Delaware",
-			"District of Columbia",
+			"",//District of Columbia",
 			"Florida",
 			"Georgia",
 			"",
@@ -420,9 +420,25 @@ public class Download extends Thread {
 		File f = new File(dest_path);
 		if( !f.exists()) { f.mkdirs(); }
 
-		URL website = new URL(url);
-		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-		FileOutputStream fos = new FileOutputStream(dest_path+dest_name);
+		URL website;
+		ReadableByteChannel rbc;
+		FileOutputStream fos = null;
+		try {
+			website = new URL(url);
+			rbc = Channels.newChannel(website.openStream());
+			fos = new FileOutputStream(dest_path+dest_name);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			try {
+				website = new URL(url);
+				rbc = Channels.newChannel(website.openStream());
+				fos = new FileOutputStream(dest_path+dest_name);
+			} catch (Exception ex2) {
+				ex2.printStackTrace();
+				System.out.println("failed to open get site "+url);
+				return false;
+			}
+		}
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 
 		return true;

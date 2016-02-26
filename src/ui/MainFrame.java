@@ -3548,7 +3548,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Object[] oo = new Object[data[i].length];
 			for( int j = 0; j < fields.length; j++) {
 				if( fields[j].getType() == 'N') {
-					oo[j] = Double.parseDouble(data[i][j]);
+					if(  data[i][j] == null) {
+						oo[j] = null;
+					} else {
+						try {
+							oo[j] = Double.parseDouble(data[i][j]);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+							oo[j] = data[i][j];
+						}
+					}
 				} else {
 					oo[j] = data[i][j];
 				}

@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 
@@ -87,14 +88,88 @@ add selection mode: tournament (will have to add slider to that then)
  * add option to lock together a set of districts together (under constraints)
  * 
  */
+/* ----
+ * 
+ * ADDD: CLEAN, DELETE, LOAD, SET, RUN
+ * 
+ * FAILED: CALIFORNIA, ONE OTHER MODE BEFORE IT, HAWAII, DISTRICT OF COLUMBIA, KENTUCKY
+ * 
+ * ownloadNextState run 21 Kentucky...
+ * RAN OUT OF SPACE AT KENTUCKY
+starting Kentucky...
+Downloading vtd shapfile...
+downloading:
+url :http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+path:/Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/
+file:vtds.zip
+ex java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:424)
+	at ui.Download.run(Download.java:230)
 
+ * 
+ * Exception in thread "Thread-3" java.lang.NumberFormatException: For input string: "<null>"
+	at sun.misc.FloatingDecimal.readJavaFormatString(FloatingDecimal.java:2043)
+	at sun.misc.FloatingDecimal.parseDouble(FloatingDecimal.java:110)
+	at java.lang.Double.parseDouble(Double.java:538)
+	at ui.MainFrame.writeDBF(MainFrame.java:3551)
+	at ui.MainFrame.saveData(MainFrame.java:6262)
+	at ui.MainFrame$ImportCountyLevel.run(MainFrame.java:2216)
+
+
+ * 
+ * 
+ * 	at ui.MainFrame$ImportCensus2Thread.run(MainFrame.java:1415)
+state_abbr: |AZ|
+java.net.SocketException: Unexpected end of file from serverjava.net.SocketException: Unexpected end of file from server
+	at sun.net.www.http.HttpClient.parseHTTPHeader(HttpClient.java:792)
+	at sun.net.www.http.HttpClient.parseHTTP(HttpClient.java:647)
+	at sun.net.www.http.HttpClient.parseHTTP(HttpClient.java:675)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1535)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.MainFrame.processVTDrenameFile(MainFrame.java:6329)
+	at ui.MainFrame$ImportTranslations.run(MainFrame.java:2039)
+
+port county level start
+url: http://autoredistrict.org/county_level_stats/Merged%20--%20District of Columbia.txt
+0
+0.0
+0.1
+1
+2
+ex java.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/Merged%20--%20District of Columbia.txtjava.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/Merged%20--%20District of Columbia.txt
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.MainFrame$ImportCountyLevel.run(MainFrame.java:2093)
+5..
+Exception in thread "Thread-3" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 0
+	at java.util.Vector.remove(Vector.java:831)
+	at ui.MainFrame$ImportCountyLevel.run(MainFrame.java:2121)
+
+
+ * 
+ */
 public class Applet extends JApplet {
 	public static MainFrame mainFrame = null;
 	public static boolean no_gui = false;
 	public static String open_project = null;
 	
     public static void main( String[] args ) {
+    	if( false) {
+	    	for( int i = 0; i < Download.states.length; i++) {
+	    		System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar download "+i);
+	    		System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i);
+	    	}
+			System.exit(0);
+    	}
+		
     	for( int i = 0; i < args.length; i++) {
+    		System.out.println("arg: "+args[i]);
     		String arg = args[i];
     		if( arg.contains("nogui") || arg.contains("headless")) {
     			no_gui = true;
@@ -105,18 +180,48 @@ public class Applet extends JApplet {
     			}
     		}
     	}
-		new Applet();
 		if( args.length > 1 && args[0].equals("download")) {
 			Download.exit_when_done = true;
+			Download.prompt = false;
 			Download.cyear=2010;
 			Download.vyear=2012;
 			Download.istate = Integer.parseInt(args[1]);
 			if( Download.states[Download.istate].length() == 0) {
 				System.exit(0);
 			}
+			new Applet();
 			mainFrame.downloadNextState();
+		} else
+		if( args.length > 1 && args[0].equals("delete")) {
+			Download.exit_when_done = true;
+			Download.prompt = false;
+			Download.cyear=2010;
+			Download.vyear=2012;
+			Download.istate = Integer.parseInt(args[1]);
+			deleteRecursive(new File(Download.getStartPath()));
+			System.exit(0);
+		} else 
+		if( args.length > 1 && args[0].equals("clean")) {
+			Download.exit_when_done = true;
+			Download.prompt = false;
+			Download.cyear=2010;
+			Download.vyear=2012;
+			Download.istate = Integer.parseInt(args[1]);
+			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_centroids"));
+			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_pop"));
+			System.exit(0);
 		}
+		new Applet();
 	}
+	public static void deleteRecursive(File f)  {
+		System.out.println("deleting "+f.getAbsolutePath());
+	  if (f.isDirectory()) {
+	    for (File c : f.listFiles())
+	      deleteRecursive(c);
+	  }
+	  f.delete();
+	}
+
     public Applet() {
     	
     	String version = System.getProperty("java.version");
