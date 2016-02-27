@@ -102,15 +102,13 @@ public class InstructionProcessor implements iDiscreteEventListener {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
-			Applet.deleteRecursive(new File(Download.getStartPath()));
+			Download.delete();
 		} else 
 		if( command.equals("CLEAN")) {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
-			Applet.deleteRecursive(new File(Download.getStartPath()+File.separator+"block_centroids"));
-			Applet.deleteRecursive(new File(Download.getStartPath()+File.separator+"block_pop"));
-			Applet.deleteRecursive(new File(Download.getStartPath()+File.separator+"2012"+File.separator+"vtd"+File.separator+"vtds.zip"));
+			Download.clean();
 		} else
 
 		//instruction select statement

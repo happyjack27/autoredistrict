@@ -2208,6 +2208,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
+			Download.makeDoneFile();
 
 			
 			System.out.println("setting columns final...");

@@ -6,6 +6,11 @@ import java.util.*;
 
 import javax.swing.*;
 
+import ui.MainFrame.ImportCensus2Thread;
+import ui.MainFrame.ImportCountyLevel;
+import ui.MainFrame.ImportTranslations;
+import ui.MainFrame.OpenShapeFileThread;
+
 public class DialogDownload extends JDialog {
 	JList<String> list = new JList<String>();
 	public boolean ok = false;
@@ -18,6 +23,12 @@ public class DialogDownload extends JDialog {
 	public JLabel lblSelectCensusYear;
 	public final JButton btnDownloadAll = new JButton("Download all");
 	//public String[] right_side = null;
+	
+	class EventThread extends Thread {
+		public void run() {
+			MainFrame.mainframe.ip.eventOccured();
+		}
+	}
 	
 	public DialogDownload() {
 		setTitle("Download vtd shapefile & population");
@@ -66,11 +77,20 @@ public class DialogDownload extends JDialog {
 				ok = true;
 				all = false;
 				hide();
-				JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
-				
-				Download.downloadState(
-						list.getSelectedIndex(), Integer.parseInt((String)comboBoxCensusYear.getSelectedItem()), Integer.parseInt((String)comboBoxElectionYear.getSelectedItem()) 
-						);
+				if( Download.prompt) {
+					JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
+				}
+				if( Download.checkForDoneFile()) {
+					System.out.println("found prepared data.  opening...");
+					OpenShapeFileThread ost = (OpenShapeFileThread) Download.nextThread;
+					Download.nextThread = null;
+					ost.nextThread = new EventThread();
+					ost.start();
+				} else {
+					Download.downloadState(
+							list.getSelectedIndex(), Integer.parseInt((String)comboBoxCensusYear.getSelectedItem()), Integer.parseInt((String)comboBoxElectionYear.getSelectedItem()) 
+							);
+				}
 			}
 		});
 		btnOk.setBounds(164, 349, 89, 23);

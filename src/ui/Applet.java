@@ -305,7 +305,7 @@ public class Applet extends JApplet {
 			Download.cyear=2010;
 			Download.vyear=2012;
 			Download.istate = Integer.parseInt(args[1]);
-			deleteRecursive(new File(Download.getStartPath()));
+			Download.delete();
 			System.exit(0);
 		} else 
 		if( args.length > 1 && args[0].equals("clean")) {
@@ -314,9 +314,7 @@ public class Applet extends JApplet {
 			Download.cyear=2010;
 			Download.vyear=2012;
 			Download.istate = Integer.parseInt(args[1]);
-			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_centroids"));
-			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_pop"));
-			deleteRecursive(new File(Download.getStartPath()+File.separator+"2012"+File.separator+"vtd"+File.separator+"vtds.zip"));
+			Download.clean();
 			System.exit(0);
 		} else {
 			new Applet();

@@ -517,4 +517,27 @@ public class Download extends Thread {
         }
         bos.close();
     }
+	public static void delete() {
+		Applet.deleteRecursive(new File(getStartPath()));
+	}
+	public static void clean() {
+		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_centroids"));
+		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_pop"));
+		Applet.deleteRecursive(new File(getStartPath()+File.separator+vyear+File.separator+"vtd"+File.separator+"vtds.zip"));
+	}
+	public static boolean checkForDoneFile() {
+		return new File(getStartPath()+File.separator+vyear+File.separator+"done.txt").exists();
+	}
+	public static void makeDoneFile() {
+		File f = new File(getStartPath()+File.separator+vyear+File.separator+"done.txt");
+		try {
+			FileOutputStream fos = new FileOutputStream(f);
+			fos.write("done".getBytes());
+			fos.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }
