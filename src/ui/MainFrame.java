@@ -3,6 +3,7 @@ package ui;
 import geography.*;
 import geography.Properties;
 import solutions.*;
+import util.Quadruplet;
 
 import java.awt.*;
 import java.awt.event.*;

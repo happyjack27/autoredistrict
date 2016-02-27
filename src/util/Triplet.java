@@ -1,4 +1,4 @@
-package solutions;
+package util;
 
 
 public class Triplet<T1, T2, T3> {

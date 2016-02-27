@@ -1,4 +1,4 @@
-package solutions;
+package util;
 
 
 public class Quadruplet<T1, T2, T3, T4> {

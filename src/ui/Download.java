@@ -8,7 +8,7 @@ import java.util.zip.*;
 
 import javax.swing.*;
 
-import solutions.BiMap;
+import util.BiMap;
 
 //http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
 //http://www.census.gov/geo/maps-data/data/baf_description.html description

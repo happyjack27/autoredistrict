@@ -12,8 +12,8 @@ import java.net.URI;
 
 import javax.swing.*;
 
-import solutions.Gaussian;
-import solutions.StaticFunctions;
+import util.Gaussian;
+import util.StaticFunctions;
 
 
 

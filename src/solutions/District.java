@@ -5,6 +5,7 @@ import java.util.*;
 
 import serialization.JSONObject;
 import ui.MainFrame;
+import util.Pair;
 
 public class District extends JSONObject {
     Vector<VTD> vtds = new Vector<VTD>();

@@ -1,6 +1,8 @@
-package solutions;
+package util;
 
 import java.util.*;
+
+import solutions.Vertex;
  
 public class ClosestPair
 {

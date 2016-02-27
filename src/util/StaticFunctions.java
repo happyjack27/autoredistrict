@@ -1,4 +1,6 @@
-package solutions;
+package util;
+
+import solutions.Settings;
 
 public class StaticFunctions {
     static int[] factorial_cache = null;

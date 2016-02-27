@@ -23,12 +23,12 @@ import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
 import solutions.Edge;
-import solutions.Quadruplet;
 import solutions.Settings;
 import solutions.Vertex;
 import solutions.VTD;
 import ui.MainFrame;
 import ui.MapPanel;
+import util.Quadruplet;
 
 public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};

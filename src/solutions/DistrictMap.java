@@ -18,6 +18,7 @@ package solutions;
 
 import geography.*;
 import ui.MainFrame;
+import util.PermIterator;
 
 import java.awt.Color;
 import java.util.*;

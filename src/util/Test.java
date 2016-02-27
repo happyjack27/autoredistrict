@@ -1,4 +1,4 @@
-package solutions;
+package util;
 
 import serialization.ReflectionJSONObject;
 import ui.Applet;
