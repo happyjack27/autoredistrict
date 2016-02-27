@@ -8,6 +8,8 @@ import java.util.zip.*;
 
 import javax.swing.*;
 
+import solutions.BiMap;
+
 //http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
 //http://www.census.gov/geo/maps-data/data/baf_description.html description
 //http://www.census.gov/geo/maps-data/data/gazetteer2010.html try using these to get population data
@@ -33,7 +35,8 @@ public class Download extends Thread {
 	public static File census_pop_file = null;
 	public static File census_centroid_file = null;
 	public static File census_tract_file = null;
-	public static HashMap<String, String> state_to_abbr = null;
+	public static BiMap<String, String> state_to_abbr = null;
+	public static BiMap<String, Integer> state_to_fips = null;
 	
 	public static boolean downloadAll = false;
 	
@@ -41,7 +44,11 @@ public class Download extends Thread {
 		if( state_to_abbr != null) {
 			return;
 		}
-		state_to_abbr = new HashMap<String, String>();
+		state_to_fips = new BiMap<String, Integer>();
+		for( int i = 0; i < states.length; i++) {
+			state_to_fips.put(states[i], i);
+		}
+		state_to_abbr = new BiMap<String, String>();
 		state_to_abbr.put("Alabama","AL");
 		state_to_abbr.put("Alaska","AK");
 		state_to_abbr.put("Alberta","AB");
@@ -412,6 +419,7 @@ public class Download extends Thread {
 	public static boolean exit_when_done = false;
 	
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
+		try {
 		System.out.println("downloading:");
 		System.out.println("url :"+url);
 		System.out.println("path:"+dest_path);
@@ -428,6 +436,7 @@ public class Download extends Thread {
 			rbc = Channels.newChannel(website.openStream());
 			fos = new FileOutputStream(dest_path+dest_name);
 		} catch (Exception ex) {
+			System.out.println("ex on download1, retrying: "+ex);
 			ex.printStackTrace();
 			try {
 				website = new URL(url);
@@ -435,11 +444,19 @@ public class Download extends Thread {
 				fos = new FileOutputStream(dest_path+dest_name);
 			} catch (Exception ex2) {
 				ex2.printStackTrace();
-				System.out.println("failed to open get site "+url);
+				System.out.println("ex on download2: failed to open site "+ex);
+				System.out.println(url);
 				return false;
 			}
 		}
 		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+		fos.flush();
+		fos.close();
+		rbc.close();
+		} catch (Exception ex) {
+			System.out.println("ex on download: "+ex);
+			ex.printStackTrace();
+		}
 
 		return true;
 	}
@@ -456,28 +473,34 @@ public class Download extends Thread {
      * @throws IOException
      */
     public static void unzip(String zipFilePath, String destDirectory) throws IOException {
-    	System.out.println("unzipping "+zipFilePath);
-        File destDir = new File(destDirectory);
-        if (!destDir.exists()) {
-            destDir.mkdir();
-        }
-        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-        ZipEntry entry = zipIn.getNextEntry();
-        // iterates over entries in the zip file
-        while (entry != null) {
-            String filePath = destDirectory + File.separator + entry.getName();
-            if (!entry.isDirectory()) {
-                // if the entry is a file, extracts it
-                extractFile(zipIn, filePath);
-            } else {
-                // if the entry is a directory, make the directory
-                File dir = new File(filePath);
-                dir.mkdir();
-            }
-            zipIn.closeEntry();
-            entry = zipIn.getNextEntry();
-        }
-        zipIn.close();
+    	try {
+	    	System.out.println("unzipping "+zipFilePath);
+	        File destDir = new File(destDirectory);
+	        if (!destDir.exists()) {
+	            destDir.mkdir();
+	        }
+	        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
+	        ZipEntry entry = zipIn.getNextEntry();
+	        // iterates over entries in the zip file
+	        while (entry != null) {
+	            String filePath = destDirectory + File.separator + entry.getName();
+	            if (!entry.isDirectory()) {
+	                // if the entry is a file, extracts it
+	            	System.out.println("extracting "+filePath+"...");
+	                extractFile(zipIn, filePath);
+	            } else {
+	                // if the entry is a directory, make the directory
+	                File dir = new File(filePath);
+	                dir.mkdir();
+	            }
+	            zipIn.closeEntry();
+	            entry = zipIn.getNextEntry();
+	        }
+	        zipIn.close();
+	    } catch (Exception ex) {
+	    	System.out.println("unzip fail!! "+ex);
+	    	ex.printStackTrace();
+	    }
     }
     /**
      * Extracts a zip entry (file entry)
@@ -494,5 +517,4 @@ public class Download extends Thread {
         }
         bos.close();
     }
-
 }

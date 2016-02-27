@@ -45,6 +45,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelSeats seatsPanel = new PanelSeats();
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
+	public InstructionProcessor ip = new InstructionProcessor();
 	
 	public ButtonGroup seatsModeBG = new ButtonGroup();
 	 
@@ -55,6 +56,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public FeatureCollection featureCollection = new FeatureCollection();
 	public Project project = new Project();
 	public DemographicSet activeDemographicSet = new DemographicSet();
+	public JRadioButton lblMembersPerDistrict;
 
 	
 	//========PRIMITIVES
@@ -1991,15 +1993,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					featureCollection.features.add(fe);
 				}
 				finishLoadingGeography();
-				if( nextThread != null) {
-					nextThread.start();
-					nextThread = null;
-				}
 				if( Download.istate < 0) {
 					setTitle("Automatic Redistricter");
 				} else {
 					setTitle("Automatic Redistricter - "+Download.states[Download.istate]+" ("+Download.cyear+")");
 				}
+				if( nextThread != null) {
+					nextThread.start();
+					nextThread = null;
+				} else {
+					ip.eventOccured();
+				}
+
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -2229,6 +2234,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				downloadNextState();
 				
 			}
+			ip.eventOccured();
 			if( nextThread != null) {
 				nextThread.start();
 				nextThread = null;
@@ -3889,6 +3895,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	public MainFrame() {
+		mainframe = this;
+		ip.mainFrame = this;
 
 		String className = getLookAndFeelClassName("Nimbus");
 		try {
@@ -3898,7 +3906,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			e1.printStackTrace();
 		} 
 
-		mainframe = this;
 		jbInit();
 		chckbxmntmHideMapLines.setSelected(true);
 		Feature.draw_lines = chckbxmntmHideMapLines.isSelected();
@@ -5480,7 +5487,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		textFieldSeatsPerDistrict.setBounds(132, 106, 52, 28);
 		panel.add(textFieldSeatsPerDistrict);
 		
-		JRadioButton lblMembersPerDistrict = new JRadioButton("Seats/district");
+		lblMembersPerDistrict = new JRadioButton("Seats/district");
 		lblMembersPerDistrict.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setSeatsMode();

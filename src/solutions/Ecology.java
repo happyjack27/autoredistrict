@@ -117,6 +117,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		}
 
     		while( !evolve_paused) {
+    			MainFrame.mainframe.ip.eventOccured();
     			try {
     				//System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
     				//System.out.println("population.size() "+population.size()+" Settings.population "+Settings.population);

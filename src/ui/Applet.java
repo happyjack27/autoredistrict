@@ -2,7 +2,12 @@ package ui;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 
 import javax.swing.*;
@@ -12,6 +17,105 @@ import solutions.StaticFunctions;
 
 
 
+/*
+ * failed: california,kentucky,louisianna,maine, massachtuses, michigan, minnesota
+ * 
+ * corrrupt vtd.zip download
+ * 
+ * vtds.zip: Zip archive data, at least v2.0 to extract
+Jims-MacBook-Air:vtd jimbrill$ unzip vtds.zip 
+Archive:  vtds.zip
+  End-of-central-directory signature not found.  Either this file is not
+  a zipfile, or it constitutes one disk of a multi-part archive.  In the
+  latter case the central directory and zipfile comment will be found on
+  the last disk(s) of this archive.
+unzip:  cannot find zipfile directory in one of vtds.zip or
+        vtds.zip.zip, and cannot find vtds.zip.ZIP, period.
+
+ * 
+ * Processing tl_2012_25_vtd10.shp...
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Massachusetts/2010/2012/vtd/tl_2012_25_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at ui.MainFrame.getFile(MainFrame.java:6132)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1975)
+exception in processing shapefile: java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Massachusetts/2010/2012/vtd/tl_2012_25_vtd10.shp (No such file or directory)
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Massachusetts/2010/2012/vtd/tl_2012_25_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at ui.MainFrame.loadShapeFile(MainFrame.java:3626)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1987)
+0 precincts loaded.
+
+ * 
+ * Starting next thread.
+Processing tl_2012_23_vtd10.shp...
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Maine/2010/2012/vtd/tl_2012_23_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at ui.MainFrame.getFile(MainFrame.java:6132)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1975)
+exception in processing shapefile: java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Maine/2010/2012/vtd/tl_2012_23_vtd10.shp (No such file or directory)
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Maine/2010/2012/vtd/tl_2012_23_vtd10.shp (No such file or directory)
+
+ * Processing tl_2012_22_vtd10.shp...
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Louisiana/2010/2012/vtd/tl_2012_22_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at ui.MainFrame.getFile(MainFrame.java:6132)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1975)
+exception in processing shapefile: java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Louisiana/2010/2012/vtd/tl_2012_22_vtd10.shp (No such file or directory)
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Louisiana/2010/2012/vtd/tl_2012_22_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at ui.MainFrame.loadShapeFile(MainFrame.java:3626)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1987)
+0 precincts loaded.
+
+ * 
+ * downloading:
+url :http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+path:/Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/
+file:vtds.zip
+no history found! []
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:428)
+	at ui.Download.run(Download.java:230)
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:434)
+	at ui.Download.run(Download.java:230)
+failed to open get site http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+unzipping /Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/vtds.zip
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/vtds.zip (No such file or directory)
+
+
+
+SKIPPED: ARIZONA
+
+Processing tl_2012_04_vtd10.shp...
+Exception in thread "Thread-0" java.lang.NoClassDefFoundError: org/nocrala/tools/gis/data/esri/shapefile/ValidationPreferences
+	at ui.MainFrame.loadShapeFile(MainFrame.java:3627)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1987)
+Caused by: java.lang.ClassNotFoundException: org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	... 2 more
+
+
+*/
 /*
 TOP PRIOIRTY TODO: multi-member isn't counting wasted votes right.  should look at how they'd be assigned if there were no wasted votes, and then take the difference, and then total the positive ones.		
 */
@@ -158,8 +262,10 @@ public class Applet extends JApplet {
 	public static MainFrame mainFrame = null;
 	public static boolean no_gui = false;
 	public static String open_project = null;
+	public static String[] args = null;
 	
-    public static void main( String[] args ) {
+    public static void main( String[] _args ) {
+    	args = _args;
     	if( false) {
 	    	for( int i = 0; i < Download.states.length; i++) {
 	    		System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar download "+i);
@@ -180,7 +286,9 @@ public class Applet extends JApplet {
     			}
     		}
     	}
+    	
 		if( args.length > 1 && args[0].equals("download")) {
+			new Applet();
 			Download.exit_when_done = true;
 			Download.prompt = false;
 			Download.cyear=2010;
@@ -189,7 +297,6 @@ public class Applet extends JApplet {
 			if( Download.states[Download.istate].length() == 0) {
 				System.exit(0);
 			}
-			new Applet();
 			mainFrame.downloadNextState();
 		} else
 		if( args.length > 1 && args[0].equals("delete")) {
@@ -209,10 +316,11 @@ public class Applet extends JApplet {
 			Download.istate = Integer.parseInt(args[1]);
 			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_centroids"));
 			deleteRecursive(new File(Download.getStartPath()+File.separator+"block_pop"));
-			deleteRecursive(new File(Download.getStartPath()+File.separator+"2012"+File.separator+"vtds.zip"));
+			deleteRecursive(new File(Download.getStartPath()+File.separator+"2012"+File.separator+"vtd"+File.separator+"vtds.zip"));
 			System.exit(0);
+		} else {
+			new Applet();
 		}
-		new Applet();
 	}
 	public static void deleteRecursive(File f)  {
 		System.out.println("deleting "+f.getAbsolutePath());
@@ -250,6 +358,9 @@ public class Applet extends JApplet {
 
 
     	mainFrame = new MainFrame();
+    	if( args.length > 1 && args[0].equals("run")) {
+			mainFrame.ip.queueInstructionsFromFile(args[1]);
+    	}
     	if( !no_gui) {
     		mainFrame.show();
     	}
@@ -285,5 +396,18 @@ public class Applet extends JApplet {
             return Integer.signum(vals1.length - vals2.length);
         }
     }
+	public static String readStream(InputStream is) {
+	    StringBuilder sb = new StringBuilder(512);
+	    try {
+	        Reader r = new InputStreamReader(is, "UTF-8");
+	        int c = 0;
+	        while ((c = r.read()) != -1) {
+	            sb.append((char) c);
+	        }
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+	    return sb.toString();
+	}
 
 }
