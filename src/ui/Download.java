@@ -189,19 +189,37 @@ public class Download extends Thread {
 		} 
 		return true;
 	}
+	public static void initPaths() {
+		System.out.println("initing paths "+istate+" "+cyear+" "+vyear);
+		String path = getStartPath();
+		File f = new File(path);
+		if( !f.exists()) { f.mkdirs(); }
+
+		census_tract_path = path;
+		census_centroid_path = path+"block_centroids"+File.separator;
+		census_pop_path = path+"block_pop"+File.separator;
+		census_vtd_path = path+vyear+File.separator+"vtd"+File.separator;	
+		
+		census_centroid_file = new File(census_centroid_path+census_centroid_filename(istate,cyear));
+		census_pop_file = new File(census_pop_path+census_pop_filename(istate,cyear));
+		vtd_file = new File(census_vtd_path+census_vtd_filename(istate,cyear,vyear));
+		vtd_dbf_file = new File(census_vtd_path+census_vtd_dbf_filename(istate,cyear,vyear));
+		census_tract_file = new File(census_tract_path+census_tract_filename(istate,cyear));
+		System.out.println("vtd_file "+vtd_file);
+	}
 	public static boolean downloadState(int _state, int _census_year, int _election_year) {
 		istate = _state;
 		cyear = _census_year;
 		vyear = _election_year;
+		Download.init();
 
-		String path = getStartPath();
-		File f = new File(path);
-		if( !f.exists()) { f.mkdirs(); }
+		MainFrame.mainframe.ip.addHistory("DOWNLOAD "
+				+Download.state_to_abbr.get(Download.state_to_fips.getBackward(Download.istate))
+				+" "+Download.cyear+" "+Download.vyear);
+
+
+		initPaths();
 		
-		census_tract_path = path;
-		census_centroid_path = path+"block_centroids"+File.separator;
-		census_pop_path = path+"block_pop"+File.separator;
-		census_vtd_path = path+vyear+File.separator+"vtd"+File.separator;
 		
 		File ftest1 = new File(census_vtd_path+"vtds.zip");
 		File ftest2 = new File(census_pop_path+"block_pops.zip");
@@ -278,11 +296,7 @@ public class Download extends Thread {
 			return;
 		}
 		System.out.println("done extracting.");
-		census_centroid_file = new File(census_centroid_path+census_centroid_filename(istate,cyear));
-		census_pop_file = new File(census_pop_path+census_pop_filename(istate,cyear));
-		vtd_file = new File(census_vtd_path+census_vtd_filename(istate,cyear,vyear));
-		vtd_dbf_file = new File(census_vtd_path+census_vtd_dbf_filename(istate,cyear,vyear));
-		census_tract_file = new File(census_tract_path+census_tract_filename(istate,cyear));
+		initPaths();
 
 		if( MainFrame.dlg != null) { MainFrame.dlg.hide(); }
 		System.out.println("done extracting.");
@@ -535,10 +549,14 @@ public class Download extends Thread {
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+vyear+File.separator+"vtd"+File.separator+"vtds.zip"));
 	}
 	public static boolean checkForDoneFile() {
-		return new File(getStartPath()+File.separator+vyear+File.separator+"done.txt").exists();
+		String path = getStartPath()+vyear+File.separator+"done.txt";
+		System.out.println("checking for file "+path);
+		File f =  new File(path);
+		System.out.println("status: "+f.exists());
+		return f.exists();
 	}
 	public static void makeDoneFile() {
-		File f = new File(getStartPath()+File.separator+vyear+File.separator+"done.txt");
+		File f = new File(getStartPath()+vyear+File.separator+"done.txt");
 		try {
 			FileOutputStream fos = new FileOutputStream(f);
 			fos.write("done".getBytes());

@@ -40,6 +40,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		getContentPane().add(scrollPane);
 		
 		historyTA = new JTextArea();
+		historyTA.setFont(new Font("Courier New", Font.PLAIN, 8));
 		scrollPane.setViewportView(historyTA);
 		
 		scrollPane_1 = new JScrollPane();
@@ -47,6 +48,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		getContentPane().add(scrollPane_1);
 		
 		scriptTA = new JTextArea();
+		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 8));
 		scrollPane_1.setViewportView(scriptTA);
 		
 		btnLoad = new JButton("load");
@@ -114,6 +116,15 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		lblInstructions = new JLabel("Instructions");
 		lblInstructions.setBounds(226, 11, 118, 16);
 		getContentPane().add(lblInstructions);
+		
+		btnApplyChanges = new JButton("apply changes");
+		btnApplyChanges.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				resetInstructions();
+			}
+		});
+		btnApplyChanges.setBounds(300, 269, 134, 29);
+		getContentPane().add(btnApplyChanges);
 	}
 	/*
 	 * TODO: download,load
@@ -148,32 +159,64 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	 */
 	boolean indent = false;
+	public JButton btnApplyChanges;
 	public void addHistory( String s) {
-		if( mainFrame.evolving) {
-			s = ""
-					+"WHEN MUTATE_RATE "+Settings.mutation_rate
-					+"\n\t"+s;
+		String prefix = "";
+		if( mainFrame.evolving && !s.equals("GO")) {
+			prefix = ""
+					+"WHEN MUTATE_RATE "+Settings.mutation_boundary_rate+"\n";
 			indent = true;
+		}
+		
+		//if last line is same type of command, replace it instead of appending
+		
+		String hist = historyTA.getText();
+		String[] hist_lines = hist.split("\n");
+		String last_line = hist_lines[hist_lines.length-1].trim();
+		//System.out.println("checking for match - last_line: "+last_line+" new line: "+s); 
+		String[] last_words = last_line.split(" ");
+		String[] s_words =  s.split(" ");
+		//System.out.println("length "+last_words.length +" "+ s_words.length);
+		boolean match = true;
+		if( last_words.length != s_words.length) {
+			match = false;
 		} else {
-			if( indent) {
-				s = "\t"+s;
+			for( int i = 0; i < last_words.length - 1; i++) {
+				//System.out.println("comparing "+last_words[i]+" "+s_words[i]);
+				if( !last_words[i].equals(s_words[i])) {
+					match = false;
+					break;
+				}
 			}
 		}
-		/*
-		if( !s.contains("WHEN")) {
-			if( indent) {
-				s = "\t"+s;
-			}
+		//System.out.println(" matched? "+match);
+		StringBuffer sb = new StringBuffer();
+		if( !match) {
+			sb.append(hist);
 		} else {
-			indent = true;
-		}*/
-		StringBuffer sb = new StringBuffer(historyTA.getText());
-		sb.append(s+"\n");
-		historyTA.setText(sb.toString());
+			for( int i = 0; i < hist_lines.length-2; i++) {
+				sb.append(hist_lines[i]+"\n");
+			}
+			if( !hist_lines[hist_lines.length-2].contains("WHEN")) { //if second last line is a when, don't do that one either.
+				sb.append(hist_lines[hist_lines.length-2]+"\n");
+			}
+		}
+		
+		//now add it.
+		sb.append(prefix+(indent ? "\t" : "")+s+"\n");
+		historyTA.setText(sb.toString());			
+	}
+	public void resetInstructions() {
+		String[] new_instructions = scriptTA.getText().toString().split("\n");
+		instructions.clear();
+		for( int i = 0; i < new_instructions.length; i++) {
+			instructions.add(new_instructions[i]);
+		}
+		eventOccured();
 	}
 	
 	public void queueInstructions( String s) {
-		scriptTA.setText(s);
+		scriptTA.setText(scriptTA.getText().toString()+s);
 		String[] new_instructions = s.split("\n");
 		for( int i = 0; i < new_instructions.length; i++) {
 			instructions.add(new_instructions[i]);
@@ -183,6 +226,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	@Override
 	public void eventOccured() {
+		Download.init();
 		if( instruction_pointer >= instructions.size()) {
 			return;
 		}
@@ -200,7 +244,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			try {
 				istate = Integer.parseInt(instruction_words[1]);
 			} catch (Exception ex) {
-				istate = Download.state_to_fips.get(Download.state_to_abbr.getBackward(instruction_words[1]));
+				try { 
+					istate = Download.state_to_fips.get(Download.state_to_abbr.getBackward(instruction_words[1]));
+				} catch (Exception ex2) {
+				
+				}
 			}
 		}
 		
@@ -249,7 +297,21 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		//LOAD,SET,GO,STOP,WHEN,SAVE,EXPORT,EXIT
 		if(command.equals("EXIT")) {
 			System.exit(0);
-		} else			
+		} else		
+		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ELECTION")  && instruction_words[2].equals("COLUMNS")) {
+			mainFrame.project.election_columns.clear();
+			for( int i = 3; i < instruction_words.length; i++) {
+				mainFrame.project.election_columns.add(instruction_words[i]);
+			}
+			mainFrame.setElectionColumns();
+		} else 
+		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ETHNICITY")  && instruction_words[2].equals("COLUMNS")) {
+			mainFrame.project.demographic_columns.clear();
+			for( int i = 3; i < instruction_words.length; i++) {
+				mainFrame.project.demographic_columns.add(instruction_words[i]);
+			}
+			mainFrame.setDemographicColumns();
+		} else 
 		if(command.equals("SET")) {
 			if( instruction_words.length > 3) { 
 				set(instruction_words[1],instruction_words[2],instruction_words[3]);
@@ -257,12 +319,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if(command.equals("GO")) {
 			for(ActionListener a: mainFrame.goButton.getActionListeners()) {
-			    a.actionPerformed(new ActionEvent(null, 0, ""));
+			    a.actionPerformed(new ActionEvent(mainFrame.goButton, 0, ""));
 			}
 		} else
 		if(command.equals("STOP")) {
 			for(ActionListener a: mainFrame.stopButton.getActionListeners()) {
-			    a.actionPerformed(new ActionEvent(null, 0, ""));
+			    a.actionPerformed(new ActionEvent(mainFrame.stopButton, 0, ""));
 			}
 		} else
 		if(command.equals("SAVE")) {
@@ -270,13 +332,13 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if(command.equals("EXPORT")) {
 			for(ActionListener a: mainFrame.panelStats.btnNewButton.getActionListeners()) {
-			    a.actionPerformed(new ActionEvent(null, 0, ""));
+			    a.actionPerformed(new ActionEvent(mainFrame.panelStats.btnNewButton, 0, ""));
 			}
 		} else
 		if(command.equals("WHEN")) {
 			if( instruction_words[1].equals("MUTATE_RATE")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
-				double current_value = Settings.mutation_rate;
+				double current_value = Settings.mutation_boundary_rate;
 				if( threshold >= current_value) {
 					return;
 				}
@@ -301,7 +363,17 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			d = Double.parseDouble(value);
 			parsed = true;
 		} catch (Exception ex) { }
-
+		if( category.equals("POPULATION") && item.equals("COLUMN")) {
+			mainFrame.setPopulationColumn(value);
+		} else
+		if( category.equals("COUNTY") && item.equals("COLUMN")) {
+			mainFrame.project.county_column = value;
+			mainFrame.setCountyColumn();
+		} else
+		if( category.equals("MUNI") && item.equals("COLUMN")) {
+			mainFrame.project.muni_column = value;
+			mainFrame.setMuniColumn();
+		} else
 		if( category.equals("EVOLUTION")) {
 			if( parsed && item.equals("POPULATION")) { mainFrame.textField.setText(value); }
 			if( parsed && item.equals("MUTATE_RATE")) { mainFrame.slider_mutation.setValue((int)(d*100)); }

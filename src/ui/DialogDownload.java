@@ -21,7 +21,6 @@ public class DialogDownload extends JDialog {
 	public JComboBox comboBoxElectionYear;
 	public JLabel lblSelectElectionYear;
 	public JLabel lblSelectCensusYear;
-	public final JButton btnDownloadAll = new JButton("Download all");
 	//public String[] right_side = null;
 	
 	class EventThread extends Thread {
@@ -46,22 +45,6 @@ public class DialogDownload extends JDialog {
 		}
 		comboBoxCensusYear.setSelectedIndex(0);
 		comboBoxElectionYear.setSelectedIndex(0);
-		btnDownloadAll.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean confirm = JOptionPane.showConfirmDialog(null, "This isn't working yet.\nAre you sure?") == JOptionPane.YES_OPTION;
-				//boolean confirm = JOptionPane.showConfirmDialog(null, "This will take a very long time.\nAre you sure?") == JOptionPane.YES_OPTION;
-				if( !confirm) {
-					return;
-				}
-				all = true;
-				ok = true;
-				hide();
-				
-			}
-		});
-		btnDownloadAll.setBounds(164, 216, 144, 29);
-		
-		getContentPane().add(btnDownloadAll);
 	}
 	private void initComponents() {
 		setModal(true);
@@ -77,19 +60,22 @@ public class DialogDownload extends JDialog {
 				ok = true;
 				all = false;
 				hide();
-				MainFrame.mainframe.ip.addHistory("DOWNLOAD "
-						+Download.state_to_abbr.get(Download.state_to_fips.getBackward(Download.istate))
-						+" "+Download.cyear+" "+Download.vyear);
-				if( Download.prompt) {
-					JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
-				}
+				System.out.println("checking for done file...");
+				Download.istate = list.getSelectedIndex();
+				Download.cyear = Integer.parseInt((String)comboBoxCensusYear.getSelectedItem());
+				Download.vyear = Integer.parseInt((String)comboBoxElectionYear.getSelectedItem());
+				Download.initPaths();
 				if( Download.checkForDoneFile()) {
 					System.out.println("found prepared data.  opening...");
 					OpenShapeFileThread ost = (OpenShapeFileThread) Download.nextThread;
+					ost.f = Download.vtd_file;
 					Download.nextThread = null;
 					ost.nextThread = new EventThread();
 					ost.start();
 				} else {
+					if( Download.prompt) {
+						JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
+					}
 					Download.downloadState(
 							list.getSelectedIndex(), Integer.parseInt((String)comboBoxCensusYear.getSelectedItem()), Integer.parseInt((String)comboBoxElectionYear.getSelectedItem()) 
 							);

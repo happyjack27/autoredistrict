@@ -222,9 +222,11 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 
 	public static void setMutationRate(double i) {
 		Settings.mutation_boundary_rate = i;
+		hush_mutate_rate = true;
 		for (iChangeListener c : mutation_rateChangeListeners) {
 			c.valueChanged();
 		}
+		hush_mutate_rate = false;
 	}
 	public static int[] getSeatDistribution_cached = null;
 	public static int getSeatDistribution_last_seats = -1;
@@ -236,6 +238,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double elite_mutate_fraction = 1;
 	public static double exp_mutate_factor = 10.0;
 	public static boolean minimize_absolute_deviation = false;
+	public static boolean hush_mutate_rate = false;;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

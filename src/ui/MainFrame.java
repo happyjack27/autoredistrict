@@ -208,6 +208,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				return;
 			}
 	
+			Download.initPaths();
 			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 			ImportCensus2Thread ir = new ImportCensus2Thread();
 			ImportTranslations it = new ImportTranslations();
@@ -246,6 +247,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			while( next_state < Download.states.length && Download.states[next_state].length() == 0) {
 				next_state++;
 			}
+			Download.initPaths();
 			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 			ImportCensus2Thread ir = new ImportCensus2Thread();
 			ImportTranslations it = new ImportTranslations();
@@ -1957,7 +1959,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		OpenShapeFileThread(File f) { super(f);  }
 		Thread nextThread = null;
     	public void run() { 
-    		if( f == null) { this.f = Download.vtd_file; }
+    		if( f == null) { Download.initPaths(); this.f = Download.vtd_file; }
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
 
@@ -3078,6 +3080,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	public void setPopulationColumn(String pop_col) {
+		ip.addHistory("SET POPULATION COLUMN "+pop_col);
+
 		project.population_column = pop_col;
 		for( Feature f : featureCollection.features) {
 			String pop = f.properties.get(pop_col).toString();
@@ -3090,6 +3094,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	public void setDemographicColumns() {
 		int num_candidates = project.demographic_columns.size();
+		StringBuffer sb = new StringBuffer("SET ETHNICITY COLUMNS");
+		for( String s : project.demographic_columns) {
+			if( s == null || s.length() == 0) {
+				continue;
+			}
+			sb.append(" "+s.trim());
+		}
+		ip.addHistory(sb.toString());
+
 		
 		for( Feature f : featureCollection.features) {
 			VTD v = f.vtd;
@@ -3106,6 +3119,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 	}
 	public void setCountyColumn() {
+		ip.addHistory("SET COUNTY COLUMN "+project.county_column);
+
 		
 		for( Feature f : featureCollection.features) {
 			VTD v = f.vtd;
@@ -3117,6 +3132,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	public void setMuniColumn() {
+		ip.addHistory("SET MUNI COLUMN "+project.muni_column);
 		
 		for( Feature f : featureCollection.features) {
 			VTD v = f.vtd;
@@ -3129,6 +3145,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 	public void setElectionColumns() {
 		int num_candidates = project.election_columns.size();
+		StringBuffer sb = new StringBuffer("SET ELECTION COLUMNS");
+		for( String s : project.election_columns) {
+			sb.append(" "+s);
+		}
+		ip.addHistory(sb.toString());
+
 		
 		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
@@ -4223,6 +4245,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JSeparator separator = new JSeparator();
 		mntmWizard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Download.initPaths();
 				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 				ImportCensus2Thread ir = new ImportCensus2Thread();
 				ImportTranslations it = new ImportTranslations();
@@ -5354,7 +5377,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		textField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 try {
-					 Settings.population = new Integer(textField.getText());
+					 int n = new Integer(textField.getText());
+					 if( n == Settings.population) {
+						 return;
+					 }
+					 Settings.population = n;
 					 ip.addHistory("SET EVOLUTION POPULATION "+Settings.population);
 				 } catch (Exception ex) {
 					 
@@ -5420,7 +5447,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		slider_anneal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.anneal_rate = Math.exp(3.0*((double)slider_anneal.getValue()-50.0)/50.0);
-				ip.addHistory("SET EVOLUTION ANNEAL_RATE "+Settings.anneal_rate);
+				ip.addHistory("SET EVOLUTION ANNEAL_RATE "+(((double)slider_anneal.getValue())/100.0));
 
 				//System.out.println("anneal rate set to: "+Settings.anneal_rate);
 			}
@@ -5975,11 +6002,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		slider_mutation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				//Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
+				//Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;;
+				if( Settings.hush_mutate_rate) {
+					return;
+				}
 				Settings.mutation_boundary_rate = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
-				ip.addHistory("SET EVOLUTION MUTATE_RATE "+Settings.mutation_boundary_rate);
-
-
+				ip.addHistory("SET EVOLUTION MUTATE_RATE "+(((double)slider_mutation.getValue())/100.0));
 			}
 		});
 		sliderPopulationBalance.addChangeListener(new ChangeListener() {
