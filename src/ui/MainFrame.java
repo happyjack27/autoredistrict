@@ -5485,6 +5485,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				progressBar.setIndeterminate(true);
 				progressBar.setStringPainted(true);
 				progressBar.setValue(0);
+				ip.addHistory("GO");
 			}
 		});
 		goButton.setBounds(109, 29, 83, 29);
@@ -6266,6 +6267,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		stopButton.setEnabled(false);
 		progressBar.setIndeterminate(false);
 		progressBar.setValue(0);
+		ip.addHistory("STOP");
 	}
 	public void saveData(File f, int opt, boolean confirm) {
 		if( opt < 0) {
