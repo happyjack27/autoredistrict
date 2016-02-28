@@ -4,10 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 
 import javax.swing.*;
@@ -15,6 +11,88 @@ import javax.swing.*;
 import util.Gaussian;
 import util.StaticFunctions;
 
+
+// failed california connectioin reset
+//failed kentucky , new hampshire - states with spaces, rhode island, texas
+//oklahoma
+/*
+ownloading vtd shapfile...
+downloading:
+url :http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+path:/Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/
+file:vtds.zip
+no history found! []
+ex on download1, retrying: java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:436)
+	at ui.Download.run(Download.java:237)
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+*/
+
+/*
+ * failed: arkansas, 06 (california), kentucky, michigan missipi
+ * 
+ * downloadNextState run 28 Mississippi...
+starting Mississippi...
+done downloading. extracting...
+done extracting.
+done extracting.
+Starting next thread.
+Processing tl_2012_28_vtd10.shp...
+java.io.FileNotFoundException: /Users/jimbrill/autoredistrict_data/Mississippi/2010/2012/vtd/tl_2012_28_vtd10.shp (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+
+ * 
+ * path:/Users/jimbrill/autoredistrict_data/Kentucky/2010/2012/vtd/
+file:vtds.zip
+ex on download1, retrying: java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:436)
+	at ui.Download.run(Download.java:237)
+java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.Download.download(Download.java:452)
+	at ui.Download.run(Download.java:237)
+ex on download2: failed to open site java.io.FileNotFoundException: http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+http://www2.census.gov/geo/tiger/TIGER2012/VTD/tl_2012_21_vtd10.zip
+Downloading census population...
+
+ * 
+ * downloading:
+url :ftp://ftp2.census.gov/geo/tiger/TIGER2010BLKPOPHU/tabblock2010_06_pophu.zip
+path:/Users/jimbrill/autoredistrict_data/California/2010/block_pop/
+file:block_pops.zip
+ex on download: java.net.SocketException: Connection reset
+java.net.SocketException: Connection reset
+	at java.net.SocketInputStream.read(SocketInputStream.java:209)
+	at java.net.SocketInputStream.read(SocketInputStream.java:141)
+
+ * 
+ * ers/jimbrill/autoredistrict_data/Arkansas/2010/block_centroids//tl_2010_05_tabblock10.shp.xml...
+extracting /Users/jimbrill/autoredistrict_data/Arkansas/2010/block_centroids//tl_2010_05_tabblock10.shx...
+done extracting.
+done extracting.
+Starting next thread.
+Processing tl_2012_05_vtd10.shp...
+Exception in thread "Thread-0" java.lang.NoClassDefFoundError: org/nocrala/tools/gis/data/esri/shapefile/ValidationPreferences
+	at ui.MainFrame.loadShapeFile(MainFrame.java:3633)
+	at ui.MainFrame$OpenShapeFileThread.run(MainFrame.java:1989)
+ * 
+ * 
+ */
 
 
 /*
@@ -267,7 +345,8 @@ public class Applet extends JApplet {
     public static void main( String[] _args ) {
     	args = _args;
     	if( false) {
-	    	for( int i = 0; i < Download.states.length; i++) {
+	    	for( int i = 27; i < Download.states.length; i++) {
+	    		//System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete "+i);
 	    		System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar download "+i);
 	    		System.out.println("java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i);
 	    	}
@@ -297,6 +376,7 @@ public class Applet extends JApplet {
 			if( Download.states[Download.istate].length() == 0) {
 				System.exit(0);
 			}
+			Download.istate--;
 			mainFrame.downloadNextState();
 		} else
 		if( args.length > 1 && args[0].equals("delete")) {
@@ -394,18 +474,5 @@ public class Applet extends JApplet {
             return Integer.signum(vals1.length - vals2.length);
         }
     }
-	public static String readStream(InputStream is) {
-	    StringBuilder sb = new StringBuilder(512);
-	    try {
-	        Reader r = new InputStreamReader(is, "UTF-8");
-	        int c = 0;
-	        while ((c = r.read()) != -1) {
-	            sb.append((char) c);
-	        }
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
-	    return sb.toString();
-	}
 
 }

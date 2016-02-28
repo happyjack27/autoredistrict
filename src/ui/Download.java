@@ -429,19 +429,32 @@ public class Download extends Thread {
 		if( !f.exists()) { f.mkdirs(); }
 
 		URL website;
-		ReadableByteChannel rbc;
+		ReadableByteChannel rbc = null;
 		FileOutputStream fos = null;
 		try {
 			website = new URL(url);
 			rbc = Channels.newChannel(website.openStream());
 			fos = new FileOutputStream(dest_path+dest_name);
+			fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+			fos.flush();
+			fos.close();
+			rbc.close();
 		} catch (Exception ex) {
-			System.out.println("ex on download1, retrying: "+ex);
-			ex.printStackTrace();
+			try {
+				System.out.println("ex on download1, retrying: "+ex);
+				System.out.println(url);
+				ex.printStackTrace();
+				rbc.close();
+				fos.close();				
+			} catch (Exception ex0) { }
 			try {
 				website = new URL(url);
 				rbc = Channels.newChannel(website.openStream());
 				fos = new FileOutputStream(dest_path+dest_name);
+				fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+				fos.flush();
+				fos.close();
+				rbc.close();
 			} catch (Exception ex2) {
 				ex2.printStackTrace();
 				System.out.println("ex on download2: failed to open site "+ex);
@@ -449,10 +462,6 @@ public class Download extends Thread {
 				return false;
 			}
 		}
-		fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		fos.flush();
-		fos.close();
-		rbc.close();
 		} catch (Exception ex) {
 			System.out.println("ex on download: "+ex);
 			ex.printStackTrace();

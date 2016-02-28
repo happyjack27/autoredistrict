@@ -77,6 +77,9 @@ public class DialogDownload extends JDialog {
 				ok = true;
 				all = false;
 				hide();
+				MainFrame.mainframe.ip.addHistory("DOWNLOAD "
+						+Download.state_to_abbr.get(Download.state_to_fips.getBackward(Download.istate))
+						+" "+Download.cyear+" "+Download.vyear);
 				if( Download.prompt) {
 					JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 				}

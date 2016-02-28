@@ -2079,7 +2079,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			System.out.println("import county level start");
 			//String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
-			String path = "http://autoredistrict.org/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
+			String path = "http://autoredistrict.org/county_level_stats/Merged%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
 			System.out.println("url: "+path);
 	    	System.out.println("0");
 		    URL url;
@@ -3935,6 +3935,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderVoteDilution.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.vote_dilution_weight = sliderVoteDilution.getValue()/100.0;
+				ip.addHistory("SET WEIGHT RACIAL "+Settings.vote_dilution_weight);
 			}
 		});
 		sliderVoteDilution.setValue(50);
@@ -3948,6 +3949,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent e) {
 				Settings.mutate_competitive = chckbxConstrain_1.isSelected();
 				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
+				ip.addHistory("SET CONSTRAIN COMPETITION  "+(chckbxConstrain_1.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
 		chckbxConstrain_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
@@ -4018,7 +4020,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 		separator_7 = new JSeparator();
 		mntmDescramble = new JMenuItem("descramble");
-		mntmShowSeats = new JMenuItem("Show seats / votes");
 		mnWindows = new JMenu("Windows");
 		btnElection2Columns = new JButton("Election 2 columns");
 		chckbxSecondElection = new JCheckBox("Second election");
@@ -5185,13 +5186,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		menuBar.add(mnWindows);
 		mnWindows.add(mntmShowStats);
 		mnWindows.add(mntmShowGraph);
-		mnWindows.add(mntmShowData);
+		mntmShowSeats = new JMenuItem("Show seats / votes");
 		mnWindows.add(mntmShowSeats);
 		mntmShowSeats.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				frameSeatsVotesChart.show();
 			}
 		});
+		mnWindows.add(mntmShowData);
+		
+		mntmShowScripts = new JMenuItem("Show scripts");
+		mntmShowScripts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ip.show();
+			}
+		});
+		mnWindows.add(mntmShowScripts);
 		
 		
 		mntmShowData.addActionListener(new ActionListener() {
@@ -5271,6 +5281,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderDisconnected.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
+				ip.addHistory("SET WEIGHT CONTIGUITY "+Settings.disconnected_population_weight);
 			}
 		});
 		sliderDisconnected.setBounds(6, 57, 190, 29);
@@ -5302,6 +5313,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxNewCheckBox_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				Settings.mutate_disconnected = chckbxNewCheckBox_1.isSelected();
+				ip.addHistory("SET CONSTRAIN CONTIGUITY  "+(chckbxNewCheckBox_1.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
 		chckbxNewCheckBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
@@ -5314,6 +5326,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent e) {
 				Settings.mutate_excess_pop = chckbxConstrain.isSelected();
 				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
+				ip.addHistory("SET CONSTRAIN POPULATION  "+(chckbxConstrain.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
 		chckbxConstrain.setFont(new Font("Tahoma", Font.PLAIN, 9));
@@ -5342,6 +5355,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent e) {
 				 try {
 					 Settings.population = new Integer(textField.getText());
+					 ip.addHistory("SET EVOLUTION POPULATION "+Settings.population);
 				 } catch (Exception ex) {
 					 
 				 }
@@ -5370,6 +5384,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderElitism.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.elite_fraction = ((double)sliderElitism.getValue())/100.0;
+				ip.addHistory("SET EVOLUTION ELITE_FRAC "+Settings.elite_fraction);
+
 			}
 		});
 		sliderElitism.setValue((int)(Settings.elite_fraction*100.0));
@@ -5391,6 +5407,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderElitesMutated.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.elite_mutate_fraction = ((double)sliderElitesMutated.getValue())/100.0;
+				ip.addHistory("SET EVOLUTION ELITE_MUTATE_FRAC "+Settings.elite_mutate_fraction);
+
 			}
 		});
 		sliderElitesMutated.setValue(100);
@@ -5402,6 +5420,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		slider_anneal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.anneal_rate = Math.exp(3.0*((double)slider_anneal.getValue()-50.0)/50.0);
+				ip.addHistory("SET EVOLUTION ANNEAL_RATE "+Settings.anneal_rate);
+
 				//System.out.println("anneal rate set to: "+Settings.anneal_rate);
 			}
 		});
@@ -5414,6 +5434,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			@Override
 			public void focusLost(FocusEvent arg0) {
 				textFieldNumDistricts.postActionEvent();
+
 			}
 		});
 		textFieldNumDistricts.addActionListener(new ActionListener() {
@@ -5421,6 +5442,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				try {
 					Settings.num_districts = Integer.parseInt(textFieldNumDistricts.getText());
 					setSeatsMode();
+					ip.addHistory("SET DISTRICTS NUM_DISTRICTS "+Settings.num_districts);
 				} catch (Exception ex) { }
 			}
 		});
@@ -5481,6 +5503,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					Settings.seats_number_per_district = Integer.parseInt(textFieldSeatsPerDistrict.getText());
 					setSeatsMode();
 					panelStats.getStats();
+					ip.addHistory("SET DISTRICTS SEATS_PER_DISTRICT "+Settings.seats_number_per_district);
 				} catch (Exception ex) { }
 			}
 		});
@@ -5522,6 +5545,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void itemStateChanged(ItemEvent arg0) {
 				if( hushcomboBoxDistrict) return;
 				setDistrictColumn((String)comboBoxDistrictColumn.getSelectedItem());
+				ip.addHistory("SET DISTRICTS COLUMN "+comboBoxDistrictColumn.getSelectedItem());
 			}
 		});
 		comboBoxDistrictColumn.setBounds(8, 522, 178, 20);
@@ -5544,6 +5568,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.competitiveness_weight = sliderWastedVotesTotal.getValue()/100.0;
+				ip.addHistory("SET WEIGHT COMPETITION "+Settings.competitiveness_weight);
 			}
 		});
 		sliderWastedVotesTotal.setBounds(11, 60, 180, 29);
@@ -5565,6 +5590,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderSeatsVotes.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.seats_votes_asymmetry_weight = sliderSeatsVotes.getValue()/100.0;
+				ip.addHistory("SET WEIGHT PARTISAN "+Settings.seats_votes_asymmetry_weight);
 			}
 		});
 		sliderSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
@@ -5589,6 +5615,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
+				ip.addHistory("SET WEIGHT GEOMETRY_FAIRNESS "+Settings.geo_or_fair_balance_weight);
 			}
 		});
 		sliderBalance.setBounds(408, 26, 182, 29);
@@ -5747,6 +5774,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderSplitReduction.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
+				ip.addHistory("SET WEIGHT SPLITS "+Settings.split_reduction_weight);
 			}
 		});
 		sliderSplitReduction.setBounds(10, 157, 180, 29);
@@ -5807,13 +5835,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				srcomboBoxCountyColumn.setEnabled(Settings.reduce_splits);
 				srlblMuniColumn.setEnabled(Settings.reduce_splits);
 				srcomboBoxMuniColumn.setEnabled(Settings.reduce_splits);
+				ip.addHistory("SET WEIGHT COUNT_SPLITS "+(chckbxReduceSplits.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
 		chckbxReduceSplits.setFont(new Font("Tahoma", Font.BOLD, 14));
-		chckbxReduceSplits.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
 		chckbxReduceSplits.setBounds(6, 7, 176, 23);
 		panel_5.add(chckbxReduceSplits);
 		srlblCountyColumn.setEnabled(Settings.reduce_splits);
@@ -5910,6 +5935,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					Settings.seats_number_total = Integer.parseInt(textFieldTotalSeats.getText());
 					setSeatsMode();
 					panelStats.getStats();
+					ip.addHistory("SET DISTRICTS FAIRVOTE_SEATS "+Settings.seats_number_total);
 				} catch (Exception ex) { }
 			}
 		});
@@ -5931,6 +5957,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void actionPerformed(ActionEvent e) {
 				Settings.setNo4s(chckbxNewCheckBox.isSelected());
 				setSeatsMode();
+				ip.addHistory("SET DISTRICTS ALLOW_4_SEATS "+(chckbxNewCheckBox.isSelected() ? "FALSE" : "TRUE"));
 			}
 		});
 		chckbxNewCheckBox.setBounds(16, 180, 172, 23);
@@ -5940,6 +5967,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void stateChanged(ChangeEvent e) {
 				//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
 				Settings.diagonalization_weight = sliderRepresentation.getValue()/100.0;
+				ip.addHistory("SET WEIGHT PROPORTIONAL "+Settings.diagonalization_weight);
+
 
 			}
 		});
@@ -5947,17 +5976,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			public void stateChanged(ChangeEvent e) {
 				//Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*slider_mutation.getValue()/100.0;
 				Settings.mutation_boundary_rate = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
+				ip.addHistory("SET EVOLUTION MUTATE_RATE "+Settings.mutation_boundary_rate);
+
 
 			}
 		});
 		sliderPopulationBalance.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
+				ip.addHistory("SET WEIGHT POPULATION "+Settings.population_balance_weight);
+
 			}
 		});
 		sliderBorderLength.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
+				ip.addHistory("SET WEIGHT COMPACTNESS "+Settings.geometry_weight);
+
 			}
 		});
 
@@ -6082,6 +6117,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBox chckbxNewCheckBox_1;
 	public JCheckBox chckbxConstrain;
 	public JCheckBox chckbxConstrain_1;
+	public JMenuItem mntmShowScripts;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6452,8 +6488,4 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setElectionColumns3();
 		setSubstituteColumns();
 	}
-
-
-
-	
 }

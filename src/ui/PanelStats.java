@@ -568,7 +568,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		scrollPane_2.setViewportView(summaryTable);
 		
 		lblSummary = new JLabel("Summary");
-		lblSummary.setBounds(26, 15, 226, 14);
+		lblSummary.setBounds(26, 15, 67, 14);
 		add(lblSummary);
 		
 		lblByDistrict = new JLabel("By district");
@@ -602,6 +602,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_2);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				MainFrame.mainframe.ip.addHistory("EXPORT");
+
 				String partiesStr = getAsHtml(partiesTable);
 				String raceStr = getAsHtml(ethnicityTable);
 				String sumStr = getAsHtml(summaryTable);

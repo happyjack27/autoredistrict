@@ -3,16 +3,118 @@ package ui;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import solutions.*;
+import util.Util;
 
-public class InstructionProcessor implements iDiscreteEventListener {
+public class InstructionProcessor extends JDialog implements iDiscreteEventListener {
 	MainFrame mainFrame;
+	Vector<String> instructions = new Vector<String>();
+	Vector<String> instruction_history = new Vector<String>();
+	int instruction_pointer = 0;
+	public JScrollPane scrollPane;
+	public JScrollPane scrollPane_1;
+	public JTextArea historyTA;
+	public JTextArea scriptTA;
+	public JButton btnLoad;
+	public JButton btnSave;
+	public JLabel lblNewLabel;
+	public JLabel lblInstructions;
+
+	public InstructionProcessor() {
+		setTitle("Scripts");
+		initComponents();
+	}
+	
+	public void initComponents() {
+		getContentPane().setLayout(null);		
+		this.setSize(new Dimension(460, 320));
+		getContentPane().setPreferredSize(new Dimension(500,600));
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setBounds(6, 45, 208, 227);
+		getContentPane().add(scrollPane);
+		
+		historyTA = new JTextArea();
+		scrollPane.setViewportView(historyTA);
+		
+		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(226, 45, 208, 227);
+		getContentPane().add(scrollPane_1);
+		
+		scriptTA = new JTextArea();
+		scrollPane_1.setViewportView(scriptTA);
+		
+		btnLoad = new JButton("load");
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("text file","txt"));
+				jfc.showOpenDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				FileInputStream fos = null;
+				try {
+					fos = new FileInputStream(f);
+					String s = Util.readStream(fos);
+					scriptTA.setText(s);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				try {
+					fos.close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnLoad.setBounds(359, 6, 75, 29);
+		getContentPane().add(btnLoad);
+		
+		btnSave = new JButton("save");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("text file","txt"));
+				jfc.showSaveDialog(null);
+				File f = jfc.getSelectedFile();
+				if( f == null)  {
+					return;
+				}
+				FileOutputStream fos = null;
+				try {
+					fos = new FileOutputStream(f);
+					fos.write(historyTA.getText().toString().getBytes());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+				try {
+					fos.flush();
+					fos.close();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnSave.setBounds(139, 4, 75, 29);
+		getContentPane().add(btnSave);
+		
+		lblNewLabel = new JLabel("History");
+		lblNewLabel.setBounds(6, 11, 118, 16);
+		getContentPane().add(lblNewLabel);
+		
+		lblInstructions = new JLabel("Instructions");
+		lblInstructions.setBounds(226, 11, 118, 16);
+		getContentPane().add(lblInstructions);
+	}
 	/*
 	 * TODO: download,load
 	 * done: have finish saving fire event, have each generation fire event. 
@@ -45,11 +147,33 @@ public class InstructionProcessor implements iDiscreteEventListener {
 		EXIT
 
 	 */
+	boolean indent = false;
+	public void addHistory( String s) {
+		if( mainFrame.evolving) {
+			s = ""
+					+"WHEN MUTATE_RATE "+Settings.mutation_rate
+					+"\n\t"+s;
+			indent = true;
+		} else {
+			if( indent) {
+				s = "\t"+s;
+			}
+		}
+		/*
+		if( !s.contains("WHEN")) {
+			if( indent) {
+				s = "\t"+s;
+			}
+		} else {
+			indent = true;
+		}*/
+		StringBuffer sb = new StringBuffer(historyTA.getText());
+		sb.append(s+"\n");
+		historyTA.setText(sb.toString());
+	}
 	
-	Vector<String> instructions = new Vector<String>();
-	int instruction_pointer = 0;
-
 	public void queueInstructions( String s) {
+		scriptTA.setText(s);
 		String[] new_instructions = s.split("\n");
 		for( int i = 0; i < new_instructions.length; i++) {
 			instructions.add(new_instructions[i]);
@@ -85,6 +209,9 @@ public class InstructionProcessor implements iDiscreteEventListener {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
+			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
+			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
+			Download.istate--;
 			mainFrame.downloadNextState();			
 			instruction_pointer++;
 			return;
@@ -94,6 +221,9 @@ public class InstructionProcessor implements iDiscreteEventListener {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
+			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
+			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
+			Download.istate--;
 			mainFrame.downloadNextState();
 			instruction_pointer++;
 			return;
@@ -102,12 +232,16 @@ public class InstructionProcessor implements iDiscreteEventListener {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
+			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
+			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
 			Download.delete();
 		} else 
 		if( command.equals("CLEAN")) {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
 			Download.istate = istate;
+			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
+			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
 			Download.clean();
 		} else
 
@@ -196,7 +330,7 @@ public class InstructionProcessor implements iDiscreteEventListener {
 			
 			if( item.equals("COUNT_SPLITS")) { mainFrame.chckbxReduceSplits.setSelected(value.equals("TRUE")); }
 		} else
-		if( category.equals("DISTRICT")) {
+		if( category.equals("DISTRICTS")) {
 			if( item.equals("NUM_DISTRICTS")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldNumDistricts.setText(value); }
 			if( item.equals("SEATS_PER_DISTRICT")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldSeatsPerDistrict.setText(value); }
 			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldTotalSeats.setText(value); }
@@ -208,7 +342,7 @@ public class InstructionProcessor implements iDiscreteEventListener {
 
 	public void queueInstructionsFromFile(String string) {
 		try {
-			queueInstructions(Applet.readStream(new FileInputStream(string)).toString());
+			queueInstructions(Util.readStream(new FileInputStream(string)).toString());
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
