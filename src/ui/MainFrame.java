@@ -3540,6 +3540,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		return dh;
 	}
 	public void writeDBF(String filename, String[] headers, String[][] data) {
+		int MAX_HEADER_LENGTH = 16;
         JDBField[] fields = new JDBField[headers.length];
         System.out.println("filename: "+filename);
         
@@ -3547,11 +3548,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			try {
 				Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
 				System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
-				fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], (char)(int)q.d, q.b,q.c);
+				fields[i] = new JDBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], (char)(int)q.d, q.b,q.c);
 				//fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
 			} catch (JDBFException e) {
 				try {
-					fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
+					fields[i] = new JDBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], 'C', 32, 0);
 				} catch (JDBFException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

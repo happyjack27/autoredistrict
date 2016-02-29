@@ -216,12 +216,19 @@ public class Util {
 				8,
 		};
 		String[] renames = new String[]{
+				/*
 				"CTY_PRES12_DEM",
 				"CTY_PRES12_REP",
 				"CTY_PRES08_DEM",
 				"CTY_PRES08_REP",
 				"CTY_PRES04_DEM",
-				"CTY_PRES04_REP",
+				"CTY_PRES04_REP",*/
+				"PRES12_DEM",
+				"PRES12_REP",
+				"PRES08_DEM",
+				"PRES08_REP",
+				"PRES04_DEM",
+				"PRES04_REP",
 		};
 		v.add(renames);
 		try {
@@ -292,13 +299,13 @@ public class Util {
 		String[] renames = new String[]{
 				"COUNTY_NAME",//0
 				"COUNTY_FIPS",//22
-				"CTY_VAP_TOT", //31
-				"CTY_VAP_WHITE",
-				"CTY_VAP_BLACK",
-				"CTY_VAP_HISPANIC",
-				"CTY_VAP_ASIAN",
-				"CTY_VAP_INDIAN",
-				"CTY_VAP_OTHER",
+				"VAP_TOT", //31
+				"VAP_WHITE",
+				"VAP_BLACK",
+				"VAP_HISPANIC",
+				"VAP_ASIAN",
+				"VAP_INDIAN",
+				"VAP_OTHER",
 				//"PRES12_DEM", //39
 				//"PRES12_REP",
 		};

@@ -32,23 +32,23 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	
 	public void initComponents() {
 		getContentPane().setLayout(null);		
-		this.setSize(new Dimension(460, 320));
+		this.setSize(new Dimension(500, 360));
 		getContentPane().setPreferredSize(new Dimension(500,600));
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(6, 45, 208, 227);
+		scrollPane.setBounds(6, 39, 230, 252);
 		getContentPane().add(scrollPane);
 		
 		historyTA = new JTextArea();
-		historyTA.setFont(new Font("Courier New", Font.PLAIN, 8));
+		historyTA.setFont(new Font("Courier New", Font.PLAIN, 9));
 		scrollPane.setViewportView(historyTA);
 		
 		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(226, 45, 208, 227);
+		scrollPane_1.setBounds(248, 39, 231, 252);
 		getContentPane().add(scrollPane_1);
 		
 		scriptTA = new JTextArea();
-		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 8));
+		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 9));
 		scrollPane_1.setViewportView(scriptTA);
 		
 		btnLoad = new JButton("load");
@@ -77,7 +77,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		});
-		btnLoad.setBounds(359, 6, 75, 29);
+		btnLoad.setBounds(404, 4, 75, 29);
 		getContentPane().add(btnLoad);
 		
 		btnSave = new JButton("save");
@@ -106,7 +106,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		});
-		btnSave.setBounds(139, 4, 75, 29);
+		btnSave.setBounds(161, 4, 75, 29);
 		getContentPane().add(btnSave);
 		
 		lblNewLabel = new JLabel("History");
@@ -114,7 +114,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		getContentPane().add(lblNewLabel);
 		
 		lblInstructions = new JLabel("Instructions");
-		lblInstructions.setBounds(226, 11, 118, 16);
+		lblInstructions.setBounds(248, 11, 118, 16);
 		getContentPane().add(lblInstructions);
 		
 		btnApplyChanges = new JButton("apply changes");
@@ -123,7 +123,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				resetInstructions();
 			}
 		});
-		btnApplyChanges.setBounds(300, 269, 134, 29);
+		btnApplyChanges.setBounds(345, 303, 134, 29);
 		getContentPane().add(btnApplyChanges);
 	}
 	/*

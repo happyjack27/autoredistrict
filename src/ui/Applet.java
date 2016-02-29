@@ -14,6 +14,7 @@ import util.StaticFunctions;
 
 // failed california connection reset again
 // failed on texas again, connection reset
+
 // failed on kentucky again, file not found
 // failed on rhode ilsand again, file not found
 
@@ -33,8 +34,8 @@ public class Applet extends JApplet {
     		//failed kentucky , new hampshire - states with spaces, rhode island, texas
 	    	for( int i = 0; i < Download.states.length; i++) {
 	    		if( true
-	    				&& !Download.states[i].equals("Kentucky") //not found
-	    				&& !Download.states[i].equals("Rhode Island") //not found
+	    				&& !Download.states[i].equals("Kentucky") //not found - did not participate in census
+	    				&& !Download.states[i].equals("Rhode Island") //not found --?
 	    				&& !Download.states[i].equals("California") //reset
 	    				&& !Download.states[i].equals("Texas") //reset
 	    				) {
