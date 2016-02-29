@@ -7,6 +7,7 @@ import java.io.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.*;
 
 import solutions.*;
 import ui.DialogDownload.EventThread;
@@ -26,6 +27,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public JButton btnSave;
 	public JLabel lblNewLabel;
 	public JLabel lblInstructions;
+	Object last_highlight = null;
 
 	public InstructionProcessor() {
 		setTitle("Scripts");
@@ -127,6 +129,69 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		});
 		btnApplyChanges.setBounds(345, 303, 134, 29);
 		getContentPane().add(btnApplyChanges);
+		
+		textFieldIP = new JTextField();
+		textFieldIP.setText("0");
+		textFieldIP.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					instruction_pointer = Integer.parseInt(textFieldIP.getText());
+					   try {
+					        Highlighter hilite = scriptTA.getHighlighter();
+
+					        String text = scriptTA.getText();
+					        String line = null;
+					        int start = 0;
+					        int end = 0;
+					        /*
+					        int totalLines = ((JTextArea) scriptTA).getLineCount();
+					        if( instruction_pointer >= totalLines) {
+					        	
+					        	return;
+					        }*/
+				            start = ((JTextArea) scriptTA).getLineStartOffset(instruction_pointer);
+				            end   = ((JTextArea) scriptTA).getLineEndOffset(instruction_pointer);
+				            line = text.substring(start, end);
+				            System.out.println("My Line: "+ instruction_pointer+" " + line);
+				            System.out.println("Start Position of Line: " + start);
+				            System.out.println("End Position of Line: " + end);
+				            if( last_highlight == null) {
+				            	System.out.println("new highlight");
+				            	last_highlight = hilite.addHighlight(start,end, DefaultHighlighter.DefaultPainter);
+				            } else {
+				            	try {
+				            		System.out.println("found old highlight, changing");
+				            		hilite.changeHighlight(last_highlight,start,end);
+				            	} catch (Exception ex) {
+				            		System.out.println("ex  dfdf "+ex);
+				            		ex.printStackTrace();
+					            	last_highlight = hilite.addHighlight(start,end, DefaultHighlighter.DefaultPainter);				            		
+				            	}
+				            }
+					    } catch (Exception e0) {
+					    }
+					//eventOccured();
+				} catch (Exception ex) {
+					
+				}
+			}
+		});
+		textFieldIP.setBounds(160, 303, 99, 28);
+		getContentPane().add(textFieldIP);
+		textFieldIP.setColumns(10);
+		
+		lblCurrentInstruction = new JLabel("Current instruction");
+		lblCurrentInstruction.setBounds(16, 308, 132, 16);
+		getContentPane().add(lblCurrentInstruction);
+		
+		btnGo = new JButton("go");
+		btnGo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				eventOccured();
+			}
+		});
+		btnGo.setBounds(271, 303, 62, 29);
+		getContentPane().add(btnGo);
 	}
 	/*
 	 * TODO: download,load
@@ -162,11 +227,14 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	 */
 	boolean indent = false;
 	public JButton btnApplyChanges;
+	public JTextField textFieldIP;
+	public JLabel lblCurrentInstruction;
+	public JButton btnGo;
 	public void addHistory( String s) {
 		String prefix = "";
 		if( mainFrame.evolving && !s.equals("GO")) {
 			prefix = ""
-					+"WHEN MUTATE_RATE "+Settings.mutation_boundary_rate+"\n";
+					+"WHEN MUTATE_RATE "+((double)mainFrame.slider_mutation.getValue()/100.0)+"\n";
 			indent = true;
 		}
 		
@@ -277,6 +345,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			}
 			instruction_pointer++;
+			textFieldIP.setText(""+instruction_pointer);
 			return;
 		} else
 		if( command.equals("DOWNLOAD")) {
@@ -288,6 +357,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
 			Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			instruction_pointer++;
+			textFieldIP.setText(""+instruction_pointer);
 			return;
 		} else
 		if( command.equals("DELETE")) {
@@ -313,16 +383,24 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			System.exit(0);
 		} else		
 		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ELECTION")  && instruction_words[2].equals("COLUMNS")) {
-			mainFrame.project.election_columns.clear();
-			for( int i = 3; i < instruction_words.length; i++) {
-				mainFrame.project.election_columns.add(instruction_words[i]);
+			//JOptionPane.showMessageDialog(null,"0");
+			if( mainFrame.project.election_columns == null) {
+				mainFrame.project.election_columns = new Vector<String>();
 			}
+			mainFrame.project.election_columns.clear();
+			//JOptionPane.showMessageDialog(null,"1");
+			for( int i = 3; i < instruction_words.length; i++) {
+				mainFrame.project.election_columns.add(instruction_words[i].trim());
+				System.out.println("added ecol: |"+instruction_words[i].trim()+"|");
+			}
+			//JOptionPane.showMessageDialog(null,"2");
 			mainFrame.setElectionColumns();
+			//JOptionPane.showMessageDialog(null,"3");
 		} else 
 		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ETHNICITY")  && instruction_words[2].equals("COLUMNS")) {
 			mainFrame.project.demographic_columns.clear();
 			for( int i = 3; i < instruction_words.length; i++) {
-				mainFrame.project.demographic_columns.add(instruction_words[i]);
+				mainFrame.project.demographic_columns.add(instruction_words[i].trim());
 			}
 			mainFrame.setDemographicColumns();
 		} else 
@@ -352,7 +430,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if(command.equals("WHEN")) {
 			if( instruction_words[1].equals("MUTATE_RATE")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
-				double current_value = Settings.mutation_boundary_rate;
+				double current_value = ((double)mainFrame.slider_mutation.getValue()/100.0);
 				if( threshold >= current_value) {
 					return;
 				}
@@ -367,6 +445,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		
 		instruction_pointer++;
+		textFieldIP.setText(""+instruction_pointer);
 		eventOccured();
 	}
 
@@ -420,8 +499,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( item.equals("NUM_DISTRICTS")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldNumDistricts.setText(value); }
 			if( item.equals("SEATS_PER_DISTRICT")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldSeatsPerDistrict.setText(value); }
 			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldTotalSeats.setText(value); }
-			if( item.equals("ALLOW_4_SEATS")) { mainFrame.chckbxNewCheckBox.setSelected(value.equals("TRUE")); }
-			if( item.equals("COLUMN")) { mainFrame.setDistrictColumn(value); }
+			if( item.equals("ALLOW_4_SEATS")) { mainFrame.chckbxNewCheckBox.setSelected(value.equals("FALSE")); }
+			if( item.equals("COLUMN")) { mainFrame.comboBoxDistrictColumn.setSelectedItem(value); mainFrame.setDistrictColumn(value); }
 		}
 	}
 
