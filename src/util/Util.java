@@ -126,6 +126,7 @@ public class Util {
 	public static void make_scripts() {
 		String base_dir = "/Users/jimbrill/git/autoredistrict/jar/";
 		String script = "";
+		Download.init();
 		File f2 = new File(base_dir+"sourcescript");
 		try {
 			script = util.Util.readStream(new FileInputStream(f2));
@@ -136,13 +137,31 @@ public class Util {
 		
 		StringBuffer main = new StringBuffer();
 		for( int i = 0; i < Download.apportionments.length; i++) {
-			if( Download.apportionments[i] < 1) {
+			if( Download.apportionments[i] < 6) {
+				continue;
+			}
+			String state = Download.states[i];
+			if( false
+					|| state.equals("California")
+					|| state.equals("Texas")
+					|| state.equals("Rhode Island")
+					|| state.equals("Kentucky")
+					) {
 				continue;
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			if( false
+					|| Download.apportionments[i] == 7  //6=3+3,8=5+3
+					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
+					//
+					) {
+				sb.append("SET DISTRICTS ALLOW_4_SEATS TRUE\n");
+			}
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-			sb.append(script);
+			sb.append(script+"\n");
+			sb.append("\tEXPORT\n");
+			sb.append("\tEXIT\n");
 			
 			File f = new File(base_dir+"subscript"+i);
 			FileOutputStream fos;

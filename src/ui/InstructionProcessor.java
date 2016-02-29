@@ -206,7 +206,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		
 		//now add it.
 		sb.append(prefix+(indent ? "\t" : "")+s+"\n");
-		historyTA.setText(sb.toString());			
+		historyTA.setText(sb.toString());
+		
+		//auto scroll to bottom when adding new item.
+		JScrollBar vertical = scrollPane.getVerticalScrollBar();
+		vertical.setValue( vertical.getMaximum() );
 	}
 	public void resetInstructions() {
 		String[] new_instructions = scriptTA.getText().toString().split("\n");
