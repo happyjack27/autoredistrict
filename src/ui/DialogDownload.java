@@ -23,7 +23,7 @@ public class DialogDownload extends JDialog {
 	public JLabel lblSelectCensusYear;
 	//public String[] right_side = null;
 	
-	class EventThread extends Thread {
+	public static class EventThread extends Thread {
 		public void run() {
 			MainFrame.mainframe.ip.eventOccured();
 		}

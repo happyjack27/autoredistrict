@@ -5,6 +5,8 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.Vector;
 
+import ui.Download;
+
 public class Util {
 	
 	//missing: alaska and lousianna!
@@ -121,11 +123,58 @@ public class Util {
 	    }
 	    return v;
 	}
+	public static void make_scripts() {
+		String base_dir = "/Users/jimbrill/git/autoredistrict/jar/";
+		String script = "";
+		File f2 = new File(base_dir+"sourcescript");
+		try {
+			script = util.Util.readStream(new FileInputStream(f2));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		StringBuffer main = new StringBuffer();
+		for( int i = 0; i < Download.apportionments.length; i++) {
+			if( Download.apportionments[i] < 1) {
+				continue;
+			}
+			StringBuffer sb = new StringBuffer();
+			sb.append("LOAD "+i+ " 2010 2012\n");
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			sb.append(script);
+			
+			File f = new File(base_dir+"subscript"+i);
+			FileOutputStream fos;
+			try {
+				fos = new FileOutputStream(f);
+				fos.write(sb.toString().getBytes());
+				fos.flush();
+				fos.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript"+i+"\n");
+		}
+		File f = new File(base_dir+"mainscript");
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(f);
+			fos.write(main.toString().getBytes());
+			fos.flush();
+			fos.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 	public static void main(String[] args) {
+		make_scripts();
 		//processVTD();
-		//System.exit(0);
+		System.exit(0);
 		
 		for( int i = 0; i < states.length; i++) {
 			try {

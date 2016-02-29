@@ -52,7 +52,8 @@ public class Applet extends JApplet {
     	for( int i = 0; i < args.length; i++) {
     		System.out.println("arg: "+args[i]);
     		String arg = args[i];
-    		if( arg.contains("nogui") || arg.contains("headless")) {
+    		if( arg.contains("nogui") ||  arg.contains("no_gui") || arg.contains("headless")) {
+    			System.out.println("requested headless...");
     			no_gui = true;
     		}
     		if( arg.contains("project") || arg.contains("file")) {

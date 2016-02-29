@@ -3,6 +3,7 @@ package ui;
 import geography.*;
 import geography.Properties;
 import solutions.*;
+import ui.MainFrame.OpenShapeFileThread;
 import util.Quadruplet;
 
 import java.awt.*;
@@ -1955,7 +1956,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
 	}
 
-	class OpenShapeFileThread extends FileThread {
+	public class OpenShapeFileThread extends FileThread {
 		OpenShapeFileThread(File f) { super(f);  }
 		Thread nextThread = null;
     	public void run() { 
@@ -6118,11 +6119,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		frameGraph.setSize(dim);
 		
 		frameGraph.move(this.getWidth(), this.getX());
-		frameGraph.show();
 		frameSeatsVotesChart.move(this.getWidth(), this.getX()+frameGraph.getHeight());
-		frameSeatsVotesChart.show();
 		frameStats.move(this.getWidth()+frameSeatsVotesChart.getWidth(), this.getX()+frameGraph.getHeight());
-		frameStats.show();
+		if( !Applet.no_gui) {
+			frameGraph.show();
+			frameSeatsVotesChart.show();
+			frameStats.show();
+		}
 		
 	}
 	public boolean hush_setSeatsMode = false;
@@ -6518,5 +6521,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setElectionColumns2();
 		setElectionColumns3();
 		setSubstituteColumns();
+	}
+	public OpenShapeFileThread createOpenShapeFileThread(File vtd_file) {
+		return new OpenShapeFileThread(vtd_file);
 	}
 }

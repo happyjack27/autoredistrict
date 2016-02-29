@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import solutions.*;
+import ui.DialogDownload.EventThread;
+import ui.MainFrame.OpenShapeFileThread;
 import util.Util;
 
 public class InstructionProcessor extends JDialog implements iDiscreteEventListener {
@@ -259,8 +261,17 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			Download.istate = istate;
 			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
 			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
-			Download.istate--;
-			mainFrame.downloadNextState();			
+			Download.initPaths();
+			if( Download.checkForDoneFile()) {
+				System.out.println("found prepared data.  opening...");
+				OpenShapeFileThread ost = MainFrame.mainframe.createOpenShapeFileThread(Download.vtd_file);
+				ost.f = Download.vtd_file;
+				Download.nextThread = null;
+				ost.nextThread = new DialogDownload.EventThread();
+				ost.start();
+			} else {
+				Download.downloadState(Download.istate,Download.cyear,Download.vyear);
+			}
 			instruction_pointer++;
 			return;
 		} else
@@ -271,8 +282,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			Download.istate = istate;
 			if( instruction_words.length > 2) { Download.cyear = Integer.parseInt(instruction_words[2]); }
 			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
-			Download.istate--;
-			mainFrame.downloadNextState();
+			Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			instruction_pointer++;
 			return;
 		} else
