@@ -14,6 +14,8 @@ import ui.DialogDownload.EventThread;
 import ui.MainFrame.OpenShapeFileThread;
 import util.Util;
 
+// show line numbers: http://www.algosome.com/articles/line-numbers-java-jtextarea-jtable.html
+
 public class InstructionProcessor extends JDialog implements iDiscreteEventListener {
 	MainFrame mainFrame;
 	Vector<String> instructions = new Vector<String>();
@@ -36,24 +38,28 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	
 	public void initComponents() {
 		getContentPane().setLayout(null);		
-		this.setSize(new Dimension(500, 360));
+		this.setSize(new Dimension(600, 500));
 		getContentPane().setPreferredSize(new Dimension(500,600));
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(6, 39, 230, 252);
+		scrollPane.setBounds(6, 39, 285, 392);
 		getContentPane().add(scrollPane);
 		
 		historyTA = new JTextArea();
-		historyTA.setFont(new Font("Courier New", Font.PLAIN, 9));
+		historyTA.setTabSize(3);
+		historyTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane.setViewportView(historyTA);
+		scrollPane.setRowHeaderView(new LineNumberComponent(historyTA));
 		
 		scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(248, 39, 231, 252);
+		scrollPane_1.setBounds(303, 39, 285, 392);
 		getContentPane().add(scrollPane_1);
 		
 		scriptTA = new JTextArea();
-		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 9));
+		scriptTA.setTabSize(3);
+		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane_1.setViewportView(scriptTA);
+		scrollPane_1.setRowHeaderView(new LineNumberComponent(scriptTA));
 		
 		btnLoad = new JButton("load");
 		btnLoad.addActionListener(new ActionListener() {
@@ -81,7 +87,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		});
-		btnLoad.setBounds(404, 4, 75, 29);
+		btnLoad.setBounds(519, 4, 75, 29);
 		getContentPane().add(btnLoad);
 		
 		btnSave = new JButton("save");
@@ -110,7 +116,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		});
-		btnSave.setBounds(161, 4, 75, 29);
+		btnSave.setBounds(216, 4, 75, 29);
 		getContentPane().add(btnSave);
 		
 		lblNewLabel = new JLabel("History");
@@ -118,7 +124,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		getContentPane().add(lblNewLabel);
 		
 		lblInstructions = new JLabel("Instructions");
-		lblInstructions.setBounds(248, 11, 118, 16);
+		lblInstructions.setBounds(303, 11, 118, 16);
 		getContentPane().add(lblInstructions);
 		
 		btnApplyChanges = new JButton("apply changes");
@@ -127,7 +133,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				resetInstructions();
 			}
 		});
-		btnApplyChanges.setBounds(345, 303, 134, 29);
+		btnApplyChanges.setBounds(454, 443, 134, 29);
 		getContentPane().add(btnApplyChanges);
 		
 		textFieldIP = new JTextField();
@@ -169,29 +175,23 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				            	}
 				            }
 					    } catch (Exception e0) {
+					    	e0.printStackTrace();
 					    }
 					//eventOccured();
 				} catch (Exception ex) {
-					
+					ex.printStackTrace();
 				}
+				invalidate();
+				repaint();
 			}
 		});
-		textFieldIP.setBounds(160, 303, 99, 28);
+		textFieldIP.setBounds(160, 443, 99, 28);
 		getContentPane().add(textFieldIP);
 		textFieldIP.setColumns(10);
 		
 		lblCurrentInstruction = new JLabel("Current instruction");
-		lblCurrentInstruction.setBounds(16, 308, 132, 16);
+		lblCurrentInstruction.setBounds(16, 448, 132, 16);
 		getContentPane().add(lblCurrentInstruction);
-		
-		btnGo = new JButton("go");
-		btnGo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				eventOccured();
-			}
-		});
-		btnGo.setBounds(271, 303, 62, 29);
-		getContentPane().add(btnGo);
 	}
 	/*
 	 * TODO: download,load
@@ -229,7 +229,6 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public JButton btnApplyChanges;
 	public JTextField textFieldIP;
 	public JLabel lblCurrentInstruction;
-	public JButton btnGo;
 	public void addHistory( String s) {
 		String prefix = "";
 		if( mainFrame.evolving && !s.equals("GO")) {
@@ -267,7 +266,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			for( int i = 0; i < hist_lines.length-2; i++) {
 				sb.append(hist_lines[i]+"\n");
 			}
-			if( !hist_lines[hist_lines.length-2].contains("WHEN")) { //if second last line is a when, don't do that one either.
+			if( hist_lines[hist_lines.length-2].contains("WHEN")) { //if second last line is a when, don't do that one either.
+				if( s.contains("MUTATE_RATE")) { //unless we're adjusting the mutate rate.  in which case, override our "when"
+					prefix = "";
+					sb.append(hist_lines[hist_lines.length-2]+"\n");
+				}
+			} else {
 				sb.append(hist_lines[hist_lines.length-2]+"\n");
 			}
 		}
