@@ -3541,7 +3541,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		return dh;
 	}
 	public void writeDBF(String filename, String[] headers, String[][] data) {
-		int MAX_HEADER_LENGTH = 16;
+		int MAX_HEADER_LENGTH = 10;
         JDBField[] fields = new JDBField[headers.length];
         System.out.println("filename: "+filename);
         

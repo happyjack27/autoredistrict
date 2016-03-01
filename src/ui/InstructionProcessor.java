@@ -43,23 +43,24 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(6, 39, 285, 392);
-		getContentPane().add(scrollPane);
 		
 		historyTA = new JTextArea();
 		historyTA.setTabSize(3);
 		historyTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane.setViewportView(historyTA);
-		scrollPane.setRowHeaderView(new LineNumberComponent(historyTA));
+		//scrollPane.setRowHeaderView(new LineNumberComponent(historyTA));
+		scrollPane.setRowHeaderView(new TextLineNumber(historyTA));
+		getContentPane().add(scrollPane);
 		
 		scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(303, 39, 285, 392);
-		getContentPane().add(scrollPane_1);
 		
 		scriptTA = new JTextArea();
 		scriptTA.setTabSize(3);
 		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane_1.setViewportView(scriptTA);
-		scrollPane_1.setRowHeaderView(new LineNumberComponent(scriptTA));
+		scrollPane_1.setRowHeaderView(new TextLineNumber(scriptTA));
+		getContentPane().add(scrollPane_1);
 		
 		btnLoad = new JButton("load");
 		btnLoad.addActionListener(new ActionListener() {
@@ -137,11 +138,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		getContentPane().add(btnApplyChanges);
 		
 		textFieldIP = new JTextField();
-		textFieldIP.setText("0");
+		textFieldIP.setText("1");
 		textFieldIP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					instruction_pointer = Integer.parseInt(textFieldIP.getText());
+					instruction_pointer = Integer.parseInt(textFieldIP.getText())-1;
 					   try {
 					        Highlighter hilite = scriptTA.getHighlighter();
 
@@ -349,7 +350,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			}
 			instruction_pointer++;
-			textFieldIP.setText(""+instruction_pointer);
+			textFieldIP.setText(""+(instruction_pointer+1));
 			return;
 		} else
 		if( command.equals("DOWNLOAD")) {
@@ -361,7 +362,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( instruction_words.length > 3) { Download.vyear = Integer.parseInt(instruction_words[3]); }
 			Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			instruction_pointer++;
-			textFieldIP.setText(""+instruction_pointer);
+			textFieldIP.setText(""+(instruction_pointer+1));
 			return;
 		} else
 		if( command.equals("DELETE")) {
@@ -449,7 +450,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		
 		instruction_pointer++;
-		textFieldIP.setText(""+instruction_pointer);
+		textFieldIP.setText(""+(instruction_pointer+1));
 		eventOccured();
 	}
 
