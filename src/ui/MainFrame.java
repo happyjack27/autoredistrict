@@ -1417,6 +1417,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
     		}
+			Feature.compare_centroid = false;
+			Collections.sort(featureCollection.features);
+			
     		trySetBasicColumns();
     		trySetGroupColumns();
     		
@@ -1960,7 +1963,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		OpenShapeFileThread(File f) { super(f);  }
 		Thread nextThread = null;
     	public void run() { 
-    		if( f == null) { Download.initPaths(); this.f = Download.vtd_file; }
+    		if( f == null) { 
+    			System.out.println("OpenShapeFileThread null file, getting from Download class... ");
+    			Download.initPaths(); 
+    			this.f = Download.vtd_file; 
+    		}
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
 
@@ -2022,6 +2029,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportTranslations extends Thread {
 		Thread nextThread = null;
 		public void run() {
+			Feature.compare_centroid = false;
+			Collections.sort(featureCollection.features);
+
 			Hashtable<String,Feature> featmap = new Hashtable<String,Feature>();
 			String skey="GEOID";
 			String[] headers = featureCollection.getHeaders();
@@ -2079,6 +2089,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
+			Feature.compare_centroid = false;
+			Collections.sort(featureCollection.features);
 
 			System.out.println("import county level start");
 			//String path = "ftp://autoredistrict.org/pub/county_level_stats/Merged%20--%20"+Download.states[Download.istate]+".txt";
@@ -4248,7 +4260,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmWizard.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Download.initPaths();
-				OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+				OpenShapeFileThread ost = new OpenShapeFileThread(null);
 				ImportCensus2Thread ir = new ImportCensus2Thread();
 				ImportTranslations it = new ImportTranslations();
 				it.nextThread = new ImportCountyLevel();
@@ -4869,6 +4881,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(mntmShowDemographics);
+		
+		separator_11 = new JSeparator();
+		mnView.add(separator_11);
+		
+		mntmColorByCounty = new JMenuItem("Color by county");
+		mntmColorByCounty.setEnabled(false);
+		mntmColorByCounty.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "Not implemented.");
+			}
+		});
+		mnView.add(mntmColorByCounty);
 		
 		
 		mnView.add(new JSeparator());
@@ -5818,6 +5842,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				MainFrame.mainframe.project.county_column = (String)srcomboBoxCountyColumn.getSelectedItem();
 				setCountyColumn();
+				mntmColorByCounty.setEnabled(MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0);
 				panelStats.getStats();
 			}
 		});
@@ -6151,6 +6176,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBox chckbxConstrain;
 	public JCheckBox chckbxConstrain_1;
 	public JMenuItem mntmShowScripts;
+	public JSeparator separator_11;
+	public JMenuItem mntmColorByCounty;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6458,7 +6485,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    return v;
 	}
 	public void trySetBasicColumns() {
-		String[] trys = new String[]{"POP18","VAP","VAP_TOTAL","POPULATION"};
+		String[] trys = new String[]{"POPULATION","POP18","VAP","VAP_TOTAL"};
 		for( int i = 0; i < trys.length; i++) {
 			if(((DefaultComboBoxModel)comboBoxPopulation.getModel()).getIndexOf(trys[i]) >= 0 ) {
 				System.out.println(" found "+trys[i]);
@@ -6493,7 +6520,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		String[] headers = featureCollection.getHeaders();
 		String[] demo = new String[]{
 				"CTY_VAP_WHITE","CTY_VAP_BLACK","CTY_VAP_HISPANIC","CTY_VAP_ASIAN","CTY_VAP_INDIAN","CTY_VAP_OTHER",
-				"VAP_WHITE","VAP_BLACK","VAP_HISPANIC","VAP_ASIAN","VAP_INDIAN","VAP_OTHER",
+				"CTY_VAP_WH","CTY_VAP_BL","CTY_VAP_HI","CTY_VAP_AS","CTY_VAP_IN","CTY_VAP_OT",
+				"VAP_WHITE","VAP_BLACK","VAP_HISPANIC","VAP_HISPAN","VAP_ASIAN","VAP_INDIAN","VAP_OTHER",
 				};
 		String[] elect = new String[]{
 				"CTY_PRES12_DEM","CTY_PRES12_REP",

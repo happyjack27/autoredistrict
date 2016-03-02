@@ -1647,15 +1647,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     	long time4 = System.currentTimeMillis();
     	//===fairness score: connectedness
-        double disconnected_pops = 0;
-        if( Settings.disconnected_population_weight > 0) {
-            for(District district : districts) {
-            	//int count = district.getRegionCount(ward_districts);
-            	//System.out.println("region count: "+count);
-            	//disconnected_pops += count;
-                disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(vtd_districts));
-            }
-        }
+        double disconnected_pops = getDisconnectedPopulation();
+
         //disconnected_pops /= total_population;
         
     	long time5 = System.currentTimeMillis();
@@ -1704,6 +1697,18 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		System.out.println("ex ab "+ex);
     		ex.printStackTrace();
     	}
+    }
+    public double getDisconnectedPopulation() {    	
+    	double disconnected_pops = 0;
+	    if( Settings.disconnected_population_weight > 0) {
+	        for(District district : districts) {
+	        	//int count = district.getRegionCount(ward_districts);
+	        	//System.out.println("region count: "+count);
+	        	//disconnected_pops += count;
+	            disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(vtd_districts));
+	        }
+	    }
+	    return disconnected_pops;
     }
     public double getMaxPopDiff() {
     	double min = -1;

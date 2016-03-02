@@ -49,7 +49,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		historyTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane.setViewportView(historyTA);
 		//scrollPane.setRowHeaderView(new LineNumberComponent(historyTA));
-		scrollPane.setRowHeaderView(new TextLineNumber(historyTA));
+		try {
+			scrollPane.setRowHeaderView(new TextLineNumber(historyTA));
+		} catch (Exception ex) {
+			
+		}
 		getContentPane().add(scrollPane);
 		
 		scrollPane_1 = new JScrollPane();
@@ -59,7 +63,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		scriptTA.setTabSize(3);
 		scriptTA.setFont(new Font("Courier New", Font.PLAIN, 10));
 		scrollPane_1.setViewportView(scriptTA);
-		scrollPane_1.setRowHeaderView(new TextLineNumber(scriptTA));
+		try {
+			scrollPane_1.setRowHeaderView(new TextLineNumber(scriptTA));
+		} catch (Exception ex) {
+			
+		}
 		getContentPane().add(scrollPane_1);
 		
 		btnLoad = new JButton("load");
@@ -193,6 +201,11 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		lblCurrentInstruction = new JLabel("Current instruction");
 		lblCurrentInstruction.setBounds(16, 448, 132, 16);
 		getContentPane().add(lblCurrentInstruction);
+		
+		lblFinished = new JLabel("Finished.");
+		lblFinished.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 13));
+		lblFinished.setBounds(271, 448, 118, 16);
+		getContentPane().add(lblFinished);
 	}
 	/*
 	 * TODO: download,load
@@ -230,6 +243,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public JButton btnApplyChanges;
 	public JTextField textFieldIP;
 	public JLabel lblCurrentInstruction;
+	public JLabel lblFinished;
 	public void addHistory( String s) {
 		String prefix = "";
 		if( mainFrame.evolving && !s.equals("GO")) {
@@ -307,8 +321,10 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public void eventOccured() {
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
+			lblFinished.setVisible(true);
 			return;
 		}
+		lblFinished.setVisible(false);
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
@@ -444,6 +460,29 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				double threshold = Double.parseDouble(instruction_words[2]);
 				double current_value = mainFrame.featureCollection.ecology.generation;//todo: get this
 				if( threshold <= current_value) {
+					return;
+				}
+			} else 
+			if( instruction_words[1].equals("POPULATION_IMBALANCE")) {
+				double threshold = Double.parseDouble(instruction_words[2]);
+				double current_value = ((double)mainFrame.featureCollection.ecology.population.get(0).getMaxPopDiff());
+				if( threshold >= current_value) {
+					return;
+				}
+			} else
+			if( instruction_words[1].equals("COMPACTNESS")) {
+				double threshold = Double.parseDouble(instruction_words[2]);
+				DistrictMap dm = mainFrame.featureCollection.ecology.population.get(0);
+				double current_value = ((double)1.0/dm.getReciprocalIsoPerimetricQuotient());
+				if( threshold >= current_value) {
+					return;
+				}
+			} else 
+			if( instruction_words[1].equals("DISCONNECTED_POPULATION")) {
+				double threshold = Double.parseDouble(instruction_words[2]);
+				DistrictMap dm = mainFrame.featureCollection.ecology.population.get(0);
+				double current_value = dm.getDisconnectedPopulation();
+				if( threshold >= current_value) {
 					return;
 				}
 			}
