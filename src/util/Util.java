@@ -134,6 +134,7 @@ public class Util {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		System.out.println(script);
 		
 		StringBuffer main = new StringBuffer();
 		for( int i = 0; i < Download.apportionments.length; i++) {
@@ -193,8 +194,8 @@ public class Util {
 	public static void main(String[] args) {
 		make_scripts();
 		//processVTD();
-		System.exit(0);
-		
+		//System.exit(0);
+		/*
 		for( int i = 0; i < states.length; i++) {
 			try {
 				String state = states[i];
@@ -204,7 +205,7 @@ public class Util {
 				System.out.println("ex in main "+ex);
 				ex.printStackTrace();
 			}
-		}
+		}*/
 		System.out.println("done.");
 	}
 	public static void process(String state) {

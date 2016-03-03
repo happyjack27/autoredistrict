@@ -6517,7 +6517,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		project.election_columns_2.clear();
 		project.election_columns_3.clear();
 		project.substitute_columns.clear();
-		project.demographic_columns.add("");
 
 		String[] headers = featureCollection.getHeaders();
 		String[] demo = new String[]{
@@ -6546,11 +6545,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 
-		setDemographicColumns();
-		setElectionColumns();
-		setElectionColumns2();
-		setElectionColumns3();
-		setSubstituteColumns();
+		try {
+			setDemographicColumns();
+			setElectionColumns();
+			setElectionColumns2();
+			setElectionColumns3();
+		} catch (Exception ex) { 
+			ex.printStackTrace();
+		}
+		//setSubstituteColumns();
 	}
 	public OpenShapeFileThread createOpenShapeFileThread(File vtd_file) {
 		return new OpenShapeFileThread(vtd_file);
