@@ -4889,7 +4889,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByCounty.setEnabled(false);
 		mntmColorByCounty.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Not implemented.");
+				Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;
+				mapPanel.revalidate();
+				mapPanel.repaint();
 			}
 		});
 		mnView.add(mntmColorByCounty);

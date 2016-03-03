@@ -327,6 +327,29 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		if( Feature.display_mode == Feature.DISPLAY_MODE_COUNTIES) {
+
+			//enumerate counties
+			String county_column = MainFrame.mainframe.project.county_column;
+			Hashtable<String,Integer> counties = new Hashtable<String,Integer>();
+			int i = 0;
+			for( Feature f : features) {
+				String county = f.properties.get(county_column).toString();
+				Integer s = counties.get(county);
+				if( s == null) {
+					counties.put(county,new Integer(i++));
+				}
+			}
+
+			//now apply colors
+			for( Feature f: features) {
+				String county = f.properties.get(county_column).toString();
+				int s = counties.get(county).intValue();
+
+				Geometry geo = f.geometry;
+				geo.fillColor = standard_district_colors[s % standard_district_colors.length];
+			}
+		}
 		if( Feature.display_mode == Feature.DISPLAY_MODE_WASTED_VOTES) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
