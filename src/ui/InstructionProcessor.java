@@ -150,6 +150,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		textFieldIP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					System.out.println("textFieldIP.getText() "+textFieldIP.getText());
 					instruction_pointer = Integer.parseInt(textFieldIP.getText())-1;
 					   try {
 					        Highlighter hilite = scriptTA.getHighlighter();
@@ -167,9 +168,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				            start = ((JTextArea) scriptTA).getLineStartOffset(instruction_pointer);
 				            end   = ((JTextArea) scriptTA).getLineEndOffset(instruction_pointer);
 				            line = text.substring(start, end);
-				            System.out.println("My Line: "+ instruction_pointer+" " + line);
-				            System.out.println("Start Position of Line: " + start);
-				            System.out.println("End Position of Line: " + end);
+				            //System.out.println("My Line: "+ instruction_pointer+" " + line);
+				            //System.out.println("Start Position of Line: " + start);
+				            //System.out.println("End Position of Line: " + end);
 				            if( last_highlight == null) {
 				            	System.out.println("new highlight");
 				            	last_highlight = hilite.addHighlight(start,end, DefaultHighlighter.DefaultPainter);
@@ -190,7 +191,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				invalidate();
+				revalidate();
 				repaint();
 			}
 		});
@@ -319,6 +320,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	@Override
 	public void eventOccured() {
+		System.out.println("eventOccured");
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
 			lblFinished.setVisible(true);
@@ -328,6 +330,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
+		System.out.println("processing "+current_instruction);
 		String[] instruction_words = current_instruction.split(" ");
 		for( int i = 0; i < instruction_words.length; i++) {
 			instruction_words[i] = instruction_words[i].toUpperCase().trim();
@@ -449,24 +452,29 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			}
 		} else
 		if(command.equals("WHEN")) {
+			System.out.println("processing when "+instruction_words[1]);
 			if( instruction_words[1].equals("MUTATE_RATE")) {
-				double threshold = Double.parseDouble(instruction_words[2]);
+				System.out.println("matched");
+						double threshold = Double.parseDouble(instruction_words[2]);
 				double current_value = ((double)mainFrame.slider_mutation.getValue()/100.0);
-				if( threshold >= current_value) {
+				System.out.println(" threshold: "+threshold+" current: "+current_value);
+				if( threshold < current_value) {
+					System.out.println("threshold not reached");
 					return;
 				}
+				System.out.println("threshold reached!");
 			} else
 			if( instruction_words[1].equals("GENERATION")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
 				double current_value = mainFrame.featureCollection.ecology.generation;//todo: get this
-				if( threshold <= current_value) {
+				if( threshold > current_value) {
 					return;
 				}
 			} else 
 			if( instruction_words[1].equals("POPULATION_IMBALANCE")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
 				double current_value = ((double)mainFrame.featureCollection.ecology.population.get(0).getMaxPopDiff());
-				if( threshold >= current_value) {
+				if( threshold < current_value) {
 					return;
 				}
 			} else
@@ -474,7 +482,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				double threshold = Double.parseDouble(instruction_words[2]);
 				DistrictMap dm = mainFrame.featureCollection.ecology.population.get(0);
 				double current_value = ((double)1.0/dm.getReciprocalIsoPerimetricQuotient());
-				if( threshold >= current_value) {
+				if( threshold < current_value) {
 					return;
 				}
 			} else 
@@ -482,7 +490,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				double threshold = Double.parseDouble(instruction_words[2]);
 				DistrictMap dm = mainFrame.featureCollection.ecology.population.get(0);
 				double current_value = dm.getDisconnectedPopulation();
-				if( threshold >= current_value) {
+				if( threshold < current_value) {
 					return;
 				}
 			}
