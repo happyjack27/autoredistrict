@@ -238,7 +238,8 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double elite_mutate_fraction = 1;
 	public static double exp_mutate_factor = 10.0;
 	public static boolean minimize_absolute_deviation = false;
-	public static boolean hush_mutate_rate = false;;
+	public static boolean hush_mutate_rate = false;
+	public static double fv_pvi_adjust = -0.0385;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;
