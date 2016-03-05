@@ -190,7 +190,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_0 = 0;
 			double wasted_1 = 0;
 			
-			String[] dcolumns = new String[11+Settings.num_candidates*2+dem_col_names.length*2];
+			String[] dcolumns = new String[12+Settings.num_candidates*2+dem_col_names.length*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Settings.num_candidates][];
@@ -224,8 +224,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				try {
 					elec_counts[i] = 0;
 					vote_counts[i] = 0;
-					dcolumns[i+11] = ""+cands.get(i)+" vote %";
-					dcolumns[i+11+Settings.num_candidates] = ""+cands.get(i)+" votes";
+					dcolumns[i+12] = ""+cands.get(i)+" vote %";
+					dcolumns[i+12+Settings.num_candidates] = ""+cands.get(i)+" votes";
 				} catch (Exception ex) { }
 			}
 			for( int i = 0; i < dem_col_names.length; i++) {
@@ -317,7 +317,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					wasted_1 += result[0][1] - (result[0][1] >= needed ? needed : 0);
 					pvi = 100.0*(result[0][0] >= needed ? result[0][0] - needed : result[0][1] - needed)/total_votes;
 					double fv_pvi = (double)(result[0][0]-result[0][1])/(double)total_votes; 
-					fv_pvi = (fv_pvi+Settings.fv_pvi_adjust)/2.0-0.5;
+					fv_pvi = (fv_pvi+Settings.fv_pvi_adjust)/2.0;
 					fv_pviw = fv_pvi > 0 ? "D+"+integer.format((int)Math.round(100*fv_pvi)) : "R+"+integer.format((int)Math.round(-100*fv_pvi))  ;
 					if( !is_uncontested) {
 						if( pvi < 5) {
