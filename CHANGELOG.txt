@@ -1,5 +1,13 @@
 Changelog:
 
+V. 1.24
+
+* added ability to color by county
+* added scripting and automatic writing of a script from your actions
+* added command line arguments so you can run a script - so now the program can be run completely from the command line
+* added fairvote.org pvi
+* made it so multi-member (fairvote version) can do less than 3 seats. (just creaes a single 1 seat or 2 seat district)
+
 V. 1.23
 
 * bugfix: when loading a new district column, will not reset the population of candidate proposals
