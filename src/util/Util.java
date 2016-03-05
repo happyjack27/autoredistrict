@@ -124,8 +124,10 @@ public class Util {
 	    return v;
 	}
 	public static void make_scripts() {
+		boolean gui = true;
 		String base_dir = "/Users/jimbrill/git/autoredistrict/jar/";
 		String script = "";
+		String script2 = "";
 		Download.init();
 		File f2 = new File(base_dir+"sourcescript");
 		try {
@@ -134,15 +136,26 @@ public class Util {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		System.out.println(script);
+		File f3 = new File(base_dir+"sourcescript2");
+		try {
+			script2 = util.Util.readStream(new FileInputStream(f3));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println(script2);
 		
 		StringBuffer main = new StringBuffer();
 		for( int i = 0; i < Download.apportionments.length; i++) {
 			if( Download.apportionments[i] < 6) {
+				//continue;
+			}
+			if( Download.apportionments[i] < 1) {
 				continue;
 			}
 			String state = Download.states[i];
 			if( false
+					|| state.equals("Alaska")
 					|| state.equals("California")
 					|| state.equals("Texas")
 					|| state.equals("Rhode Island")
@@ -153,7 +166,7 @@ public class Util {
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			if( false
-					|| Download.apportionments[i] == 7  //6=3+3,8=5+3
+					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
 					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
 					//
 					) {
@@ -161,6 +174,19 @@ public class Util {
 			}
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			sb.append(script+"\n");
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			if( false
+					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
+					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
+					//
+					) {
+				sb.append("SET DISTRICTS ALLOW_4_SEATS TRUE\n");
+			}			
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			if( Download.apportionments[i] >= 6) {
+				sb.append(script2+"\n");
+			}
+
 			sb.append("\tEXPORT\n");
 			sb.append("\tEXIT\n");
 			
@@ -175,7 +201,7 @@ public class Util {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript"+i+"\n");
+			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");
 		FileOutputStream fos;

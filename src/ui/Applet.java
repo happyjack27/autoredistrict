@@ -133,8 +133,10 @@ public class Applet extends JApplet {
 
 
     	mainFrame = new MainFrame();
-    	if( args.length > 1 && args[0].equals("run")) {
-			mainFrame.ip.queueInstructionsFromFile(args[1]);
+    	for( int i = 0; i < args.length-1; i++) {
+	    	if( args[i].equals("run")) {
+				mainFrame.ip.queueInstructionsFromFile(args[i+1]);
+	    	}
     	}
     	if( !no_gui) {
     		mainFrame.show();

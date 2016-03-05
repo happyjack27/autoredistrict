@@ -247,6 +247,14 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		getSeatDistribution_last_seats = -1;
 	}
 	public static int[] getSeatDistribution(int seats) {
+		if( seats == 7) {
+			return new int[]{0,0,0,1,1,0};
+		}
+		if( seats <= 5) {
+			int[] iseats =  new int[]{0,0,0,0,0,0};
+			iseats[seats] = 1;
+			return iseats;
+		}
 		if( seats != getSeatDistribution_last_seats) {
 			int sm5 = seats % 5;
 			int s5 = (seats-sm5) / 5;

@@ -150,7 +150,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		textFieldIP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					System.out.println("textFieldIP.getText() "+textFieldIP.getText());
+					//System.out.println("textFieldIP.getText() "+textFieldIP.getText());
 					instruction_pointer = Integer.parseInt(textFieldIP.getText())-1;
 					   try {
 					        Highlighter hilite = scriptTA.getHighlighter();
@@ -320,7 +320,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	@Override
 	public void eventOccured() {
-		System.out.println("eventOccured");
+		//System.out.println("eventOccured");
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
 			lblFinished.setVisible(true);
@@ -330,7 +330,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
-		System.out.println("processing "+current_instruction);
+		//System.out.println("processing "+current_instruction);
 		String[] instruction_words = current_instruction.split(" ");
 		for( int i = 0; i < instruction_words.length; i++) {
 			instruction_words[i] = instruction_words[i].toUpperCase().trim();
@@ -452,14 +452,14 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			}
 		} else
 		if(command.equals("WHEN")) {
-			System.out.println("processing when "+instruction_words[1]);
+			//System.out.println("processing when "+instruction_words[1]);
 			if( instruction_words[1].equals("MUTATE_RATE")) {
-				System.out.println("matched");
-						double threshold = Double.parseDouble(instruction_words[2]);
+				//System.out.println("matched");
+				double threshold = Double.parseDouble(instruction_words[2]);
 				double current_value = ((double)mainFrame.slider_mutation.getValue()/100.0);
-				System.out.println(" threshold: "+threshold+" current: "+current_value);
+				//System.out.println(" threshold: "+threshold+" current: "+current_value);
 				if( threshold < current_value) {
-					System.out.println("threshold not reached");
+					//System.out.println("threshold not reached");
 					return;
 				}
 				System.out.println("threshold reached!");
@@ -550,7 +550,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( category.equals("DISTRICTS")) {
 			if( item.equals("NUM_DISTRICTS")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldNumDistricts.setText(value); }
 			if( item.equals("SEATS_PER_DISTRICT")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldSeatsPerDistrict.setText(value); }
-			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldTotalSeats.setText(value); }
+			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); Settings.seats_number_total = Integer.parseInt(mainFrame.textFieldTotalSeats.getText()); mainFrame.textFieldTotalSeats.setText(value); }
 			if( item.equals("ALLOW_4_SEATS")) { mainFrame.chckbxNewCheckBox.setSelected(value.equals("FALSE")); }
 			if( item.equals("COLUMN")) { mainFrame.comboBoxDistrictColumn.setSelectedItem(value); mainFrame.setDistrictColumn(value); }
 		}
