@@ -69,6 +69,18 @@ public class Util {
 		"Wyoming",
 	};
 	
+	public static void writeHTML() {
+		Download.init();
+		for( int i = 0; i < states.length; i++) {
+			System.out.println("<tr>");
+			System.out.println("<td>"+states[i]+"</td>");
+			//file:///Users/jimbrill/autoredistrict_data/Alabama/2010/map_districts.png
+			System.out.println("<td><a href='fairvote/"+states[i]+"/2010/stats.html'>stats</a></td>");
+			System.out.println("<td><img src='fairvote/"+states[i]+"/2010/map_districts.png' width=100></td>");
+			System.out.println("</tr>");
+		}
+	}
+	
 	public static Vector processVTD() {
 		String path = "http://www2.census.gov/geo/docs/reference/codes/files/national_vtd.txt";
 	    URL url;
@@ -153,13 +165,40 @@ public class Util {
 			if( Download.apportionments[i] < 1) {
 				continue;
 			}
+			if( Download.apportionments[i] > 5) {
+				//continue;
+			}
 			String state = Download.states[i];
 			if( false
-					|| state.equals("Alaska")
-					|| state.equals("California")
-					|| state.equals("Texas")
-					|| state.equals("Rhode Island")
-					|| state.equals("Kentucky")
+					//|| state.equals("Alaska")
+					//|| state.equals("California")
+					//|| state.equals("Texas")
+					//|| state.equals("Louisianna")
+					//|| state.equals("Rhode Island")
+					//|| state.equals("Kentucky")
+					) {
+				continue;
+			}
+			
+			if( true
+					//&& !state.equals("Alaska")
+					//&& !state.equals("Louisiana")
+					//|| state.equals("California")
+					//|| state.equals("Texas")
+					
+					//&& !state.equals("Rhode Island")
+					//&& !state.equals("Kentucky")
+					&& !state.equals("Oregon") //missing election data!
+					&& !state.equals("Montana")
+					/*
+					&& !state.equals("Delaware")
+					&& !state.equals("Hawaii")
+					&& !state.equals("North Dakota")
+					&& !state.equals("Vermont")
+					&& !state.equals("Michigan")
+					&& !state.equals("Indiana")
+					&& !state.equals("Virginia")
+					&& !state.equals("Wisconsin")*/
 					) {
 				continue;
 			}
@@ -185,6 +224,10 @@ public class Util {
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			if( Download.apportionments[i] >= 6) {
 				sb.append(script2+"\n");
+			} else {
+				sb.append("GO\n");
+				sb.append("STOP\n");
+				sb.append("SAVE\n");
 			}
 
 			sb.append("\tEXPORT\n");
@@ -218,6 +261,7 @@ public class Util {
 
 
 	public static void main(String[] args) {
+		//writeHTML();
 		make_scripts();
 		//processVTD();
 		//System.exit(0);

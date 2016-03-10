@@ -28,9 +28,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng( component, path,component.getWidth(), component.getHeight());
   	}
 	public void saveAsPng(JComponent component, String path, int width, int height) {
-		 BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
+        Dimension d = component.getSize();
+        
+        if( false) {
+        	component.setSize(width,height);
+        	
+        } else {
+        	width = d.width;
+        	height = d.height;
+        }
+        
+		BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = image.createGraphics(); 
-
+        
         component.paint(graphics2D);
         try {
             ImageIO.write(image,"png", new File(path));
@@ -38,6 +48,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         catch(Exception ex) {
             ex.printStackTrace();
         }
+        component.setSize(d);
 
 	}
 
@@ -607,94 +618,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_2);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainFrame.mainframe.ip.addHistory("EXPORT");
-
-				String partiesStr = getAsHtml(partiesTable);
-				String raceStr = getAsHtml(ethnicityTable);
-				String sumStr = getAsHtml(summaryTable);
-				String districtsStr = getAsHtml(districtsTable);
-				
-				URL header_path = Applet.class.getResource("/resources/header.php");
-				URL footer_path = Applet.class.getResource("/resources/footer.php");
-				URL style_sheet = Applet.class.getResource("/resources/styles2.css");
-				
-				String write_folder = Download.getStartPath();
-				saveURL(write_folder+"style.css",style_sheet);
-				
-
-				MapPanel.override_size = 1024;
-				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
-				saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
-				MapPanel.override_size = -1;
-				
-				int num_maps_temp = Settings.num_maps_to_draw;
-				int display_mode_temp = Feature.display_mode;
-				Settings.num_maps_to_draw = 1;
-				
-				boolean maplines = Feature.draw_lines;
-				Feature.draw_lines = true;
-				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
-				
-				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
-				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png");
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
-				saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png");
-
-				Feature.draw_lines = maplines;
-				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
-				Settings.num_maps_to_draw = num_maps_temp;
-				Feature.display_mode = display_mode_temp;
-				
-				MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
-				MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
-				
-				
-				String html = "";
-				//html += "<html>\n";
-				//html += "<body>\n";
-				html += getURLtext(header_path);
-				html +="<i>This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.</i><br/><br/>\n";
-				html +="<h3>VTD district assignments</h3><br/>\n";
-				html +="<a href='./vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
-				html +="<a href='./vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
-				html +="<br/><br/>\n";
-				html +="<h3>Map</h3><br/>\n";
-				html +="<center><img src='./map_districts.png' width=800><br/><br/><img src='./map_district_votes.png' width=800></center><br/>\n";
-				html +="<h3>Seats / votes curve - Sorted districts</h3><br/>\n";
-				html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>\n";
-				html +="<h3>Summary</h3>\n";
-				html += sumStr+"\n";
-				html +="<br/><br/>\n";
-				html +="<h3>By party</h3>\n";
-				html += partiesStr+"\n";
-				html +="<br/><br/>\n";
-				html +="<h3>By district</h3>\n";
-				html += districtsStr+"\n";
-				html +="<br/><br/>\n";
-				html +="<h3>By ethnicity</h3>\n";
-				html += raceStr+"\n";
-				html += getURLtext(footer_path);
-				//html += "</body>\n";
-				//html += "</html>\n";
-				//System.out.println(html);
-				
-
-				try {
-					FileOutputStream fos = new FileOutputStream(write_folder+"stats.html");
-					fos.write(html.getBytes());
-					fos.close();
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/").replaceAll(" ", "%20");
-				//url = URLEncoder.encode(url);
-				Applet.browseTo(url);
-				
-
-				/*
-				excel.ExportThread thread = new excel.ExportThread();
-				thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
-				*/
+				exportToHtml();
 			}
 		});
 		btnNewButton.setBounds(89, 8, 117, 29);
@@ -823,5 +747,152 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public void eventOccured() {
 		getStats();
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
+	}
+	public void exportToHtml() {
+		MainFrame.mainframe.ip.addHistory("EXPORT");
+
+		String partiesStr = getAsHtml(partiesTable);
+		String raceStr = getAsHtml(ethnicityTable);
+		String sumStr = getAsHtml(summaryTable);
+		String districtsStr = getAsHtml(districtsTable);
+		
+		URL header_path = Applet.class.getResource("/resources/header.php");
+		URL footer_path = Applet.class.getResource("/resources/footer.php");
+		URL style_sheet = Applet.class.getResource("/resources/styles2.css");
+		
+		String write_folder = Download.getStartPath();
+		saveURL(write_folder+"style.css",style_sheet);
+		
+
+		//MapPanel.override_size = 1024;
+		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
+		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
+
+		int num_maps_temp = Settings.num_maps_to_draw;
+		int display_mode_temp = Feature.display_mode;
+		Settings.num_maps_to_draw = 1;
+		
+		boolean maplines = Feature.draw_lines;
+		boolean draw_labels = Feature.showDistrictLabels;
+		Feature.draw_lines = true;
+		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		
+		
+		///====begin insert
+		Feature.showDistrictLabels = true;
+		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",1024,1024);
+		Feature.showDistrictLabels = false;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",1024,1024);
+
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",1024,1024);
+
+		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes.png",1024,1024);
+		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",1024,1024);
+
+		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",1024,1024);
+
+
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+
+		Feature.showDistrictLabels = draw_labels;
+		Feature.draw_lines = maplines;
+		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		Settings.num_maps_to_draw = num_maps_temp;
+		Feature.display_mode = display_mode_temp;
+		MapPanel.override_size = -1;
+
+
+		String html = "";
+
+		html += getURLtext(header_path);
+		html +="<i>This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.</i><br/><br/>\n";
+
+		html +="<h3>VTD district assignments</h3><br/>\n";
+		html +="<a href='./vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
+		html +="<a href='./vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
+		html +="<br/><br/>\n";
+
+		html +="<h3>Maps</h3><br/>\n";
+		html +="<table>";
+		html +="<tr>";
+		html +="<td>Districts</td>";
+		html +="<td align='center'><center><a href='./map_districts_labels.png'><img src='./map_districts_labels.png' width=100></br>Labeled districts</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_districts.png'><img src='./map_districts.png' width=100></br>Unlabeled districts</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_votes.png'><img src='./map_district_votes.png' width=100></br>Vote balance</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_pop.png'><img src='./map_district_pop.png' width=100></br>Population difference</br>(click to enlarge)</a></center></td>";
+		html +="</tr>";
+		html +="<tr>";
+		html +="<td>Fairness</td>";
+		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing.png' width=100></br>Partisan vote packing</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing.png' width=100></br>Racial vote packing</br>(click to enlarge)</a></center></td>";
+
+		html +="<td align='center'><center><a href='./map_district_wasted_votes.png'><img src='./map_district_wasted_votes.png' width=100></br>Wasted votes by party</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_compactness.png'><img src='./map_district_compactness.png' width=100></br>Compactness</br>(click to enlarge)</a></center></td>";
+		html +="</tr>";
+		html +="<tr>";
+		html +="<td>Counties</td>";
+		html +="<td align='center'><center><a href='./map_counties.png'><img src='./map_counties.png' width=100></br>Counties</br>(click to enlarge)</a></center></td>";
+		html +="</tr>";
+		html +="<tr>";
+		html +="<td>VTDs</td>";
+		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes.png' width=100></br>VTD vote balance</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics.png' width=100></br>VTD demographics</br>(click to enlarge)</a></center></td>";
+		html +="</tr>";
+		html +="</table>";
+		html +="</br>";
+
+		html +="<h3>Seats / votes curve - Sorted districts</h3><br/>\n";
+		html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>\n";
+
+		html +="<h3>Summary</h3>\n";
+		html += sumStr+"\n";
+		html +="<br/><br/>\n";
+		html +="<h3>By party</h3>\n";
+		html += partiesStr+"\n";
+		html +="<br/><br/>\n";
+		html +="<h3>By district</h3>\n";
+		html += districtsStr+"\n";
+		html +="<br/><br/>\n";
+		html +="<h3>By ethnicity</h3>\n";
+		html += raceStr+"\n";
+
+		html += getURLtext(footer_path);
+
+
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats.html");
+			fos.write(html.getBytes());
+			fos.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/").replaceAll(" ", "%20");
+		//url = URLEncoder.encode(url);
+		Applet.browseTo(url);
+		
+		///=====end insert
+		
+		
+
+		/*
+		excel.ExportThread thread = new excel.ExportThread();
+		thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
+		*/
 	}
 }

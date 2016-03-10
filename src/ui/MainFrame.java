@@ -101,6 +101,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelGraph panelGraph = new PanelGraph();
 
 	//===========COMPONENTS - MENU ITEMS
+	JMenuItem mntmColorDistDemo;
+	JMenuItem mntmColorPartisanPacking;
+	JMenuItem mntmColorRacialPacking;
+	JMenuItem mntmExportToHtml;
 	public ButtonGroup selectionType = new ButtonGroup();
 	JMenuItem mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
 	JMenuItem mntmShowDemographics = new JMenuItem("Color by demographic");;
@@ -2066,8 +2070,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				Feature feat = featmap.get(ss[ikey]);
 				if( feat == null) {
-					System.out.println("no match found!: "+ss[ikey]);
-					continue;
+					if( ss[ikey].length() >= 6) {
+						ss[ikey] = ss[ikey].substring(3);
+					}
+					feat = featmap.get(ss[ikey]);
+					if( feat == null) {
+						System.out.println("no match found!: "+ss[ikey]);
+						continue;
+					}
 				}
 				//System.out.println("match found!: "+ss[ikey]);
 				for( int j = 0; j < care.length; j++) {
@@ -2141,8 +2151,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 	        String[] headers = v.remove(0);
 			//todo: populate v with the data.
-			String county_column = "COUNTY_NAM";
-			String county_column2 = "COUNTY_NAME";
+			String county_column = "COUNTYFP10";
+			String county_column2 = "COUNTY_NAM";
 			int iCountyColumn = 0;
 			
 			//collect counties;
@@ -2186,15 +2196,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 
 			for( String[] ss : v) {
+				String[] tries = new String[]{" COUNTY"," PARISH"," BOROUGH"," CENSUS AREA"," MUNICIPALITY"};
 				try {
-				String incounty = ss[iCountyColumn].trim().toUpperCase();
+				String incounty = ss[iCountyColumn+1].trim().toUpperCase();
 				Vector<Feature> vf = county_feats.get(incounty);
 				if( vf == null) {
-					incounty += " COUNTY";
+					while( incounty.length() > 1 && incounty.substring(0,1).equals("0")) {
+						incounty = incounty.substring(1);
+					}
 					vf = county_feats.get(incounty);
 					if( vf == null) {
-							System.out.println("not found!: "+incounty);
-							continue;
+						incounty = ss[iCountyColumn].trim().toUpperCase();
+						vf = county_feats.get(incounty);
+						if( vf == null) {
+							for( int i = 0; i < tries.length; i++) {
+								vf = county_feats.get(incounty+tries[i]);
+								if( vf != null) {
+									incounty += tries[i];
+									break;
+								}
+							}
+							if( vf == null) {
+									System.out.println("not found!: "+incounty);
+									continue;
+							}
+						}
 					}
 				}
 				double total_pop = (double)county_pops.get(incounty);
@@ -4559,7 +4585,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.exit(0);
 			}
 		});
+		//add at ened of jmenu (move code in panelstats to function)
+		mntmExportToHtml = new JMenuItem("Export to html");
+		mntmExportToHtml.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panelStats.exportToHtml();
+			}
+		});
+		mnFile.add(mntmExportToHtml);
+
+		
 		mnFile.add(mntmExit);
+		
 		
 		JMenuItem mntmWisconsin = new JMenuItem("Wisconsin 2012");
 		mntmWisconsin.addActionListener(new ActionListener() {
@@ -4857,6 +4894,37 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mnView.add(mntmColorByWasted);
 		mnView.add(mntmColorByVote);
+		
+		//add before the jseparator
+				mntmColorDistDemo = new JMenuItem("Color by district demographics");
+				mntmColorDistDemo.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmColorDistDemo);
+
+				mntmColorPartisanPacking = new JMenuItem("Color by district partisan vote packing");
+				mntmColorPartisanPacking.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmColorPartisanPacking);
+
+				mntmColorRacialPacking = new JMenuItem("Color by district racial vote packing");
+				mntmColorRacialPacking.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmColorRacialPacking);
 		
 		mntmShowVoteBalance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

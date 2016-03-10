@@ -105,7 +105,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		return getAnnealingFloor(generation)*1.2;
 	}
 	public static double getAnnealingPerGeneration() {
-		double e = Math.exp(-0.0006 * anneal_rate ); // reaches
+		double e = Math.exp(-0.0010 * anneal_rate ); // reaches
 		return e;
 	}
 	public static double getAnnealingFloor(long generation) {

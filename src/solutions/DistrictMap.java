@@ -1956,4 +1956,99 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				255-c.getBlue()
 				);
 	}
+
+	//vote gap_by_district
+	boolean hasStats = false;
+		public double getVoteGapForDistrict(int k) {
+			if( !hasStats) {
+				this.calcDemographicStatistics();
+			}
+			double[] votes = districts.get(k).getAnOutcome();//getElectionResults()[0];
+			double[] seats = District.popular_vote_to_elected(votes, k);
+			double num_seats = Settings.seats_in_district(k);
+			
+			double total_votes = votes[0]+votes[1];
+			double votes_per_seat = total_votes/num_seats;
+			double dem_res  = votes[0] - votes_per_seat*seats[0];
+			double rep_res  = votes[1] - votes_per_seat*seats[1];
+			if( dem_res < 0) { dem_res += votes_per_seat; } //seats[0]--;
+			if( rep_res < 0) { rep_res += votes_per_seat; } //seats[1]--;
+			
+			System.out.println("dem_res: "+dem_res);
+			System.out.println("rep_res: "+rep_res);
+			return dem_res-rep_res;
+		}
+		public Color getVoteGapByDemoColor(int k) {
+			double[] votes = districts.get(k).getAnOutcome();
+			double vote_gap = getVoteGapForDistrict(k);
+			vote_gap /= (votes[0]+votes[1]);
+			vote_gap *= 2;
+			vote_gap = Math.abs(vote_gap);
+			double[] amts1 = districts.get(k).getDemographics();
+			double tot = 0;
+			for( int i = 0; i < amts1.length; i++) {
+				tot += amts1[i];
+			}
+			tot = vote_gap/tot;
+			for( int i = 0; i < amts1.length; i++) {
+				amts1[i] *= tot;
+			}
+			
+			double[] rgb = new double[]{0,0,0};
+			if( amts1.length == 0) {
+				return Color.WHITE;
+			}
+
+			for( int j = 0; j < amts1.length; j++) {
+				if( amts1[j] == 0) {
+					amts1[j] = 1;
+				}
+				Color c = getComplement(FeatureCollection.standard_district_colors[j]);
+				double d = amts1[j];
+				d /= 2;
+				if( d > 1) { d = 1; }
+				if( d < 0) { d = 0; }
+				rgb[0] += d*c.getRed();
+				rgb[1] += d*c.getGreen();
+				rgb[2] += d*c.getBlue();
+			}
+			for( int j = 0; j < 3; j++) {
+				if( rgb[j] < 0) rgb[j] = 0;
+				if( rgb[j] > 255) rgb[j] = 255;
+			}
+			return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+		}
+		public Color getVoteGapByPartyColor(int k) {
+			double votes[] = districts.get(k).getAnOutcome();
+			double vote_gap = getVoteGapForDistrict(k);
+			vote_gap /= (votes[0]+votes[1]);
+			vote_gap *= 2;
+			System.out.println("vote_gap: "+vote_gap);
+			double[] amts1 = new double[]{vote_gap > 0 ? vote_gap : 0,vote_gap < 0 ? -vote_gap : 0};
+		
+			double[] rgb = new double[]{0,0,0};
+			if( amts1.length == 0) {
+				return Color.WHITE;
+			}
+
+			for( int j = 0; j < amts1.length; j++) {
+				if( amts1[j] == 0) {
+					amts1[j] = 1;
+				}
+				Color c = getComplement(FeatureCollection.standard_district_colors[j]);
+				double d = amts1[j];
+				d /= 2;
+				if( d > 1) { d = 1; }
+				if( d < 0) { d = 0; }
+				rgb[0] += d*c.getRed();
+				rgb[1] += d*c.getGreen();
+				rgb[2] += d*c.getBlue();
+			}
+			for( int j = 0; j < 3; j++) {
+				if( rgb[j] < 0) rgb[j] = 0;
+				if( rgb[j] > 255) rgb[j] = 255;
+			}
+			return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
+		}
+
 }
