@@ -1,0 +1,171 @@
+FILEID	Text	               6
+STUSAB	Text	               2
+CHARITER	Text	               3
+CIFSN	Text	               2
+LOGRECNO	Text	               7
+P0010001	Number (Long)	4
+P0010002	Number (Long)	4
+P0010003	Number (Long)	4
+P0010004	Number (Long)	4
+P0010005	Number (Long)	4
+P0010006	Number (Long)	4
+P0010007	Number (Long)	4
+P0010008	Number (Long)	4
+P0010009	Number (Long)	4
+P0010010	Number (Long)	4
+P0010011	Number (Long)	4
+P0010012	Number (Long)	4
+P0010013	Number (Long)	4
+P0010014	Number (Long)	4
+P0010015	Number (Long)	4
+P0010016	Number (Long)	4
+P0010017	Number (Long)	4
+P0010018	Number (Long)	4
+P0010019	Number (Long)	4
+P0010020	Number (Long)	4
+P0010021	Number (Long)	4
+P0010022	Number (Long)	4
+P0010023	Number (Long)	4
+P0010024	Number (Long)	4
+P0010025	Number (Long)	4
+P0010026	Number (Long)	4
+P0010027	Number (Long)	4
+P0010028	Number (Long)	4
+P0010029	Number (Long)	4
+P0010030	Number (Long)	4
+P0010031	Number (Long)	4
+P0010032	Number (Long)	4
+P0010033	Number (Long)	4
+P0010034	Number (Long)	4
+P0010035	Number (Long)	4
+P0010036	Number (Long)	4
+P0010037	Number (Long)	4
+P0010038	Number (Long)	4
+P0010039	Number (Long)	4
+P0010040	Number (Long)	4
+P0010041	Number (Long)	4
+P0010042	Number (Long)	4
+P0010043	Number (Long)	4
+P0010044	Number (Long)	4
+P0010045	Number (Long)	4
+P0010046	Number (Long)	4
+P0010047	Number (Long)	4
+P0010048	Number (Long)	4
+P0010049	Number (Long)	4
+P0010050	Number (Long)	4
+P0010051	Number (Long)	4
+P0010052	Number (Long)	4
+P0010053	Number (Long)	4
+P0010054	Number (Long)	4
+P0010055	Number (Long)	4
+P0010056	Number (Long)	4
+P0010057	Number (Long)	4
+P0010058	Number (Long)	4
+P0010059	Number (Long)	4
+P0010060	Number (Long)	4
+P0010061	Number (Long)	4
+P0010062	Number (Long)	4
+P0010063	Number (Long)	4
+P0010064	Number (Long)	4
+P0010065	Number (Long)	4
+P0010066	Number (Long)	4
+P0010067	Number (Long)	4
+P0010068	Number (Long)	4
+P0010069	Number (Long)	4
+P0010070	Number (Long)	4
+P0010071	Number (Long)	4
+P0020001	Number (Long)	4
+P0020002	Number (Long)	4
+P0020003	Number (Long)	4
+P0020004	Number (Long)	4
+P0020005	Number (Long)	4
+P0020006	Number (Long)	4
+P0020007	Number (Long)	4
+P0020008	Number (Long)	4
+P0020009	Number (Long)	4
+P0020010	Number (Long)	4
+P0020011	Number (Long)	4
+P0020012	Number (Long)	4
+P0020013	Number (Long)	4
+P0020014	Number (Long)	4
+P0020015	Number (Long)	4
+P0020016	Number (Long)	4
+P0020017	Number (Long)	4
+P0020018	Number (Long)	4
+P0020019	Number (Long)	4
+P0020020	Number (Long)	4
+P0020021	Number (Long)	4
+P0020022	Number (Long)	4
+P0020023	Number (Long)	4
+P0020024	Number (Long)	4
+P0020025	Number (Long)	4
+P0020026	Number (Long)	4
+P0020027	Number (Long)	4
+P0020028	Number (Long)	4
+P0020029	Number (Long)	4
+P0020030	Number (Long)	4
+P0020031	Number (Long)	4
+P0020032	Number (Long)	4
+P0020033	Number (Long)	4
+P0020034	Number (Long)	4
+P0020035	Number (Long)	4
+P0020036	Number (Long)	4
+P0020037	Number (Long)	4
+P0020038	Number (Long)	4
+P0020039	Number (Long)	4
+P0020040	Number (Long)	4
+P0020041	Number (Long)	4
+P0020042	Number (Long)	4
+P0020043	Number (Long)	4
+P0020044	Number (Long)	4
+P0020045	Number (Long)	4
+P0020046	Number (Long)	4
+P0020047	Number (Long)	4
+P0020048	Number (Long)	4
+P0020049	Number (Long)	4
+P0020050	Number (Long)	4
+P0020051	Number (Long)	4
+P0020052	Number (Long)	4
+P0020053	Number (Long)	4
+P0020054	Number (Long)	4
+P0020055	Number (Long)	4
+P0020056	Number (Long)	4
+P0020057	Number (Long)	4
+P0020058	Number (Long)	4
+P0020059	Number (Long)	4
+P0020060	Number (Long)	4
+P0020061	Number (Long)	4
+P0020062	Number (Long)	4
+P0020063	Number (Long)	4
+P0020064	Number (Long)	4
+P0020065	Number (Long)	4
+P0020066	Number (Long)	4
+P0020067	Number (Long)	4
+P0020068	Number (Long)	4
+P0020069	Number (Long)	4
+P0020070	Number (Long)	4
+P0020071	Number (Long)	4
+P0020072	Number (Long)	4
+P0020073	Number (Long)	4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -188,8 +188,8 @@ public class Util {
 					
 					//&& !state.equals("Rhode Island")
 					//&& !state.equals("Kentucky")
-					&& !state.equals("Oregon") //missing election data!
-					&& !state.equals("Montana")
+					//&& !state.equals("Oregon") //missing election data!
+					//&& !state.equals("Montana")
 					/*
 					&& !state.equals("Delaware")
 					&& !state.equals("Hawaii")
@@ -200,7 +200,7 @@ public class Util {
 					&& !state.equals("Virginia")
 					&& !state.equals("Wisconsin")*/
 					) {
-				continue;
+				//continue;
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
@@ -222,6 +222,7 @@ public class Util {
 				sb.append("SET DISTRICTS ALLOW_4_SEATS TRUE\n");
 			}			
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			/*
 			if( Download.apportionments[i] >= 6) {
 				sb.append(script2+"\n");
 			} else {
@@ -229,6 +230,7 @@ public class Util {
 				sb.append("STOP\n");
 				sb.append("SAVE\n");
 			}
+			*/
 
 			sb.append("\tEXPORT\n");
 			sb.append("\tEXIT\n");

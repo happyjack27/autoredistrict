@@ -4,7 +4,7 @@ import geography.*;
 import geography.Properties;
 import solutions.*;
 import ui.MainFrame.OpenShapeFileThread;
-import util.Quadruplet;
+import util.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -2062,7 +2062,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Vector<String[]> v = processVTDrenameFile();
 			System.out.println("size: "+v.size());
 			String[] header = v.remove(0);
-			int[] care = new int[]{3,6};
+			int[] care = new int[]{3,5,6};
 			for(String[] ss : v) {
 				if( !ss[0].equals(state_abbr)) {
 					//System.out.print(".");
@@ -6626,4 +6626,473 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public OpenShapeFileThread createOpenShapeFileThread(File vtd_file) {
 		return new OpenShapeFileThread(vtd_file);
 	}
+	
+	
+	public int[] joinToTxt(String path, String primary_key, int foreign_key, int start_row, int[] cols, String[] names) {
+		boolean try_trim_zeros = false;
+
+		int found = 0;
+		int not_found = 0;
+		System.out.println("url: "+path);
+		System.out.println("0");
+		URL url;
+		InputStream is = null;
+		System.out.println("0.0");
+
+		BufferedReader br;
+		String line;
+		System.out.println("0.1");
+
+		Vector<String[]> v = new Vector<String[]>();
+
+		try {
+			System.out.println("1");
+			url = new URL(path);
+			System.out.println("2");
+			is = url.openStream();  // throws an IOException
+			System.out.println("3");
+			br = new BufferedReader(new InputStreamReader(is));
+			System.out.println("4..");
+
+			while ((line = br.readLine()) != null) {
+				System.out.print(".");
+				System.out.println(line);
+				String[] ss = line.split("\t");
+				for( int i = 0; i < ss.length; i++) {
+					ss[i] = ss[i].replaceAll("\"", "").replaceAll(",", "");
+				}
+				v.add(ss);
+			}
+		} catch (Exception mue) {
+			System.out.print("ex "+mue);
+			mue.printStackTrace();
+		}
+		try {
+			if (is != null) is.close();
+		} catch (IOException ioe) {
+			// nothing to see here
+		}
+		System.out.println("5..");
+		
+		for( int i = 0; i < start_row; i++) {
+			v.remove(0);
+		}
+		
+		//collect counties;
+		HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+		HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
+		for( Feature feat : featureCollection.features) {
+			try {
+			String county = (String) feat.properties.get(primary_key);
+			county = county.trim().toUpperCase();
+			
+			Vector<Feature> vf = county_feats.get(county);
+			if( vf == null) { 
+				vf = new Vector<Feature>();
+				county_feats.put(county,vf);
+			}
+			vf.add(feat);
+			Integer i = county_pops.get(county);
+			if( i == null) { 
+				i = new Integer(0);
+				county_pops.put(county,i);
+			}
+			if( feat.properties.POPULATION == 0) {
+				Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
+				feat.properties.POPULATION = d.intValue();
+			}
+			i += feat.properties.POPULATION;
+			county_pops.put(county,i);
+			} catch (Exception ex) {
+				System.out.println("ex "+ex);
+				ex.printStackTrace();
+			}
+		}
+		
+		//now deaggregate proportional
+		System.out.println("deaggregating proportional...");
+
+		for( String[] ss : v) {
+			String[] tries = new String[]{" COUNTY"," PARISH"," BOROUGH"," CENSUS AREA"," MUNICIPALITY"," VOTING DISTRICT"};
+			try {
+			String incounty = ss[foreign_key].trim().toUpperCase();
+			Vector<Feature> vf = county_feats.get(incounty);
+			if( vf == null) {
+				if( try_trim_zeros ) {
+					while( incounty.length() > 1 && incounty.substring(0,1).equals("0")) {
+						incounty = incounty.substring(1);
+					}
+				}
+				vf = county_feats.get(incounty);
+				if( vf == null) {
+					incounty = ss[foreign_key].trim().toUpperCase();
+					vf = county_feats.get(incounty);
+					if( vf == null) {
+						for( int i = 0; i < tries.length; i++) {
+							vf = county_feats.get(incounty+tries[i]);
+							if( vf != null) {
+								incounty += tries[i];
+								break;
+							}
+						}
+						if( vf == null) {
+								System.out.println("not found!: "+incounty);
+								not_found++;
+								continue;
+						}
+					}
+				}
+			}
+			double total_pop = (double)county_pops.get(incounty);
+			System.out.println("found!: "+incounty+" "+total_pop);
+			found++;
+			double[] dd = new double[cols.length];
+			
+			for( int i = 0; i < cols.length; i++) {
+				dd[i] = Double.parseDouble(ss[cols[i]]);///total_pop;
+			}
+			for(Feature feat : vf) {
+				double feat_pop = feat.properties.POPULATION;
+				for( int i = 0; i < ss.length; i++) {
+					feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
+				}
+			}
+			} catch (Exception ex) {
+				System.out.println("ex: "+ex);
+				ex.printStackTrace();
+			}
+		}
+		return new int[]{found,not_found};
+		
+		
+	}
+
+	class ImportVTDLevel extends Thread {
+		public Thread nextThread;
+		public void run() {
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+			Feature.compare_centroid = false;
+			Collections.sort(featureCollection.features);
+
+			System.out.println("import vtd level start");
+			//String path = "ftp://autoredistrict.org/pub/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
+			String path = "http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
+			
+			int[] ii =  joinToTxt(path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+
+			System.out.println("total found: "+ii[0]+"  total not found: "+ii[1]);
+				
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+			Download.makeDoneFile();
+
+			
+			System.out.println("setting columns final...");
+			trySetBasicColumns();
+			trySetGroupColumns();
+			System.out.println("done county data merge");
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
+			saveData(Download.vtd_dbf_file, 2,false);
+			System.out.println("done save "+nextThread);
+			if( nextThread == null) {
+				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			}
+
+			if( Download.prompt) {
+				JOptionPane.showMessageDialog(null, "Import complete.");
+			}
+			if( Download.exit_when_done) {
+				System.exit(0);
+			}
+			if( Download.downloadAll) {
+				downloadNextState();
+				
+			}
+			ip.eventOccured();
+			if( nextThread != null) {
+				nextThread.start();
+				nextThread = null;
+			}
+		}
+	}
+	class ImportDemographics extends Thread {
+		Thread nextThread = null;
+		public void run() {
+			String state = Download.states[Download.istate];
+			
+			getDemographics(state,Download.state_to_abbr.get(state),""+Download.cyear);
+		
+			System.out.println("done nextThred: "+nextThread);
+			if( nextThread != null) {
+				nextThread.start();
+				nextThread = null;
+			}
+		}
+		public void getDemographics(String statename, String stateabbr, String year) {
+			try {
+
+			int DATA_STARTS_AT = 3;
+			boolean trim_leading_zeros = false;
+		
+			Hashtable<String,String> column_renames = new Hashtable<String,String>();
+			String base_url = "http://www2.census.gov/census_2010/01-Redistricting_File--PL_94-171/";
+			
+			String fn_zipfile = stateabbr.toLowerCase()+year+".pl.zip";
+			String url = base_url+statename+"/"+fn_zipfile;
+			String path = Download.census_tract_path+"demographics"+File.separator;
+
+			Download.download(url,path,fn_zipfile);
+			Download.unzip(path+fn_zipfile, Download.census_tract_path+"demographics"+File.separator);
+			
+			String fn_geoheader = stateabbr.toLowerCase()+"geo"+year+".pl";
+			String fn_part1 = stateabbr.toLowerCase()+"00001"+year+".pl";
+			String fn_part2 = stateabbr.toLowerCase()+"00002"+year+".pl";
+			
+			File f_geoheader = new File(path+fn_geoheader);
+			FileInputStream fis_geoheader = new FileInputStream(f_geoheader);
+			BufferedReader br_geoheader = new BufferedReader(new InputStreamReader(fis_geoheader));
+
+			File f_part1 = new File(path+fn_part1);
+			FileInputStream fis_part1;
+				fis_part1 = new FileInputStream(f_part1);
+			BufferedReader br_part1 = new BufferedReader(new InputStreamReader(fis_part1));
+			
+			File f_part2 = new File(path+fn_part2);
+			FileInputStream fis_part2 = new FileInputStream(f_part2);
+			BufferedReader br_part2 = new BufferedReader(new InputStreamReader(fis_part2));
+			
+			
+			column_renames.put("INTPTLAT","INTPTLAT");
+			column_renames.put("INTPTLON","INTPTLON");
+			column_renames.put("VTD","VTD");
+			
+			column_renames.put("P0020001","POP_TOTAL");
+			column_renames.put("P0020002","POP_HISPAN");
+			column_renames.put("P0020005","POP_WHITE");
+			column_renames.put("P0020006","POP_BLACK");
+			column_renames.put("P0020007","POP_INDIAN");
+			column_renames.put("P0020008","POP_ASIAN");
+			column_renames.put("P0020009","POP_HAWAII");
+			column_renames.put("P0020010","POP_OTHER");
+			column_renames.put("P0020011","POP_MULTI");
+			
+			column_renames.put("P0040001","VAP_TOTAL");
+			column_renames.put("P0040002","VAP_HISPAN");
+			column_renames.put("P0040005","VAP_WHITE");
+			column_renames.put("P0040006","VAP_BLACK");
+			column_renames.put("P0040007","VAP_INDIAN");
+			column_renames.put("P0040008","VAP_ASIAN");
+			column_renames.put("P0040009","VAP_HAWAII");
+			column_renames.put("P0040010","VAP_OTHER");
+			column_renames.put("P0040011","VAP_MULTI");
+			
+			String[] headers = new String[]{
+					"INTPTLAT",
+					"INTPTLON",
+					"VTD",
+					
+					"POP_TOTAL",
+					"POP_HISPAN",
+					"POP_WHITE",
+					"POP_BLACK",
+					"POP_INDIAN",
+					"POP_ASIAN",
+					"POP_HAWAII",
+					"POP_OTHER",
+					"POP_MULTI",
+					
+					"VAP_TOTAL",
+					"VAP_HISPAN",
+					"VAP_WHITE",
+					"VAP_BLACK",
+					"VAP_INDIAN",
+					"VAP_ASIAN",
+					"VAP_HAWAII",
+					"VAP_OTHER",
+					"VAP_MULTI",
+			};
+			
+
+			Vector<String[]> data = new Vector<String[]>();
+			
+			String sgeo_header = Util.readStream(getClass().getResourceAsStream("/resources/geoheader_cols.txt")); 
+			String spart1_header = Util.readStream(getClass().getResourceAsStream("/resources/part1_cols.txt")); 
+			String spart2_header = Util.readStream(getClass().getResourceAsStream("/resources/part2_cols.txt")); 
+			
+			Vector<Triplet<String,String,Integer>> geo_header = new Vector<Triplet<String,String,Integer>>();
+			Vector<Triplet<String,String,Integer>> part1_header = new Vector<Triplet<String,String,Integer>>();
+			Vector<Triplet<String,String,Integer>> part2_header = new Vector<Triplet<String,String,Integer>>();
+			
+			String[] lines = sgeo_header.split("\n");
+			for( int i = 0; i < lines.length; i++) {
+				String[] ss = lines[i].split("\t");
+				geo_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
+			}
+			lines = spart1_header.split("\n");
+			for( int i = 0; i < lines.length; i++) {
+				String[] ss = lines[i].split("\t");
+				part1_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
+			}
+			lines = spart2_header.split("\n");
+			for( int i = 0; i < lines.length; i++) {
+				String[] ss = lines[i].split("\t");
+				part2_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
+			}
+			
+			String primary_key = "VTD"+(Download.cyear % 100);
+			int foreign_key = 2;
+			
+			//collect primary keys;
+			HashMap<String,double[]> from_import = new HashMap<String,double[]>();
+			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+			HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
+			for( Feature feat : featureCollection.features) {
+				try {
+				String county = (String) feat.properties.get(primary_key);
+				county = county.trim().toUpperCase();
+				
+				Vector<Feature> vf = county_feats.get(county);
+				if( vf == null) { 
+					vf = new Vector<Feature>();
+					county_feats.put(county,vf);
+				}
+				vf.add(feat);
+				Integer i = county_pops.get(county);
+				if( i == null) { 
+					i = new Integer(0);
+					county_pops.put(county,i);
+				}
+				if( feat.properties.POPULATION == 0) {
+					Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
+					feat.properties.POPULATION = d.intValue();
+				}
+				i += feat.properties.POPULATION;
+				county_pops.put(county,i);
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+			}
+			
+			//read file into hash table (aggregating into vtd's)
+			while( true) {
+				String geo_line = br_geoheader.readLine();
+				String part1_line =  br_part1.readLine();
+				String part2_line =  br_part2.readLine();
+				if( geo_line == null) {
+					break;
+				}
+				
+				String[] geo_ss = parse_fixed_width(geo_line, geo_header);
+				String[] part1_ss = part1_line.split(",");
+				String[] part2_ss = part2_line.split(",");
+				
+				String[] ss = new String[column_renames.size()];
+				int ndx = 0;
+				
+				for( int i = 0; i < geo_header.size(); i++) {
+					String rename = column_renames.get(geo_header.get(i).a);
+					if( rename != null) {
+						ss[ndx++] = geo_ss[i];
+					}
+				}
+				for( int i = 0; i < part1_header.size(); i++) {
+					String rename = column_renames.get(part1_header.get(i).a);
+					if( rename != null) {
+						ss[ndx++] = part1_ss[i];
+					}
+				}
+				for( int i = 0; i < part2_header.size(); i++) {
+					String rename = column_renames.get(part2_header.get(i).a);
+					if( rename != null) {
+						ss[ndx++] = part2_ss[i];
+					}
+				}
+				
+				String s = ss[foreign_key];
+				if( trim_leading_zeros) {
+					while( s.length() > 1 && s.charAt(0) == '0') {
+						s = s.substring(1);
+					}
+				}
+				
+				double[] dd = from_import.get(s);
+				if( dd == null) {
+					dd = new double[ss.length-DATA_STARTS_AT];
+					for( int i = 0; i < dd.length; i++) {
+						dd[i] = 0;
+					}
+					from_import.put(s,dd);
+				}
+				for( int i = 0; i < dd.length; i++) {
+					try {
+						dd[i] += Double.parseDouble(ss[i+DATA_STARTS_AT]);
+					} catch (Exception ex) { ex.printStackTrace(); }
+				}
+			}
+			
+			//close everything
+			try {
+				br_geoheader.close();
+				br_part1.close();
+				br_part2.close();
+				
+				fis_geoheader.close();
+				fis_part1.close();
+				fis_part2.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			int found = 0;
+			int not_found = 0;
+			
+			//now write it out into features.
+			for( Map.Entry<String,double[]> entry : from_import.entrySet() ) {
+				try { 
+					String incounty = entry.getKey();
+					double[] dd = entry.getValue();
+					Vector<Feature> vf = county_feats.get(incounty);
+					if( vf == null) {
+						System.out.println("not found!: "+incounty);
+						not_found++;
+						continue;
+					}
+					found++;
+					double total_pop = (double)county_pops.get(incounty);
+					System.out.println("found!: "+incounty+" "+total_pop);
+					
+					for(Feature feat : vf) {
+						double feat_pop = feat.properties.POPULATION;
+						for( int i = 0; i < dd.length; i++) {
+							feat.properties.put(headers[i+DATA_STARTS_AT], ""+(dd[i]*feat_pop/total_pop));
+						}
+					}
+				} catch (Exception ex) {
+					System.out.println("ex: "+ex);
+					ex.printStackTrace();
+				}
+			}	
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		public String[] parse_fixed_width(String s, Vector<Triplet<String,String,Integer>> header) {
+			String[] ss = new String[header.size()];
+			for( int i = 0; i < header.size(); i++) {
+				int n = header.get(i).c < s.length() ? header.get(i).c : s.length();
+				ss[i] = s.substring(0,n);
+				s = s.substring(n); 
+			}
+			return ss;
+		}
+	}
+
 }

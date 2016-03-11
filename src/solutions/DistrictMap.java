@@ -1976,19 +1976,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			
 			System.out.println("dem_res: "+dem_res);
 			System.out.println("rep_res: "+rep_res);
-			return dem_res-rep_res;
+			return (dem_res-rep_res)/num_seats;
 		}
 		public Color getVoteGapByDemoColor(int k) {
 			double[] votes = districts.get(k).getAnOutcome();
 			double vote_gap = getVoteGapForDistrict(k);
 			vote_gap /= (votes[0]+votes[1]);
-			vote_gap *= 2;
-			vote_gap = Math.abs(vote_gap);
+			vote_gap = Math.abs(vote_gap)*2.0;
 			double[] amts1 = districts.get(k).getDemographics();
 			double tot = 0;
 			for( int i = 0; i < amts1.length; i++) {
 				tot += amts1[i];
 			}
+			System.out.println("tot: "+tot);
 			tot = vote_gap/tot;
 			for( int i = 0; i < amts1.length; i++) {
 				amts1[i] *= tot;
@@ -2001,11 +2001,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 			for( int j = 0; j < amts1.length; j++) {
 				if( amts1[j] == 0) {
-					amts1[j] = 1;
+					//amts1[j] = 1;
 				}
 				Color c = getComplement(FeatureCollection.standard_district_colors[j]);
 				double d = amts1[j];
-				d /= 2;
+				//d /= 2;
 				if( d > 1) { d = 1; }
 				if( d < 0) { d = 0; }
 				rgb[0] += d*c.getRed();
@@ -2022,7 +2022,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			double votes[] = districts.get(k).getAnOutcome();
 			double vote_gap = getVoteGapForDistrict(k);
 			vote_gap /= (votes[0]+votes[1]);
-			vote_gap *= 2;
 			System.out.println("vote_gap: "+vote_gap);
 			double[] amts1 = new double[]{vote_gap > 0 ? vote_gap : 0,vote_gap < 0 ? -vote_gap : 0};
 		
@@ -2033,11 +2032,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 			for( int j = 0; j < amts1.length; j++) {
 				if( amts1[j] == 0) {
-					amts1[j] = 1;
+					//amts1[j] = 1;
 				}
 				Color c = getComplement(FeatureCollection.standard_district_colors[j]);
 				double d = amts1[j];
-				d /= 2;
+				//d /= 2;
 				if( d > 1) { d = 1; }
 				if( d < 0) { d = 0; }
 				rgb[0] += d*c.getRed();

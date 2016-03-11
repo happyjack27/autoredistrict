@@ -327,6 +327,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			return;
 		}
 		lblFinished.setVisible(false);
+		try {
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
@@ -494,6 +495,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 					return;
 				}
 			}
+		}
+		} catch (Exception ex) {
+			//just go to next instruction if an exception is thrown.
 		}
 		
 		instruction_pointer++;

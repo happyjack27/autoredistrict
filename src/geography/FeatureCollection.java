@@ -62,6 +62,28 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static boolean[] buncontested2 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested3 = new boolean[Settings.num_districts];
 	
+	public void renameFeature(String source, String dest) {
+		copyFeature(source,dest);
+		deleteFeature(source);
+	}
+	public void copyFeature(String source, String dest) {
+		MainFrame.mainframe.ip.addHistory("COPY FEATURE "+source+" "+dest);
+		for( Feature feat : features) {
+			feat.properties.put(dest,feat.properties.get(source));
+		}
+	}
+	public void addFeature(String dest) {
+		MainFrame.mainframe.ip.addHistory("CREATE FEATURE "+dest);
+		for( Feature feat : features) {
+			feat.properties.put(dest,"");
+		}
+	}
+	public void deleteFeature(String dest) {
+		MainFrame.mainframe.ip.addHistory("DELETE FEATURE "+dest);
+		for( Feature feat : features) {
+			feat.properties.remove(dest);
+		}
+	}
 	public void findUncontested() {
 		DistrictMap dm = ecology.population.get(0);
 		
@@ -215,7 +237,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public void draw(Graphics g) {
 		//Graphics2D g2 = (Graphics2D)g;
 		g.setColor(BACKGROUND_COLOR);
-		g.fillRect(0, 0, 6000, 4000);
+		g.fillRect(0, 0, 6000, 6000);
 		if( features == null) {
 			return;
 		}

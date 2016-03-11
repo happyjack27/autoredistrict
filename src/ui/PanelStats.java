@@ -30,8 +30,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public void saveAsPng(JComponent component, String path, int width, int height) {
         Dimension d = component.getSize();
         
-        if( false) {
+        if( true) {
         	component.setSize(width,height);
+        	component.doLayout();
         	
         } else {
         	width = d.width;
@@ -41,15 +42,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = image.createGraphics(); 
         
+        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
         component.paint(graphics2D);
+        component.print(graphics2D);
+        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
         try {
             ImageIO.write(image,"png", new File(path));
         }
         catch(Exception ex) {
             ex.printStackTrace();
         }
+        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
         component.setSize(d);
-
+    	component.doLayout();
 	}
 
 	public void getNormalizedStats() {
@@ -241,8 +246,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			for( int i = 0; i < dem_col_names.length; i++) {
 				try {
-				dcolumns[i+11+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
-				dcolumns[i+11+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
+				dcolumns[i+12+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
+				dcolumns[i+12+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
 			} catch (Exception ex) { }
 			}
 			
@@ -895,4 +900,59 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
 		*/
 	}
+	
+	public static double[] getSeats(double pct_d, double seats) {
+		double pct_r = 1.0-pct_d;
+		double safe_d = Math.floor(pct_d*seats);
+		double safe_r = Math.floor(pct_r*seats);
+		
+		double threshold_d = (safe_d+1.0)/(seats+1.0);
+		double threshold_r = (safe_r+1.0)/(seats+1.0);
+		double remainder_d = pct_d-threshold_d;
+		double remainder_r = pct_r-threshold_r;
+
+		safe_d += remainder_d >= 0.08 ? 1 : 0;
+		safe_r += remainder_r >= 0.08 ? 1 : 0;
+		double lean_d = remainder_d < 0.08 && remainder_d >= 0.04 ? 1 : 0;
+		double lean_r = remainder_r < 0.08 && remainder_r >= 0.04 ? 1 : 0;
+		double tossup = remainder_d < 0.04 && remainder_r < 0.04 ? 1 : 0;
+
+		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
+	}
+
+	public static double[] getSeats_alt(double pct_d, double seats) {
+		double pct_r = 1.0-pct_d;
+		double safe_d = Math.floor(pct_d*seats);
+		double safe_r = Math.floor(pct_r*seats);
+		
+		double remainder_d = pct_d*seats-safe_d;
+		double remainder_r = pct_r*seats-safe_r;
+
+		remainder_d -= 0.5;
+		remainder_r -= 0.5;
+
+		safe_d += remainder_d >= 0.08 ? 1 : 0;
+		safe_r += remainder_r >= 0.08 ? 1 : 0;
+		double lean_d = remainder_d < 0.08 && remainder_d >= 0.04 ? 1 : 0;
+		double lean_r = remainder_r < 0.08 && remainder_r >= 0.04 ? 1 : 0;
+		double tossup = remainder_d < 0.04 && remainder_r < 0.04 ? 1 : 0;
+
+		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
+	}
+	public static double[] getSeats_new(double pct_d, double seats) {
+
+		double safe_d = Math.floor((pct_d-0.08)*seats);
+
+		double threshold_d = Math.round((seats+1)*pct_d)/(seats+1);
+		double remainder_d = pct_d-threshold_d;
+
+		double lean_d = remainder_d <= 0.08 && remainder_d > 0.04 ? 1 : 0;
+		double tossup = remainder_d <= 0.04 && remainder_d >= -0.04 ? 1 : 0;
+		double lean_r = remainder_d >= -0.08 && remainder_d < -0.04 ? 1 : 0;
+
+		double safe_r = seats - lean_r - tossup - lean_d - safe_d;
+
+		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
+	}
+	
 }
