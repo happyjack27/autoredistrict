@@ -3,6 +3,7 @@ package util;
 import java.util.*;
 
 public class BiMap<K extends Object, V extends Object> {
+	
 
 	  private Map<K,V> forward = new Hashtable<K, V>();
 	  private Map<V,K> backward = new Hashtable<V, K>();
@@ -21,4 +22,6 @@ public class BiMap<K extends Object, V extends Object> {
 	  public synchronized K getBackward(V key) {
 	    return backward.get(key);
 	  }
+	  public int size() { return forward.size(); }
+
 }

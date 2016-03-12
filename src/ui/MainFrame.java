@@ -216,11 +216,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Download.initPaths();
 			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 			ImportCensus2Thread ir = new ImportCensus2Thread();
-			ImportTranslations it = new ImportTranslations();
-			ImportCountyLevel icl = new ImportCountyLevel();
-	
-			it.nextThread = icl;
-			ir.nextThread =  it;
+			
+			ir.nextThread = new MergeInDemoAndElection();
 			ost.nextThread = ir;
 			Download.nextThread = ost;
 			
@@ -230,6 +227,50 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		} catch (Exception ex) {
 			System.out.println("ex in cyclehtread "+ex);
 			ex.printStackTrace();
+		}
+
+	}
+	
+	public void mergeInDemoAndElection() {
+		ip.addHistory("MERGE");
+		new MergeInDemoAndElection().start();
+	}
+	
+	class MergeInDemoAndElection extends Thread {
+		public void run() {
+			ImportTranslations it = new ImportTranslations();
+			ImportCountyLevel icl = new ImportCountyLevel();
+			ImportVTDLevel ivtd = new ImportVTDLevel();
+			ImportDemographics idg = new ImportDemographics();
+			
+			idg.nextThread = new ThreadFinishImport();
+			ivtd.nextThread = idg;
+			icl.nextThread = ivtd;
+			it.nextThread = icl;
+			
+			it.start();
+		}
+	}
+	class ThreadFinishImport extends Thread {
+		public void run() {
+			trySetGroupColumns();
+
+			
+			Download.makeDoneFile();
+			dlbl.setText("Saving...");
+			saveData(Download.vtd_dbf_file, 2,false);
+			dlg.hide();
+			if( Download.prompt) {
+				JOptionPane.showMessageDialog(null, "Import complete.");
+			}
+			if( Download.exit_when_done) {
+				System.exit(0);
+			}
+			if( Download.downloadAll) {
+				downloadNextState();
+				
+			}
+			ip.eventOccured();
 		}
 
 	}
@@ -255,8 +296,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Download.initPaths();
 			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
 			ImportCensus2Thread ir = new ImportCensus2Thread();
-			ImportTranslations it = new ImportTranslations();
-			ImportCountyLevel icl = new ImportCountyLevel();
+			MergeInDemoAndElection it = new MergeInDemoAndElection();
+			//ImportCountyLevel icl = new ImportCountyLevel();
 			CycleThread ct = new CycleThread();
 			ct.cyear = cyear;
 			ct.eyear = eyear;
@@ -264,8 +305,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( ct == null) {
 				JOptionPane.showMessageDialog(null,"ct is null!");
 			}
-			icl.nextThread = ct;
-			it.nextThread = icl;
+			//icl.nextThread = ct;
+			//it.nextThread = icl;
 			ir.nextThread =  it;
 			ost.nextThread = ir;
 			Download.nextThread = ost;
@@ -2033,6 +2074,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportTranslations extends Thread {
 		Thread nextThread = null;
 		public void run() {
+			dlg.show();
+			dlbl.setText("Adding translations...");
 			Feature.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 
@@ -2063,6 +2106,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("size: "+v.size());
 			String[] header = v.remove(0);
 			int[] care = new int[]{3,5,6};
+			int matches = 0;
+			int non_matches = 0;
 			for(String[] ss : v) {
 				if( !ss[0].equals(state_abbr)) {
 					//System.out.print(".");
@@ -2076,15 +2121,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					feat = featmap.get(ss[ikey]);
 					if( feat == null) {
 						System.out.println("no match found!: "+ss[ikey]);
+						non_matches++;
 						continue;
 					}
 				}
+				matches++;
 				//System.out.println("match found!: "+ss[ikey]);
 				for( int j = 0; j < care.length; j++) {
 					int k = care[j];
 					feat.properties.put(header[k],ss[k]);
 				}
 			}
+			System.out.println("translations matches: "+matches+" non_matches: "+non_matches);
 			System.out.println("done nextThred: "+nextThread);
 			if( nextThread != null) {
 				nextThread.start();
@@ -2096,6 +2144,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportCountyLevel extends Thread {
 		public Thread nextThread;
 		public void run() {
+			dlbl.setText("Importing county data...");
+
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
@@ -2227,6 +2277,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println("found!: "+incounty+" "+total_pop);
 				double[] dd = new double[ss.length];
 				for( int i = 0; i < ss.length; i++) {
+					if( headers[i].equals("VAP_HISPANIC")) {
+						headers[i] = "VAP_HISPAN";
+					}
 					if( i == iCountyColumn || headers[i].equals("COUNTY_NAME") || headers[i].equals("COUNTY_FIPS")) {
 						continue;
 					}
@@ -2250,8 +2303,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
-			Download.makeDoneFile();
-
 			
 			System.out.println("setting columns final...");
 			trySetBasicColumns();
@@ -2259,26 +2310,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("done county data merge");
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
-			}
-
-			saveData(Download.vtd_dbf_file, 2,false);
-			System.out.println("done save "+nextThread);
-			if( nextThread == null) {
-				//JOptionPane.showMessageDialog(null,"nextThread is null!");
-			}
-
-			if( Download.prompt) {
-				JOptionPane.showMessageDialog(null, "Import complete.");
-			}
-			if( Download.exit_when_done) {
-				System.exit(0);
-			}
-			if( Download.downloadAll) {
-				downloadNextState();
-				
-			}
-			ip.eventOccured();
-			if( nextThread != null) {
+			} else {
 				nextThread.start();
 				nextThread = null;
 			}
@@ -3124,9 +3156,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		project.population_column = pop_col;
 		for( Feature f : featureCollection.features) {
 			String pop = f.properties.get(pop_col).toString();
+			pop = pop.replaceAll(",","");
+			if( pop == null || pop.length() == 0) {
+				pop = "0";
+			}
 			if( f.vtd != null) {
 				f.vtd.has_census_results = true;
-				f.vtd.population = Double.parseDouble(pop.replaceAll(",",""));
+				f.vtd.population = Double.parseDouble(pop);
 			}
 			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
 		}
@@ -3230,7 +3266,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 
 				b.elections.get(0).add(d);
-				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
@@ -3285,7 +3321,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 
 				b.elections.get(1).add(d);
-				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
@@ -3339,7 +3375,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 
 				b.elections.get(2).add(d);
-				System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
 		
@@ -3434,7 +3470,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							b.elections.add(new Vector<Election>());
 						}
 						b.elections.get(idem).add(d);
-						System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
+						//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 					}
 				}
 			} catch (Exception ex) {
@@ -3619,7 +3655,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			for( int j = 0; j < fields.length; j++) {
 				if( fields[j].getType() == 'N') {
 					if(  data[i][j] == null) {
-						oo[j] = null;
+						oo[j] = new Double(0);
 					} else {
 						try {
 							oo[j] = Double.parseDouble(data[i][j]);
@@ -3719,7 +3755,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    int total = 0;
 		    AbstractShape s;
 		    while ((s = r.next()) != null) {
-		    	Object aobj[] = dbfreader.nextRecord(Charset.defaultCharset());
+		    	Object aobj[] = new Object[cols.length];
+		    	try {
+		    		aobj = dbfreader.nextRecord(Charset.defaultCharset());
+		    	} catch (Exception ex) {
+		    		System.out.println("aobj ex "+ex);
+		    		ex.printStackTrace();
+		    		for( int i = 0; i < aobj.length; i++) {
+		    			aobj[i] = "";
+		    		}
+		    		
+		    	}
 		      switch (s.getShapeType()) {
 		      case POLYGON_Z:
 			      {
@@ -3889,7 +3935,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						b.elections.add(new Vector<Election>());
 					}
 					b.elections.get(0).add(d);
-					System.out.println("ward "+b.id+" added demo "+d.population+" "+j);
+					//System.out.println("ward "+b.id+" added demo "+d.population+" "+j);
 				}
 			}
 			Settings.num_candidates = num_candidates;
@@ -4288,8 +4334,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Download.initPaths();
 				OpenShapeFileThread ost = new OpenShapeFileThread(null);
 				ImportCensus2Thread ir = new ImportCensus2Thread();
-				ImportTranslations it = new ImportTranslations();
-				it.nextThread = new ImportCountyLevel();
+				MergeInDemoAndElection it = new MergeInDemoAndElection();
+				//it.nextThread = new ImportCountyLevel();
 				ir.nextThread =  it;
 				ost.nextThread = ir;
 				Download.nextThread = ost;
@@ -4329,6 +4375,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				Applet.browseTo("http://projects.iq.harvard.edu/eda/data");
 			}
 		});
+		
+		mntmMergeInElection = new JMenuItem("Merge in election data and demographics");
+		mntmMergeInElection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mergeInDemoAndElection();
+			}
+		});
+		mnFile.add(mntmMergeInElection);
 		mnFile.add(mntmHarvardElectionData);
 		
 		mntmPublicMappingProject = new JMenuItem("Public Mapping Project data...");
@@ -6248,6 +6302,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmShowScripts;
 	public JSeparator separator_11;
 	public JMenuItem mntmColorByCounty;
+	public JMenuItem mntmMergeInElection;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6585,12 +6640,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		project.election_columns_2.clear();
 		project.election_columns_3.clear();
 		project.substitute_columns.clear();
+		
+		try {
+			setDemographicColumns();
+			setElectionColumns();
+			setElectionColumns2();
+			setElectionColumns3();
+		} catch (Exception ex) { 
+			ex.printStackTrace();
+		}
+
 
 		String[] headers = featureCollection.getHeaders();
 		String[] demo = new String[]{
 				"CTY_VAP_WHITE","CTY_VAP_BLACK","CTY_VAP_HISPANIC","CTY_VAP_ASIAN","CTY_VAP_INDIAN","CTY_VAP_OTHER",
 				"CTY_VAP_WH","CTY_VAP_BL","CTY_VAP_HI","CTY_VAP_AS","CTY_VAP_IN","CTY_VAP_OT",
-				"VAP_WHITE","VAP_BLACK","VAP_HISPANIC","VAP_HISPAN","VAP_ASIAN","VAP_INDIAN","VAP_OTHER",
+				"VAP_WHITE","VAP_BLACK","VAP_HISPANIC","VAP_HISPAN","VAP_ASIAN","VAP_HAWAII","VAP_INDIAN","VAP_MULTI","VAP_OTHER",
 				};
 		String[] elect = new String[]{
 				"CTY_PRES12_DEM","CTY_PRES12_REP",
@@ -6659,13 +6724,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println(line);
 				String[] ss = line.split("\t");
 				for( int i = 0; i < ss.length; i++) {
-					ss[i] = ss[i].replaceAll("\"", "").replaceAll(",", "");
+					ss[i] = ss[i].replaceAll("\"", "").replaceAll(",", "").replaceAll("\\n", "").replaceAll("\\r", "").trim().toUpperCase();
 				}
 				v.add(ss);
 			}
 		} catch (Exception mue) {
 			System.out.print("ex "+mue);
 			mue.printStackTrace();
+			return new int[]{0,0};
 		}
 		try {
 			if (is != null) is.close();
@@ -6753,8 +6819,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			for(Feature feat : vf) {
 				double feat_pop = feat.properties.POPULATION;
-				for( int i = 0; i < ss.length; i++) {
-					feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
+				for( int i = 0; i < cols.length; i++) { 
+					try {
+						feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
+					} catch (Exception ex) {
+						System.out.println("ex x "+ex);
+						ex.printStackTrace();
+					}
 				}
 			}
 			} catch (Exception ex) {
@@ -6770,6 +6841,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportVTDLevel extends Thread {
 		public Thread nextThread;
 		public void run() {
+			dlbl.setText("Importing election data...");
+			//JOptionPane.showMessageDialog(null,"importing election data.");
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
@@ -6781,15 +6854,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String path = "http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
 			
 			int[] ii =  joinToTxt(path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
-
-			System.out.println("total found: "+ii[0]+"  total not found: "+ii[1]);
-				
-			if( nextThread == null) {
-				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+			System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+			if( ii[1] > ii[0]) {
+				System.out.println("trying shifting columns by 1...");
+				ii =  joinToTxt(path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
-			Download.makeDoneFile();
-
 			
+			//JOptionPane.showMessageDialog(null,"total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+						
 			System.out.println("setting columns final...");
 			trySetBasicColumns();
 			trySetGroupColumns();
@@ -6798,23 +6871,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
 
-			saveData(Download.vtd_dbf_file, 2,false);
-			System.out.println("done save "+nextThread);
-			if( nextThread == null) {
-				//JOptionPane.showMessageDialog(null,"nextThread is null!");
-			}
-
-			if( Download.prompt) {
-				JOptionPane.showMessageDialog(null, "Import complete.");
-			}
-			if( Download.exit_when_done) {
-				System.exit(0);
-			}
-			if( Download.downloadAll) {
-				downloadNextState();
-				
-			}
-			ip.eventOccured();
 			if( nextThread != null) {
 				nextThread.start();
 				nextThread = null;
@@ -6824,6 +6880,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportDemographics extends Thread {
 		Thread nextThread = null;
 		public void run() {
+			dlbl.setText("Importing demographics...");
+
 			String state = Download.states[Download.istate];
 			
 			getDemographics(state,Download.state_to_abbr.get(state),""+Download.cyear);
@@ -6836,11 +6894,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		public void getDemographics(String statename, String stateabbr, String year) {
 			try {
+				boolean remove_hyphens = false;
 
 			int DATA_STARTS_AT = 3;
 			boolean trim_leading_zeros = false;
 		
-			Hashtable<String,String> column_renames = new Hashtable<String,String>();
+			BiMap<String,String> column_renames = new BiMap<String,String>();
 			String base_url = "http://www2.census.gov/census_2010/01-Redistricting_File--PL_94-171/";
 			
 			String fn_zipfile = stateabbr.toLowerCase()+year+".pl.zip";
@@ -6917,6 +6976,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					"VAP_OTHER",
 					"VAP_MULTI",
 			};
+			String[] original_headers = new String[headers.length];
+			for( int i = 0; i < original_headers.length; i++) {
+				original_headers[i] = column_renames.getBackward(headers[i]);
+			}
 			
 
 			Vector<String[]> data = new Vector<String[]>();
@@ -6929,23 +6992,52 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Vector<Triplet<String,String,Integer>> part1_header = new Vector<Triplet<String,String,Integer>>();
 			Vector<Triplet<String,String,Integer>> part2_header = new Vector<Triplet<String,String,Integer>>();
 			
+			//System.out.println(sgeo_header.length()+" "+spart1_header.length()+" "+spart2_header.length());
+			
 			String[] lines = sgeo_header.split("\n");
+			//System.out.println("lines: "+lines.length);
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
+				if( ss.length < 3) {
+					continue;
+				}
+				for( int j = 0; j < ss.length; j++ ) {
+					ss[j] = ss[j].trim().replaceAll("\"","").replaceAll("\\r","").replaceAll("\\n","");
+				}
+				//System.out.println("adding |"+ss[0]+"|");
 				geo_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
 			}
 			lines = spart1_header.split("\n");
+			//System.out.println("lines: "+lines.length);
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
+				if( ss.length < 3) {
+					continue;
+				}
+				for( int j = 0; j < ss.length; j++ ) {
+					ss[j] = ss[j].trim().replaceAll("\"","").replaceAll("\\r","").replaceAll("\\n","");
+				}
+				//System.out.println("adding |"+ss[0]+"|");
 				part1_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
 			}
 			lines = spart2_header.split("\n");
+			//System.out.println("lines: "+lines.length);
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
+				if( ss.length < 3) {
+					continue;
+				}
+				for( int j = 0; j < ss.length; j++ ) {
+					ss[j] = ss[j].trim().replaceAll("\"","").replaceAll("\\r","").replaceAll("\\n","");
+				}
+				//System.out.println("adding |"+ss[0]+"|");
 				part2_header.add(new Triplet<String,String,Integer>(ss[0],ss[1],Integer.parseInt(ss[2])));
 			}
-			
-			String primary_key = "VTD"+(Download.cyear % 100);
+			String yr = ""+(Download.cyear % 100); 
+			while( yr.length() < 2) {
+				yr = "0"+yr;
+			}
+			String primary_key = "VTDST"+yr;
 			int foreign_key = 2;
 			
 			//collect primary keys;
@@ -6956,6 +7048,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				try {
 				String county = (String) feat.properties.get(primary_key);
 				county = county.trim().toUpperCase();
+				if( county.contains("-") && remove_hyphens) {
+					county = county.split("-")[1];
+				}
 				
 				Vector<Feature> vf = county_feats.get(county);
 				if( vf == null) { 
@@ -6969,19 +7064,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					county_pops.put(county,i);
 				}
 				if( feat.properties.POPULATION == 0) {
-					Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
+					Double d = new Double(0);
+					try { 
+						Double.parseDouble(feat.properties.get(project.population_column).toString());
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
 					feat.properties.POPULATION = d.intValue();
 				}
 				i += feat.properties.POPULATION;
 				county_pops.put(county,i);
 				} catch (Exception ex) {
-					System.out.println("ex "+ex);
+					System.out.println("ex aa "+ex);
 					ex.printStackTrace();
+					System.exit(0);
 				}
 			}
 			
 			//read file into hash table (aggregating into vtd's)
+			int lline = 0;
 			while( true) {
+				
+				lline++;
+				if( lline % 1000 == 0) {
+					System.out.print(".");
+				}
 				String geo_line = br_geoheader.readLine();
 				String part1_line =  br_part1.readLine();
 				String part2_line =  br_part2.readLine();
@@ -6998,21 +7105,43 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 				for( int i = 0; i < geo_header.size(); i++) {
 					String rename = column_renames.get(geo_header.get(i).a);
-					if( rename != null) {
-						ss[ndx++] = geo_ss[i];
-					}
+					//if( rename != null) {
+						for( int j = 0; j < headers.length; j++) {
+							if( geo_header.get(i).a.equals(original_headers[j])) {
+								//System.out.println("matched "+j+" "+headers[j]);
+								ss[j] = geo_ss[i];
+								break;
+							}
+						}
+						//ss[ndx++] = geo_ss[i];
+					//}
 				}
 				for( int i = 0; i < part1_header.size(); i++) {
 					String rename = column_renames.get(part1_header.get(i).a);
-					if( rename != null) {
-						ss[ndx++] = part1_ss[i];
-					}
+					//if( rename != null) {
+						for( int j = 0; j < headers.length; j++) {
+							if( part1_header.get(i).a.equals(original_headers[j])) {
+								//System.out.println("matched "+j+" "+headers[j]);
+								ss[j] = part1_ss[i];
+								break;
+							}
+						}
+					//}
 				}
 				for( int i = 0; i < part2_header.size(); i++) {
 					String rename = column_renames.get(part2_header.get(i).a);
-					if( rename != null) {
-						ss[ndx++] = part2_ss[i];
-					}
+					//if( rename != null) {
+						for( int j = 0; j < headers.length; j++) {
+							if( part2_header.get(i).a.equals(original_headers[j])) {
+								//System.out.println("matched "+j+" "+headers[j]);
+								ss[j] = part2_ss[i];
+								break;
+							}
+						}
+					//}
+				}
+				for( int i = 0; i < ss.length; i++) {
+					//System.out.println(""+i+": "+ss[i]);
 				}
 				
 				String s = ss[foreign_key];
@@ -7033,7 +7162,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				for( int i = 0; i < dd.length; i++) {
 					try {
 						dd[i] += Double.parseDouble(ss[i+DATA_STARTS_AT]);
-					} catch (Exception ex) { ex.printStackTrace(); }
+					} catch (Exception ex) { 
+						System.out.println("ex cc "+ex+""+i+" "+ss[i+DATA_STARTS_AT]+" "+headers[i+DATA_STARTS_AT]);
+						System.exit(0);
+						ex.printStackTrace(); 
+					}
 				}
 			}
 			
@@ -7048,7 +7181,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				fis_part2.close();
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				System.exit(0);
 			}
+			//System.exit(0);
 			int found = 0;
 			int not_found = 0;
 			
@@ -7056,13 +7191,25 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			for( Map.Entry<String,double[]> entry : from_import.entrySet() ) {
 				try { 
 					String incounty = entry.getKey();
+					String orig = incounty;
 					double[] dd = entry.getValue();
 					Vector<Feature> vf = county_feats.get(incounty);
 					if( vf == null) {
-						System.out.println("not found!: "+incounty);
-						not_found++;
-						continue;
+						if( incounty.length() > 3) {
+							incounty = incounty.substring(0,2)+"-"+incounty.substring(2);
+						}
+						vf = county_feats.get(incounty);
+						if( vf == null) {
+							incounty = incounty.split("-")[1];
+							vf = county_feats.get(incounty);
+							if( vf == null) {
+								System.out.println("not found!: "+orig);
+								not_found++;
+								continue;
+							}
+						}
 					}
+					county_feats.remove(incounty);
 					found++;
 					double total_pop = (double)county_pops.get(incounty);
 					System.out.println("found!: "+incounty+" "+total_pop);
@@ -7074,16 +7221,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 				} catch (Exception ex) {
-					System.out.println("ex: "+ex);
+					System.out.println("ex bb: "+ex);
 					ex.printStackTrace();
+					System.exit(0);
+
 				}
 			}	
+			//finish up unmatched entries.
+			for( Entry<String, Vector<Feature>> entry : county_feats.entrySet() ) {
+				System.out.println("filling "+entry.getKey());
+				for( Feature feat : entry.getValue()) {
+					for( int i = DATA_STARTS_AT; i < headers.length; i++) {
+						feat.properties.put(headers[i+DATA_STARTS_AT], ""+0);
+					}
+				}
+			}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(0);
+
 			}
 
 		}
+
 		public String[] parse_fixed_width(String s, Vector<Triplet<String,String,Integer>> header) {
 			String[] ss = new String[header.size()];
 			for( int i = 0; i < header.size(); i++) {

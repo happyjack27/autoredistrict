@@ -600,6 +600,7 @@ public class Download extends Thread {
 	public static void clean() {
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_centroids"));
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_pop"));
+		Applet.deleteRecursive(new File(getStartPath()+File.separator+"demographics"));
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+vyear+File.separator+"vtd"+File.separator+"vtds.zip"));
 	}
 	public static boolean checkForDoneFile() {

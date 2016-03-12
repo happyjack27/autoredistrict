@@ -1,5 +1,3 @@
-
-Name	Type	Size
 FILEID	Text	               6
 STUSAB	Text	               2
 CHARITER	Text	               3

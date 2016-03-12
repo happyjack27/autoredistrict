@@ -204,6 +204,8 @@ public class Util {
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			sb.append("\tMERGE\n");
+			sb.append("\tSAVE\n");
 			if( false
 					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
 					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
@@ -231,7 +233,6 @@ public class Util {
 				sb.append("SAVE\n");
 			}
 			*/
-
 			sb.append("\tEXPORT\n");
 			sb.append("\tEXIT\n");
 			
@@ -246,6 +247,7 @@ public class Util {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			main.append("
 			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");

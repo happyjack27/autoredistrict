@@ -223,7 +223,8 @@ public class JDBField {
         }
       }
       catch (NumberFormatException numberformatexception) {
-        throw new JDBFException(numberformatexception);
+    	  return 0;
+        //throw new JDBFException(numberformatexception);
       }
     }
     if (type == 'C') {

@@ -385,6 +385,18 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			textFieldIP.setText(""+(instruction_pointer+1));
 			return;
 		} else
+		if( command.equals("RENAME") && instruction_words[1].equals("FEATURE")) {
+			mainFrame.featureCollection.renameFeature(instruction_words[2], instruction_words[3]);
+		} else
+		if( command.equals("ADD") && instruction_words[1].equals("FEATURE")) {
+			mainFrame.featureCollection.addFeature(instruction_words[2]);
+		} else
+		if( command.equals("DELETE") && instruction_words[1].equals("FEATURE")) {
+			mainFrame.featureCollection.deleteFeature(instruction_words[2]);
+		} else
+		if( command.equals("COPY") && instruction_words[1].equals("FEATURE")) {
+			mainFrame.featureCollection.copyFeature(instruction_words[2], instruction_words[3]);
+		} else
 		if( command.equals("DELETE")) {
 			Download.cyear = 2010;
 			Download.vyear = 2012;
@@ -443,6 +455,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			for(ActionListener a: mainFrame.stopButton.getActionListeners()) {
 			    a.actionPerformed(new ActionEvent(mainFrame.stopButton, 0, ""));
 			}
+		} else
+		if( command.equals("MERGE")) {
+			mainFrame.mergeInDemoAndElection();
 		} else
 		if(command.equals("SAVE")) {
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
