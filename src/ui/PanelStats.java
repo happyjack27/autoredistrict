@@ -489,7 +489,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+tot_seats[0],"FV Safe D"},
 					new String[]{""+tot_seats[1],"FV Lean D"},
 					new String[]{""+tot_seats[2],"FV Tossup"},
-					new String[]{""+tot_seats[3],"FV Leav R"},
+					new String[]{""+tot_seats[3],"FV Lean R"},
 					new String[]{""+tot_seats[4],"FV Safe R"},
 					new String[]{"",""},
 					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
@@ -882,8 +882,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="</tr>";
 		html +="<tr>";
 		html +="<td>VTDs</td>";
-		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes.png' width=100></br>VTD vote balance</br>(click to enlarge)</a></center></td>";
-		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics.png' width=100></br>VTD demographics</br>(click to enlarge)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes.png' width=100></br>VTD vote balance</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics.png' width=100></br>VTD demographics</a></center></td>";
 		html +="</tr>";
 		html +="</table>";
 		html +="</br>";

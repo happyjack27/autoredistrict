@@ -2272,14 +2272,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 								}
 							}
 							if( vf == null) {
-									System.out.println("not found!: "+incounty);
+									//System.out.println("not found!: "+incounty);
 									continue;
 							}
 						}
 					}
 				}
 				double total_pop = (double)county_pops.get(incounty);
-				System.out.println("found!: "+incounty+" "+total_pop);
+				//System.out.println("found!: "+incounty+" "+total_pop);
 				double[] dd = new double[ss.length];
 				for( int i = 0; i < ss.length; i++) {
 					if( headers[i].equals("VAP_HISPANIC")) {
@@ -6755,6 +6755,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		for( Feature feat : featureCollection.features) {
 			try {
 			String county = (String) feat.properties.get(primary_key);
+			if( county == null) {
+				System.out.println("no county found!");
+				continue;
+			}
 			county = county.trim().toUpperCase();
 			
 			Vector<Feature> vf = county_feats.get(county);
@@ -6818,19 +6822,42 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("found!: "+incounty+" "+total_pop);
 			found++;
 			double[] dd = new double[cols.length];
+			boolean[] bb = new boolean[cols.length];
 			
 			for( int i = 0; i < cols.length; i++) {
-				dd[i] = Double.parseDouble(ss[cols[i]]);///total_pop;
+				try {
+					ss[cols[i]] = ss[cols[i]].replaceAll(",","").replaceAll("\\+","").trim();
+					dd[i] = Double.parseDouble(ss[cols[i]]);///total_pop;
+					bb[i] = true;
+				} catch (Exception ex) {
+					dd[i] = 0;
+					bb[i] = false;
+					ex.printStackTrace();
+				}
 			}
-			for(Feature feat : vf) {
-				double feat_pop = feat.properties.POPULATION;
-				if( !test) {
-					for( int i = 0; i < cols.length; i++) { 
-						try {
-							feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
-						} catch (Exception ex) {
-							System.out.println("ex x "+ex);
-							ex.printStackTrace();
+			if( total_pop == total_pop) {
+				for(Feature feat : vf) {
+					double feat_pop = feat.properties.POPULATION;
+					if( !test) {
+						for( int i = 0; i < cols.length; i++) { 
+							if( bb[i] == false) {
+								continue;
+							}
+							int other =  i+(i % 2 == 1 ? -1 : 1);
+							if( dd[i] == 0 && dd[other] == 0) {
+								System.out.println("both dem and rep are 0, skipping..");
+								continue;
+							}
+							try {
+								if( feat_pop != feat_pop || feat_pop == 0 || total_pop == 0 || feat_pop == total_pop) {
+									feat.properties.put(names[i], ""+dd[i]);
+								} else {
+									feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
+								}
+							} catch (Exception ex) {
+								System.out.println("ex x "+ex);
+								ex.printStackTrace();
+							}
 						}
 					}
 				}
@@ -6869,12 +6896,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				matches[m] = ii[0];
 				non_matches[m] = ii[1];
 			}
-			if( matches[1] > non_matches[1]*2 && matches[1] > matches[0]) {
+			double match_pct0 = ((double)matches[0])/(double)(matches[0]+non_matches[0]);
+			double match_pct1 = ((double)matches[1])/(double)(matches[1]+non_matches[1]);
+			if( match_pct1 > 0.95 && matches[1] > matches[0]) {
 				System.out.println("trying shifting columns by 1...");
 				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
-			if( matches[0] > non_matches[0]*2 && matches[0] > matches[1]) {
+			if( match_pct0 > 0.95 && matches[0] > matches[1]) {
 				System.out.println("trying shifting columns by 1...");
 				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
@@ -7227,7 +7256,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							incounty = incounty.split("-")[1];
 							vf = county_feats.get(incounty);
 							if( vf == null) {
-								System.out.println("not found!: "+orig);
+								//System.out.println("not found!: "+orig);
 								not_found++;
 								continue;
 							}
@@ -7236,7 +7265,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					county_feats.remove(incounty);
 					found++;
 					double total_pop = (double)county_pops.get(incounty);
-					System.out.println("found!: "+incounty+" "+total_pop);
+					//System.out.println("found!: "+incounty+" "+total_pop);
 					
 					for(Feature feat : vf) {
 						double feat_pop = feat.properties.POPULATION;

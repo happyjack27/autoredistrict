@@ -1446,6 +1446,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     		System.out.println("res < 0");
                     	}
                     	double amt = 0;
+                    	if( unit == 0) {
+                    		unit = 1;
+                    	}
                     	if( Settings.seats_in_district(k) > 1) {
                     		int c = ((int)res[0][j]) / unit;
                         	amt = res[0][j] - c*unit;//% unit;//res[0][j] - (res[1][j] == 0 ? 0 : (res[1][j]-1)) * unit;

@@ -204,7 +204,7 @@ public class Util {
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
-			sb.append("COPY FEATURE AR_RESULT CONGRESS_FV\n");
+			sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
 			sb.append("MERGE\n");
 			sb.append("SAVE\n");
 

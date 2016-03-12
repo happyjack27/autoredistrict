@@ -4,6 +4,7 @@ import geography.Feature;
 import java.util.*;
 
 import serialization.*;
+import ui.MainFrame;
 
 public class VTD extends ReflectionJSONObject<VTD> {
     public int id;
@@ -178,16 +179,35 @@ public class VTD extends ReflectionJSONObject<VTD> {
             for(int i = 0; i < outcomes[0].length; i++) {
             	outcomes[0][i] = 0;
             }
+            double[] totals = new double[elections.size()];
+            for( int i = 0; i < totals.length; i++);
             for( int elec = 0; elec < elections.size(); elec++) {
 		        for( Election d : elections.get(elec)) {
 		            for( int j = 0; j < d.vote_prob.length; j++) {
 		            	outcomes[0][j] += d.population * d.vote_prob[j]*d.turnout_probability;//d.vote_prob[j];
+		            	totals[elec] += d.population * d.vote_prob[j]*d.turnout_probability;
 		            }
 		        }
             }
+            double c = 0;
+            
+            for( int i = 0; i < elections.size(); i++) {
+            	if( elections.get(i).size() > 1 && totals[i] > 2) {
+            		if( 
+            				(i == 0 ? MainFrame.mainframe.project.election_columns.size() : 
+            					i == 1 ? MainFrame.mainframe.project.election_columns_2.size() :
+                					i == 2 ? MainFrame.mainframe.project.election_columns_3.size() :
+            					0) 
+            				> 1) {
+            			c++;
+            		}
+            	}
+            }
+            /*
             for(int i = 0; i < outcomes[0].length; i++) {
-            	outcomes[0][i] /= elections.size();
-            }    		
+            	outcomes[0][i] /= c;
+            }
+            */
     	} else {
 	    	outcomes = new double[Settings.num_ward_outcomes][];
 	    	for( int out = 0; out < outcomes.length; out++) {

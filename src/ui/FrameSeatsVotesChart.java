@@ -280,7 +280,11 @@ public class FrameSeatsVotesChart extends JFrame {
 			    
 			    //draw wang
 			    g.setColor(Color.BLACK);
-			    g.fillRect(100*iFSAA,99*iFSAA, scale_width(wang*200.0)*iFSAA, 3);
+			    if( wang < 0) {
+			    	g.fillRect((100+scale_width(wang*200.0))*iFSAA,99*iFSAA, scale_width(-wang*200.0)*iFSAA, 3);
+			    } else {
+			    	g.fillRect(100*iFSAA,99*iFSAA, scale_width(wang*200.0)*iFSAA, 3);
+			    }
 
 			    
 		        graphics.drawImage(off_Image,
@@ -435,11 +439,27 @@ public class FrameSeatsVotesChart extends JFrame {
 		
 		double min = 1;
 		double median = 0.5;
+		double below_x = 0;
+		double above_x = 0;
+		double below_y = 0;
+		double above_y = 0;
 		//now set the table
 		String[][] sd = new String[seats_votes.size()][2];
 		for( int i = 0; i < sd.length; i++) {
 			double[] dd = seats_votes.get(i);
-			sd[i] = new String[]{""+dd[0],""+dd[1]};
+			sd[i] = new String[]{""+dd[0],""+dd[1]}; //0=y, 1=x
+			if( dd[0] < 0.5) {
+				if( Math.abs(dd[0]-0.5) < Math.abs(below_y-0.5)) {
+					below_y = dd[0];
+					below_x = dd[1];
+				}
+			}
+			if( dd[0] > 0.5) {
+				if( Math.abs(dd[0]-0.5) < Math.abs(above_y-0.5)) {
+					above_y = dd[0];
+					above_x = dd[1];
+				}
+			}
 			if( Math.abs(dd[0]-0.5) < min) {
 				min = Math.abs(dd[0]-0.5);
 				median = dd[1];
@@ -447,6 +467,11 @@ public class FrameSeatsVotesChart extends JFrame {
 				median = (median + dd[1])/2.0;
 			}
 		}
+		double dx = above_x-below_x;
+		double dy = above_y-below_y;
+		
+		double move_y_frac = (0.5-below_y)/dy;
+		median = below_x + move_y_frac*dx;
 		try {
 			
 			DecimalFormat decimal = new DecimalFormat("#0.00000");
