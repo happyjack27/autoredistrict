@@ -303,6 +303,9 @@ public class Download extends Thread {
 		if( nextThread != null) {
 			System.out.println("Starting next thread.");
 			nextThread.start();
+		} else {
+			System.out.println("no next thread, hittng event occured.");
+			MainFrame.mainframe.ip.eventOccured();
 		}
 		return;
 	}

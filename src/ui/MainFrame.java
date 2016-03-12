@@ -212,23 +212,27 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JOptionPane.showMessageDialog(null, "Done downloading all states!");
 				return;
 			}
-	
-			Download.initPaths();
-			OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
-			ImportCensus2Thread ir = new ImportCensus2Thread();
 			
-			ir.nextThread = new MergeInDemoAndElection();
-			ost.nextThread = ir;
-			Download.nextThread = ost;
-			
-			System.out.println("starting "+Download.states[Download.istate]+"...");
-			Download.downloadState(Download.istate,Download.cyear,Download.vyear);	
-			
+			downloadState();
+
 		} catch (Exception ex) {
 			System.out.println("ex in cyclehtread "+ex);
 			ex.printStackTrace();
 		}
 
+	}
+	
+	public void downloadState() {	
+		Download.initPaths();
+		OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
+		ImportCensus2Thread ir = new ImportCensus2Thread();
+		
+		ir.nextThread = new MergeInDemoAndElection();
+		ost.nextThread = ir;
+		Download.nextThread = ost;
+		
+		System.out.println("starting "+Download.states[Download.istate]+"...");
+		Download.downloadState(Download.istate,Download.cyear,Download.vyear);	
 	}
 	
 	public void mergeInDemoAndElection() {
@@ -243,10 +247,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			ImportVTDLevel ivtd = new ImportVTDLevel();
 			ImportDemographics idg = new ImportDemographics();
 			
-			idg.nextThread = new ThreadFinishImport();
-			ivtd.nextThread = idg;
-			icl.nextThread = ivtd;
 			it.nextThread = icl;
+			icl.nextThread = ivtd;
+			ivtd.nextThread = idg;
+			idg.nextThread = new ThreadFinishImport();
 			
 			it.start();
 		}
@@ -260,6 +264,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			dlbl.setText("Saving...");
 			saveData(Download.vtd_dbf_file, 2,false);
 			dlg.hide();
+			
 			if( Download.prompt) {
 				JOptionPane.showMessageDialog(null, "Import complete.");
 			}
@@ -7089,7 +7094,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( lline % 1000 == 0) {
 					System.out.print(".");
 				}
-				String geo_line = br_geoheader.readLine();
+				if( lline % 100000 == 0) {
+					System.out.print("o");
+				}				String geo_line = br_geoheader.readLine();
 				String part1_line =  br_part1.readLine();
 				String part2_line =  br_part2.readLine();
 				if( geo_line == null) {

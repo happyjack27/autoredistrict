@@ -214,8 +214,11 @@ public class Util {
 				sb.append("SET DISTRICTS ALLOW_4_SEATS TRUE\n");
 			}
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-			sb.append(script+"\n");
+			//sb.append(script+"\n");
+			sb.append("SET DISTRICTS COLUMN AR_RESULT\n");
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			sb.append("SET DISTRICTS COLUMN AR_RESULT\n");
+			sb.append("STOP\n");
 			if( false
 					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
 					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
@@ -233,8 +236,13 @@ public class Util {
 				sb.append("SAVE\n");
 			}
 			*/
+			sb.append("STOP\n");
 			sb.append("\tEXPORT\n");
+			sb.append("\tSAVE\n");
 			sb.append("\tEXIT\n");
+
+			System.out.println(sb.toString());
+
 			
 			File f = new File(base_dir+"subscript"+i);
 			FileOutputStream fos;
@@ -247,8 +255,8 @@ public class Util {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			main.append("
 			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
+			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");
 		FileOutputStream fos;

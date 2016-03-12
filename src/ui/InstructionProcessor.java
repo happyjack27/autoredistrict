@@ -367,7 +367,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				ost.nextThread = new DialogDownload.EventThread();
 				ost.start();
 			} else {
-				Download.downloadState(Download.istate,Download.cyear,Download.vyear);
+				mainFrame.downloadState();
+				//Download.downloadState(Download.istate,Download.cyear,Download.vyear);
 			}
 			instruction_pointer++;
 			textFieldIP.setText(""+(instruction_pointer+1));
@@ -458,6 +459,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if( command.equals("MERGE")) {
 			mainFrame.mergeInDemoAndElection();
+			instruction_pointer++;
+			textFieldIP.setText(""+(instruction_pointer+1));
+			return;
 		} else
 		if(command.equals("SAVE")) {
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
