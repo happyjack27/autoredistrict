@@ -1241,13 +1241,18 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		
 		//now normalize to 50/50
-		double adjust = vote_count_totals[1]/vote_count_totals[0];
+		double adjust = total/vote_count_totals[0];
 		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
 			vote_count_districts[i][0] *= adjust;
+		}
+		adjust = total/vote_count_totals[1];
+		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+			vote_count_districts[i][1] *= adjust;
 		}
 		
 		//now sample it at different vote ratios
 		for( double dempct = 0; dempct <= 1; dempct += 0.0025) {
+			// District.popular_vote_to_elected(result[0], i);
 			double reppct = 1-dempct;
 			//double votes = dempct;
 			double demseats = 0;

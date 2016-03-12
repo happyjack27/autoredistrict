@@ -272,7 +272,11 @@ public class FrameSeatsVotesChart extends JFrame {
 			    g.drawLine(100*iFSAA,100*iFSAA, scale(100+(int)(wang*200))*iFSAA, 100*iFSAA);
 			    */
 			    g.setColor(Color.BLACK);
-			    g.fillRect(99*iFSAA,100*iFSAA, 3, ((int)Math.round(grofman*200))*iFSAA);
+			    if( grofman < 0) {
+			    	g.fillRect(99*iFSAA,(100+(int)Math.round(grofman*200))*iFSAA, 3, ((int)Math.round(-grofman*200))*iFSAA);
+			    } else {
+			    	g.fillRect(99*iFSAA,100*iFSAA, 3, ((int)Math.round(grofman*200))*iFSAA);			    	
+			    }
 			    
 			    //draw wang
 			    g.setColor(Color.BLACK);

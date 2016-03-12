@@ -530,7 +530,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    				} catch (Exception ex) {
 			    					System.out.println("ex aa: "+ex);
 			    					ex.printStackTrace();
-			    					System.exit(0);
+			    					//System.exit(0);
 			    				}
 			    			}
 
@@ -4387,7 +4387,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mergeInDemoAndElection();
 			}
 		});
-		mnFile.add(mntmMergeInElection);
+		//mnFile.add(mntmMergeInElection);
 		mnFile.add(mntmHarvardElectionData);
 		
 		mntmPublicMappingProject = new JMenuItem("Public Mapping Project data...");
@@ -6698,7 +6698,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	
-	public int[] joinToTxt(String path, String primary_key, int foreign_key, int start_row, int[] cols, String[] names) {
+	public int[] joinToTxt( boolean test, String path, String primary_key, int foreign_key, int start_row, int[] cols, String[] names) {
 		boolean try_trim_zeros = false;
 
 		int found = 0;
@@ -6726,7 +6726,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			while ((line = br.readLine()) != null) {
 				System.out.print(".");
-				System.out.println(line);
+				//System.out.println(line);
 				String[] ss = line.split("\t");
 				for( int i = 0; i < ss.length; i++) {
 					ss[i] = ss[i].replaceAll("\"", "").replaceAll(",", "").replaceAll("\\n", "").replaceAll("\\r", "").trim().toUpperCase();
@@ -6824,12 +6824,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			for(Feature feat : vf) {
 				double feat_pop = feat.properties.POPULATION;
-				for( int i = 0; i < cols.length; i++) { 
-					try {
-						feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
-					} catch (Exception ex) {
-						System.out.println("ex x "+ex);
-						ex.printStackTrace();
+				if( !test) {
+					for( int i = 0; i < cols.length; i++) { 
+						try {
+							feat.properties.put(names[i], ""+(dd[i]*feat_pop/total_pop));
+						} catch (Exception ex) {
+							System.out.println("ex x "+ex);
+							ex.printStackTrace();
+						}
 					}
 				}
 			}
@@ -6858,11 +6860,23 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			//String path = "ftp://autoredistrict.org/pub/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
 			String path = "http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
 			
-			int[] ii =  joinToTxt(path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
-			System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
-			if( ii[1] > ii[0]) {
+			int[] ii;
+			int[] matches = new int[2];
+			int[] non_matches = new int[2];
+			for( int m = 0; m < 2; m++) {
+				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+				matches[m] = ii[0];
+				non_matches[m] = ii[1];
+			}
+			if( matches[1] > non_matches[1]*2 && matches[1] > matches[0]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+			}
+			if( matches[0] > non_matches[0]*2 && matches[0] > matches[1]) {
+				System.out.println("trying shifting columns by 1...");
+				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			
@@ -6898,6 +6912,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 		public void getDemographics(String statename, String stateabbr, String year) {
+			if( true) {
+				return;
+			}
 			try {
 				boolean remove_hyphens = false;
 
@@ -7082,7 +7099,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				} catch (Exception ex) {
 					System.out.println("ex aa "+ex);
 					ex.printStackTrace();
-					System.exit(0);
+					//System.exit(0);
 				}
 			}
 			
@@ -7235,14 +7252,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}	
 			//finish up unmatched entries.
+			/*
 			for( Entry<String, Vector<Feature>> entry : county_feats.entrySet() ) {
 				System.out.println("filling "+entry.getKey());
 				for( Feature feat : entry.getValue()) {
 					for( int i = DATA_STARTS_AT; i < headers.length; i++) {
-						feat.properties.put(headers[i+DATA_STARTS_AT], ""+0);
+						feat.properties.put(headers[i], ""+0);
 					}
 				}
 			}
+			*/
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
