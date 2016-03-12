@@ -967,7 +967,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	}
 	public static double[] getSeats_new(double pct_d, double seats) {
 
-		double safe_d = Math.floor((pct_d-0.08)*seats);
+		double safe_d = Math.floor((pct_d-0.08)*(seats+1));
+
+		//System.out.println("pct_d "+pct_d+" seats "+seats+" safe_d "+safe_d+" (pct_d-0.08)*seats "+((pct_d-0.08)*(seats+1)));
 
 		double threshold_d = Math.round((seats+1)*pct_d)/(seats+1);
 		double remainder_d = pct_d-threshold_d;

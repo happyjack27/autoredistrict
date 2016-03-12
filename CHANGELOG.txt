@@ -1,5 +1,16 @@
 Changelog:
 
+V. 1.25
+
+* ---
+* joined in vtd-level election data
+* grofman-king now shows when its negative
+* added 3 more map coloring modes.
+* changed map output to stats: higher res
+* changed map output to stats: 11 different maps - thumbnails that you click on
+* added fair vote safe/lean/tossup counts
+* bugfix: by district stats headers were shifted
+
 V. 1.24
 
 * added ability to color by county
