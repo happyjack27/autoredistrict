@@ -217,7 +217,7 @@ public class Util {
 			}
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			//sb.append(script+"\n");
-			sb.append("SET DISTRICTS COLUMN AR_RESULT\n");
+			sb.append("SET DISTRICTS COLUMN CONGRESS_F\n");
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			sb.append("STOP\n");
 			if( false
@@ -228,7 +228,7 @@ public class Util {
 				sb.append("SET DISTRICTS ALLOW_4_SEATS TRUE\n");
 			}			
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-			sb.append("SET DISTRICTS COLUMN AR_RESULT\n");
+			sb.append("SET DISTRICTS COLUMN CONGRESS_F\n");
 			/*
 			if( Download.apportionments[i] >= 6) {
 				sb.append(script2+"\n");

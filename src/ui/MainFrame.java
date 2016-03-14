@@ -6745,6 +6745,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		System.out.println("5..");
 		
+		if( start_row == 1) {
+			String[] header = v.get(0);
+			int vtd_start = -1;
+			int pres_start = -1;
+			for( int i = 0; i < header.length; i++) {
+				String s = header[i].toUpperCase().trim();
+				if( vtd_start < 0) {
+					if( header[i].equals("VTD NAME") || header[i].equals("NAME")) {
+						vtd_start = i;
+					}
+				}
+				if( pres_start < 0) {
+					if( header[i].equals("OBAMA") || header[i].equals("BARACK OBAMA")) {
+						pres_start = i;
+					}
+				}
+				if( pres_start >= 0 && vtd_start >= 0) {
+					break;
+				}
+			}
+			if( pres_start >= 0 && vtd_start >= 0) {
+				foreign_key = vtd_start;
+				cols = new int[]{pres_start,pres_start+1,pres_start+2,pres_start+3,pres_start+4,pres_start+5};
+			}
+		}
 		for( int i = 0; i < start_row; i++) {
 			v.remove(0);
 		}
@@ -6898,7 +6923,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			double match_pct0 = ((double)matches[0])/(double)(matches[0]+non_matches[0]);
 			double match_pct1 = ((double)matches[1])/(double)(matches[1]+non_matches[1]);
-			if( match_pct1 > 0.95 && matches[1] > matches[0]) {
+			if( match_pct1 > 0.95 && matches[1] >= matches[0]) {
 				System.out.println("trying shifting columns by 1...");
 				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);

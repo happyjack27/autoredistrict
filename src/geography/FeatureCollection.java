@@ -623,7 +623,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		System.out.println("drawing features...");
+		//System.out.println("drawing features...");
         for( Feature f : features) {
         	f.geometry.makePolys();
         	f.draw(g);

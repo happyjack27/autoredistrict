@@ -477,7 +477,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			DecimalFormat decimal = new DecimalFormat("#0.00000");
 			baasTF.setText(decimal.format(d));
 			double[] mid = seats_votes.get(seats_votes.size()/2);
-			wang = median-0.5;
+			wang = 0;//median-0.5;
 			grofman = 0.5-mid[0];
 
 			grofmanTF.setText(decimal.format(grofman));
