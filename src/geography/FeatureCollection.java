@@ -349,6 +349,19 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
+		if( Feature.display_mode == Feature.DISPLAY_MODE_COUNTY_SPLITS) {
+			Hashtable<String,int[]> counties =  ecology.population.get(shown_map).getSplitCounties();
+
+			//enumerate counties
+			String county_column = MainFrame.mainframe.project.county_column;
+			for( Feature f : features) {
+				String county = f.properties.get(county_column).toString();
+				int[] ii = counties.get(county);
+				if( ii == null) {
+					f.geometry.fillColor = DEFAULT_COLOR;
+				}
+			}
+		}
 		if( Feature.display_mode == Feature.DISPLAY_MODE_COUNTIES) {
 
 			//enumerate counties

@@ -5023,6 +5023,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByCounty);
 		
+		mntmColorBySplits = new JMenuItem("Color by splits");
+		mntmColorBySplits.setEnabled(false);
+		mntmColorBySplits.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;
+				mapPanel.revalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorBySplits);
+		
 		
 		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
@@ -5972,6 +5983,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				MainFrame.mainframe.project.county_column = (String)srcomboBoxCountyColumn.getSelectedItem();
 				setCountyColumn();
 				mntmColorByCounty.setEnabled(MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0);
+				mntmColorBySplits.setEnabled(MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0);
 				panelStats.getStats();
 			}
 		});
@@ -6308,6 +6320,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_11;
 	public JMenuItem mntmColorByCounty;
 	public JMenuItem mntmMergeInElection;
+	public JMenuItem mntmColorBySplits;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -7335,5 +7348,4 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			return ss;
 		}
 	}
-
 }

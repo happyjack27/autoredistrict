@@ -22,6 +22,7 @@ import util.PermIterator;
 
 import java.awt.Color;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
@@ -2057,5 +2058,46 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 			return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
 		}
+			
+		
+		public Hashtable<String,int[]> getSplitCounties() {
+			Hashtable<String,int[]> counties = new Hashtable<String,int[]>();
 
+			if( MainFrame.mainframe.project.county_column == null || MainFrame.mainframe.project.county_column.length() == 0) {
+				return counties;
+			}
+			try { 
+				for( int i = 0; i < vtds.size(); i++) {
+					VTD vtd = vtds.get(i);
+					int[] dists = counties.get(vtd.county);
+					if( dists == null) {
+						dists = new int[Settings.num_districts];
+						counties.put(vtd.county, dists);
+					}
+					int dist = vtd_districts[i];
+					if( dist >= dists.length) {
+						dist = (int)(Math.random()*(double)dists.length);
+					}
+					dists[dist]++;
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+			Hashtable<String,int[]> ret = new Hashtable<String,int[]>();
+			
+			for( Entry<String,int[]> entry : counties.entrySet()) {
+				int matches = 0;
+				int[] ii = entry.getValue();
+				for( int i = 0; i < ii.length; i++) {
+					if( ii[i] > 0) {
+						matches++;
+					}
+				}
+				if( matches > 1) {
+					ret.put(entry.getKey(),entry.getValue());//.remove(entry.getKey());
+				}
+			}
+			
+			return ret;
+		}
 }

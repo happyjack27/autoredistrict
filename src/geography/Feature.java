@@ -33,6 +33,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static final int DISPLAY_MODE_VICTORY_MARGIN = 10;
 	public static final int DISPLAY_MODE_WASTED_VOTES_BY_DEM = 11;
 	public static final int DISPLAY_MODE_DIST_DEMO = 12;
+	public static final int DISPLAY_MODE_COUNTY_SPLITS = 13;
 
 	public static boolean show_seats = true;
 	
