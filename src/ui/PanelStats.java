@@ -790,7 +790,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	}
 	public void exportToHtml() {
 		System.out.println("1");
-		MainFrame.mainframe.ip.addHistory("EXPORT");
+		MainFrame.mainframe.ip.addHistory("EXPORT HTML");
 
 		String partiesStr = getAsHtml(partiesTable);
 		String raceStr = getAsHtml(ethnicityTable);

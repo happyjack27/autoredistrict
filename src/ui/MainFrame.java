@@ -134,7 +134,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmShowData = new JMenuItem("Show data");
 	
 	JMenu mnImportExport = new JMenu("Aggregate/Deaggregate");
-	private JMenu mnImportExport_1;
 
 	JMenuItem mntmExportPopulation = new JMenuItem("Export population");
 	JMenuItem mntmImportPopulation = new JMenuItem("Import population");
@@ -162,8 +161,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmOpenProjectFile_1;
 	public JPanel panel_4;
 	public JButton btnElectionColumns;
-	public JMenuItem mntmImportCensusData;
-	public JMenuItem mntmExportToBlock;
 	public JSeparator separator_1 = new JSeparator();
 	public JSeparator separator_2 = new JSeparator();
 	public JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
@@ -238,6 +235,35 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void mergeInDemoAndElection() {
 		ip.addHistory("MERGE");
 		new MergeInDemoAndElection().start();
+	}
+	public void importCountyData() {
+		ip.addHistory("IMPORT COUNTY");
+		ImportCountyLevel ivtd = new ImportCountyLevel();	
+		ivtd.nextThread = new ThreadFinishImport();
+		ivtd.start();
+	}
+	public void importBlockElection() {
+		ip.addHistory("IMPORT ELECTIONS");
+		ImportVTDLevel ivtd = new ImportVTDLevel();	
+		ivtd.nextThread = new ThreadFinishImport();
+		ivtd.start();
+	}
+	
+	public void importBlockDemographics() {
+		ip.addHistory("IMPORT DEMOGRAPHICS");
+		ImportDemographics ivtd = new ImportDemographics();	
+		ivtd.nextThread = new ThreadFinishImport();
+		ivtd.start();
+	}
+	
+	public void importBlockBdistricting() {
+		ip.addHistory("IMPORT BDISTRICTING");
+		
+	}
+	
+	public void importBlockCurrentDistricts() {
+		ip.addHistory("IMPORT CURRENT_DISTRICTS");
+		
 	}
 	
 	class MergeInDemoAndElection extends Thread {
@@ -1267,16 +1293,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		protected Thread nextThread;
 		ImportCensus2Thread() { super(); }
     	public void run() { 
+    		dlbl.setText("Loading population...");
+    		importBlockDataDBF(Download.census_pop_file.getAbsolutePath(),"POPULATION","POPULATION",false);
+    	}
+    	public void importBlockDataDBF(String path, String column, String source_column, boolean MAJORITY_VOTE) {
     		try {
 	    		dlg.setVisible(true);
-	    		dlbl.setText("Loading population...");
 	    		Hashtable<String,String> hash_population = new Hashtable<String,String>();
 	    		
 				
 				DBFReader dbfreader;
 
 				try {
-					dbfreader = new DBFReader(Download.census_pop_file.getAbsolutePath());
+					dbfreader = new DBFReader(path);
 				} catch (JDBFException e1) {
 					e1.printStackTrace();
 					return;
@@ -1292,10 +1321,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				for( int i = 0; i < dh.header.length; i++) {
 					dh.header[i] = dbfreader.getField(i).getName();
 					System.out.println(dh.header[i]+" ");
-					if( dh.header[i].toUpperCase().trim().indexOf("POP") == 0) {
+					if( dh.header[i].toUpperCase().trim().indexOf(source_column) == 0) {
 						col_pop = i;
 					}
-					if( dh.header[i].toUpperCase().trim().indexOf("BLOCKID") == 0) {
+					if( dh.header[i].toUpperCase().trim().indexOf("BLOCKID") == 0 || dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid_pop = i;
 					}
 				}
@@ -1448,6 +1477,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    dbfreader.close();
 			    
 	    		dlbl.setText("Finalizing...");
+	    		
+				Feature.compare_centroid = false;
+				Collections.sort(featureCollection.features);
+
 
 			    
 	    		for( Feature feat : featureCollection.features) {
@@ -1500,7 +1533,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmWholeCounties;
 	public JLabel lblGeometricFairness;
 	public JSlider sliderBalance;
-	public JMenuItem mntmConvertWktTo;
 	public JSeparator separator_4;
 	public JMenuItem mntmNoMap;
 	public JMenuItem mntmOneMap;
@@ -4132,7 +4164,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 		separator_7 = new JSeparator();
-		mntmDescramble = new JMenuItem("descramble");
 		mnWindows = new JMenu("Windows");
 		btnElection2Columns = new JButton("Election 2 columns");
 		chckbxSecondElection = new JCheckBox("Second election");
@@ -4221,8 +4252,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmImportcsv = new JMenuItem("Import results .csv");
 		mntmShowStats = new JMenuItem("Show stats");
 		mntmShowData = new JMenuItem("Show data");
-		
-		mnImportExport_1 = new JMenu("Aggregate/Deaggregate");
 
 		mntmExportPopulation = new JMenuItem("Export population");
 		mntmImportPopulation = new JMenuItem("Import population");
@@ -4230,7 +4259,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmZoomIn = new JMenuItem("Zoom in");
 		mntmUndoZoom = new JMenuItem("Undo zoom");
 		mntmShowGraph = new JMenuItem("Show graph");
-		mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 		comboBoxPopulation = new JComboBox();
 		comboBoxDistrictColumn = new JComboBox();
 	    textFieldNumDistricts = new JTextField();
@@ -4238,7 +4266,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 
 		separator_1 = new JSeparator();
-		mntmImportAggregate = new JMenuItem("Import & aggregate custom");
 		mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 
 	    dlg = new JDialog(mainframe, "Working", true);
@@ -4271,7 +4298,107 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		menuBar.add(mnFile);
-		menuBar.add(mnImportExport_1);
+		
+		mnMerge = new JMenu("Merge");
+		menuBar.add(mnMerge);
+		
+		mntmCountyVote = new JMenuItem("2010 county vote and ethnic data");
+		mntmCountyVote.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importCountyData();
+
+			}
+		});
+		mnMerge.add(mntmCountyVote);
+		
+		separator_13 = new JSeparator();
+		mnMerge.add(separator_13);
+		
+		mntmVtdVote = new JMenuItem("2010 vtd vote estimates");
+		mntmVtdVote.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importBlockElection();
+			}
+		});
+		mnMerge.add(mntmVtdVote);
+		
+		separator_12 = new JSeparator();
+		mnMerge.add(separator_12);
+		
+		mntmBlocklevelPopulation = new JMenuItem("Block-level population");
+		mntmBlocklevelPopulation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ip.addHistory("IMPORT POPULATION");
+
+				if( Download.census_merge_working) {
+					if( Download.census_merge_old) {
+						Download.nextThread = new ImportCensus2Thread(); 
+					} else {
+						Download.nextThread = new ImportGazzeterThread(); 
+						
+					}
+				}
+				//Download.nextThread = ost;
+				DialogDownload dd = new DialogDownload();
+				dd.setTitle("Download and aggregate census data from census.gov");
+				dd.show();
+			}
+		});
+		mnMerge.add(mntmBlocklevelPopulation);
+		
+		mntmBlocklevelEthnicData = new JMenuItem("Block-level ethnic data");
+		mnMerge.add(mntmBlocklevelEthnicData);
+		mntmBlocklevelEthnicData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importBlockDemographics();
+			}
+		});
+
+		
+		mntmBlocklevelCurrentDistricts = new JMenuItem("Block-level current districts");
+		mntmBlocklevelCurrentDistricts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importBlockCurrentDistricts();
+			}
+		});
+		mnMerge.add(mntmBlocklevelCurrentDistricts);
+		
+		
+		mntmBlocklevelBdistricting = new JMenuItem("Block-level bdistricting");
+		mntmBlocklevelBdistricting.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				importBlockBdistricting();
+			}
+		});
+		mnMerge.add(mntmBlocklevelBdistricting);
+		
+		mntmImportBlockFile = new JMenuItem("Import block file");
+		mntmImportBlockFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new ImportAggregateCustom().init();
+			}
+		});
+		mnMerge.add(mntmImportBlockFile);
+		
+		separator_14 = new JSeparator();
+		mnMerge.add(separator_14);
+		mntmExportAndDeaggregate = new JMenuItem("Export & de-aggregate custom");
+		mnMerge.add(mntmExportAndDeaggregate);
+		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				/*
+				JFileChooser jfc = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Dbase file", "dbf");
+				jfc.setFileFilter(filter);
+				jfc.showOpenDialog(null);
+				File fd = jfc.getSelectedFile();
+				if( fd == null) {
+					return;
+				}*/
+				new ExportCustomThread().init();
+			}				
+		});
 		
 		JMenuItem mntmOpenProjectFile = new JMenuItem("Open project file");
 		mntmOpenProjectFile.addActionListener(new ActionListener() {
@@ -4399,9 +4526,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(mntmPublicMappingProject);
 		
 		mnFile.add(separator_7);
-		//mnFile.add(separator);
-		
-		mnFile.add(mntmOpenGeojson);
+		mntmOpenEsriShapefile = new JMenuItem("Open ESRI shapefile");
 		mntmOpenEsriShapefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser jfc = new JFileChooser();
@@ -4419,13 +4544,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnFile.add(mntmOpenEsriShapefile);
+		//mnFile.add(separator);
 		
-		mntmImportCensusData = new JMenuItem("Import Census Data from file");
-		mntmImportCensusData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new LoadCensusFileThread().init();
-			}
-		});
+		mnFile.add(mntmOpenGeojson);
 		mntmOpenWktTabdelimited.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				new OpenWKTFileThread().start();
@@ -4435,81 +4556,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(mntmOpenWktTabdelimited);
 		
 		mnFile.add(separator_1);
-		mnImportExport_1.add(mntmImportCensusData);
-		
-		mntmExportToBlock = new JMenuItem("Export districts to block level");
-		mntmExportToBlock.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				boolean ok = true;
-				if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
-					ok = false;
-				}
-				if( ok && comboBoxDistrictColumn.getSelectedItem() == null) {
-					ok = false;
-				}
-				if( ok && ((String)comboBoxDistrictColumn.getSelectedItem()).length() == 0) {
-					ok = false;
-				}
-				if( ok) {
-					new ExportToBlockLevelThread().start();
-				} else {
-					JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
-				}
-			}
-		});
-		mntmImportAggregate.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new ImportAggregateCustom().init();
-			}
-		});
-		
-		mntmImportCensusData_1 = new JMenuItem("Import Census Data from census.gov");
-		mntmImportCensusData_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				//OpenShapeFileThread ost = new OpenShapeFileThread(Download.vtd_file);
-				if( Download.census_merge_working) {
-					if( Download.census_merge_old) {
-						Download.nextThread = new ImportCensus2Thread(); 
-					} else {
-						Download.nextThread = new ImportGazzeterThread(); 
-						
-					}
-				}
-				//Download.nextThread = ost;
-				DialogDownload dd = new DialogDownload();
-				dd.setTitle("Download and aggregate census data from census.gov");
-				dd.show();
-			}
-		});
-		mnImportExport_1.add(mntmImportCensusData_1);
-		separator_2 = new JSeparator();
-		
-		mnImportExport_1.add(separator_2);
-		
-		mnImportExport_1.add(mntmImportAggregate);
-		mntmExportAndDeaggregate = new JMenuItem("Export & de-aggregate custom");
-		mntmExportAndDeaggregate.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				/*
-				JFileChooser jfc = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Dbase file", "dbf");
-				jfc.setFileFilter(filter);
-				jfc.showOpenDialog(null);
-				File fd = jfc.getSelectedFile();
-				if( fd == null) {
-					return;
-				}*/
-				new ExportCustomThread().init();
-			}				
-		});
-		
-		mnImportExport_1.add(mntmExportAndDeaggregate);
-		
-		separator_10 = new JSeparator();
-		mnImportExport_1.add(separator_10);
-		mnImportExport_1.add(mntmExportToBlock);
-		mnImportExport_1.add(new JSeparator());
 
 
 		
@@ -4605,37 +4651,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		separator_4 = new JSeparator();
 		mnFile.add(separator_4);
-		
-		mntmConvertWktTo = new JMenuItem("Convert WKT to lat/lon");
-		mntmConvertWktTo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				new WKTFileToCoordsThread().init();
-			}
-		});
-		mnImportExport_1.add(mntmConvertWktTo);
-		mntmDescramble.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				for( Feature feat : featureCollection.features) {
-					feat.geometry.makePolysFull();
-				}
-
-				String[] districts = new String[featureCollection.features.size()];
-				Feature.compare_centroid = true;
-				String s = (String)mainframe.comboBoxDistrictColumn.getSelectedItem();
-				Collections.sort(featureCollection.features);
-				for( int i = 0; i < featureCollection.features.size(); i++) {
-					districts[i] = featureCollection.features.get(i).properties.getString(s);
-				}
-				Feature.compare_centroid = false;
-				Collections.sort(featureCollection.features);
-				for( int i = 0; i < featureCollection.features.size(); i++) {
-					featureCollection.features.get(i).properties.put(s,districts[i]);
-				}
-				System.out.println("done descrambling");
-			}
-		});
-		
-		mnImportExport_1.add(mntmDescramble);
 
 		
 		JMenuItem mntmExit = new JMenuItem("Exit");
@@ -4652,6 +4667,29 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmExportToHtml);
+		
+		mntmExportBlockFile = new JMenuItem("Export block file");
+		mntmExportBlockFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ip.addHistory("EXPORT BLOCK");
+				boolean ok = true;
+				if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
+					ok = false;
+				}
+				if( ok && comboBoxDistrictColumn.getSelectedItem() == null) {
+					ok = false;
+				}
+				if( ok && ((String)comboBoxDistrictColumn.getSelectedItem()).length() == 0) {
+					ok = false;
+				}
+				if( ok) {
+					new ExportToBlockLevelThread().start();
+				} else {
+					JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
+				}
+			}
+		});
+		mnFile.add(mntmExportBlockFile);
 
 		
 		mnFile.add(mntmExit);
@@ -6309,9 +6347,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
-	public JMenuItem mntmImportCensusData_1;
 	public JSeparator separator_8;
-	public JSeparator separator_10;
 	public JSlider slider_anneal;
 	public JCheckBox chckbxNewCheckBox_1;
 	public JCheckBox chckbxConstrain;
@@ -6321,6 +6357,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmColorByCounty;
 	public JMenuItem mntmMergeInElection;
 	public JMenuItem mntmColorBySplits;
+	public JMenu mnMerge;
+	public JMenuItem mntmCountyVote;
+	public JMenuItem mntmVtdVote;
+	public JMenuItem mntmBlocklevelCurrentDistricts;
+	public JMenuItem mntmBlocklevelBdistricting;
+	public JSeparator separator_12;
+	public JMenuItem mntmBlocklevelPopulation;
+	public JSeparator separator_13;
+	public JMenuItem mntmBlocklevelEthnicData;
+	public JMenuItem mntmImportBlockFile;
+	public JMenuItem mntmExportBlockFile;
+	public JSeparator separator_14;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

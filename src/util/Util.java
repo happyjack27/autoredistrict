@@ -136,6 +136,8 @@ public class Util {
 	    return v;
 	}
 	public static void make_scripts() {
+		String prepend = "";
+		//prepend = "xvfb-run -a -e xvfb.log  ";
 		boolean gui = true;
 		String base_dir = "/Users/jimbrill/git/autoredistrict/jar/";
 		String script = "";
@@ -257,8 +259,8 @@ public class Util {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
-			main.append("java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
+			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
+			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");
 		FileOutputStream fos;

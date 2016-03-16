@@ -309,6 +309,38 @@ public class Download extends Thread {
 		}
 		return;
 	}
+	public static String census_districts_url() {
+		String fips = ""+istate;
+		if( fips.length()< 2) {
+			fips = "0"+fips;
+		}
+		//"http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST04_AZ.zip"
+		return "http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST"+fips+"_"+state_to_abbr.get(states[istate])+".zip";
+		//then the file in the zip is:
+		/*
+		 BlockAssign_ST01_AL_[type].txt
+		 type = 
+		 CD: congress
+		 SLDL: state house
+		 SLDH: state senate
+		 
+		 comma separated, with header row
+		 */
+	}
+	public static String bdistricting_congress_url() {
+		return "http://bdistricting.com/"+cyear+"/"+state_to_abbr.get(states[istate])+"_Congress/solution.zip";
+	}
+	public static String bdistricting_senate_url() {
+		return "http://bdistricting.com/"+cyear+"/"+state_to_abbr.get(states[istate])+"_Senate/solution.zip";
+	}
+	public static String[] bdistricting_house_urls() {
+		String[] names = new String[]{"House","Assembly","General","Legislature"};
+		String[] urls = new String[names.length];
+		for( int i = 0; i < names.length; i++) {
+			urls[i] = "http://bdistricting.com/"+cyear+"/"+state_to_abbr.get(states[istate])+"_"+names[i]+"/solution.zip";
+		}
+		return urls;
+	}
 	public static String census_tract_url(int state, int year) {
 		return "http://www2.census.gov/geo/docs/maps-data/data/gazetteer/"
 			+"census_tracts_list_"+num(state)+".txt";
