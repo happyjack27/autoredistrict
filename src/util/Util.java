@@ -170,6 +170,9 @@ public class Util {
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
+			if( i < 35) {
+				//continue;
+			}
 			String state = Download.states[i];
 			if( false
 					//|| state.equals("Alaska")

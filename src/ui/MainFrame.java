@@ -28,11 +28,13 @@ import org.nocrala.tools.gis.data.esri.shapefile.header.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
+import dbf.*;
+/*
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.DBFWriter;
-import com.hexiong.jdbf.JDBFException;
-import com.hexiong.jdbf.JDBField;
-
+import com.hexiong.jdbf.Exception;
+import com.hexiong.jdbf.DBField;
+*/
 
 public class MainFrame extends JFrame implements iChangeListener, iDiscreteEventListener {
 	/*
@@ -432,7 +434,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				DBFReader dbfreader;
 				try {
 					dbfreader = new DBFReader(dbfname);
-				} catch (JDBFException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 					return;
 				}
@@ -448,14 +450,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
+					dh.header[i] = dbfreader.getField(i).name;
 					featureCollection.header_data.put(
 						dh.header[i],
 						new Quadruplet<String,Integer,Integer,Byte>(
 							dh.header[i],
-							dbfreader.getField(i).getLength(),
-							dbfreader.getField(i).getDecimalCount(),
-							(byte)dbfreader.getField(i).getType()
+							dbfreader.getField(i).length,
+							dbfreader.getField(i).decimalCount,
+							(byte)dbfreader.getField(i).type
 						)
 					);
 
@@ -628,7 +630,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				DBFReader dbfreader;
 				try {
 					dbfreader = new DBFReader(dbfname);
-				} catch (JDBFException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 					return points;
 				}
@@ -642,7 +644,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
+					dh.header[i] = dbfreader.getField(i).name;
 					if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 						col_geoid = i;
 					}
@@ -800,7 +802,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					DBFReader dbfreader;
 					try {
 						dbfreader = new DBFReader(dbfname);
-					} catch (JDBFException e1) {
+					} catch (Exception e1) {
 						e1.printStackTrace();
 						return;
 					}
@@ -814,7 +816,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 					dh.header = new String[dbfreader.getFieldCount()];
 					for( int i = 0; i < dh.header.length; i++) {
-						dh.header[i] = dbfreader.getField(i).getName();
+						dh.header[i] = dbfreader.getField(i).name;
 						if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
 							col_geoid = i;
 						}
@@ -1062,7 +1064,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				DBFReader dbfreader;
 				try {
 					dbfreader = new DBFReader(dbfname);
-				} catch (JDBFException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 					return;
 				}
@@ -1076,7 +1078,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
+					dh.header[i] = dbfreader.getField(i).name;
 					if( dh.header[i].toUpperCase().trim().equals("POP2010") && col_pop < 0) {
 						col_pop = i;
 					}
@@ -1306,7 +1308,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				try {
 					dbfreader = new DBFReader(path);
-				} catch (JDBFException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 					return;
 				}
@@ -1319,7 +1321,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
+					dh.header[i] = dbfreader.getField(i).name;
 					System.out.println(dh.header[i]+" ");
 					if( dh.header[i].toUpperCase().trim().indexOf(source_column) == 0) {
 						col_pop = i;
@@ -1363,7 +1365,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    
 				try {
 					dbfreader = new DBFReader(Download.census_centroid_file.getAbsolutePath());
-				} catch (JDBFException e1) {
+				} catch (Exception e1) {
 					e1.printStackTrace();
 					return;
 				}
@@ -1377,7 +1379,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				dh.header = new String[dbfreader.getFieldCount()];
 				for( int i = 0; i < dh.header.length; i++) {
-					dh.header[i] = dbfreader.getField(i).getName();
+					dh.header[i] = dbfreader.getField(i).name;
 					System.out.println(dh.header[i]+" ");
 
 					if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
@@ -1671,6 +1673,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	class ImportAggregateCustom extends Thread {
 		File f;
+		int opt = 0;
+		int ACCUMULATE = 0;
+		int OVERWRITE = 1;
 		ImportAggregateCustom() { super(); }
 		public void init() {
 			JFileChooser jfc = new JFileChooser();
@@ -1683,12 +1688,25 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( f == null)  {
 				return;
 			}
+			String[] options = new String[]{"Accumulate","Majority vote"};
+			opt = JOptionPane.showOptionDialog(mainframe, "Accumulate values or majority vote?", "Select option", 0,0,null,options,options[0]);
+			if( opt < 0) {
+				System.out.println("aborted.");
+				return;
+			}
 			
 			start();
 		}
     	public void run() {
+    		boolean CONTAINS_HEADER = false; 
+    		boolean MAJORITY_VOTE = false;
+    		importBlockData( f.getName().trim(), true, opt == 1, new String[]{"IMPORTED"}, new String[]{"IMPORTED"});
+    	}
+    	public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
     		try {
-				String fn = f.getName().trim();
+    			opt = MAJORITY_VOTE ? 1 : 0;
+    			f = new File(fn);
+				//String fn = f.getName().trim();
 				String ext = fn.substring(fn.length()-3).toLowerCase();
 				DataAndHeader dh = new DataAndHeader();
 
@@ -1717,7 +1735,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					//TODO: CONVERT TO IMPORT CUSTOM
 					FileReader fr = new FileReader(f);
 					BufferedReader br = new BufferedReader(fr);
-					dh.header = br.readLine().split(delimiter);
+					if( !CONTAINS_HEADER) {
+						dh.header = new String[source_column_names.length+1];
+						dh.header[0] = "GEOID";
+						for( int i = 0; i < source_column_names.length; i++) {
+							dh.header[i+1] = source_column_names[i];
+						}
+					} else {
+						dh.header = br.readLine().split(delimiter);
+					}
 					
 					//now select the columns
 		    		System.out.println("reading columns");
@@ -1744,14 +1770,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						return;
 					}
 					
-					String[] options = new String[]{"Accumulate","Majority vote"};
-					int ACCUMULATE = 0;
-					int OVERWRITE = 1;
-					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate values or majority vote?", "Select option", 0,0,null,options,options[0]);
-					if( opt < 0) {
-						System.out.println("aborted.");
-						return;
-					}
+
 					
 		    		dlg.setVisible(true);
 					Object[] col_names = dsc.in.toArray();
@@ -1916,7 +1935,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					DBFReader dbfreader;
 					try {
 						dbfreader = new DBFReader(dbfname);
-					} catch (JDBFException e1) {
+					} catch (Exception e1) {
 						e1.printStackTrace();
 						return;
 					}
@@ -1926,7 +1945,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 					dh.header = new String[dbfreader.getFieldCount()];
 					for( int i = 0; i < dh.header.length; i++) {
-						dh.header[i] = dbfreader.getField(i).getName();
+						dh.header[i] = dbfreader.getField(i).name;
 					}
 
 					//now select the columns
@@ -3653,19 +3672,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	public void writeDBF(String filename, String[] headers, String[][] data) {
 		int MAX_HEADER_LENGTH = 10;
-        JDBField[] fields = new JDBField[headers.length];
+        DBField[] fields = new DBField[headers.length];
         System.out.println("filename: "+filename);
         
 		for( int i = 0; i < headers.length; i++) {
 			try {
 				Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
 				System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
-				fields[i] = new JDBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], (char)(int)q.d, q.b,q.c);
-				//fields[i] = new JDBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
-			} catch (JDBFException e) {
+				fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], (char)(int)q.d, q.b,q.c);
+				//fields[i] = new DBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
+			} catch (Exception e) {
 				try {
-					fields[i] = new JDBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], 'C', 32, 0);
-				} catch (JDBFException e1) {
+					fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], 'C', 32, 0);
+				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -3678,7 +3697,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		DBFWriter dbfwriter;
 		try {
 			dbfwriter = new DBFWriter(filename, fields);
-		} catch (JDBFException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 			return;
 		}
@@ -3690,7 +3709,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			Object[] oo = new Object[data[i].length];
 			for( int j = 0; j < fields.length; j++) {
-				if( fields[j].getType() == 'N') {
+				if( fields[j].type == 'N') {
 					if(  data[i][j] == null) {
 						oo[j] = new Double(0);
 					} else {
@@ -3709,7 +3728,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			try {
 				//dbfwriter.addRecord(data[i]);
 				dbfwriter.addRecord(oo);
-			} catch (JDBFException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -3717,7 +3736,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		try {
 			dbfwriter.close();
 			System.out.println("dbfwriter closed");
-		} catch (JDBFException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -3727,7 +3746,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		DBFReader dbfreader;
 		try {
 			dbfreader = new DBFReader(dbfname);
-		} catch (JDBFException e1) {
+		} catch (Exception e1) {
 			e1.printStackTrace();
 			return null;
 		}
@@ -3736,7 +3755,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		dh.header = new String[dbfreader.getFieldCount()];
 		for( int i = 0; i < dh.header.length; i++) {
 			try {
-				dh.header[i] = dbfreader.getField(i).getName();
+				dh.header[i] = dbfreader.getField(i).name;
 				System.out.println("i: "+dh.header[i]);
 			} catch (Exception ex) {
 				ex.printStackTrace();
@@ -3779,7 +3798,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			DBFReader dbfreader = new DBFReader(dbfname);
 			String[] cols = new String[dbfreader.getFieldCount()];
 			for( int i=0; i<cols.length; i++) {
-				cols[i] = dbfreader.getField(i).getName();
+				cols[i] = dbfreader.getField(i).name;
 				System.out.print(cols[i]+"  ");
 			}
 			System.out.print("\n");
@@ -3874,7 +3893,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		      total++;
 		    }
 			for( int i=0; i<cols.length; i++) {
-				cols[i] = dbfreader.getField(i).getName();
+				cols[i] = dbfreader.getField(i).name;
 				System.out.print(cols[i]+"  ");
 			}
 			System.out.print("\n");
