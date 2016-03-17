@@ -260,12 +260,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 	public void importBlockBdistricting() {
 		ip.addHistory("IMPORT BDISTRICTING");
-		
+		Download.prompt = false;
+		importBlocksBdistricting();	
 	}
 	
 	public void importBlockCurrentDistricts() {
 		ip.addHistory("IMPORT CURRENT_DISTRICTS");
-		
+		Download.prompt = false;
+		importBlocksCurrentDistricts();		
 	}
 	
 	class MergeInDemoAndElection extends Thread {
@@ -7320,7 +7322,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		importBlockData(path+File.separator+abbr+"_Senate.csv", true, false, new String[]{"SLDU_BD"},new String[]{"SLDU_BD"});
 		String[] tries = new String[]{"House","General","Legislature","Assembly"};
 		for( int i = 0; i < tries.length; i++) {
-			if( new File(path+File.separator+abbr+"_"+tries[i]+".csv").exists()) {
+			if( new File(path+File.separator+abbr+"_"+tries[i]+".csv").exists() || i == tries.length-1) {
 				importBlockData(path+File.separator+abbr+"_"+tries[i]+".csv", true, false, new String[]{"SLDL_BD"},new String[]{"SLDL_BD"});
 				break;
 			}
@@ -7347,9 +7349,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		
 		try {
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.txt", true, true, new String[]{"DISTRICT"},new String[]{"CD_NOW"});
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.txt", true, true, new String[]{"DISTRICT"},new String[]{"SLDU_NOW"});
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.txt", true, true, new String[]{"DISTRICT"},new String[]{"SLDL_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.csv", true, true, new String[]{"DISTRICT"},new String[]{"CD_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.csv", true, true, new String[]{"DISTRICT"},new String[]{"SLDU_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.ccsv", true, true, new String[]{"DISTRICT"},new String[]{"SLDL_NOW"});
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -7502,7 +7504,6 @@ ui.Mainframe:
     		System.out.println("Reading headers...");
     		dlbl.setText("Reading headers...");
 
-
 			File f = new File(filename);
 			String ext = filename.substring(filename.length()-3).toLowerCase();
 			dh = new DataAndHeader();
@@ -7525,6 +7526,13 @@ ui.Mainframe:
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					for( Feature feat : featureCollection.features) {
+						for( int i = 0; i < dest_columns.length; i++) {
+							feat.properties.put(dest_columns[i],"0");
+						}
+					}
+					dlg.hide();
+					return;
 				}
 				BufferedReader br = new BufferedReader(fr);
 				

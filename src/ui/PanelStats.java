@@ -32,12 +32,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public void saveAsPng(JComponent component, String path, int width, int height) {
 		 System.out.println("path: "+path);
 		 saveAsPng2( component,  path,  width,  height);
+		 /*
 		 String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
 		 System.out.println("path2: "+path2);
 		 System.out.println("index: "+path.indexOf(".png"));
 		 saveAsPng2( component,  path2,  width/4,  height/4);
+		 */
 	}
 	public void saveAsPng2(JComponent component, String path, int width, int height) {
+		String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
         Dimension d = component.getSize();
         
         if( true) {
@@ -49,20 +52,48 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         	height = d.height;
         }
         
-		BufferedImage image = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = image.createGraphics(); 
+		BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image2 = new BufferedImage(width/2,height/2, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image4 = new BufferedImage(width/4,height/4, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics1 = image1.createGraphics(); 
+        Graphics2D graphics2 = image2.createGraphics(); 
+        Graphics2D graphics4 = image4.createGraphics(); 
+
+        graphics1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics1.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics4.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics4.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics4.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+
         
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
-        component.paint(graphics2D);
-        component.print(graphics2D);
+        component.paint(graphics1);
+        component.print(graphics1);
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
         try {
-            ImageIO.write(image,"png", new File(path));
+            ImageIO.write(image1,"png", new File(path));
         }
         catch(Exception ex) {
             ex.printStackTrace();
         }
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+    	
+        graphics2.drawImage(image1,0,0,width/2,height/2,null);
+        graphics4.drawImage(image2,0,0,width/4,height/4,null);
+        
+        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+        try {
+            ImageIO.write(image4,"png", new File(path2));
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+        
         component.setSize(d);
     	component.doLayout();
 	}

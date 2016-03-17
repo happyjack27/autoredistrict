@@ -386,6 +386,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			textFieldIP.setText(""+(instruction_pointer+1));
 			return;
 		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
+			mainFrame.importBlockBdistricting();
+		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("CURRENT_DISTRICTS")) {
+			mainFrame.importBlockCurrentDistricts();
+		} else
 		if( command.equals("RENAME") && instruction_words[1].equals("FEATURE")) {
 			mainFrame.featureCollection.renameFeature(instruction_words[2], instruction_words[3]);
 		} else
