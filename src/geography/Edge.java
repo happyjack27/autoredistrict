@@ -1,10 +1,10 @@
-package solutions;
+package geography;
 
 import java.awt.Polygon;
 
-import geography.FeatureCollection;
-import geography.Geometry;
+import geography.*;
 import serialization.ReflectionJSONObject;
+import solutions.*;
 
 public class Edge extends ReflectionJSONObject<Edge> {
 	public int id = -1;
@@ -21,7 +21,15 @@ public class Edge extends ReflectionJSONObject<Edge> {
 	
 	public static boolean isLatLon = true;
 	
-    boolean areBothSidesSameDistrict(int[] ward_districts) {
+	public VTD otherVTD(VTD vtd) {
+		return ward1 == vtd ? ward2 : ward1;
+	}
+	public Vertex otherVertex(Vertex vertex) {
+		return vertex1 == vertex ? vertex2 : vertex1;
+	}
+
+	
+    public boolean areBothSidesSameDistrict(int[] ward_districts) {
     	if( ward1 == null || ward2 == null) {
     		return false;
     	}

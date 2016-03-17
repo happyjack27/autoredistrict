@@ -22,9 +22,7 @@ import solutions.Election;
 import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
-import solutions.Edge;
 import solutions.Settings;
-import solutions.Vertex;
 import solutions.VTD;
 import ui.MainFrame;
 import ui.MapPanel;
@@ -977,6 +975,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		
 		//initialize locked_wards array.
+		ecology.wards = vtds;
 		locked_wards = new boolean[vtds.size()];
 		for( int i = 0; i < locked_wards.length; i++) {
 			locked_wards[i] = false;
@@ -1044,17 +1043,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		return best;
 	}
-	
-	public void initEcology() {
-		ecology.wards = vtds;
-		locked_wards = new boolean[vtds.size()];
-		for( int i = 0; i < locked_wards.length; i++) {
-			locked_wards[i] = false;
-		}
 
-		//ecology.edges = edgeHash.values();
-		//ecology.vertexes = vertexes;
-	}
 	public void storeDistrictsToProperties(String column_name) {
 		if( ecology.population == null) {
 			ecology.population = new Vector<DistrictMap>();
@@ -1285,5 +1274,81 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			q.d = 'N';
 		}
 		return q;
+	}
+	
+	public Hashtable<String,double[][][]> getOutlines(String key) {
+		Hashtable<String,double[][][]> outlines = new Hashtable<String,double[][][]>();
+		Hashtable<String,Vector<Edge>> new_polys = new Hashtable<String,Vector<Edge>>();
+		
+		for( Feature f : features) {
+			String current_district = f.properties.get(key).toString();
+			Vector<Edge> outer_edges = new_polys.get(current_district);
+			if( outer_edges == null) {
+				outer_edges = new Vector<Edge>();
+				new_polys.put(current_district,outer_edges);
+			}
+			for(Edge e : f.vtd.edges) {
+				String s = e.otherVTD(f.vtd).feature.properties.get(key).toString();
+				if( !s.equals(current_district)) {
+					outer_edges.add(e);
+				}
+			}	
+		}
+		for( java.util.Map.Entry<String, Vector<Edge>> entry : new_polys.entrySet()) {
+		
+			//get all connecting vertexes
+			Hashtable<Vertex,Vector<Vertex>> connecting_vertexes = new Hashtable<Vertex,Vector<Vertex>>();
+			for(Edge e : entry.getValue()) {
+				Vector<Vertex> v1 = connecting_vertexes.get(e.vertex1);
+				if( v1 == null) {
+					v1 = new Vector<Vertex>();
+					connecting_vertexes.put(e.vertex1,v1);
+				}
+				v1.add(e.vertex2);
+
+				Vector<Vertex> v2 = connecting_vertexes.get(e.vertex2);
+				if( v2 == null) {
+					v2 = new Vector<Vertex>();
+					connecting_vertexes.put(e.vertex1,v2);
+				}
+				v2.add(e.vertex1);
+			}	
+			
+			//now start at a vertex and iterate through, collecting all polygons
+			Vector<Vector<Vertex>> vpolygons = new Vector<Vector<Vertex>>();
+			while( connecting_vertexes.size() > 0) {
+				Vector<Vertex> vpolygon = new Vector<Vertex>();
+				Vertex first_vertex = connecting_vertexes.keys().nextElement();
+				Vertex v = first_vertex;
+				while( true) {
+					vpolygon.add(v);
+					Vector<Vertex> vs = connecting_vertexes.remove(v);
+					if( vs == null) {
+						System.out.println("vertex not found!");
+						break;
+					}
+					Vertex next = vs.remove(0);
+					v = next;
+					if( v == first_vertex) {
+						break;
+					}
+				}
+				vpolygons.add(vpolygon);
+			}
+			
+			//now convert to double[][][].
+			double[][][] polys = new double[vpolygons.size()][][];
+			for( int i = 0; i < vpolygons.size(); i++) {
+				Vector<Vertex> vpolygon = vpolygons.get(i);
+				polys[i] = new double[vpolygon.size()][];
+				for( int j = 0; j < vpolygon.size(); j++) {
+					Vertex v = vpolygon.get(j);
+					polys[i][j] = new double[]{v.x,v.y};
+				}
+			}
+			outlines.put(entry.getKey(),polys);
+		}
+		
+		return outlines;
 	}
 }

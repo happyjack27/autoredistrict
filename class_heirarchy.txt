@@ -1,0 +1,247 @@
+PROPOSED NEW ARCHITECTURE
+===============
+===============
+
+Applet
+|-static MainFrame mainframe;
+|-static InstructionProcessor ip;
+|-static FeatureCollection featureCollection;
+|-static Ecology ecology;
+|-static LoadShapefile; <-- load shapefile threads
+|-static ThreadFactory; <-- other threads
+\-static Core; <-- everything else from mainframe that's not ui-related
+
+
+merge Feature and VTD classes into one.
+
+move vertex and edge into geography package
+
+remove JSonobject extension from edges and vertexes - just a memory waste
+
+
+loading
+==========
+load to hash
+hash to vector
+
+getMinMaxXY
+featureCollection.initWards:
+
+	create vtd's and add to vtd vector
+	attempt set population
+	collect vertexes
+	collect edges
+	set feature.vtd.feature = feature
+	f.vtd.collectNieghbors
+	f.vtd.suncneighbors
+	f.vtd.collectneighbotlengths
+	f.calcarea
+	f.geometry.makePolysFull
+	if no neighbors, add nearest neighbor
+	find islands and link
+	unlock all wards
+
+
+resetZoom()
+featureCollection.initEcology <--- merge into initWards
+		ecology.wards = vtds;
+		locked_wards = new boolean[vtds.size()];
+		for( int i = 0; i < locked_wards.length; i++) {
+			locked_wards[i] = false;
+		}
+addEcologyListeners(); <-- this should be on a constructor, probably mainframe's.
+
+fillComboBoxes();
+mapPanel.invalidate();
+mapPanel.repaint();
+		
+setDistrictColumn(project.district_column);
+setEnableds();
+project.demographic_columns.clear();
+setDemographicColumns();
+project.election_columns.clear();
+setElectionColumns();
+project.election_columns_2.clear();
+setElectionColumns2();
+project.election_columns_3.clear();
+setElectionColumns3();
+project.substitute_columns.clear();
+setSubstituteColumns();
+
+
+OBSOLETE (REMOVE)
+-----------------
+initFeatures (and calling function)
+
+
+CLASS HEIRARCHY
+===============
+===============
+
+
+ui
+==========
+
+Applet
+\-MainFrame mainFrame
+  |-static MainFrame mainframe;
+  |-Project project = new Project();
+  |-FeatureCollection featureCollection = new FeatureCollection();
+  |
+  |-InstructionProcessor ip = new InstructionProcessor();
+  | |-MainFrame mainFrame;
+  | |-Vector<String> instructions = new Vector<String>();
+  | \-Vector<String> instruction_history = new Vector<String>();
+  | 
+  |-MapPanel mapPanel = new MapPanel(); 
+  |-PanelSeats seatsPanel = new PanelSeats();
+  |
+  |-FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
+  |-DialogShowProperties df = new DialogShowProperties();
+  |-JFrame frameGraph = new JFrame();
+  |-PanelGraph panelGraph = new PanelGraph();
+  |-JFrame frameStats = new JFrame();
+  |-PanelStats panelStats = new PanelStats();
+  \-DialogManageLocks manageLocks = new DialogManageLocks();
+
+
+
+Threads in ui.MainFrame
+========
+FileThread
+
+OpenShapeFileThread;
+OpenProjectFileThread  (deprecated?)
+OpenGeoJsonFileThread 
+
+MergeInDemoAndElection();  (deprecated?)
+ImportCensus2Thread;
+ImportTranslations
+ImportCountyLevel
+ImportDemographics
+ImportVTDLevel
+ThreadFinishImport		
+
+ImportAggregateCustom 
+
+ExportCustomThread 
+ExportToBlockLevelThread 
+
+LoadCensusFileThread  (deprecated?)
+ImportGazzeterThread  (deprecated)
+
+OpenWKTFileThread 
+WKTFileToCoordsThread  (deprecated?)
+
+CycleThread (deprecated)
+
+
+FeatureCollection - Simple
+==========
+
+FeatureCollection 
+|-Features
+| |-Properties
+| |-Geometry
+| \-VTD
+|   |-Edge
+|   \-VTD (neighbors)
+\-Ecology
+  \-DistrictMap
+    \-District
+      \-VTD
+
+
+
+FeatureCollection - Detailed
+========
+
+FeatureCollection extends ReflectionJSONObject<FeatureCollection>
+|-Vector<Features> features 
+|-Vector<VTD> vtds
+|-Ecology ecology
+|-HashMap<String,Quadruplet<String,Integer,Integer,Byte>> header_data
+\-Vector<String> locked_counties
+
+
+Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature>
+|-Properties properties
+|-Geometry geometry
+|-VTD vtd
+\-Vector<double[]> points
+
+Properties extends ReflectionJSONObject<Properties> 
+
+Geometry extends ReflectionJSONObject<Geometry> 
+|-String type;
+|-double[][][] coordinates;
+|-int[] xpolys;
+|-int[] ypolys;
+|-Polygon[] polygons;
+|-Polygon[] polygons_full;
+|-Color outlineColor = Color.BLACK;
+|-Color fillColor = FeatureCollection.DEFAULT_COLOR;
+|-boolean isDistrict = true;
+\-double[] full_centroid;
+
+
+VTD extends ReflectionJSONObject<VTD>
+|-Feature feature 
+|-Vector<Edge> edges 
+|-Vector<VTD> neighbors 
+|-Vector<Vector<Election>>
+\-double[] demographics
+
+Edge extends ReflectionJSONObject<Edge>
+|-VTD ward1 = null;
+|-VTD ward2 = null;
+|-Vertex vertex1;
+|-Vertex vertex2;
+|-int id = -1;
+|-int ward1_id = -1;
+|-int ward2_id = -1;
+|-int vertex1_id = -1;
+|-int vertex2_id = -1;
+\-double length;
+    
+
+Vertex extends ReflectionJSONObject<Vertex>
+|-int id;
+|-double x;
+\-double y;
+	
+
+
+Ecology extends ReflectionJSONObject<Ecology> 
+|-Vector<DistrictMap> population
+|-Vector<DistrictMap> swap_population
+|-HashMap<Integer,VTD> wards_by_id;
+|-Vector<VTD> wards = new Vector<VTD>();
+|-Vector<Edge> edges = new Vector<Edge>();
+\-Vector<Vertex> vertexes = new Vector<Vertex>();
+
+
+DistrictMap implements iEvolvable, Comparable<DistrictMap>
+|-Vector<VTD> vtds = new Vector<VTD>();
+\-Vector<District> districts = new Vector<District>();
+
+
+District extends JSONObject
+\-Vector<VTD> vtds = new Vector<VTD>();
+
+
+
+
+
+jdbf
+=====
+DBFReader / DBFWRiter
+|-JDBField
+\-JDBFException
+
+
+serialization
+==========
+ReflectionJSONObject
+\-JSONObject
+  \-iJSONObject

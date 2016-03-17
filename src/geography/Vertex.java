@@ -1,4 +1,4 @@
-package solutions;
+package geography;
 
 import serialization.ReflectionJSONObject;
 

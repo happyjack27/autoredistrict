@@ -656,5 +656,21 @@ public class Download extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void downloadAndExtractCentroids() {
+		downloadAndExtract(census_centroid_url(istate,cyear),census_centroid_path);
+	}
+	
+	public static void downloadAndExtract(String source_url, String dest_folder) {
+		try {
+			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading "+source_url+"..."); }
+			download(source_url,dest_folder,"downloaded.zip");
+			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting "+source_url+"..."); }
+			unzip(dest_folder+"downloaded.zip", dest_folder);
+			System.out.println("done extracting.");		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 
 }

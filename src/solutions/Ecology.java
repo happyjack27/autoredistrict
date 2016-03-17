@@ -1,6 +1,6 @@
 package solutions;
 
-import geography.Feature;
+import geography.*;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;

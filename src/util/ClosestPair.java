@@ -1,8 +1,8 @@
 package util;
 
-import java.util.*;
+import geography.Vertex;
 
-import solutions.Vertex;
+import java.util.*;
  
 public class ClosestPair
 {

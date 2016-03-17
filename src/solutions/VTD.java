@@ -1,5 +1,5 @@
 package solutions;
-import geography.Feature;
+import geography.*;
 
 import java.util.*;
 

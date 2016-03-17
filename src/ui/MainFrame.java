@@ -2988,7 +2988,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 	    dlbl.setText("Initializing ecology...");
 	    try {
-	    	featureCollection.initEcology();
+	    	//featureCollection.initEcology();
 	    	addEcologyListeners();
 	    } catch (Exception ex) {
 	    	System.out.println("init ecology ex: "+ex);
@@ -4007,59 +4007,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setEnableds();
 	}
 	
-	public void initFeatures() {
-		Vector<Feature> features = featureCollection.features;
-		System.out.println(features.size()+" precincts loaded.");
-		System.out.println("Getting min/max...");
-	    getMinMaxXY();
-		System.out.println("Initializing wards...");
-		featureCollection.initwards();
-		Settings.resetAnnealing();
-		featureCollection.ecology.generation = 0;
-/*
-		minx = features.get(0).geometry.coordinates[0][0][0];
-		maxx = features.get(0).geometry.coordinates[0][0][0];
-		miny = features.get(0).geometry.coordinates[0][0][1];
-		maxy = features.get(0).geometry.coordinates[0][0][1];
-		HashSet<String> types = new HashSet<String>();
-		for( Feature f : features) {
-			double[][][] coordinates2 = f.geometry.coordinates;
-			for( int j = 0; j < coordinates2.length; j++) {
-				double[][] coordinates = coordinates2[j];
-				for( int i = 0; i < coordinates.length; i++) {
-					if( coordinates[i][0] < minx) {
-						minx = coordinates[i][0];
-					}
-					if( coordinates[i][0] > maxx) {
-						maxx = coordinates[i][0];
-					}
-					if( coordinates[i][1] < miny) {
-						miny = coordinates[i][1];
-					}
-					if( coordinates[i][1] > maxy) {
-						maxy = coordinates[i][1];
-					}
-				}
-			}					
-		}
-		System.out.println(""+minx+","+miny);
-		System.out.println(""+maxx+","+maxy);
-		*/
-		resetZoom();
-		mapPanel.featureCollection = featureCollection;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		//featureCollection.ecology.mapPanel = mapPanel;
-		//featureCollection.ecology.statsPanel = panelStats;
-		featureCollection.initEcology();
-    	addEcologyListeners();
-
-		System.out.println("Ready.");
-		
-		geo_loaded = true;
-		setEnableds();
-	}
-	
 	public MainFrame() {
 		mainframe = this;
 		ip.mainFrame = this;
@@ -4711,64 +4658,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnFile.add(mntmExportBlockFile);
 
 		
-		mnFile.add(mntmExit);
-		
-		
-		JMenuItem mntmWisconsin = new JMenuItem("Wisconsin 2012");
-		mntmWisconsin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				StringBuffer sb = new StringBuffer();
-				InputStream in = getClass().getResourceAsStream("/resources/Wards_111312_ED_110612.json"); 
-				//System.exit(0);
-				//BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-				try {
-					while( in.available() > 0) {
-						byte[] bb = new byte[in.available()];
-						in.read(bb);
-						sb.append(new String(bb));
-						Thread.sleep(load_wait);
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch ward
-					e.printStackTrace();
-				}
-				
-				FeatureCollection fc = new FeatureCollection();
-				if( panelStats != null) {
-					panelStats.featureCollection = featureCollection;
-				}
-
-				try {
-					fc.fromJSON(sb.toString());
-				} catch (Exception ex) {
-					System.out.println("ex "+ex);
-					ex.printStackTrace();
-				}
-				for( Feature fe : fc.features) {
-						featureCollection.features.add(fe);
-				}
-				initFeatures();
-
-				sb = new StringBuffer();
-				in = getClass().getResourceAsStream("/resources/combined_results.txt"); 
-				//System.exit(0);
-				//BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-				try {
-					while( in.available() > 0) {
-						byte[] bb = new byte[in.available()];
-						in.read(bb);
-						sb.append(new String(bb));
-						Thread.sleep(load_wait);
-					}
-				} catch (Exception e) {
-					// TODO Auto-generated catch ward
-					e.printStackTrace();
-				}
-				loadElection(sb.toString());
-
-			}
-		});
-		
+		mnFile.add(mntmExit);		
 		
 		mntmOpenGeojson.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -7415,4 +7305,398 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			return ss;
 		}
 	}
+	
+	public void importBlocksBdistricting() {
+		String path = Download.getStartPath()+File.separator+"bdistricting";
+		Download.downloadAndExtract(Download.bdistricting_congress_url(),path);
+		Download.downloadAndExtract(Download.bdistricting_senate_url(),path);
+		String[] urls = Download.bdistricting_house_urls();
+		for( int i = 0 ; i < urls.length; i++) {
+			Download.downloadAndExtract(urls[i],path);
+		}
+		String abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
+		
+		importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"});
+		importBlockData(path+File.separator+abbr+"_Senate.csv", true, false, new String[]{"SLDU_BD"},new String[]{"SLDU_BD"});
+		String[] tries = new String[]{"House","General","Legislature","Assembly"};
+		for( int i = 0; i < tries.length; i++) {
+			if( new File(path+File.separator+abbr+"_"+tries[i]+".csv").exists()) {
+				importBlockData(path+File.separator+abbr+"_"+tries[i]+".csv", true, false, new String[]{"SLDL_BD"},new String[]{"SLDL_BD"});
+				break;
+			}
+		}
+		
+		Applet.deleteRecursive(new File(path));
+	}
+
+
+	public void importBlocksCurrentDistricts() {
+		String path = Download.getStartPath()+File.separator+"current";
+		Download.downloadAndExtract(Download.census_districts_url(),path);
+		String abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
+		String fips = ""+Download.istate;
+		if( fips.length() < 2) {
+			fips = "0"+fips;
+		}
+		try {
+			new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.txt").renameTo(new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.csv"));
+			new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.txt").renameTo(new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.csv"));
+			new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.txt").renameTo(new File(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.csv"));
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		try {
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.txt", true, true, new String[]{"DISTRICT"},new String[]{"CD_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.txt", true, true, new String[]{"DISTRICT"},new String[]{"SLDU_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.txt", true, true, new String[]{"DISTRICT"},new String[]{"SLDL_NOW"});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		Applet.deleteRecursive(new File(path));
+	}
+
+/*preparing:
+
+					String[] options = new String[]{"Accumulate","Majority vote"};
+					int ACCUMULATE = 0;
+					int MAJORITY = 1;
+					int opt = JOptionPane.showOptionDialog(mainframe, "Accumulate values or majority vote?", "Select option", 0,0,null,options,options[0]);
+					if( opt < 0) {
+						System.out.println("aborted.");
+						return;
+					}
+
+					DialogMultiColumnSelect dsc = new DialogMultiColumnSelect("Select columns to import",dh.header,new String[]{});
+					dsc.show();
+					if( !dsc.ok) {
+						return;
+					}
+					Object[] dest_columns = dsc.in.toArray();
+					int[] col_indexes = new int[dsc.in.size()]; 
+					for( int i = 0; i < col_indexes.length; i++) {
+						String test = ((String)dest_columns[i]).toUpperCase().trim();
+						for( int j = 0; j < dh.header.length; j++) {
+							if( dh.header[j].toUpperCase().trim().equals(test)) {
+								col_indexes[i] = j;
+								break;
+							}
+						}
+					}
+					
+
+ui.Mainframe:	
+*/				
+
+	public void importBlockData(String filename, boolean MAJORITY_VOTE, boolean HAS_HEADER_ROW, String[] source_columns, String[] dest_columns) {
+			int ACCUMULATE = 0;
+			int MAJORITY = 1;
+			int opt = MAJORITY_VOTE ? 1 : 0;
+			
+			DataAndHeader dh = new DataAndHeader();
+			
+			int col_lat = -1;
+			int col_lon = -1;
+			int col_geoid_centroid = -1;
+			//Hashtable<String,int[]> hash_centroids = new Hashtable<String,int[]>();
+			Hashtable<String,Feature> hash_geoid_feat = new Hashtable<String,Feature>();
+			
+
+			DBFReader dbfReader;
+
+
+
+    		dlg.setVisible(true);
+
+//download/extract centroid file if not there.
+			File test = new File(Download.census_centroid_file.getAbsolutePath());
+			if( !test.exists()) {
+				Download.downloadAndExtractCentroids();
+			}
+
+
+//make polygons
+    		dlbl.setText("Making polygons...");
+
+			
+			int count = 0;
+    		for( Feature feat : featureCollection.features) {
+    			feat.geometry.makePolysFull();
+				feat.vtd.population = 0;
+    		}
+    		
+    		dlbl.setText("Doing hit tests...");
+			Feature.compare_centroid = true;
+			Collections.sort(featureCollection.features);
+			
+//make centroid hash
+			try {
+				dbfReader = new DBFReader(Download.census_centroid_file.getAbsolutePath());
+			} catch (Exception e1) {
+				e1.printStackTrace();
+				return;
+			}
+			
+    		dlbl.setText("Reading header...");
+
+			dh.header = new String[dbfReader.getFieldCount()];
+			for( int i = 0; i < dh.header.length; i++) {
+				dh.header[i] = dbfReader.getField(i).name;
+				System.out.println(dh.header[i]+" ");
+
+				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
+					col_lat = i;
+				}
+				if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
+					col_lon = i;
+				}
+				if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0 || dh.header[i].toUpperCase().trim().indexOf("BLOCKID") == 0) {
+					col_geoid_centroid = i;
+				}
+			}
+			if( col_geoid_centroid < 0 || col_lat < 0 || col_lon < 0) {
+				JOptionPane.showMessageDialog(mainframe, "Required columns not found."
+						+"\ncol_geoid_centroid "+col_geoid_centroid
+						//+"\ncol_lat "+col_lat
+						//+"\ncol_lon "+col_lon
+						);
+				dlg.setVisible(false);
+				return;
+			}
+
+    		dlbl.setText("Creating blockid to feature hash...");
+		    while (dbfReader.hasNextRecord()) {
+		    	try {
+		    		Object[] oo = dbfReader.nextRecord(Charset.defaultCharset());
+		    		String[] ss = new String[oo.length];
+		    		for( int i = 0; i < oo.length; i++) {
+		    			ss[i] = oo[i].toString().trim();
+		    		}
+		    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
+		    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
+					
+	    			Feature feat = getHit(dlon,dlat);
+					hash_geoid_feat.put(ss[col_geoid_centroid],feat);
+					
+					
+		    		//int ilat = (int)(dlat*Geometry.SCALELATLON);
+		    		//int ilon = (int)(dlon*Geometry.SCALELATLON);
+		    		//hash_centroids.put(ss[col_geoid_centroid].trim(),new int[]{ilat,ilon});
+		    	} catch (Exception ex) {
+		    		ex.printStackTrace();
+		    	}
+		    }
+		    try {
+				dbfReader.close();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+//resort features
+			Feature.compare_centroid = false;
+			Collections.sort(featureCollection.features);
+							
+//read headers
+    		System.out.println("Reading headers...");
+    		dlbl.setText("Reading headers...");
+
+
+			File f = new File(filename);
+			String ext = filename.substring(filename.length()-3).toLowerCase();
+			dh = new DataAndHeader();
+
+			if( ext.equals("csv") || ext.equals("txt")) {
+	    		System.out.println("loading delimited");
+	    		dlbl.setText("Loading file...");
+
+				String delimiter = ",";
+				if( ext.equals("csv")) {
+					delimiter = ",";
+				} else
+				if( ext.equals("txt")) {
+					delimiter = "\t";
+				}
+				
+				FileReader fr = null;
+				try {
+					fr = new FileReader(f);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				BufferedReader br = new BufferedReader(fr);
+				
+				if( HAS_HEADER_ROW) {
+					try {
+						dh.header = br.readLine().split(delimiter);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					dh.header = new String[source_columns.length+1];
+					dh.header[0] = "GEOID";
+					for( int i = 0; i < source_columns.length; i++) {
+						dh.header[i+1] = source_columns[i];
+					}
+				}
+				
+				//now select the columns
+	    		System.out.println("reading columns");
+				int col_geoid = -1;
+				int[] col_indexes = new int[source_columns.length];
+				for( int i = 0; i < dh.header.length; i++) {
+					String header = dh.header[i].toUpperCase().trim();
+					if( header.indexOf("GEOID") == 0 || header.indexOf("BLOCKID") == 0) {
+						col_geoid = i;
+					}
+					for( int j = 0; j < source_columns.length; j++) {
+						if( header.equals(source_columns[j])) {
+							col_indexes[j] = i;
+						}
+					}
+				}
+				if( col_geoid < 0) {
+					dlg.setVisible(false);
+		    		System.out.println("Required columns not found.");
+					if( Download.prompt) {
+						JOptionPane.showMessageDialog(mainframe, "Required columns not found.\nMissing geoid column.");
+					}
+					return;
+				}
+				
+	    		
+//read and put
+				System.out.println("Reading data...");
+				dlbl.setText("Reading data...");
+				
+				hits = 0;
+	    		misses = 0;
+	    		
+	    		try {
+					if( opt == MAJORITY) { //MAJORITY
+						//make properties in first feature
+    					for( int j = 0; j < dest_columns.length; j++) {
+    						featureCollection.features.get(0).properties.put((String)dest_columns[j]," ");		
+    					}
+						//reset hash in all features
+    					for( Feature feat : featureCollection.features) {
+    						feat.properties.temp_hash.clear();
+    					}
+					} else {
+    					for( Feature feat : featureCollection.features) {
+							for( int i = 0; i < dest_columns.length; i++) {
+								feat.properties.put(dest_columns[i],"0");
+							}
+    					}
+					}
+
+				    String line;
+				    while ((line = br.readLine()) != null) {
+				    	try {
+					    	String[] ss = line.split(delimiter);
+					    	if( ss.length > dh.header.length) {
+					    		System.out.print("+"+(ss.length - dh.header.length));
+					    	}
+							Feature feat = hash_geoid_feat.get(ss[col_geoid]);
+							if( feat == null) {
+								misses++;
+					    		//System.out.println("miss "+dlon+","+dlat+" ");
+								continue;
+							}
+							hits++;
+							
+							if( hits % 100 == 0) {
+				    			System.out.print(".");
+				    		}
+				    		if( hits % (100*100) == 0) {
+				    			System.out.println(""+hits);
+				    		}
+							
+							String[] results = new String[dest_columns.length];
+							for( int i = 0; i < dest_columns.length; i++) {
+								results[i] = ss[col_indexes[i]].trim();
+							}
+
+							if( opt == MAJORITY) { //MAJORITY
+								String dist = ss[col_indexes[0]].trim();
+								Integer integer = feat.properties.temp_hash.get(dist);
+								if( integer == null) {
+									integer = 0;
+								}
+								integer++;
+								feat.properties.temp_hash.put(dist,integer);
+							} else if (opt == ACCUMULATE) { //accumulate
+								for( int i = 0; i < dest_columns.length; i++) {
+									try {
+										Double initial = Double.parseDouble(feat.properties.get(dest_columns[i]).toString());
+										initial += Double.parseDouble(results[i].replaceAll(",","").replaceAll("\\+",""));
+										feat.properties.put(dest_columns[i],""+initial);
+									} catch (Exception ex) { ex.printStackTrace(); } 
+								}
+							}
+				    		
+						} catch (Exception e) {
+							// TODO Auto-generated catch ward
+							e.printStackTrace();
+						}
+				    }
+					
+					//note majority vote is only handling 1 column right now!
+					String key = ((String)dest_columns[0]).trim().toUpperCase();
+					if( opt == MAJORITY) { //MAJORITY
+						for( Feature feat : featureCollection.features) {
+							if( feat.properties.temp_hash.size() == 0) {
+								System.out.println("no values");
+								feat.properties.put(key,"1");
+								continue;
+							}
+							String max = "";
+							int max_count = 0;
+							for( Entry<String,Integer> entry : feat.properties.temp_hash.entrySet()) {
+								System.out.println(""+feat.properties.get("GEOID10")+": "+entry.getKey()+": "+entry.getValue());
+								if( entry.getValue() > max_count) {
+									max_count = entry.getValue();
+									max = entry.getKey();
+								}
+							}
+    						feat.properties.put(key,max);
+						}
+					}
+
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+				
+//finish up
+				try {
+					br.close();
+					fr.close();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+	    		dlbl.setText("Finalizing...");
+				
+				
+				project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
+				project.population_column = (String) comboBoxPopulation.getSelectedItem();
+				fillComboBoxes();
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				
+	    		dlg.setVisible(false);
+
+				if(Download.prompt) {
+					JOptionPane.showMessageDialog(mainframe,"Done importing data.\nHits: "+hits+"\nMisses: "+misses);
+				}
+	    		System.out.println("done");
+
+				return;
+				
+			}
+	}
 }
+
+
