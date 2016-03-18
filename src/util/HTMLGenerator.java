@@ -127,13 +127,14 @@ public class HTMLGenerator {
 	}
 	
 	public static void main(String[] args) {
+		String col = "CD_FV/";
 		Vector<String[]> v = new Vector<String[]>();
 		int[] ii = new int[4];
 		String html = "";
 		for( int i = 0; i < states.length; i++) {
 			String state = states[i];
 			
-			String[] ss = parse(urlToString("http://autoredistrict.org/fairvote/"+state.replaceAll(" ","%20")+"/2010/stats.html"));
+			String[] ss = parse(urlToString("http://autoredistrict.org/fairvote/"+state.replaceAll(" ","%20")+"/2010/"+col+"stats.html"));
 			html += "<tr>\n";
 			html += "\t<td>"+state+"</td>\n";
 			html += "\t<td><a href='fairvote/"+state+"/2010/stats.html'>stats</a></td>\n";

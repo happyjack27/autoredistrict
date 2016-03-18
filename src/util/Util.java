@@ -209,9 +209,21 @@ public class Util {
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
-			sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
-			sb.append("MERGE\n");
+			sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
+			//sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
+			//sb.append("MERGE\n");
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("IMPORT BDISTRICTING\n");
+			sb.append("SET DISTRICTS COLUMN CD_BD\n");
+			sb.append("EXPORT\n");
+			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
+			sb.append("EXPORT\n");
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			sb.append("SET DISTRICTS COLUMN CD_FV\n");
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			sb.append("EXPORT\n");
 			sb.append("SAVE\n");
+			sb.append("EXIT\n");
 
 			if( false
 					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3

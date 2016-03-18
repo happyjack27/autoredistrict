@@ -7318,16 +7318,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		String abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
 		
-		importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"});
-		importBlockData(path+File.separator+abbr+"_Senate.csv", true, false, new String[]{"SLDU_BD"},new String[]{"SLDU_BD"});
+		importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"},false);
+		importBlockData(path+File.separator+abbr+"_Senate.csv", true, false, new String[]{"SLDU_BD"},new String[]{"SLDU_BD"},false);
 		String[] tries = new String[]{"House","General","Legislature","Assembly"};
 		for( int i = 0; i < tries.length; i++) {
 			if( new File(path+File.separator+abbr+"_"+tries[i]+".csv").exists() || i == tries.length-1) {
-				importBlockData(path+File.separator+abbr+"_"+tries[i]+".csv", true, false, new String[]{"SLDL_BD"},new String[]{"SLDL_BD"});
+				importBlockData(path+File.separator+abbr+"_"+tries[i]+".csv", true, false, new String[]{"SLDL_BD"},new String[]{"SLDL_BD"},false);
 				break;
 			}
 		}
-		
+		Feature.compare_centroid = false;
+		Collections.sort(featureCollection.features);
+
 		Applet.deleteRecursive(new File(path));
 	}
 
@@ -7349,12 +7351,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		
 		try {
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.csv", true, true, new String[]{"DISTRICT"},new String[]{"CD_NOW"});
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.csv", true, true, new String[]{"DISTRICT"},new String[]{"SLDU_NOW"});
-			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.ccsv", true, true, new String[]{"DISTRICT"},new String[]{"SLDL_NOW"});
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_CD.csv", true, true, new String[]{"DISTRICT"},new String[]{"CD_NOW"},true);
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDU.csv", true, true, new String[]{"DISTRICT"},new String[]{"SLDU_NOW"},true);
+			importBlockData(path+File.separator+"BlockAssign_ST"+fips+"_"+abbr+"_SLDL.csv", true, true, new String[]{"DISTRICT"},new String[]{"SLDL_NOW"},true);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+		Feature.compare_centroid = false;
+		Collections.sort(featureCollection.features);
 		
 		Applet.deleteRecursive(new File(path));
 	}
@@ -7391,7 +7395,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 ui.Mainframe:	
 */				
 
-	public void importBlockData(String filename, boolean MAJORITY_VOTE, boolean HAS_HEADER_ROW, String[] source_columns, String[] dest_columns) {
+	public void importBlockData(String filename, boolean MAJORITY_VOTE, boolean HAS_HEADER_ROW, String[] source_columns, String[] dest_columns, boolean one_indexed) {
 			int ACCUMULATE = 0;
 			int MAJORITY = 1;
 			int opt = MAJORITY_VOTE ? 1 : 0;
@@ -7655,10 +7659,12 @@ ui.Mainframe:
 					//note majority vote is only handling 1 column right now!
 					String key = ((String)dest_columns[0]).trim().toUpperCase();
 					if( opt == MAJORITY) { //MAJORITY
+						Vector<Feature> missing = new Vector<Feature>();
 						for( Feature feat : featureCollection.features) {
 							if( feat.properties.temp_hash.size() == 0) {
 								System.out.println("no values");
-								feat.properties.put(key,"1");
+								missing.add(feat);
+								feat.properties.put(key,"");
 								continue;
 							}
 							String max = "";
@@ -7670,7 +7676,34 @@ ui.Mainframe:
 									max = entry.getKey();
 								}
 							}
+							if( one_indexed) {
+								max = ""+(Integer.parseInt(max)-1);
+							}
     						feat.properties.put(key,max);
+						}
+						
+						//fill in empties with neighbors
+						Hashtable<String,Integer> counts = new Hashtable<String,Integer>(); 
+						for( Feature feat : missing) {
+							counts.clear();
+							for(VTD vtd : feat.vtd.neighbors) {
+								String p = vtd.feature.properties.get(key).toString();
+								Integer i = counts.get(p);
+								if( i == null) {
+									i = new Integer(0);
+									counts.put(p, i);
+								}
+								i++;
+							}
+							String best = "";
+							int max = 0;
+							for( Entry<String,Integer> entries : counts.entrySet()) {
+								if( entries.getValue() > max) {
+									max = entries.getValue();
+									best = entries.getKey();
+								}
+							}
+							feat.properties.put(key,best);
 						}
 					}
 

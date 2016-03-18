@@ -832,7 +832,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		URL footer_path = Applet.class.getResource("/resources/footer.php");
 		URL style_sheet = Applet.class.getResource("/resources/styles2.css");
 		
-		String write_folder = Download.getStartPath();
+		String write_folder = Download.getStartPath()+MainFrame.mainframe.project.district_column+File.separator;
+		new File(write_folder).mkdirs();
+		
 		saveURL(write_folder+"style.css",style_sheet);
 		
 		System.out.println("1");

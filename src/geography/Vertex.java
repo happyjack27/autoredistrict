@@ -2,7 +2,7 @@ package geography;
 
 import serialization.ReflectionJSONObject;
 
-public class Vertex extends ReflectionJSONObject<Vertex> {
+public class Vertex {
 	public int id;
 	public double x;
 	public double y;

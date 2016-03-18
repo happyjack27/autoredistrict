@@ -286,10 +286,10 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	@Override
 	public JSONObject instantiateObject(String key) {
 		if( key.equals("vertexes")) {
-			return new Vertex();
+			return null;//new Vertex();
 		}
 		if( key.equals("edges")) {
-			return new Edge();
+			return null;//new Edge();
 		}
 		if( key.equals("wards")) {
 			return new VTD();

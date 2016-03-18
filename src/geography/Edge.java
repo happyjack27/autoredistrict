@@ -6,7 +6,7 @@ import geography.*;
 import serialization.ReflectionJSONObject;
 import solutions.*;
 
-public class Edge extends ReflectionJSONObject<Edge> {
+public class Edge {// extends ReflectionJSONObject<Edge> {
 	public int id = -1;
 	public int ward1_id = -1;
 	public int ward2_id = -1;
