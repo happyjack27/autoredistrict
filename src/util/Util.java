@@ -11,10 +11,61 @@ public class Util {
 	
 	//missing: alaska and lousianna!
 	
-	static final String path = "C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\all_state_elections_and_demo_from_google_drive";
+	static final String path = "/Users/jimbrill/autoredistrict_data/county_stats";
+	//"C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\all_state_elections_and_demo_from_google_drive";
+
 	static final String[] states1 = new String[]{
 		//"Louisiana",
 		"Alaska",
+	};
+	static final String[] states_vtd = new String[]{
+		"Alabama",
+		"Arkansas",
+		"California",
+		"Connecticut",		
+		"Delaware",
+		"Florida",
+		"Georgia",
+		"Hawaii",
+		"Idaho",
+		"Illinois",
+		"Indiana",
+		"Iowa",
+		"Kansas",
+		"Kentucky",
+		//"Louisiana",
+		"Maine",
+		//"Maryland",
+		"Massachusetts",
+		"Michigan",
+		//"Minnesota",
+		"Mississippi",
+		"Missouri",
+		"Montana",
+		"Nebraska",
+		//"Nevada",
+		//"New Hampshire",
+		"New Jersey",
+		"New Mexico",
+		"New York",
+		"North Carolina",
+		"North Dakota",
+		"Ohio",
+		"Oklahoma",
+		//"Oregon",
+		"Pennsylvania",
+		//"Rhode Island",
+		"South Carolina",
+		"South Dakota",
+		"Tennessee",
+		//"Texas",
+		"Utah",
+		"Vermont",
+		"Virginia",
+		"Washington",
+		"West Virginia",
+		"Wisconsin",
+		"Wyoming",
 	};
 	static final String[] states = new String[]{
 		"Alabama",
@@ -160,7 +211,9 @@ public class Util {
 		System.out.println(script2);
 		
 		StringBuffer main = new StringBuffer();
-		for( int i = 0; i < Download.apportionments.length; i++) {
+		int i0 = 0;
+		//while( !Download.states[i0].equals("Indiana")) { i0++; }
+		for( int i = 0; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
 			if( Download.apportionments[i] < 6) {
 				//continue;
 			}
@@ -174,10 +227,13 @@ public class Util {
 				//continue;
 			}
 			String state = Download.states[i];
+			
+			
 			if( false
 					//|| state.equals("Alaska")
 					//|| state.equals("California")
-					//|| state.equals("Texas")
+					|| state.equals("Texas")
+					|| state.equals("Florida")
 					//|| state.equals("Louisianna")
 					//|| state.equals("Rhode Island")
 					//|| state.equals("Kentucky")
@@ -185,7 +241,9 @@ public class Util {
 				continue;
 			}
 			
-			if( true
+			if( false
+					//&& !state.equals("New York")
+					//&& !state.equals("Oklahoma")
 					//&& !state.equals("Alaska")
 					//&& !state.equals("Louisiana")
 					//|| state.equals("California")
@@ -209,22 +267,53 @@ public class Util {
 			}
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
-			sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
+			
+			/*
+			for( int j = 0; j < states_vtd.length; j++) {
+				if( states_vtd[j].equals(Download.states[i])) {
+					sb.append("IMPORT ELECTIONS\n");
+					sb.append("SAVE\n");
+					break;
+				}
+			}*/
+			
+			//sb.append("MERGE\n");
+			//sb.append("SAVE\n");
+			//sb.append("EXIT\n");
+			sb.append("IMPORT BDISTRICTING\n");
+			sb.append("SAVE\n");
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("SAVE\n");
+
+			
+			sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			sb.append("SET POPULATION COLUMN POPULATION\n");
+			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
+			sb.append("SET WEIGHT COUNT_SPLITS TRUE\n");
+			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
+			sb.append("SET ETHNICITY COLUMNS VAP_WHITE VAP_BLACK VAP_HISPAN VAP_ASIAN VAP_INDIAN VAP_OTHER\n");
+			sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			//sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
 			//sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
 			//sb.append("MERGE\n");
-			sb.append("IMPORT CURRENT_DISTRICTS\n");
-			sb.append("IMPORT BDISTRICTING\n");
+			//sb.append("SAVE\n");
+			//sb.append("EXIT\n");
+			//sb.append("IMPORT CURRENT_DISTRICTS\n");
+			//sb.append("IMPORT BDISTRICTING\n");
 			sb.append("SET DISTRICTS COLUMN CD_BD\n");
+			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
 			sb.append("EXPORT\n");
+			//sb.append("EXIT\n");
+			
 			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
 			sb.append("EXPORT\n");
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			sb.append("SET DISTRICTS COLUMN CD_FV\n");
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			sb.append("EXPORT\n");
-			sb.append("SAVE\n");
+			//sb.append("SAVE\n");
 			sb.append("EXIT\n");
-
+/*
 			if( false
 					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
 					//|| Download.apportionments[i] == 9 //9=3+3+3,10=5+5,11=3+3+5,12=3+3+3+3,13=5+5+3,14=3+3+3+5,15=5+5+5,16=3+3+5+5
@@ -246,19 +335,11 @@ public class Util {
 			}			
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			sb.append("SET DISTRICTS COLUMN CONGRESS_F\n");
-			/*
-			if( Download.apportionments[i] >= 6) {
-				sb.append(script2+"\n");
-			} else {
-				sb.append("GO\n");
-				sb.append("STOP\n");
-				sb.append("SAVE\n");
-			}
-			*/
 			//sb.append("STOP\n");
 			sb.append("\tEXPORT\n");
 			//sb.append("\tSAVE\n");
 			sb.append("\tEXIT\n");
+			*/
 
 			System.out.println(sb.toString());
 
@@ -295,8 +376,8 @@ public class Util {
 		//writeHTML();
 		make_scripts();
 		//processVTD();
-		//System.exit(0);
-		/*
+		System.exit(0);
+		
 		for( int i = 0; i < states.length; i++) {
 			try {
 				String state = states[i];
@@ -306,7 +387,7 @@ public class Util {
 				System.out.println("ex in main "+ex);
 				ex.printStackTrace();
 			}
-		}*/
+		}
 		System.out.println("done.");
 	}
 	public static void process(String state) {
@@ -318,6 +399,7 @@ public class Util {
 		Vector<String[]> vmerged = new Vector<String[]>();
 		int s1 = vsum.get(0).length;
 		int s2 = vdetail.get(0).length;
+		System.out.println("v "+s1+" "+s2);
 		for( int i = 0; i < vsum.size(); i++) {
 			String[] out = new String[s1+s2];
 			String[] vs = vsum.get(i);
@@ -384,6 +466,8 @@ public class Util {
 				6,
 				7,
 				8,
+				9,
+				10,
 		};
 		String[] renames = new String[]{
 				/*
@@ -399,11 +483,15 @@ public class Util {
 				"PRES08_REP",
 				"PRES04_DEM",
 				"PRES04_REP",
+				"CD12_DEM",
+				"CD12_REP",
 		};
 		v.add(renames);
 		try {
 			String filestring = Util.readStream(new FileInputStream(file)).toString();
 			String[] lines = filestring.split("\n");
+			System.out.println("found "+lines.length+" lines");
+			
 			for(int i = 0; i < 3; i++) {
 				String[] ss = lines[i].split("\t");
 				for(int j = 0; j < ss.length; j++) {
@@ -415,6 +503,9 @@ public class Util {
 			int detail_start = 4;
 			for(int i = 4; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
+				if( ss.length == 0) {
+					continue;
+				}
 				if( ss[0].trim().equals("Total:")) {
 					detail_start = i+1;
 					break;
@@ -444,6 +535,8 @@ public class Util {
 			}
 			
 		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(0);
 			
 		}
 		return v;

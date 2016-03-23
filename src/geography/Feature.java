@@ -6,7 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-import com.hexiong.jdbf.JDBField;
+import dbf.*;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
@@ -37,7 +37,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 
 	public static boolean show_seats = true;
 	
-	public Vector<JDBField> dbfFields = new Vector<JDBField>();
+	public Vector<DBField> dbfFields = new Vector<DBField>();
 	
 	public String type;
 	public Properties properties;

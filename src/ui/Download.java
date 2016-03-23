@@ -663,6 +663,9 @@ public class Download extends Thread {
 	
 	public static void downloadAndExtract(String source_url, String dest_folder) {
 		try {
+			if( !dest_folder.substring(dest_folder.length()-1).equals(File.separator)) {
+				dest_folder += File.separator;
+			}
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading "+source_url+"..."); }
 			download(source_url,dest_folder,"downloaded.zip");
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting "+source_url+"..."); }

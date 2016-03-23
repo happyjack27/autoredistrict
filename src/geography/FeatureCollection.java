@@ -14,7 +14,7 @@ import org.nocrala.tools.gis.data.esri.shapefile.header.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
-import com.hexiong.jdbf.DBFReader;
+import dbf.DBFReader;
 
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
@@ -235,6 +235,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public void draw(Graphics g) {
 		//Graphics2D g2 = (Graphics2D)g;
 		g.setColor(BACKGROUND_COLOR);
+		if( Settings.national_map) {
+			g.setColor(new Color(0,0,0,0));
+		}
 		g.fillRect(0, 0, 6000, 6000);
 		if( features == null) {
 			return;

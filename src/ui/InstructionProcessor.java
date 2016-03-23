@@ -320,6 +320,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	@Override
 	public void eventOccured() {
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//System.out.println("eventOccured");
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
@@ -389,6 +395,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
 			mainFrame.importBlockBdistricting();
 		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
+			mainFrame.importBlockElection();
+		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("CURRENT_DISTRICTS")) {
 			mainFrame.importBlockCurrentDistricts();
 		} else
@@ -443,6 +452,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else 
 		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ETHNICITY")  && instruction_words[2].equals("COLUMNS")) {
 			mainFrame.project.demographic_columns.clear();
+			mainFrame.project.demographic_columns.clear();
 			for( int i = 3; i < instruction_words.length; i++) {
 				mainFrame.project.demographic_columns.add(instruction_words[i].trim());
 			}
@@ -473,8 +483,15 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
 		} else
 		if(command.equals("EXPORT")) {
-			for(ActionListener a: mainFrame.panelStats.btnNewButton.getActionListeners()) {
-			    a.actionPerformed(new ActionEvent(mainFrame.panelStats.btnNewButton, 0, ""));
+			if( instruction_words[1].equals("NATIONAL")) {
+				mainFrame.panelStats.exportTransparent();
+			} else
+			if( instruction_words[1].equals("BLOCKS")) {
+				
+			} else {
+				for(ActionListener a: mainFrame.panelStats.btnNewButton.getActionListeners()) {
+				    a.actionPerformed(new ActionEvent(mainFrame.panelStats.btnNewButton, 0, ""));
+				}
 			}
 		} else
 		if(command.equals("WHEN")) {

@@ -742,9 +742,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ExportToBlockLevelThread extends Thread {
+		String output_file = null;
 		ExportToBlockLevelThread() { super(); }
     	public void run() { 
     		try {
+    			dlg.show();
+    			dlbl.setText("Downloading and extracting census block centroids...");
+    			File test = new File(Download.census_centroid_file.getAbsolutePath());
+    			if( !test.exists()) {
+    				Download.downloadAndExtractCentroids();
+    			}
+    			String ext = "dbf";
+    			String fn = Download.census_centroid_file.getAbsolutePath();
+    			File f = new File(fn);
+    			
+
+    			/*
     			JOptionPane.showMessageDialog(mainframe, "Select the .dbf or .txt file with census block-level data.\n");
 				JFileChooser jfc = new JFileChooser();
 				jfc.setCurrentDirectory(new File(Download.getStartPath()));
@@ -761,14 +774,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
 				}
-				
-    			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
-				JFileChooser jfc2 = new JFileChooser();
-				jfc2.setCurrentDirectory(new File(Download.getStartPath()));
-				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
-				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
-				jfc2.showSaveDialog(null);
-				File foutput = jfc2.getSelectedFile();
+				*/
+    			dlg.hide();
+    			
+    			File foutput = null;
+    			if( output_file == null) { 
+	    			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
+					JFileChooser jfc2 = new JFileChooser();
+					jfc2.setCurrentDirectory(new File(Download.getStartPath()));
+					jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
+					jfc2.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
+					jfc2.showSaveDialog(null);
+					foutput = jfc2.getSelectedFile();
+    			} else {
+    				foutput = new File(output_file);
+    			}
 				if( foutput == null)  {
 					return;
 				}
@@ -2945,6 +2965,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 	}
 	public void getMinMaxXY() {
+		if( Settings.national_map) {
+			System.out.println("national");
+			minx = -127.50;
+			miny = 28.70;
+			maxx = -55.90;
+			maxy = 48.85;
+			System.out.println(""+minx+","+miny);
+			System.out.println(""+maxx+","+maxy);
+			featureCollection.recalcDlonlat();
+			return;
+		}
 		Vector<Feature> features = featureCollection.features;
 
 		minx = features.get(0).geometry.coordinates[0][0][0];
@@ -3180,7 +3211,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						setDistrictColumn(district);
 						hushSetDistrict = false;
 					} else {
-						int opt = JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
+						int opt = JOptionPane.NO_OPTION;//JOptionPane.showConfirmDialog(this, "Uncontested elections detected.  Lock and ignore uncontested districts?", "Uncontested elections detected!", JOptionPane.YES_NO_OPTION);
 						if( opt == JOptionPane.YES_OPTION) {
 							Settings.ignore_uncontested = true;
 							for( Integer d : FeatureCollection.vuncontested1) {
@@ -4657,7 +4688,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
+		
+		mntmExportNationalMaps = new JMenuItem("Export national maps");
+		mntmExportNationalMaps.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panelStats.exportTransparent();
+			}
+		});
+		mnFile.add(mntmExportNationalMaps);
 		mnFile.add(mntmExportBlockFile);
+		
+		separator_10 = new JSeparator();
+		mnFile.add(separator_10);
 
 		
 		mnFile.add(mntmExit);		
@@ -6280,6 +6322,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmImportBlockFile;
 	public JMenuItem mntmExportBlockFile;
 	public JSeparator separator_14;
+	public JSeparator separator_10;
+	public JMenuItem mntmExportNationalMaps;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6888,7 +6932,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int[] matches = new int[2];
 			int[] non_matches = new int[2];
 			for( int m = 0; m < 2; m++) {
-				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 				matches[m] = ii[0];
 				non_matches[m] = ii[1];
@@ -6897,12 +6941,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			double match_pct1 = ((double)matches[1])/(double)(matches[1]+non_matches[1]);
 			if( match_pct1 > 0.95 && matches[1] >= matches[0]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10,11,12}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			if( match_pct0 > 0.95 && matches[0] > matches[1]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP"});
+				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9,10,11}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			
@@ -6938,7 +6982,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 		public void getDemographics(String statename, String stateabbr, String year) {
-			if( true) {
+			if( false) {
 				return;
 			}
 			try {
@@ -7309,6 +7353,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	public void importBlocksBdistricting() {
+		Feature.compare_centroid = false;
+		Collections.sort(featureCollection.features);
+
 		String path = Download.getStartPath()+File.separator+"bdistricting";
 		Download.downloadAndExtract(Download.bdistricting_congress_url(),path);
 		Download.downloadAndExtract(Download.bdistricting_senate_url(),path);
@@ -7335,6 +7382,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 
 	public void importBlocksCurrentDistricts() {
+		Feature.compare_centroid = false;
+		Collections.sort(featureCollection.features);
+
 		String path = Download.getStartPath()+File.separator+"current";
 		Download.downloadAndExtract(Download.census_districts_url(),path);
 		String abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
@@ -7472,6 +7522,7 @@ ui.Mainframe:
 			}
 
     		dlbl.setText("Creating blockid to feature hash...");
+    		System.out.println("Creating blockid to feature hash...");
 		    while (dbfReader.hasNextRecord()) {
 		    	try {
 		    		Object[] oo = dbfReader.nextRecord(Charset.defaultCharset());
@@ -7483,7 +7534,9 @@ ui.Mainframe:
 		    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 					
 	    			Feature feat = getHit(dlon,dlat);
-					hash_geoid_feat.put(ss[col_geoid_centroid],feat);
+	    			if( ss != null && ss[col_geoid_centroid] != null && feat != null) {
+	    				hash_geoid_feat.put(ss[col_geoid_centroid],feat);
+	    			}
 					
 					
 		    		//int ilat = (int)(dlat*Geometry.SCALELATLON);
@@ -7591,7 +7644,7 @@ ui.Mainframe:
 					if( opt == MAJORITY) { //MAJORITY
 						//make properties in first feature
     					for( int j = 0; j < dest_columns.length; j++) {
-    						featureCollection.features.get(0).properties.put((String)dest_columns[j]," ");		
+    						featureCollection.features.get(0).properties.put((String)dest_columns[j],"");		
     					}
 						//reset hash in all features
     					for( Feature feat : featureCollection.features) {
@@ -7672,6 +7725,9 @@ ui.Mainframe:
 							for( Entry<String,Integer> entry : feat.properties.temp_hash.entrySet()) {
 								System.out.println(""+feat.properties.get("GEOID10")+": "+entry.getKey()+": "+entry.getValue());
 								if( entry.getValue() > max_count) {
+									if( max.equals("0") && one_indexed) {
+										continue;
+									}
 									max_count = entry.getValue();
 									max = entry.getKey();
 								}

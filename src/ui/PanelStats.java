@@ -15,7 +15,7 @@ import java.text.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,6 +25,38 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
 	double[] tot_seats = new double[5];
+	
+    private static BufferedImage imageToBufferedImage(Image image) {
+
+    	BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+    	Graphics2D g2 = bufferedImage.createGraphics();
+    	g2.drawImage(image, 0, 0, null);
+    	g2.dispose();
+
+    	return bufferedImage;
+
+    }
+
+    public static Image makeColorTransparent(BufferedImage im, final Color color) {
+    	ImageFilter filter = new RGBImageFilter() {
+
+    		// the color we are looking for... Alpha bits are set to opaque
+    		public int markerRGB = color.getRGB() | 0xFF000000;
+
+    		public final int filterRGB(int x, int y, int rgb) {
+    			if ((rgb | 0xFF000000) == markerRGB) {
+    				// Mark the alpha bits as zero - transparent
+    				return 0x00FFFFFF & rgb;
+    			} else {
+    				// nothing to do
+    				return rgb;
+    			}
+    		}
+    	};
+
+    	ImageProducer ip = new FilteredImageSource(im.getSource(), filter);
+    	return Toolkit.getDefaultToolkit().createImage(ip);
+    }
 	
 	public void saveAsPng(JComponent component, String path) {
 		saveAsPng( component, path,component.getWidth(), component.getHeight());
@@ -69,11 +101,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         graphics4.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         graphics4.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
+        MainFrame.mainframe.resetZoom();
         
-        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
         component.paint(graphics1);
+        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
         component.print(graphics1);
-        try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+        if( Settings.national_map) {
+        	image1 = imageToBufferedImage(makeColorTransparent(image1,Color.WHITE));
+        }
         try {
             ImageIO.write(image1,"png", new File(path));
         }
@@ -84,6 +121,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
     	
         graphics2.drawImage(image1,0,0,width/2,height/2,null);
         graphics4.drawImage(image2,0,0,width/4,height/4,null);
+        if( Settings.national_map) {
+        	image4 = imageToBufferedImage(makeColorTransparent(image4,Color.WHITE));
+        }
         
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
         try {
@@ -788,6 +828,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         }
 
     }
+
     public String getAsHtml(JTable t) {
     	String str = "";
     	int cc = t.getColumnCount();
@@ -819,6 +860,89 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		getStats();
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
+	public void exportMaps(String write_folder, int res) {
+		int num_maps_temp = Settings.num_maps_to_draw;
+		int display_mode_temp = Feature.display_mode;
+		Settings.num_maps_to_draw = 1;
+		
+		boolean maplines = Feature.draw_lines;
+		boolean draw_labels = Feature.showDistrictLabels;
+		Feature.draw_lines = true;
+		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		
+		
+		///====begin insert
+		Feature.showDistrictLabels = true;
+		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
+		Feature.showDistrictLabels = false;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
+		
+		System.out.println("2");
+	
+	
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
+		System.out.println("3");
+	
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_splits.png",res,res);
+		System.out.println("4");
+	
+		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",res,res);
+		System.out.println("5");
+	
+	
+		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
+	
+	
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+	
+		Feature.showDistrictLabels = draw_labels;
+		Feature.draw_lines = maplines;
+		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		Settings.num_maps_to_draw = num_maps_temp;
+		Feature.display_mode = display_mode_temp;
+		MapPanel.override_size = -1;
+	}
+
+	
+	public void exportTransparent() {
+		MainFrame.mainframe.ip.addHistory("EXPORT NATIONAL");
+		String write_folder = Download.getStartPath()+MainFrame.mainframe.project.district_column+File.separator
+				+"national"+File.separator;
+		new File(write_folder).mkdirs();
+
+		boolean t = Settings.national_map;
+		
+		Settings.national_map = true;
+		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
+			f.geometry.makePolysFull();
+			f.geometry.makePolys();
+		}
+		exportMaps(write_folder,2048);
+		Settings.national_map = t;
+		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
+			f.geometry.makePolysFull();
+			f.geometry.makePolys();
+		}
+		
+	}
 	public void exportToHtml() {
 		System.out.println("1");
 		MainFrame.mainframe.ip.addHistory("EXPORT HTML");
@@ -843,64 +967,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
 		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
 
-		int num_maps_temp = Settings.num_maps_to_draw;
-		int display_mode_temp = Feature.display_mode;
-		Settings.num_maps_to_draw = 1;
-		
-		boolean maplines = Feature.draw_lines;
-		boolean draw_labels = Feature.showDistrictLabels;
-		Feature.draw_lines = true;
-		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
-		
-		
-		///====begin insert
-		Feature.showDistrictLabels = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",1024,1024);
-		Feature.showDistrictLabels = false;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",1024,1024);
-		
-		System.out.println("2");
-
-
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",1024,1024);
-		System.out.println("3");
-
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_splits.png",1024,1024);
-		System.out.println("4");
-
-		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes.png",1024,1024);
-		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",1024,1024);
-		System.out.println("5");
-
-
-		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",1024,1024);
-
-
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
-
-		Feature.showDistrictLabels = draw_labels;
-		Feature.draw_lines = maplines;
-		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
-		Settings.num_maps_to_draw = num_maps_temp;
-		Feature.display_mode = display_mode_temp;
-		MapPanel.override_size = -1;
+		exportMaps(write_folder,1024);
+	
 		System.out.println("6");
 
 
