@@ -3268,7 +3268,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory(sb.toString());
 
 		
-		for( Feature f : featureCollection.features) {
+		for( int k = 0; k < featureCollection.features.size(); k++) {
+			Feature f = featureCollection.features.get(k);
 			VTD v = f.vtd;
 			v.demographics = new double[num_candidates];
 			for( int i = 0; i < project.demographic_columns.size(); i++) {
@@ -3321,7 +3322,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			b.has_election_results = true;
 		}
 		
-		for( Feature f : featureCollection.features) {
+		for( int k = 0; k < featureCollection.features.size(); k++) {
+			Feature f = featureCollection.features.get(k);
 			VTD b = f.vtd;
 			b.resetOutcomes();
 			double[] dd = new double[num_candidates];
@@ -5008,7 +5010,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByCounty.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;
-				mapPanel.revalidate();
+				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
 		});
@@ -5019,7 +5021,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorBySplits.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;
-				mapPanel.revalidate();
+				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
 		});
@@ -7793,6 +7795,164 @@ ui.Mainframe:
 				return;
 				
 			}
+	}
+	
+	//more than 1 party above the vote threshold (as %) is counted as contested.  (original had it at 2%)
+	public void imputeUncontestedVTDs( Vector<String> election_columns, Vector<String> substitute_columns, double vote_threshold) {
+		if( election_columns.size() != substitute_columns.size()) {
+			return;
+		}
+		
+		//find contested and uncontested
+		Vector<Feature> contested_vtds = new Vector<Feature>();
+		Vector<Feature> uncontested_vtds = new Vector<Feature>();
+		for( Feature f : featureCollection.features) {
+
+			double tot = 0;
+			for( String s : election_columns) {
+				try {
+					tot += Double.parseDouble(f.properties.get(s).toString());
+				} catch (Exception ex) {}
+			}
+
+			int nonzeros = 0;
+			for( String s : election_columns) {
+				try {
+					double val = Double.parseDouble(f.properties.get(s).toString());
+					if( val > vote_threshold*tot) {
+						nonzeros++;
+					}
+				} catch (Exception ex) {}
+			}
+			if( nonzeros > 1) {
+				contested_vtds.add(f);
+			} else {
+				uncontested_vtds.add(f);
+			}
+		}
+		
+		//find the total vote counts for contested races
+		double[] election_sums = new double[election_columns.size()];
+		double[] substitute_sums = new double[election_columns.size()];
+		for( int i = 0; i < election_sums.length; i++) {
+			election_sums[i] = 0;
+			substitute_sums[i] = 0;
+		}
+		for( Feature f : contested_vtds) {
+			for( int i = 0; i < election_sums.length; i++) {
+				try {
+					election_sums[i] += Double.parseDouble(f.properties.get(election_columns.get(i)).toString());
+				} catch (Exception ex) {}
+				try {
+					election_sums[i] += Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString());
+				} catch (Exception ex) {}
+			}
+		}
+
+		//now find the ratio for that for election vs substitute columns
+		for( int i = 0; i < election_sums.length; i++) {
+			election_sums[i] = substitute_sums[i] == 0 ? 0 : election_sums[i] / substitute_sums[i];
+		}
+		
+		//now fill in uncontested, adjusted by vote ratio of contested.
+		for( Feature f : uncontested_vtds) {
+			for( int i = 0; i < election_sums.length; i++) {
+				try {
+					double val = Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString())*election_sums[i];
+					f.properties.put(election_columns.get(i),""+val);
+				} catch (Exception ex) {}
+			}
+		}
+	}
+		
+		
+	//more than 1 party above the vote threshold (as %) is counted as contested.  (original had it at 2%)
+	public void imputeUncontestedDistricts( Vector<String> election_columns, Vector<String> substitute_columns, String district_column, double vote_threshold) {
+		if( election_columns.size() != substitute_columns.size()) {
+			return;
+		}
+		
+		//accumulate by district
+		Hashtable<String,double[]> district_election_sums = new Hashtable<String,double[]>();
+		for( Feature f : featureCollection.features) {
+		
+			//get or create district in hashtable
+			String key = f.properties.get(district_column).toString();
+			double[] dd = district_election_sums.get(key);
+			if( dd == null) {
+				dd = new double[election_columns.size()];
+				for( int i = 0; i < dd.length; i++) {
+					dd[i] = 0;
+				}
+				district_election_sums.put(key,dd);
+			}
+		
+			//accumulate
+			for( int i = 0; i < election_columns.size(); i++) {
+				try {
+					dd[i] += Double.parseDouble(f.properties.get(election_columns.get(i)).toString());
+				} catch (Exception ex) {}
+			}
+		}
+
+		//find contested and uncontested
+		Vector<Feature> contested_vtds = new Vector<Feature>();
+		Vector<Feature> uncontested_vtds = new Vector<Feature>();
+		for( Feature f : featureCollection.features) {
+			String key = f.properties.get(district_column).toString();
+			double[] dd = district_election_sums.get(key);
+
+			double tot = 0;
+			for( int i = 0; i < dd.length; i++) {
+				tot += dd[i];
+			}
+
+			int nonzeros = 0;
+			for( int i = 0; i < dd.length; i++) {
+				if( dd[i] > vote_threshold*tot) {
+					nonzeros++;
+				}
+			}
+			if( nonzeros > 1) {
+				contested_vtds.add(f);
+			} else {
+				uncontested_vtds.add(f);
+			}
+		}
+
+		
+		//find the total vote counts for contested races
+		double[] election_sums = new double[election_columns.size()];
+		double[] substitute_sums = new double[election_columns.size()];
+		for( int i = 0; i < election_sums.length; i++) {
+			election_sums[i] = 0;
+			substitute_sums[i] = 0;
+		}
+		for( Feature f : contested_vtds) {
+			for( int i = 0; i < election_sums.length; i++) {
+				try {
+					election_sums[i] += Double.parseDouble(f.properties.get(election_columns.get(i)).toString());
+				} catch (Exception ex) {}
+				try {
+					election_sums[i] += Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString());
+				} catch (Exception ex) {}
+			}
+		}
+
+		//now find the ratio for that for election vs substitute columns
+		for( int i = 0; i < election_sums.length; i++) {
+			election_sums[i] = substitute_sums[i] == 0 ? 0 : election_sums[i] / substitute_sums[i];
+		}
+		
+		//now fill in uncontested, adjusted by vote ratio of contested.
+		for( Feature f : uncontested_vtds) {
+			for( int i = 0; i < election_sums.length; i++) {
+				try {
+					double val = Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString())*election_sums[i];
+					f.properties.put(election_columns.get(i),""+val);
+				} catch (Exception ex) {}
+			}
+		}
 	}
 }
 

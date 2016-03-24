@@ -191,7 +191,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				revalidate();
+				invalidate();
 				repaint();
 			}
 		});
@@ -321,7 +321,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	@Override
 	public void eventOccured() {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

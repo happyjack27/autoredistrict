@@ -3,7 +3,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.*;
 import java.nio.channels.*;
-import java.util.Vector;
+import java.util.*;
 
 import ui.Download;
 
@@ -13,6 +13,55 @@ public class Util {
 	
 	static final String path = "/Users/jimbrill/autoredistrict_data/county_stats";
 	//"C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\all_state_elections_and_demo_from_google_drive";
+	
+	public static String findBestMatch(String source_string, Hashtable<String,Object> hash) {
+		String test_source_string = source_string.toUpperCase().trim();
+
+		//try for exact match
+		Object s = hash.get(test_source_string);
+		if( s != null) {
+			return test_source_string;
+		}
+
+
+		//find closest match if no exact match.
+		boolean tie = false;
+		int ibest = -1;
+		String sbest = "";
+		for( String dest_name : hash.keySet()) {
+			String test_name = dest_name.toUpperCase().trim();
+			int cur = LevenshteinDistance( test_source_string, test_name);
+			if( ibest < 0 || cur < ibest) {
+				ibest = cur;
+				sbest = test_name;
+				tie = false;
+			} else if( cur == ibest && !test_name.equals(sbest)) {
+				tie = true;	
+			}
+		}
+		System.out.println("matched "+test_source_string+" to "+sbest+" distance: "+ibest+" tie?: "+tie);
+		if( tie) {
+			return null;
+		}
+		return sbest;
+	}
+
+
+    public static int LevenshteinDistance(String a, String b) {
+        int [] costs = new int [b.length() + 1];
+        for (int j = 0; j < costs.length; j++)
+            costs[j] = j;
+        for (int i = 1; i <= a.length(); i++) {
+            costs[0] = i;
+            int nw = i - 1;
+            for (int j = 1; j <= b.length(); j++) {
+                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]), a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
+                nw = costs[j];
+                costs[j] = cj;
+            }
+        }
+        return costs[b.length()];
+    }
 
 	static final String[] states1 = new String[]{
 		//"Louisiana",
@@ -234,6 +283,7 @@ public class Util {
 					//|| state.equals("California")
 					|| state.equals("Texas")
 					|| state.equals("Florida")
+					|| state.equals("California")
 					//|| state.equals("Louisianna")
 					//|| state.equals("Rhode Island")
 					//|| state.equals("Kentucky")
@@ -289,6 +339,9 @@ public class Util {
 
 			
 			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("IMPORT BDISTRICTING\n");
+			sb.append("SAVE");
 			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
@@ -301,8 +354,6 @@ public class Util {
 			//sb.append("MERGE\n");
 			//sb.append("SAVE\n");
 			//sb.append("EXIT\n");
-			//sb.append("IMPORT CURRENT_DISTRICTS\n");
-			//sb.append("IMPORT BDISTRICTING\n");
 			
 			
 			sb.append("SET DISTRICTS COLUMN CD_BD\n");
