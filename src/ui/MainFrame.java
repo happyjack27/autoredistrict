@@ -487,8 +487,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
-				Feature.compare_centroid = true;
-				Collections.sort(featureCollection.features);
+				//Feature.compare_centroid = true;
+				//Collections.sort(featureCollection.features);
 	    		
 
     			String s0 = "GEOID"+delimiter+"INTPTLAT"+delimiter+"INTPTLON";
@@ -671,8 +671,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				
 				dlbl.setText("Doing hit tests...");
-				Feature.compare_centroid = true;
-				Collections.sort(featureCollection.features);
+				//Feature.compare_centroid = true;
+				//Collections.sort(featureCollection.features);
 		
 		
 			    while (dbfreader.hasNextRecord()) {
@@ -863,8 +863,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		}
 		    		
 		    		dlbl.setText("Doing hit tests...");
-					Feature.compare_centroid = true;
-					Collections.sort(featureCollection.features);
+					//Feature.compare_centroid = true;
+					//Collections.sort(featureCollection.features);
 		    		
 		    		Hashtable<String,String> used = new Hashtable<String,String>(); 
 	
@@ -966,8 +966,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		}
 		    		
 		    		dlbl.setText("Doing hit tests...");
-					Feature.compare_centroid = true;
-					Collections.sort(featureCollection.features);
+					//Feature.compare_centroid = true;
+					//Collections.sort(featureCollection.features);
 		    		hits = 0;
 		    		misses = 0;
 		    		
@@ -1153,8 +1153,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
-				Feature.compare_centroid = true;
-				Collections.sort(featureCollection.features);
+				//Feature.compare_centroid = true;
+				//Collections.sort(featureCollection.features);
 
 
 	    		hits = 0;
@@ -1261,8 +1261,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
-				Feature.compare_centroid = true;
-				Collections.sort(featureCollection.features);
+				//Feature.compare_centroid = true;
+				//Collections.sort(featureCollection.features);
 	    		
 	    		hits = 0;
 	    		misses = 0;
@@ -1435,8 +1435,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
-				Feature.compare_centroid = true;
-				Collections.sort(featureCollection.features);
+				//Feature.compare_centroid = true;
+				//Collections.sort(featureCollection.features);
 				/*
 				for(Feature f : featureCollection.features) {
 					System.out.println("centroid: "+f.geometry.full_centroid[0]+","+f.geometry.full_centroid[0]);
@@ -1610,9 +1610,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		dlon *= Geometry.SCALELATLON;
 		
 		double min_x = 0;
-		double max_x = featureCollection.features.size()-1;
-		double min_lon = featureCollection.features.get((int)min_x).geometry.full_centroid[0];
-		double max_lon = featureCollection.features.get((int)max_x).geometry.full_centroid[0];
+		double max_x = featureCollection.sortedFeatures.size()-1;
+		double min_lon = featureCollection.sortedFeatures.get((int)min_x).geometry.full_centroid[0];
+		double max_lon = featureCollection.sortedFeatures.get((int)max_x).geometry.full_centroid[0];
 		//System.out.println("min_lon "+min_lon);
 		//System.out.println("dlon "+dlon);
 		//System.out.println("max_lon "+max_lon);
@@ -1634,13 +1634,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( itestx >= max_x-0.00000000000001) {
 				itestx--;
 			}
-			if( itestx >= featureCollection.features.size()) {
-				itestx = featureCollection.features.size()-1;
+			if( itestx >= featureCollection.sortedFeatures.size()) {
+				itestx = featureCollection.sortedFeatures.size()-1;
 			}
 			if( itestx < 0) {
 				itestx = 0;
 			}
-			double test_lon = featureCollection.features.get(itestx).geometry.full_centroid[0];
+			double test_lon = featureCollection.sortedFeatures.get(itestx).geometry.full_centroid[0];
 			if( test_lon > dlon) {
 				max_lon = test_lon;
 				max_x = itestx;
@@ -1656,9 +1656,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				break;
 			}
 		}
-		for( int i = 0; i < featureCollection.features.size(); i++ ) {
-			if(  itestx+i < featureCollection.features.size()) {
-				Feature testfeat = featureCollection.features.get(itestx+i);
+		for( int i = 0; i < featureCollection.sortedFeatures.size(); i++ ) {
+			if(  itestx+i < featureCollection.sortedFeatures.size()) {
+				Feature testfeat = featureCollection.sortedFeatures.get(itestx+i);
 				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
 					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
 						hits++;
@@ -1667,7 +1667,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( itestx-i >= 0) {
-				Feature testfeat = featureCollection.features.get(itestx-i);
+				Feature testfeat = featureCollection.sortedFeatures.get(itestx-i);
 				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
 					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
 						hits++;
@@ -1679,7 +1679,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		//old way
 		System.out.print("n");
-		for( Feature feat : featureCollection.features) {
+		for( Feature feat : featureCollection.sortedFeatures) {
 			Polygon[] polys = feat.geometry.polygons_full;
 			for( int i = 0; i < polys.length; i++) {
 				if( polys[i].contains(ilon,ilat)) {
@@ -1809,8 +1809,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		System.out.println("doing hit tests");
 
 		    		dlbl.setText("Doing hit tests...");
-					Feature.compare_centroid = true;
-		    		Collections.sort(featureCollection.features);
+					//Feature.compare_centroid = true;
+		    		//Collections.sort(featureCollection.features);
 		    		hits = 0;
 		    		misses = 0;
 		    		
@@ -2013,8 +2013,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 
 		    		dlbl.setText("Doing hit tests...");
-					Feature.compare_centroid = true;
-		    		Collections.sort(featureCollection.features);
+					//Feature.compare_centroid = true;
+		    		//Collections.sort(featureCollection.features);
 
 		    		
 		    		//and finally process each row
@@ -3012,7 +3012,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		System.out.println(features.size()+" precincts loaded.");
 	    getMinMaxXY();
 		System.out.println("Initializing wards...");
-		featureCollection.initwards();
+		featureCollection.initFeatures();
 	    dlbl.setText("Setting min and max coordinates...");
 	    
 	    getMinMaxXY();
@@ -3152,7 +3152,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					int d = 0;
 					try {
 
-						d = Integer.parseInt((String)feat.properties.get(district) );
+						d = Integer.parseInt(feat.properties.get(district).toString() );
 					} catch (Exception ex) {
 						System.out.println("ex aa "+ex);
 						d = 0;
@@ -7483,8 +7483,8 @@ ui.Mainframe:
     		}
     		
     		dlbl.setText("Doing hit tests...");
-			Feature.compare_centroid = true;
-			Collections.sort(featureCollection.features);
+			//Feature.compare_centroid = true;
+			//Collections.sort(featureCollection.features);
 			
 //make centroid hash
 			try {

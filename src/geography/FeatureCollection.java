@@ -15,7 +15,6 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import dbf.DBFReader;
-
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 import solutions.Election;
@@ -52,6 +51,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	HashMap<Integer,HashMap<Integer,Edge>> edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();	
 	
 	Vector<String> locked_counties = new Vector<String>();
+
+	public Vector<Feature> sortedFeatures;
 	
 	public static Vector<Integer> vuncontested1 = new Vector<Integer>();
 	public static Vector<Integer> vuncontested2 = new Vector<Integer>();
@@ -790,7 +791,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		return super.instantiateObject(key);
 	}
 	
-	public void initwards() {
+	public void initFeatures() {
 		vtds = new Vector<VTD>();
 		wardHash = new HashMap<String,VTD>();
 		VTD.id_enumerator = 0;
@@ -803,6 +804,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			vtds.add(f.vtd);
 			//precinctHash.put(f.ward.name,f.ward);
+		}
+		sortedFeatures = new Vector<Feature>();
+		for( Feature f : features) {
+			sortedFeatures.add(f);
 		}
 		collectVertexes();
 		collectEdges();
@@ -972,6 +977,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				f.vtd.unpaired_edge_length = 0;
 			}
 		}
+		
+		
+		//create geographically sorted vector
+		Feature.compare_centroid = true;
+		Collections.sort(sortedFeatures);
+		Feature.compare_centroid = false;
+
 		
 		
 		
