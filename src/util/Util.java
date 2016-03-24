@@ -280,19 +280,22 @@ public class Util {
 			//sb.append("MERGE\n");
 			//sb.append("SAVE\n");
 			//sb.append("EXIT\n");
+			/*
 			sb.append("IMPORT BDISTRICTING\n");
 			sb.append("SAVE\n");
 			sb.append("IMPORT CURRENT_DISTRICTS\n");
 			sb.append("SAVE\n");
+			*/
 
 			
-			sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
 			sb.append("SET WEIGHT COUNT_SPLITS TRUE\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
 			sb.append("SET ETHNICITY COLUMNS VAP_WHITE VAP_BLACK VAP_HISPAN VAP_ASIAN VAP_INDIAN VAP_OTHER\n");
-			sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
 			//sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
 			//sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
 			//sb.append("MERGE\n");
@@ -300,17 +303,28 @@ public class Util {
 			//sb.append("EXIT\n");
 			//sb.append("IMPORT CURRENT_DISTRICTS\n");
 			//sb.append("IMPORT BDISTRICTING\n");
-			sb.append("SET DISTRICTS COLUMN CD_BD\n");
-			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
-			sb.append("EXPORT\n");
-			//sb.append("EXIT\n");
 			
+			
+			sb.append("SET DISTRICTS COLUMN CD_BD\n");
+			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			sb.append("EXPORT NATIONAL\n");
+
 			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
-			sb.append("EXPORT\n");
-			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			sb.append("EXPORT NATIONAL\n");
+
+			if( Download.apportionments[i] <= 5) {
+				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
+			} else {
+				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			}
 			sb.append("SET DISTRICTS COLUMN CD_FV\n");
-			sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-			sb.append("EXPORT\n");
+			if( Download.apportionments[i] <= 5) {
+				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
+			} else {
+				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			}
+			sb.append("EXPORT NATIONAL\n");
 			//sb.append("SAVE\n");
 			sb.append("EXIT\n");
 /*

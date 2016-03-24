@@ -108,6 +108,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
         component.print(graphics1);
         try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+        graphics2.drawImage(image1,0,0,width/2,height/2,null);
+        graphics4.drawImage(image2,0,0,width/4,height/4,null);
+ 
         if( Settings.national_map) {
         	image1 = imageToBufferedImage(makeColorTransparent(image1,Color.WHITE));
         }
@@ -119,10 +122,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         }
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
     	
-        graphics2.drawImage(image1,0,0,width/2,height/2,null);
-        graphics4.drawImage(image2,0,0,width/4,height/4,null);
         if( Settings.national_map) {
         	image4 = imageToBufferedImage(makeColorTransparent(image4,Color.WHITE));
+        	image4 = imageToBufferedImage(makeColorTransparent(image4,Color.BLACK));
         }
         
         try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
