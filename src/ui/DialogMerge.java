@@ -155,7 +155,7 @@ public class DialogMerge extends JDialog {
 				System.out.println("hmap.size "+hmmap.size());
 				System.out.println("data_headers.length "+data_headers.length);
 				for( Feature f : fc.features) {
-					f.vtd.temp_bool = false;
+					f.temp_bool = false;
 				}
 				for( int i = 0; i < data.length; i++) {
 					try {
@@ -181,7 +181,7 @@ public class DialogMerge extends JDialog {
 								}
 							} catch (Exception ex) { }
 							*/
-							f.vtd.temp_bool = true;
+							f.temp_bool = true;
 							for( int j = 0; j < data_headers.length; j++) {
 								f.properties.put(data_headers[j], data[i][j]);
 							}
@@ -195,12 +195,12 @@ public class DialogMerge extends JDialog {
 					}
 				}
 				for( Feature f : fc.features) {
-					if( f.vtd.temp_bool == false) {
+					if( f.temp_bool == false) {
 						for( int j = 0; j < data_headers.length; j++) {
 							f.properties.put(data_headers[j], "0");
 						}
 					} else {
-						f.vtd.temp_bool = false;
+						f.temp_bool = false;
 					}
 				}
 				

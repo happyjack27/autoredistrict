@@ -246,7 +246,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	public void importBlockElection() {
 		ip.addHistory("IMPORT ELECTIONS");
-		ImportVTDLevel ivtd = new ImportVTDLevel();	
+		ImportFeatureLevel ivtd = new ImportFeatureLevel();	
 		ivtd.nextThread = new ThreadFinishImport();
 		ivtd.start();
 	}
@@ -274,7 +274,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		public void run() {
 			ImportTranslations it = new ImportTranslations();
 			ImportCountyLevel icl = new ImportCountyLevel();
-			ImportVTDLevel ivtd = new ImportVTDLevel();
+			ImportFeatureLevel ivtd = new ImportFeatureLevel();
 			ImportDemographics idg = new ImportDemographics();
 			
 			it.nextThread = icl;
@@ -548,9 +548,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    							try {
 						    				Object str = feat.properties.get(key);
 						    				if( str instanceof Double) {
-						    					s += delimiter+(((Double)str)/points[feat.vtd.id]);
+						    					s += delimiter+(((Double)str)/points[feat.id]);
 						    				} else {
-				    							double d = Double.parseDouble(str.toString())/points[feat.vtd.id];
+				    							double d = Double.parseDouble(str.toString())/points[feat.id];
 				    							s += delimiter+d;
 						    				}
 		    							} catch (Exception ex) {
@@ -696,7 +696,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 
 			    		} else {
-			    			points[feat.vtd.id]++;
+			    			points[feat.id]++;
 							//String district = ""+(1+featureCollection.ecology.population.get(0).ward_districts[feat.ward.id]);
 							
 							try {
@@ -893,7 +893,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		System.out.println();
 					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.vtd.id]);
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.id]);
 		    					
 		    					try {
 		    						//System.out.println("writing...");
@@ -996,7 +996,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		System.out.println();
 					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.vtd.id]);
+		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.id]);
 		    					
 		    					try {
 		    						//System.out.println("writing...");
@@ -1149,7 +1149,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int count = 0;
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
-					feat.vtd.population = 0;
+					feat.population = 0;
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
@@ -1177,8 +1177,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    			System.out.print("x");
 				    		System.out.println("miss "+dlon+","+dlat+" ");
 			    		} else {
-	    					feat.vtd.population += pop18;
-	    					feat.vtd.has_census_results = true;
+	    					feat.population += pop18;
+	    					feat.has_census_results = true;
 			    			
 			    		}
 			    		
@@ -1200,8 +1200,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			    
 	    		for( Feature feat : featureCollection.features) {
-				    feat.properties.put("POPULATION",feat.vtd.population);
-				    feat.properties.POPULATION = (int) feat.vtd.population;
+				    feat.properties.put("POPULATION",feat.population);
+				    feat.properties.POPULATION = (int) feat.population;
 	    		}
 	    		System.out.println("setting pop column");
 	    		
@@ -1257,7 +1257,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int count = 0;
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
-					feat.vtd.population = 0;
+					feat.population = 0;
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
@@ -1283,8 +1283,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		System.out.println();
 				    		System.out.println("miss "+dlon+","+dlat+" ");
 				    	} else {
-	    					feat.vtd.population += Integer.parseInt(ss[col_pop]);
-	    					feat.vtd.has_census_results = true;
+	    					feat.population += Integer.parseInt(ss[col_pop]);
+	    					feat.has_census_results = true;
 				    	}
 				    } catch (Exception ex) {
 				    	ex.printStackTrace();
@@ -1298,8 +1298,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		dlbl.setText("Finalizing...");
 		    
     		for( Feature feat : featureCollection.features) {
-			    feat.properties.put("POPULATION",feat.vtd.population);
-			    feat.properties.POPULATION = (int) feat.vtd.population;
+			    feat.properties.put("POPULATION",feat.population);
+			    feat.properties.POPULATION = (int) feat.population;
     		}
     		System.out.println("setting pop column");
     		
@@ -1431,7 +1431,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				int count = 0;
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
-					feat.vtd.population = 0;
+					feat.population = 0;
 	    		}
 	    		
 	    		dlbl.setText("Doing hit tests...");
@@ -1480,8 +1480,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    			System.out.print("x");
 				    		System.out.println("miss "+dlon+","+dlat+" "+ilat+","+ilon);
 			    		} else {
-	    					feat.vtd.population += pop18;
-	    					feat.vtd.has_census_results = true;
+	    					feat.population += pop18;
+	    					feat.has_census_results = true;
 			    			
 			    		}
 			    		
@@ -1508,8 +1508,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			    
 	    		for( Feature feat : featureCollection.features) {
-				    feat.properties.put("POPULATION",feat.vtd.population);
-				    feat.properties.POPULATION = (int) feat.vtd.population;
+				    feat.properties.put("POPULATION",feat.population);
+				    feat.properties.POPULATION = (int) feat.population;
 	    		}
 	    		System.out.println("setting pop column");
 	    		
@@ -1739,7 +1739,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 	    		for( Feature feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
-					feat.vtd.population = 0;
+					feat.population = 0;
 	    		}
 
 				if( ext.equals("csv") || ext.equals("txt")) {
@@ -2166,7 +2166,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					break;
 				}
 			}
-			String skey2="VTDST";
+			String skey2="FeatureST";
 			for( int i = 0; i < headers.length; i++) {
 				if( headers[i].indexOf(skey2) == 0) {
 					skey2 = headers[i];
@@ -2180,7 +2180,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			for(Feature feat : featureCollection.features) {
 				featmap.put((String) feat.properties.get(skey),feat);
 			}
-			Vector<String[]> v = processVTDrenameFile();
+			Vector<String[]> v = processFeaturerenameFile();
 			System.out.println("size: "+v.size());
 			String[] header = v.remove(0);
 			int[] care = new int[]{3,5,6};
@@ -3249,9 +3249,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( pop == null || pop.length() == 0) {
 				pop = "0";
 			}
-			if( f.vtd != null) {
-				f.vtd.has_census_results = true;
-				f.vtd.population = Double.parseDouble(pop);
+			if( f != null) {
+				f.has_census_results = true;
+				f.population = Double.parseDouble(pop);
 			}
 			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
 		}
@@ -3270,14 +3270,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		for( int k = 0; k < featureCollection.features.size(); k++) {
 			Feature f = featureCollection.features.get(k);
-			VTD v = f.vtd;
-			v.demographics = new double[num_candidates];
+			f.demographics = new double[num_candidates];
 			for( int i = 0; i < project.demographic_columns.size(); i++) {
 				try {
-					v.demographics[i] = Double.parseDouble(f.properties.get(project.demographic_columns.get(i)).toString().replaceAll(",",""));
+					f.demographics[i] = Double.parseDouble(f.properties.get(project.demographic_columns.get(i)).toString().replaceAll(",",""));
 				} catch (Exception ex) {
 					
-					v.demographics[i] = 0;
+					f.demographics[i] = 0;
 					f.properties.put(project.demographic_columns.get(i),"0");
 				}
 			}
@@ -3288,9 +3287,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		for( Feature f : featureCollection.features) {
-			VTD v = f.vtd;
 			try {
-				v.county = f.properties.get(project.county_column).toString();
+				f.county = f.properties.get(project.county_column).toString();
 			} catch (Exception ex) {
 			}
 		}
@@ -3300,9 +3298,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory("SET MUNI COLUMN "+project.muni_column);
 		
 		for( Feature f : featureCollection.features) {
-			VTD v = f.vtd;
 			try {
-				v.muni = f.properties.get(project.muni_column).toString();
+				f.muni = f.properties.get(project.muni_column).toString();
 			} catch (Exception ex) {
 			}
 		}
@@ -3317,15 +3314,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory(sb.toString());
 
 		
-		for( VTD b : featureCollection.vtds) {
+		for( Feature b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
 		for( int k = 0; k < featureCollection.features.size(); k++) {
 			Feature f = featureCollection.features.get(k);
-			VTD b = f.vtd;
-			b.resetOutcomes();
+			f.resetOutcomes();
 			double[] dd = new double[num_candidates];
 			for( int i = 0; i < project.election_columns.size(); i++) {
 				try {
@@ -3337,10 +3333,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		
-			if( b.elections.size() < 1) {
-				b.elections.add(new Vector<Election>());
+			if( f.elections.size() < 1) {
+				f.elections.add(new Vector<Election>());
 			} else {
-				b.elections.get(0).clear();
+				f.elections.get(0).clear();
 			}
 			for( int j = 0; j < num_candidates; j++) {
 				Election d = new Election();
@@ -3352,11 +3348,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				if( b.elections.size() < 1) {
-					b.elections.add(new Vector<Election>());
+				if( f.elections.size() < 1) {
+					f.elections.add(new Vector<Election>());
 				}
 
-				b.elections.get(0).add(d);
+				f.elections.get(0).add(d);
 				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
@@ -3373,14 +3369,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			chckbxSubstituteColumns.doClick();
 		}
 		
-		for( VTD b : featureCollection.vtds) {
+		for( Feature b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
 		for( Feature f : featureCollection.features) {
-			VTD b = f.vtd;
-			b.resetOutcomes();
+			f.resetOutcomes();
 			double[] dd = new double[Settings.num_candidates];
 			for( int i = 0; i < project.election_columns_2.size(); i++) {
 				try {
@@ -3392,10 +3387,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		
-			while( b.elections.size() < 2) {
-				b.elections.add(new Vector<Election>());
+			while( f.elections.size() < 2) {
+				f.elections.add(new Vector<Election>());
 			}
-			b.elections.get(1).clear();
+			f.elections.get(1).clear();
 			
 			for( int j = 0; j < Settings.num_candidates; j++) {
 				Election d = new Election();
@@ -3407,11 +3402,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				while( b.elections.size() < 2) {
-					b.elections.add(new Vector<Election>());
+				while( f.elections.size() < 2) {
+					f.elections.add(new Vector<Election>());
 				}
 
-				b.elections.get(1).add(d);
+				f.elections.get(1).add(d);
 				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
@@ -3427,14 +3422,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			chckbxSubstituteColumns.doClick();
 		}
 		
-		for( VTD b : featureCollection.vtds) {
+		for( Feature b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
 		for( Feature f : featureCollection.features) {
-			VTD b = f.vtd;
-			b.resetOutcomes();
+			f.resetOutcomes();
 			double[] dd = new double[Settings.num_candidates];
 			for( int i = 0; i < project.election_columns_3.size(); i++) {
 				try {
@@ -3446,10 +3440,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		
-			while( b.elections.size() < 3) {
-				b.elections.add(new Vector<Election>());
+			while( f.elections.size() < 3) {
+				f.elections.add(new Vector<Election>());
 			}
-			b.elections.get(2).clear();
+			f.elections.get(2).clear();
 			
 			for( int j = 0; j < Settings.num_candidates; j++) {
 				Election d = new Election();
@@ -3461,11 +3455,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					d.vote_prob[i] = 0;
 				}
 				d.vote_prob[j] = 1;
-				while( b.elections.size() < 3) {
-					b.elections.add(new Vector<Election>());
+				while( f.elections.size() < 3) {
+					f.elections.add(new Vector<Election>());
 				}
 
-				b.elections.get(2).add(d);
+				f.elections.get(2).add(d);
 				//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 			}
 		}
@@ -3482,7 +3476,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2, FeatureCollection.buncontested3};
 		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.election_columns, project.election_columns_2, project.election_columns_3};
 		
-		for( VTD b : featureCollection.vtds) {
+		for( Feature b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
@@ -3522,12 +3516,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 				for( int id = 0; id < featureCollection.features.size(); id++) {
 					Feature f = featureCollection.features.get(id);
-					VTD b = f.vtd;
 					if( !buncontested[idem][dm.vtd_districts[id]]) {
 						continue;
 					}
 					
-					b.resetOutcomes();
+					f.resetOutcomes();
 					double[] dd = new double[Settings.num_candidates];
 					for( int i = 0; i < project.substitute_columns.size(); i++) {
 						try {
@@ -3539,10 +3532,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 				
-					while( b.elections.size() <= idem) {
-						b.elections.add(new Vector<Election>());
+					while( f.elections.size() <= idem) {
+						f.elections.add(new Vector<Election>());
 					}
-					b.elections.get(idem).clear();
+					f.elections.get(idem).clear();
 					
 					for( int j = 0; j < Settings.num_candidates; j++) {
 						Election d = new Election();
@@ -3557,10 +3550,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							d.vote_prob[i] = 0;
 						}
 						d.vote_prob[j] = 1;
-						if( b.elections.size() < 1) {
-							b.elections.add(new Vector<Election>());
+						if( f.elections.size() < 1) {
+							f.elections.add(new Vector<Election>());
 						}
-						b.elections.get(idem).add(d);
+						f.elections.get(idem).add(d);
 						//System.out.println("ward "+b.id+" added demo "+j+" "+d.population);
 					}
 				}
@@ -3641,11 +3634,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void setMaxElections() {
 		int imax = chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
 		for( Feature f : featureCollection.features) {
-			VTD b = f.vtd;
-			while( b.elections.size() > imax) {
-				b.elections.remove(imax-1);//.add(new Vector<Demographic>());
+			while( f.elections.size() > imax) {
+				f.elections.remove(imax-1);//.add(new Vector<Demographic>());
 			}
-			b.resetOutcomes();
+			f.resetOutcomes();
 		}
 	}
 	
@@ -3950,13 +3942,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int num_candidates = lines[0].split("\t").length - 1;
 			
 			Vector<String> not_found_in_geo = new Vector<String>();
-			for( VTD b : featureCollection.vtds) {
+			for( Feature b : featureCollection.vtds) {
 				b.has_election_results = false;
 			}
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
 				String district = ss[0].trim();
-				VTD b = featureCollection.wardHash.get(district);
+				Feature b = featureCollection.wardHash.get(district);
 				if( b == null) {
 					not_found_in_geo.add(district);
 					System.out.println("not in geo: "+district);
@@ -3966,7 +3958,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			Vector<String> not_found_in_census = new Vector<String>();
-			for( VTD b : featureCollection.vtds) {
+			for( Feature b : featureCollection.vtds) {
 				if( b.has_election_results == false) {
 					//not_found_in_census.add(b.name);
 					//System.out.println("not in election: |"+b.name+"|");
@@ -3974,7 +3966,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-				for( VTD b : featureCollection.vtds) {
+				for( Feature b : featureCollection.vtds) {
 					b.has_election_results = false;
 				}
 				JOptionPane.showMessageDialog(null,""
@@ -4010,7 +4002,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			
 			for( Entry<String, double[]> es : votes.entrySet()) {
-				VTD b = featureCollection.wardHash.get(es.getKey());
+				Feature b = featureCollection.wardHash.get(es.getKey());
 				double[] dd = es.getValue();
 				for( int j = 0; j < num_candidates; j++) {
 					Election d = new Election();
@@ -4056,8 +4048,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		jbInit();
 		chckbxmntmHideMapLines.setSelected(true);
-		Feature.draw_lines = chckbxmntmHideMapLines.isSelected();
-		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		Feature.outline_vtds = chckbxmntmHideMapLines.isSelected();
+		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
 		
@@ -4151,7 +4143,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderVoteDilution = new JSlider();
 		textFieldTotalSeats = new JTextField();
 		lblTotalSeats = new JRadioButton("Total seats");
-		chckbxNewCheckBox = new JCheckBox("No 4 seat districts");
 		srlblMuniColumn = new JLabel("Muni column");
 		srcomboBoxMuniColumn = new JComboBox();
 		rdbtnReduceTotalSplits = new JRadioButton("Reduce total splits");
@@ -4231,7 +4222,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmShowVoteBalance = new JMenuItem("Color by vtd vote");;
 		mntmShowDemographics = new JMenuItem("Color by vtd demographic");;
 		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
-		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 		chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
 		chckbxmntmShowDistrictLabels = new JCheckBoxMenuItem("Show district labels");
@@ -4743,13 +4733,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String[] lines = s.split("\n");
 					
 					Vector<String> not_found_in_geo = new Vector<String>();
-					for( VTD b : featureCollection.vtds) {
+					for( Feature b : featureCollection.vtds) {
 						b.has_census_results = false;
 					}
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						VTD b = featureCollection.wardHash.get(district);
+						Feature b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -4757,13 +4747,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 					Vector<String> not_found_in_census = new Vector<String>();
-					for( VTD b : featureCollection.vtds) {
+					for( Feature b : featureCollection.vtds) {
 						if( b.has_census_results == false) {
 							//not_found_in_census.add(b.name);
 						}
 					}
 					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-						for( VTD b : featureCollection.vtds) {
+						for( Feature b : featureCollection.vtds) {
 							b.has_census_results = false;
 						}
 						JOptionPane.showMessageDialog(null,""
@@ -4777,7 +4767,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						VTD b = featureCollection.wardHash.get(district);
+						Feature b = featureCollection.wardHash.get(district);
 						b.has_census_results = true;
 						b.population = Double.parseDouble(ss[1].replaceAll(",",""));
 						System.out.println("ward "+b.id+" added census "+b.population);
@@ -4869,16 +4859,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(chckbxmntmShowDistrictLabels);
-		chckbxmntmHideMapLines.setSelected(Feature.draw_lines );
-		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Feature.draw_lines = chckbxmntmHideMapLines.isSelected();
-				MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		mnView.add(chckbxmntmHideMapLines);
 		
 		chckbxmntmSimplifyPolygons = new JCheckBoxMenuItem("Simplify polygons");
 		chckbxmntmSimplifyPolygons.addActionListener(new ActionListener() {
@@ -4890,6 +4870,56 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		chckbxmntmSimplifyPolygons.setToolTipText("This makes the map draw considerably faster by reducing the number of lines in each polygon.");
 		mnView.add(chckbxmntmSimplifyPolygons);
+		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Outline vtd's");
+		chckbxmntmHideMapLines.setSelected(Feature.outline_vtds );
+		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.outline_vtds = chckbxmntmHideMapLines.isSelected();
+				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		
+		separator_15 = new JSeparator();
+		mnView.add(separator_15);
+		mnView.add(chckbxmntmHideMapLines);
+		
+		chckbxmntmOutlineState = new JCheckBoxMenuItem("Outline state");
+		chckbxmntmOutlineState.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.outline_state = chckbxmntmOutlineState.isSelected();
+				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+			}
+		});
+		mnView.add(chckbxmntmOutlineState);
+		
+		mntmOutlineDistricts = new JMenuItem("Outline districts");
+		mntmOutlineDistricts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.outline_districts = mntmOutlineDistricts.isSelected();
+				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+			}
+		});
+		mnView.add(mntmOutlineDistricts);
+		
+		mntmOutlineCounties = new JMenuItem("Outline counties");
+		mntmOutlineCounties.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.outline_counties = mntmOutlineCounties.isSelected();
+				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+			}
+		});
+		mnView.add(mntmOutlineCounties);
 		
 		
 		separator_6 = new JSeparator();
@@ -5217,7 +5247,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					
 					DistrictMap dm = featureCollection.ecology.population.get(0);
 					for( int i = 0; i < dm.vtd_districts.length; i++) {
-						VTD b = featureCollection.ecology.wards.get(i);
+						Feature b = featureCollection.ecology.vtds.get(i);
 						//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 						//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 					}
@@ -5246,14 +5276,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String[] lines = s.split("\n");
 				
 				Vector<String> not_found_in_geo = new Vector<String>();
-				for( VTD b : featureCollection.vtds) {
+				for( Feature b : featureCollection.vtds) {
 					b.temp = -1;
 				}
 				for( int i = 0; i < lines.length; i++) {
 					try {
 						String[] ss = lines[i].split(",");
 						String district = ss[0].trim();
-						VTD b = featureCollection.wardHash.get(district);
+						Feature b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -5264,13 +5294,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 				}
 				Vector<String> not_found_in_census = new Vector<String>();
-				for( VTD b : featureCollection.vtds) {
+				for( Feature b : featureCollection.vtds) {
 					if( b.temp < 0) {
 						//not_found_in_census.add(b.name);
 					}
 				}
 				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-					for( VTD b : featureCollection.vtds) {
+					for( Feature b : featureCollection.vtds) {
 						b.temp = -1;
 					}
 					JOptionPane.showMessageDialog(null,""
@@ -5338,7 +5368,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						
 						DistrictMap dm = featureCollection.ecology.population.get(pop);
 						for( int i = 0; i < dm.vtd_districts.length; i++) {
-							VTD b = featureCollection.ecology.wards.get(i);
+							Feature b = featureCollection.ecology.vtds.get(i);
 							//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 							//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 						}
@@ -6140,18 +6170,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblTotalSeats.setBounds(6, 146, 124, 16);
 		
 		panel.add(lblTotalSeats);
-		chckbxNewCheckBox.setSelected(true);
-		chckbxNewCheckBox.setEnabled(false);
-		chckbxNewCheckBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.setNo4s(chckbxNewCheckBox.isSelected());
-				setSeatsMode();
-				ip.addHistory("SET DISTRICTS ALLOW_4_SEATS "+(chckbxNewCheckBox.isSelected() ? "FALSE" : "TRUE"));
-			}
-		});
-		chckbxNewCheckBox.setBounds(16, 180, 172, 23);
-		
-		panel.add(chckbxNewCheckBox);
 		sliderRepresentation.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				//Settings.disenfranchise_weight = sliderRepresentation.getValue()/100.0;
@@ -6244,6 +6262,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		rdbtnRouletteSelection.setSelected(Settings.SELECTION_MODE == Settings.ROULETTE_SELECTION);
 		selectionType.add(rdbtnRouletteSelection);
+		
+		comboBoxQuota = new JComboBox();
+		comboBoxQuota.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String s = (String) comboBoxQuota.getSelectedItem();
+				if( s.equals("STV")) { 
+					Settings.quota_method = Settings.QUOTA_METHOD_STV;
+				} else {
+					Settings.quota_method = Settings.QUOTA_METHOD_PARTY;
+				}
+			}
+		});
+		comboBoxQuota.setBounds(52, 178, 136, 27);
+		comboBoxQuota.addItem("PARTY LIST");
+		comboBoxQuota.addItem("STV");
+		panel.add(comboBoxQuota);
+		
+		lblQuotaMethod = new JLabel("Quota");
+		lblQuotaMethod.setBounds(6, 182, 52, 16);
+		panel.add(lblQuotaMethod);
 		rdbtnRouletteSelection.setVisible(false);
 		rdbtnRankSelection.setVisible(false);
 		
@@ -6326,6 +6364,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_14;
 	public JSeparator separator_10;
 	public JMenuItem mntmExportNationalMaps;
+	public JComboBox comboBoxQuota;
+	public JLabel lblQuotaMethod;
+	public JSeparator separator_15;
+	public JCheckBoxMenuItem chckbxmntmOutlineState;
+	public JMenuItem mntmOutlineDistricts;
+	public JMenuItem mntmOutlineCounties;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6579,7 +6623,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 	}
 	
-	public static Vector processVTDrenameFile() {
+	public static Vector processFeaturerenameFile() {
 		String path = "http://www2.census.gov/geo/docs/reference/codes/files/national_vtd.txt";
 	    URL url;
 	    InputStream is = null;
@@ -6591,7 +6635,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	        url = new URL(path);
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
-	        v.add( new String[]{"STATE","STATEFP","COUNTYFP","COUNTY_NAME","VTDST","VTDNAME","CTYFP_FUL","VTDST_FUL","VTDST_HLF","GEO"});
+	        v.add( new String[]{"STATE","STATEFP","COUNTYFP","COUNTY_NAME","FeatureST","FeatureNAME","CTYFP_FUL","FeatureST_FUL","FeatureST_HLF","GEO"});
 	        int i = 0;
 
 	        while ((line = br.readLine()) != null) {
@@ -6778,7 +6822,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			for( int i = 0; i < header.length; i++) {
 				String s = header[i].toUpperCase().trim();
 				if( vtd_start < 0) {
-					if( header[i].equals("VTD NAME") || header[i].equals("NAME")) {
+					if( header[i].equals("Feature NAME") || header[i].equals("NAME")) {
 						vtd_start = i;
 					}
 				}
@@ -6939,7 +6983,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 	}
 
-	class ImportVTDLevel extends Thread {
+	class ImportFeatureLevel extends Thread {
 		public Thread nextThread;
 		public void run() {
 			dlbl.setText("Importing election data...");
@@ -6951,14 +6995,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Collections.sort(featureCollection.features);
 
 			System.out.println("import vtd level start");
-			//String path = "ftp://autoredistrict.org/pub/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
-			String path = "http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
+			//String path = "ftp://autoredistrict.org/pub/county_level_stats/Feature%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
+			String path = "http://autoredistrict.org/county_level_stats/Feature%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
 			
 			int[] ii;
 			int[] matches = new int[2];
 			int[] non_matches = new int[2];
 			for( int m = 0; m < 2; m++) {
-				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(true,path, "FeatureNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 				matches[m] = ii[0];
 				non_matches[m] = ii[1];
@@ -6967,12 +7011,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			double match_pct1 = ((double)matches[1])/(double)(matches[1]+non_matches[1]);
 			if( match_pct1 > 0.95 && matches[1] >= matches[0]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10,11,12}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(false,path, "FeatureNAME", 4, 1, new int[]{5,6,7,8,9,10,11,12}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			if( match_pct0 > 0.95 && matches[0] > matches[1]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9,10,11}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(false,path, "FeatureNAME", 3, 1, new int[]{4,5,6,7,8,9,10,11}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			
@@ -7047,7 +7091,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			column_renames.put("INTPTLAT","INTPTLAT");
 			column_renames.put("INTPTLON","INTPTLON");
-			column_renames.put("VTD","VTD");
+			column_renames.put("Feature","Feature");
 			
 			column_renames.put("P0020001","POP_TOTAL");
 			column_renames.put("P0020002","POP_HISPAN");
@@ -7072,7 +7116,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String[] headers = new String[]{
 					"INTPTLAT",
 					"INTPTLON",
-					"VTD",
+					"Feature",
 					
 					"POP_TOTAL",
 					"POP_HISPAN",
@@ -7155,7 +7199,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			while( yr.length() < 2) {
 				yr = "0"+yr;
 			}
-			String primary_key = "VTDST"+yr;
+			String primary_key = "FeatureST"+yr;
 			int foreign_key = 2;
 			
 			//collect primary keys;
@@ -7505,7 +7549,7 @@ ui.Mainframe:
 			int count = 0;
     		for( Feature feat : featureCollection.features) {
     			feat.geometry.makePolysFull();
-				feat.vtd.population = 0;
+				feat.population = 0;
     		}
     		
     		dlbl.setText("Doing hit tests...");
@@ -7768,7 +7812,7 @@ ui.Mainframe:
 						Hashtable<String,Integer> counts = new Hashtable<String,Integer>(); 
 						for( Feature feat : missing) {
 							counts.clear();
-							for(VTD vtd : feat.vtd.neighbors) {
+							for(Feature vtd : feat.neighbors) {
 								String p = vtd.feature.properties.get(key).toString();
 								Integer i = counts.get(p);
 								if( i == null) {
@@ -7822,7 +7866,7 @@ ui.Mainframe:
 	}
 	
 	//more than 1 party above the vote threshold (as %) is counted as contested.  (original had it at 2%)
-	public void imputeUncontestedVTDs( Vector<String> election_columns, Vector<String> substitute_columns, double vote_threshold) {
+	public void imputeUncontestedFeatures( Vector<String> election_columns, Vector<String> substitute_columns, double vote_threshold) {
 		if( election_columns.size() != substitute_columns.size()) {
 			return;
 		}

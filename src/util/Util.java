@@ -25,7 +25,7 @@ public class Util {
 		System.out.println("\t");
 		for( int i = 0; i < states.length; i++) {
 			String p = path+states[i].replaceAll(" ","%20")+separator+"2010"+separator+column+separator+"national"+separator+image_name;
-			System.out.println("\t$image_"+i+" = imagecreatefrompng('"+p+"');");
+			System.out.println("\t$image_"+i+" = imagecreatefrompng(file_get_contents('"+p+"'));");
 
 			System.out.println("\timagecopy($dest_image, $image_"+i+", 0, 0, 0, 0, WIDTH, HEIGHT);");
 		}
@@ -283,10 +283,14 @@ public class Util {
 					//|| state.equals("Rhode Island")
 					//|| state.equals("Kentucky")
 					) {
-				continue;
+				//continue;
 			}
 			
-			if( false
+			if( true
+					&& !state.equals("Texas")
+					&& !state.equals("Florida")
+					&& !state.equals("California")
+
 					//&& !state.equals("New York")
 					//&& !state.equals("Oklahoma")
 					//&& !state.equals("Alaska")
@@ -334,12 +338,17 @@ public class Util {
 
 			
 			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
-			sb.append("IMPORT POPULATION\n");
-			sb.append("IMPORT CURRENT_DISTRICTS\n");
-			sb.append("IMPORT BDISTRICTING\n");
-			sb.append("SAVE");
+			//sb.append("IMPORT POPULATION\n");
+			//sb.append("IMPORT CURRENT_DISTRICTS\n");
+			//sb.append("IMPORT BDISTRICTING\n");
+			//sb.append("SAVE");
 			
-			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			//sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
+			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("RESCALE ELECTIONS\n");
+			sb.append("SAVE\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
@@ -355,11 +364,11 @@ public class Util {
 			
 			
 			sb.append("SET DISTRICTS COLUMN CD_BD\n");
-			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("EXPORT NATIONAL\n");
 
 			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
-			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("EXPORT NATIONAL\n");
 
 			if( Download.apportionments[i] <= 5) {
@@ -436,8 +445,8 @@ public class Util {
 
 
 	public static void main(String[] args) {
-		mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", 
-				"map_districts.png", 2048, 2048, "/");
+		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 2048, 2048, "/");
+		mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
 
 		//"http://localhost:8888/autoredistrict"
 		//sfds

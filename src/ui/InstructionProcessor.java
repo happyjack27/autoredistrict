@@ -392,6 +392,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			textFieldIP.setText(""+(instruction_pointer+1));
 			return;
 		} else
+		if( command.equals("RESCALE") && instruction_words[1].equals("ELECTIONS")) {
+			MainFrame.mainframe.featureCollection.rescaleElections();
+		}
 		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
 			mainFrame.importBlockBdistricting();
 		} else
@@ -400,6 +403,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("CURRENT_DISTRICTS")) {
 			mainFrame.importBlockCurrentDistricts();
+		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("COUNTY")) {
+			mainFrame.importCountyData();
 		} else
 		if( command.equals("RENAME") && instruction_words[1].equals("FEATURE")) {
 			mainFrame.featureCollection.renameFeature(instruction_words[2], instruction_words[3]);

@@ -7,12 +7,9 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 
 import dbf.*;
-
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
-import solutions.Election;
-import solutions.Settings;
-import solutions.VTD;
+import solutions.*;
 import ui.MainFrame;
 
 public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
@@ -42,7 +39,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public String type;
 	public Properties properties;
 	public Geometry geometry;
-	public VTD vtd = null;
+	//public Feature vtd = null;
 	public Vector<double[]> points = new Vector<double[]>();
 	
 	public static boolean compare_centroid = true;
@@ -50,8 +47,15 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static boolean showPrecinctLabels = false;
 	public static boolean showDistrictLabels = false;
 	public static int display_mode = 0;
-	public static boolean draw_lines = false;
+	public static boolean outline_vtds = false;
+	public static boolean outline_state = false;
+	public static boolean outline_districts = false;
+	public static boolean outline_counties = false;
 	public static boolean showPoints = true;
+	
+	public static boolean isOutlineActive() {
+		return outline_vtds || outline_state || outline_districts || outline_counties;
+	}
 	
 	public void setDistFromPoints( String colname) {
 		if( points == null || points.size() == 0) {
@@ -87,8 +91,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 					 ;
 		} else {
 			return 
-					this.vtd.id > o.vtd.id ? 1 :
-						this.vtd.id < o.vtd.id ? -1 :
+					this.id > o.id ? 1 :
+						this.id < o.id ? -1 :
 							0;
 		}
 	}
@@ -136,7 +140,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		vtd.area = tot_area;
+		area = tot_area;
 		return tot_area;
 	}
 	
@@ -238,9 +242,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public void toggleClicked() {
 		try {
 
-		if( vtd.state == 0) {
-			vtd.state = 2;
-			for( VTD b : vtd.neighbors) {
+		if( state == 0) {
+			state = 2;
+			for( Feature b : neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -249,9 +253,9 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 					b.state = 1;
 				}
 			}
-		} else if( vtd.state == 2) { 
-			vtd.state = 0;
-			for( VTD b : vtd.neighbors) {
+		} else if( state == 2) { 
+			state = 0;
+			for( Feature b : neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -265,25 +269,6 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 			System.out.println(" ex "+ex);
 			ex.printStackTrace();
 		}
-	}
-
-	@Override
-	public void post_deserialize() {
-		super.post_deserialize();
-		if( containsKey("properties")) {
-			properties = (Properties) getObject("properties");
-		}
-		if( containsKey("geometry")) {
-			geometry = (Geometry) getObject("geometry");
-		}
-		/*
-		if( properties.DISTRICT == null || properties.DISTRICT.toLowerCase().equals("null")) {
-			geometry.outlineColor = Color.BLUE;
-			geometry.isDistrict = false;
-		}
-		*/
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -308,21 +293,21 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		if( geometry.polygons == null) {
 			geometry.makePolys();
 		}
-		if( geometry.fillColor != null || vtd.state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
+		if( geometry.fillColor != null || state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);
 			if( display_mode == DISPLAY_MODE_TEST1) {
-				g.setColor(vtd.elections != null && vtd.elections.size() > 0 ? FeatureCollection.DEFAULT_COLOR :  Color.black);
+				g.setColor(elections != null && elections.size() > 0 ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_TEST2) {
-				g.setColor(vtd.has_census_results ? FeatureCollection.DEFAULT_COLOR :  Color.black);
+				g.setColor(has_census_results ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
 				double tot = 0;
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				//for( int k = 0; k < vtd.elections.size(); k++) {
-					//Vector<Election> dem = vtd.elections.get(k);
-					for( int i = 0; i < vtd.demographics.length && i < colors.length; i++) {
-						int pop = (int)vtd.demographics[i];
+				//for( int k = 0; k < elections.size(); k++) {
+					//Vector<Election> dem = elections.get(k);
+					for( int i = 0; i < demographics.length && i < colors.length; i++) {
+						int pop = (int)demographics[i];
 						tot += pop;
 						red += colors[i].getRed()*pop;
 						green += colors[i].getGreen()*pop;
@@ -338,8 +323,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				double red = 0;
 				double green = 0;
 				double blue = 0;
-				for( int k = 0; k < vtd.elections.size(); k++) {
-					Vector<Election> dem = vtd.elections.get(k);
+				for( int k = 0; k < elections.size(); k++) {
+					Vector<Election> dem = elections.get(k);
 					for( int i = 0; i < dem.size() && i < colors.length; i++) {
 						int pop = dem.get(i).population;
 						tot += pop;
@@ -353,10 +338,10 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				blue /= tot;
 				g.setColor(new Color((int)red,(int)green,(int)blue));
 			} else {
-				if( vtd.state == 1) {
+				if( state == 1) {
 					g.setColor(Color.blue);
 				}
-				if( vtd.state == 2) {
+				if( state == 2) {
 					g.setColor(Color.gray);
 				}
 			}
@@ -364,7 +349,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				g.fillPolygon(geometry.polygons[i]);
 			}
 		}
-		if( geometry.outlineColor != null && draw_lines && !MainFrame.mainframe.evolving) {
+		if( geometry.outlineColor != null && outline_vtds && !MainFrame.mainframe.evolving) {
 			g.setColor(geometry.outlineColor);
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
@@ -402,4 +387,246 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		}
 		*/
 	}
+	   public int id;
+		public static int id_enumerator = 0;
+		public Feature feature = null;
+		public int state = 0;
+		public int temp = -1;
+		public double area = 0;
+		public String county = "";
+		
+		//public String name = "";
+
+
+	    public Vector<Edge> edges = new Vector<Edge>();
+	    public Vector<Feature> neighbors = new Vector<Feature>();
+	    public double[] neighbor_lengths;
+	    public double unpaired_edge_length = 0;
+	    public Vector<Vector<Election>> elections = new Vector<Vector<Election>>();
+	    //private double[][] mu_sigma_n = null;
+	    
+	    public boolean has_census_results = false;
+	    public boolean has_election_results = false;
+	    public double population=1;
+	    
+	    public void resetOutcomes() {
+	    	outcomes = null;    	
+	    }
+	    /*
+	    public void recalcMuSigmaN() {
+	    	try {
+	   		double[] successes = new double[Settings.num_candidates];
+			double total = 0;
+	        for( Demographic d : demographics) {
+	            for( int j = 0; j < d.vote_prob.length; j++) {
+	            	double n = d.population * d.vote_prob[j]*d.turnout_probability;
+	            	n /= Settings.voting_coalition_size;
+	            	total += n;
+	            	successes[j] += n;
+	            }
+	        }
+	        mu_sigma_n = new double[Settings.num_candidates][];
+	        for( int j = 0; j < successes.length; j++) {
+	        	double n = total;
+	        	double p = successes[j] / total;
+				double mu = n*p;
+				double sigma = n*p*(1-p);
+	        	mu_sigma_n[j] = new double[]{mu,sigma,n};
+	        	if( total == 0) {
+	        		mu_sigma_n[j] = new double[]{0,0,0};
+	        	}
+	        }   
+	    	} catch (Exception ex) {
+	    		ex.printStackTrace();
+	    	}
+	    }
+	    
+	    public double[][] getMuSigmaN() {
+	    	if( mu_sigma_n == null) {
+	    		recalcMuSigmaN();    		
+	    	}
+	    	return mu_sigma_n;
+	    }
+	    */
+	    
+		double[][] outcomes;
+		public double[] demographics = new double[]{};
+		public String muni;
+		public boolean temp_bool;
+
+	    public Feature() {
+	    	super();
+	    	id = id_enumerator++;
+	    }
+	    public boolean equals(Feature b) {
+	    	return b != null && b.id == this.id;
+	    }
+	    public void syncNeighbors() {
+			for(Feature b : neighbors) {
+				boolean is_in = false;
+				for(Feature b2 : b.neighbors) {
+					if( b2.id == this.id){
+						is_in = true;
+						break;
+					}
+				}
+				if( !is_in) {
+					b.neighbors.add(this);
+				}
+			}
+	    	
+	    }
+	    public void collectNeighborLengths() {
+	    	unpaired_edge_length = 0;
+	    	neighbor_lengths = new double[neighbors.size()];
+	    	for( int i = 0; i < neighbor_lengths.length; i++) {
+	    		neighbor_lengths[i] = 0;
+	    	}
+			for(Edge e : edges) {
+				boolean found = false;
+		    	for( int i = 0; i < neighbor_lengths.length; i++) {
+		    		Feature b = neighbors.get(i);
+		    		if( e.ward1_id == b.id || e.ward2_id == b.id){
+		    			neighbor_lengths[i] += e.length;
+		    			found = true;
+		    			break;
+		    		}
+		    	}
+		    	if( !found) {
+		    		unpaired_edge_length += e.length;
+		    	}
+			}
+	    }
+	    
+	    public void collectNeighbors() {
+	    	//this gets a list of distinct neighbors.
+	    	
+			neighbors = new Vector<Feature>();
+			for( Edge e : edges) {
+				Feature b = e.ward1.id == this.id ? e.ward2 : e.ward1;
+				if( b != null && b.id != this.id) {
+					boolean is_in = false;
+					for(Feature b2 : neighbors) {
+						if( b2.id == b.id){
+							is_in = true;
+							break;
+						}
+					}
+					if( !is_in) {
+						neighbors.add(b);
+						//System.out.print(""+b.id+", ");
+					}
+				}
+			}
+			//System.out.println();
+	    }
+
+	    
+		@Override
+		public void post_deserialize() {
+			super.post_deserialize();
+			super.post_deserialize();
+			if( containsKey("properties")) {
+				properties = (Properties) getObject("properties");
+			}
+			if( containsKey("geometry")) {
+				geometry = (Geometry) getObject("geometry");
+			}
+			/*
+			if( properties.DISTRICT == null || properties.DISTRICT.toLowerCase().equals("null")) {
+				geometry.outlineColor = Color.BLUE;
+				geometry.isDistrict = false;
+			}
+			*/
+			// TODO Auto-generated method stub
+
+			// TODO Auto-generated method stub
+			
+		}
+		
+	    public double[] getOutcome() {
+	    	if( outcomes == null) {
+	    		generateOutComes();
+	    	}
+	    	int i = (int)Math.floor(Math.random()*(double)outcomes.length);
+	    	return outcomes[i];
+	    }
+	    
+	    public void generateOutComes() {
+	    	if( !District.use_simulated_elections) {
+	        	outcomes = new double[1][];
+	    		outcomes[0] = new double[Settings.num_candidates];
+	    	    
+	    		//aggregate and normalize voting probs
+	            for(int i = 0; i < outcomes[0].length; i++) {
+	            	outcomes[0][i] = 0;
+	            }
+	            double[] totals = new double[elections.size()];
+	            for( int i = 0; i < totals.length; i++);
+	            for( int elec = 0; elec < elections.size(); elec++) {
+			        for( Election d : elections.get(elec)) {
+			            for( int j = 0; j < d.vote_prob.length; j++) {
+			            	outcomes[0][j] += d.population * d.vote_prob[j]*d.turnout_probability;//d.vote_prob[j];
+			            	totals[elec] += d.population * d.vote_prob[j]*d.turnout_probability;
+			            }
+			        }
+	            }
+	            double c = 0;
+	            
+	            for( int i = 0; i < elections.size(); i++) {
+	            	if( elections.get(i).size() > 1 && totals[i] > 2) {
+	            		if( 
+	            				(i == 0 ? MainFrame.mainframe.project.election_columns.size() : 
+	            					i == 1 ? MainFrame.mainframe.project.election_columns_2.size() :
+	                					i == 2 ? MainFrame.mainframe.project.election_columns_3.size() :
+	            					0) 
+	            				> 1) {
+	            			c++;
+	            		}
+	            	}
+	            }
+	            /*
+	            for(int i = 0; i < outcomes[0].length; i++) {
+	            	outcomes[0][i] /= c;
+	            }
+	            */
+	    	} else {
+		    	outcomes = new double[Settings.num_ward_outcomes][];
+		    	for( int out = 0; out < outcomes.length; out++) {
+		    		outcomes[out] = new double[Settings.num_candidates];
+		    	    
+		    		//aggregate and normalize voting probs
+		        	double[] probs = new double[Settings.num_candidates];
+		            for(int i = 0; i < probs.length; i++) {
+		            	probs[i] = 0;
+		            }
+		            int elec = (int)(Math.random()*(double)elections.size());
+		            for( Election d : elections.get(elec)) {
+		                for( int j = 0; j < d.vote_prob.length; j++) {
+		                	probs[j] += d.population * d.vote_prob[j]*d.turnout_probability;
+		                }
+		            }
+		            double total_population = 0;
+		            for(int i = 0; i < probs.length; i++) {
+		            	total_population += probs[i];
+		            }
+		            double r_tot_prob  = 1.0/total_population;
+		            for(int i = 0; i < probs.length; i++) {
+		            	probs[i] *= r_tot_prob;
+		            }
+		
+		            for(int j = 0; j < total_population; j++) {
+		                double p = Math.random();
+		                for( int k = 0; k < probs.length; k++) {
+		                    p -=  probs[k];
+		                    if( p <= 0) {
+		                    	outcomes[out][k]++;
+		                        break;
+		                    }
+		                }
+		    		}
+		    	}
+	    	}
+	    }
+
 }

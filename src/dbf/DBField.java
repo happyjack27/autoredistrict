@@ -50,7 +50,7 @@ public class DBField {
 					String s1 = decimalformat.format(number);
 					int k = length - s1.length();
 					if (k < 0) {
-						throw new Exception("Value " + number + " cannot fit in pattern: '" + sb +  "'.");
+						throw new Exception("Value " + number + " cannot fit in pattern: '" + sb +  "'. " +name);
 					}
 					StringBuffer sb2 = new StringBuffer(k);
 					for (int l = 0; l < k; l++) {
@@ -62,13 +62,13 @@ public class DBField {
 					throw new Exception("Expected a Number, got " + obj.getClass() + ".");
 				}
 		case 'C':
-				if (obj == null) {
+				if (obj == null || obj.equals("<null>") || obj.equals("null")) {
 					obj = "";
 				}
 				if (obj instanceof String) {
 					String s = (String) obj;
 					if (s.length() > length) {
-					  throw new Exception("'" + obj + "' is longer than " + length + " characters.");
+					  throw new Exception("'" + obj + "' is longer than " + length + " characters. "+name);
 					}
 					StringBuffer sb1 = new StringBuffer(length - s.length());
 					for (int j = 0; j < length - s.length(); j++) {
@@ -77,7 +77,7 @@ public class DBField {
 					return s + sb1;
 				}
 				else {
-					throw new Exception("Expected a String, got " + obj.getClass() + ".");
+					throw new Exception("Expected a String, got " + obj.getClass() + ". " +name);
 				}
 		case 'L':
 				if (obj == null) {
@@ -88,7 +88,7 @@ public class DBField {
 					return boolean1.booleanValue() ? "Y" : "N";
 				}
 				else {
-					throw new Exception("Expected a Boolean, got " + obj.getClass() + ".");
+					throw new Exception("Expected a Boolean, got " + obj.getClass() + ". " +name);
 				}
 		case 'D':
 				if (obj == null) {
@@ -99,7 +99,7 @@ public class DBField {
 					return sdf.format(date);
 				}
 				else {
-					throw new Exception("Expected a Date, got " + obj.getClass() + ".");
+					throw new Exception("Expected a Date, got " + obj.getClass() + ". " +name);
 				}
 		default:
 				throw new Exception("Unrecognized DBFField type: " + type);

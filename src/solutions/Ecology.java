@@ -46,9 +46,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	int last_population = 0;
 	int last_num_districts = 0;
 	
-	public HashMap<Integer,VTD> wards_by_id;
+	public HashMap<Integer,Feature> wards_by_id;
 	
-	public Vector<VTD> wards = new Vector<VTD>();
+	public Vector<Feature> vtds = new Vector<Feature>();
 	public Vector<Edge> edges = new Vector<Edge>();
 	public Vector<Vertex> vertexes = new Vector<Vertex>();
 	//public MapPanel mapPanel;
@@ -229,14 +229,14 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void post_deserialize() {
-		wards_by_id = new HashMap<Integer,VTD>();
+		wards_by_id = new HashMap<Integer,Feature>();
 		HashMap<Integer,Edge> edges_by_id = new HashMap<Integer,Edge>();
 		HashMap<Integer,Vertex> vertexes_by_id = new HashMap<Integer,Vertex>();
 		
 		//geometry
 		if( containsKey("wards")) {
-			wards = getVector("wards");
-			for( VTD ward: wards) {
+			vtds = getVector("wards");
+			for( Feature ward: vtds) {
 				wards_by_id.put(ward.id,ward);
 			}
 		}
@@ -262,7 +262,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 				edge.ward2.edges.add(edge);
 			}
 		}
-		for( VTD b : wards) {
+		for( Feature b : vtds) {
 			b.collectNeighbors();
 		}
 
@@ -276,7 +276,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	@Override
 	public void pre_serialize() {		
-		put("wards",wards);
+		put("wards",vtds);
 		put("edges",edges);
 		put("vertexes",vertexes);
 		
@@ -292,7 +292,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 			return null;//new Edge();
 		}
 		if( key.equals("wards")) {
-			return new VTD();
+			return new Feature();
 		}
 		
 		if( key.equals("candidates")) {
@@ -312,9 +312,6 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	this.generation = 0;
     	history = new Vector<double[]>();
     	normalized_history = new Vector<double[]>();
-    	for( VTD b : wards) {
-    		//b.recalcMuSigmaN();
-    	}
         for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
         	fairnessScoreEmaMeans[i] = 0;
         	fairnessScoreEmaVars[i] = 0;
@@ -332,7 +329,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     		population =  new Vector<DistrictMap>();
     	}
         while( population.size() < Settings.population) {
-            population.add(new DistrictMap(wards,Settings.num_districts));
+            population.add(new DistrictMap(vtds,Settings.num_districts));
         }
         while( population.size() > Settings.population) {
             population.remove(Settings.population);
@@ -670,7 +667,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	}
         	if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
     	        while( swap_population.size() < population.size()) {
-    	        	swap_population.add(new DistrictMap(wards,Settings.num_districts));
+    	        	swap_population.add(new DistrictMap(vtds,Settings.num_districts));
     	        }
     	        while( swap_population.size() > population.size()) {
     	        	swap_population.remove(0);
@@ -718,7 +715,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	    			Vector<DistrictMap> temp = new Vector<DistrictMap>();
 	    			for(int j = cutoff; j < population.size(); j++) {
 	    				temp.add(population.get(j));
-	    				population.set(j, new DistrictMap(wards,Settings.num_districts));
+	    				population.set(j, new DistrictMap(vtds,Settings.num_districts));
 	    			}
 	    			
 	    	  		for( int j = 0; j < matingThreads.length; j++) {

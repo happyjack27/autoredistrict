@@ -14,14 +14,14 @@ public class Edge {// extends ReflectionJSONObject<Edge> {
 	public int vertex2_id = -1;
     public double length;
     
-	public VTD ward1 = null;
-	public VTD ward2 = null;
+	public Feature ward1 = null;
+	public Feature ward2 = null;
 	public Vertex vertex1;
 	public Vertex vertex2;
 	
 	public static boolean isLatLon = true;
 	
-	public VTD otherVTD(VTD vtd) {
+	public Feature otherFeature(Feature vtd) {
 		return ward1 == vtd ? ward2 : ward1;
 	}
 	public Vertex otherVertex(Vertex vertex) {

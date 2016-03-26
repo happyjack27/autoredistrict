@@ -872,10 +872,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		int display_mode_temp = Feature.display_mode;
 		Settings.num_maps_to_draw = 1;
 		
-		boolean maplines = Feature.draw_lines;
+		boolean maplines = Feature.outline_vtds;
 		boolean draw_labels = Feature.showDistrictLabels;
-		Feature.draw_lines = true;
-		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		Feature.outline_vtds = true;
+		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		
 		
 		///====begin insert
@@ -921,8 +921,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
 	
 		Feature.showDistrictLabels = draw_labels;
-		Feature.draw_lines = maplines;
-		MapPanel.FSAA = Feature.draw_lines ? 4 : 1;
+		Feature.outline_vtds = maplines;
+		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		Settings.num_maps_to_draw = num_maps_temp;
 		Feature.display_mode = display_mode_temp;
 		MapPanel.override_size = -1;

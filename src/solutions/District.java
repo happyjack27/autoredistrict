@@ -1,5 +1,5 @@
 package solutions;
-import geography.FeatureCollection;
+import geography.*;
 
 import java.util.*;
 
@@ -8,7 +8,7 @@ import ui.MainFrame;
 import util.Pair;
 
 public class District extends JSONObject {
-    Vector<VTD> vtds = new Vector<VTD>();
+    Vector<Feature> vtds = new Vector<Feature>();
     
     public static int id = -1;
     
@@ -24,7 +24,7 @@ public class District extends JSONObject {
     public double iso_quotient = -1;
     public double paired_edge_length = -1;
     public double unpaired_edge_length = -1;
-    public Vector<Vector<VTD>> regions = null;
+    public Vector<Vector<Feature>> regions = null;
 
 	public int excess_pop = 0;
 	
@@ -44,7 +44,7 @@ public class District extends JSONObject {
     		return population;
     	}
         double pop = 0;
-        for( VTD vtd : vtds) {
+        for( Feature vtd : vtds) {
         	if( vtd.has_census_results) {
         		pop += vtd.population;
         	} 
@@ -61,7 +61,7 @@ public class District extends JSONObject {
     	for(int i = 0; i < cols.length; i++) {
     		dd[i] = 0;
     	}
-    	for( VTD vtd : vtds) {
+    	for( Feature vtd : vtds) {
     		try {
         	for(int i = 0; i < cols.length && i <  vtd.demographics.length; i++) {
         			dd[i] += vtd.demographics[i];
@@ -116,7 +116,7 @@ public class District extends JSONObject {
     Collection<Pair<String,Integer>> vcounties = new Vector<Pair<String,Integer>>();
     public Collection getCounties() {
     	HashMap<String,Pair<String,Integer>> counties = new HashMap<String,Pair<String,Integer>>();
-    	for( VTD vtd : vtds) {
+    	for( Feature vtd : vtds) {
     		Pair<String,Integer> pair = counties.get(vtd.county);
     		if( pair == null) {
     			pair = new Pair<String,Integer>(vtd.county,1);
@@ -350,7 +350,7 @@ public class District extends JSONObject {
             }
             return district_vote;
         }
-        for( VTD vtd : vtds) {
+        for( Feature vtd : vtds) {
             double[] vtd_vote = vtd.getOutcome();
             if( vtd_vote != null) {
                 for( int i = 0; i < vtd_vote.length; i++) {//most_value) {
@@ -370,7 +370,7 @@ public class District extends JSONObject {
             }
             return new double[][]{district_vote,district_vote};
         }
-        for( VTD ward : vtds) {
+        for( Feature ward : vtds) {
             double[] ward_vote = ward.getOutcome();
             if( ward_vote != null) {
             	double tot = 0;
@@ -425,11 +425,11 @@ public class District extends JSONObject {
         return getRegions(ward_districts).size();
     }
 
-    Vector<VTD> getTopPopulationRegion(int[] ward_districts) {
-        Vector<Vector<VTD>> regions = getRegions(ward_districts);
-        Vector<VTD> high = null;
+    Vector<Feature> getTopPopulationRegion(int[] ward_districts) {
+        Vector<Vector<Feature>> regions = getRegions(ward_districts);
+        Vector<Feature> high = null;
         double max_pop = 0;
-        for( Vector<VTD> region : regions) {
+        for( Vector<Feature> region : regions) {
             double pop = getRegionPopulation(region);
             if( pop > max_pop || high == null) {
                 max_pop = pop;
@@ -438,40 +438,40 @@ public class District extends JSONObject {
         }
         return high;
     }
-    Vector<Vector<VTD>> getRegions(int[] ward_districts) {
+    Vector<Vector<Feature>> getRegions(int[] ward_districts) {
     	/*
     	if( regions != null) {
     		return regions;
     	}*/
-        Hashtable<Integer,Vector<VTD>> region_hash = new Hashtable<Integer,Vector<VTD>>();
-        regions = new Vector<Vector<VTD>>();
-        for( VTD ward : vtds) {
+        Hashtable<Integer,Vector<Feature>> region_hash = new Hashtable<Integer,Vector<Feature>>();
+        regions = new Vector<Vector<Feature>>();
+        for( Feature ward : vtds) {
             if( region_hash.get(ward.id) != null)
                 continue;
-            Vector<VTD> region = new Vector<VTD>();
+            Vector<Feature> region = new Vector<Feature>();
             regions.add(region);
             addAllConnected(ward,region,region_hash,ward_districts);
         }
         return regions;
     }
     //recursively insert connected wards.
-    void addAllConnected( VTD ward, Vector<VTD> region,  Hashtable<Integer,Vector<VTD>> region_hash, int[] ward_districts) {
+    void addAllConnected( Feature ward, Vector<Feature> region,  Hashtable<Integer,Vector<Feature>> region_hash, int[] ward_districts) {
         if( region_hash.get(ward.id) != null)
             return;
         region.add(ward);
         region_hash.put(ward.id,region);
-        for( VTD other_ward : ward.neighbors) {
+        for( Feature other_ward : ward.neighbors) {
         	if( ward_districts[other_ward.id] == ward_districts[ward.id]) {
         		addAllConnected( other_ward, region, region_hash, ward_districts);
         	}
         }
     }
-    double getRegionPopulation(Vector<VTD> region) {
+    double getRegionPopulation(Vector<Feature> region) {
         double population = 0;
         if( region == null) {
         	return 0;
         }
-        for( VTD ward : region) {
+        for( Feature ward : region) {
         	if( ward.has_census_results) {
         		population += ward.population;
         	}
