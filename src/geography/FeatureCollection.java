@@ -61,6 +61,64 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static boolean[] buncontested2 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested3 = new boolean[Settings.num_districts];
 	
+	public void addFeatures(String dest, String[] sources) {
+		String s = "ADD FEATURES";
+		for( int i = 0; i < sources.length; i++) {
+			s += sources[i];
+		}
+		MainFrame.mainframe.ip.addHistory(s);
+		
+		for( Feature feat : features) {
+			double d = 0;
+			for( int i = 0; i < sources.length; i++) {
+				try {
+					d += Double.parseDouble(feat.properties.get(feat.properties.get(sources[i])).toString());
+				} catch (Exception ex) { }
+			}
+			feat.properties.put(dest,""+d);
+		}
+	}			
+	public void rescaleFeature(String dest, String scale, String filter, String filter_key) {
+		String s = "RESCALE FEATURE "+dest+" "+scale;
+		if( filter != null) {
+			s += " "+filter+" "+filter_key;
+		}
+		MainFrame.mainframe.ip.addHistory(s);
+		
+		double dscale = 1;
+		try {
+			dscale = Double.parseDouble(scale);
+		} catch (Exception ex) { }
+		
+		
+		double tot = 0;
+		for( Feature feat : features) {
+			if( filter != null) {
+				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
+					continue;
+				}
+			}			
+			try {
+				tot += Double.parseDouble(feat.properties.get(dest).toString());
+			} catch (Exception ex) { }
+		}
+		
+		dscale /= tot;
+
+		
+		for( Feature feat : features) {
+			if( filter != null) {
+				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
+					continue;
+				}
+			}			
+			try {
+				feat.properties.put(dest,""+(dscale* Double.parseDouble(feat.properties.get(dest).toString()) ));
+			} catch (Exception ex) { }
+		}
+	}		
+	
+	
 	public void renameFeature(String source, String dest) {
 		copyFeature(source,dest);
 		deleteFeature(source);

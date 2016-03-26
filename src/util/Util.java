@@ -1,51 +1,46 @@
 package util;
+import geography.Feature;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import ui.Download;
 
 public class Util {
 	
+
+	public static void mergeTransparentImages(String path, String column, String image_name, int width, int height, String separator) {
+		System.out.println("<?php ");
+		System.out.println("\tdefine(\"WIDTH\","+width+");");
+		System.out.println("\tdefine(\"HEIGHT\","+height+");");
+		System.out.println("\t$dest_image = imagecreatetruecolor(WIDTH, HEIGHT);");
+		System.out.println("\timagealphablending($dest_image, true);");
+		System.out.println("\timagesavealpha($dest_image, true);");
+		System.out.println("\t$trans_background = imagecolorallocatealpha($dest_image, 0, 0, 0, 127);");
+		System.out.println("\timagefill($dest_image, 0, 0, $trans_background);");
+		System.out.println("\t");
+		for( int i = 0; i < states.length; i++) {
+			String p = path+states[i].replaceAll(" ","%20")+separator+"2010"+separator+column+separator+"national"+separator+image_name;
+			System.out.println("\t$image_"+i+" = imagecreatefrompng('"+p+"');");
+
+			System.out.println("\timagecopy($dest_image, $image_"+i+", 0, 0, 0, 0, WIDTH, HEIGHT);");
+		}
+		System.out.println("\t");
+		//System.out.println("\timagepng($dest_image);");
+		System.out.println("\timagepng($dest_image,'"+image_name+"');");
+		System.out.println("\techo('done');");
+		System.out.println("?>");
+	}	
+
+	
 	//missing: alaska and lousianna!
 	
 	static final String path = "/Users/jimbrill/autoredistrict_data/county_stats";
 	//"C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\all_state_elections_and_demo_from_google_drive";
-	
-	public static String findBestMatch(String source_string, Hashtable<String,Object> hash) {
-		String test_source_string = source_string.toUpperCase().trim();
-
-		//try for exact match
-		Object s = hash.get(test_source_string);
-		if( s != null) {
-			return test_source_string;
-		}
-
-
-		//find closest match if no exact match.
-		boolean tie = false;
-		int ibest = -1;
-		String sbest = "";
-		for( String dest_name : hash.keySet()) {
-			String test_name = dest_name.toUpperCase().trim();
-			int cur = LevenshteinDistance( test_source_string, test_name);
-			if( ibest < 0 || cur < ibest) {
-				ibest = cur;
-				sbest = test_name;
-				tie = false;
-			} else if( cur == ibest && !test_name.equals(sbest)) {
-				tie = true;	
-			}
-		}
-		System.out.println("matched "+test_source_string+" to "+sbest+" distance: "+ibest+" tie?: "+tie);
-		if( tie) {
-			return null;
-		}
-		return sbest;
-	}
-
 
     public static int LevenshteinDistance(String a, String b) {
         int [] costs = new int [b.length() + 1];
@@ -339,10 +334,13 @@ public class Util {
 
 			
 			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
+			sb.append("IMPORT POPULATION\n");
 			sb.append("IMPORT CURRENT_DISTRICTS\n");
 			sb.append("IMPORT BDISTRICTING\n");
 			sb.append("SAVE");
+			
 			sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
 			sb.append("SET WEIGHT COUNT_SPLITS TRUE\n");
@@ -438,8 +436,13 @@ public class Util {
 
 
 	public static void main(String[] args) {
+		mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", 
+				"map_districts.png", 2048, 2048, "/");
+
+		//"http://localhost:8888/autoredistrict"
+		//sfds
 		//writeHTML();
-		make_scripts();
+		//make_scripts();
 		//processVTD();
 		System.exit(0);
 		
@@ -702,5 +705,40 @@ public class Util {
 	        throw new RuntimeException(e);
 	    }
 	    return sb.toString();
+	}
+	
+	public static Triplet<String,Feature,Integer> findBestMatch(String source_string, Hashtable<String,Feature> dictionary) {
+		String test_source_string = source_string.toUpperCase().trim();
+
+		//try for exact match
+		Feature s = dictionary.get(test_source_string);
+		if( s != null) {
+			return new Triplet<String,Feature,Integer>(test_source_string,s,0);
+		}
+
+
+		//find closest match if no exact match.
+		boolean tie = false;
+		int ibest = -1;
+		String sbest = "";
+		Feature obest = null;
+		for( Entry<String,Feature> entry: dictionary.entrySet()) {
+			String dest_name = entry.getKey();
+			String test_name = dest_name.toUpperCase().trim();
+			int cur = LevenshteinDistance( test_source_string, test_name);
+			if( ibest < 0 || cur < ibest) {
+				ibest = cur;
+				sbest = test_name;
+				obest = entry.getValue();
+				tie = false;
+			} else if( cur == ibest && !test_name.equals(sbest)) {
+				tie = true;	
+			}
+		}
+		System.out.println("matched "+test_source_string+" to "+sbest+" distance: "+ibest+" tie?: "+tie);
+		if( tie) {
+			return null;
+		}
+		return new Triplet<String,Feature,Integer>(sbest,obest,ibest);
 	}
 }

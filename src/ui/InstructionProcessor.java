@@ -413,6 +413,19 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("COPY") && instruction_words[1].equals("FEATURE")) {
 			mainFrame.featureCollection.copyFeature(instruction_words[2], instruction_words[3]);
 		} else
+		if( command.equals("ADD") && instruction_words[1].equals("FEATURES")) {
+			String[] ss = new String[instruction_words.length-3];
+			for( int i = 0; i < ss.length; i++) {
+				ss[i] = instruction_words[3+i];
+			}
+			mainFrame.featureCollection.addFeatures(instruction_words[2], ss);
+		} else
+		if( command.equals("RESCALE") && instruction_words[1].equals("FEATURE")) {
+			mainFrame.featureCollection.rescaleFeature(instruction_words[2],instruction_words[3]
+			, instruction_words.length > 5 ? instruction_words[4] : null
+			, instruction_words.length > 5 ? instruction_words[5] : null
+			);
+		} else
 		if( command.equals("DELETE")) {
 			Download.cyear = 2010;
 			Download.vyear = 2012;

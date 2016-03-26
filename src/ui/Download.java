@@ -662,14 +662,15 @@ public class Download extends Thread {
 	}
 	
 	public static void downloadAndExtract(String source_url, String dest_folder) {
+		String dest_folder2 = dest_folder;
 		try {
 			if( !dest_folder.substring(dest_folder.length()-1).equals(File.separator)) {
-				dest_folder += File.separator;
+				dest_folder2 += File.separator;
 			}
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading "+source_url+"..."); }
-			download(source_url,dest_folder,"downloaded.zip");
+			download(source_url,dest_folder2,"downloaded.zip");
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting "+source_url+"..."); }
-			unzip(dest_folder+"downloaded.zip", dest_folder);
+			unzip(dest_folder2+"downloaded.zip", dest_folder);
 			System.out.println("done extracting.");		
 		} catch (Exception ex) {
 			ex.printStackTrace();

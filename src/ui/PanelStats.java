@@ -83,10 +83,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         	width = d.width;
         	height = d.height;
         }
+        //BufferedImage.TYPE_INT_ARGB
         
-		BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_RGB);
-		BufferedImage image2 = new BufferedImage(width/2,height/2, BufferedImage.TYPE_INT_RGB);
-		BufferedImage image4 = new BufferedImage(width/4,height/4, BufferedImage.TYPE_INT_RGB);
+		BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image2 = new BufferedImage(width/2,height/2, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image4 = new BufferedImage(width/4,height/4, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics1 = image1.createGraphics(); 
         Graphics2D graphics2 = image2.createGraphics(); 
         Graphics2D graphics4 = image4.createGraphics(); 
@@ -100,6 +101,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         graphics4.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         graphics4.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         graphics4.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        graphics1.setComposite(AlphaComposite.Clear);
+        graphics1.fillRect(0, 0, width, height);
+        graphics1.setComposite(AlphaComposite.Src);
 
         MainFrame.mainframe.resetZoom();
         
@@ -937,7 +942,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			f.geometry.makePolysFull();
 			f.geometry.makePolys();
 		}
-		exportMaps(write_folder,2048);
+		exportMaps(write_folder,1024);
 		Settings.national_map = t;
 		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
 			f.geometry.makePolysFull();

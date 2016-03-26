@@ -6733,6 +6733,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		Vector<String[]> v = new Vector<String[]>();
 
+		Hashtable<String,Feature> dictionary = new Hashtable<String,Feature>();
+		for( int i = 0; i < featureCollection.features.size(); i++) {
+			Feature f =  featureCollection.features.get(i);
+			dictionary.put(f.properties.get(primary_key).toString(),f);
+		}
+		int total_edit_distance = 0;
+		int total_match_distance = 0;
+		
 		try {
 			System.out.println("1");
 			url = new URL(path);
@@ -6853,14 +6861,29 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 								break;
 							}
 						}
+						/*
 						if( vf == null) {
 								System.out.println("not found!: "+incounty);
 								not_found++;
 								continue;
-						}
+						}*/
 					}
 				}
 			}
+			if( vf == null) {
+				Triplet<String,Feature,Integer> best_match = util.Util.findBestMatch(incounty,dictionary);
+				if( best_match == null) {
+					System.out.println("not found!: "+incounty);
+					not_found++;
+					total_edit_distance += incounty.length();
+					continue;
+				} else {
+					incounty = best_match.a;
+					total_edit_distance += best_match.c;
+					total_match_distance += incounty.length() - best_match.c;
+				}
+			}	
+			
 			double total_pop = (double)county_pops.get(incounty);
 			System.out.println("found!: "+incounty+" "+total_pop);
 			found++;
@@ -6910,8 +6933,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				ex.printStackTrace();
 			}
 		}
-		return new int[]{found,not_found};
-		
+		return new int[]{total_match_distance,total_edit_distance};
+
+		//return new int[]{found,not_found};
 		
 	}
 
