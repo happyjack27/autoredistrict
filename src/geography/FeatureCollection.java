@@ -742,14 +742,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			System.out.println("drawing polys...");
 			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
 				double[][][] coords = outline.getValue();
-				//for( int i = 0; i < coords.length; i++) {
-					//System.out.println("making poly "+i+"...");
-					Polygon[] polygons = Geometry.makePolys(coords);
-					//System.out.println("drawing poly "+i+"...");
-					for( int j = 0; j < polygons.length; j++) {
-						g.drawPolygon(polygons[j]);
-					}
-				//}
+				//System.out.println("making poly "+i+"...");
+				Polygon[] polygons = Geometry.makePolys(coords);
+				//System.out.println("drawing poly "+i+"...");
+				for( int j = 0; j < polygons.length; j++) {
+					g.drawPolygon(polygons[j]);
+				}
 			}
 		}
 		if( Feature.outline_state && !MainFrame.mainframe.evolving) {
@@ -758,14 +756,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			System.out.println("drawing polys...");
 			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
 				double[][][] coords = outline.getValue();
-				//for( int i = 0; i < coords.length; i++) {
-					//System.out.println("making poly "+i+"...");
-					Polygon[] polygons = Geometry.makePolys(coords);
-					//System.out.println("drawing poly "+i+"...");
-					for( int j = 0; j < polygons.length; j++) {
-						g.drawPolygon(polygons[j]);
-					}
-				//}
+				//System.out.println("making poly "+i+"...");
+				Polygon[] polygons = Geometry.makePolys(coords);
+				//System.out.println("drawing poly "+i+"...");
+				for( int j = 0; j < polygons.length; j++) {
+					g.drawPolygon(polygons[j]);
+				}
 			}
 		}
 		if( Feature.outline_counties && !MainFrame.mainframe.evolving) {
@@ -774,14 +770,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			System.out.println("drawing polys...");
 			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
 				double[][][] coords = outline.getValue();
-				//for( int i = 0; i < coords.length; i++) {
-					//System.out.println("making poly "+i+"...");
-					Polygon[] polygons = Geometry.makePolys(coords);
-					//System.out.println("drawing poly "+i+"...");
-					for( int j = 0; j < polygons.length; j++) {
-						g.drawPolygon(polygons[j]);
-					}
-				//}
+				//System.out.println("making poly "+i+"...");
+				Polygon[] polygons = Geometry.makePolys(coords);
+				//System.out.println("drawing poly "+i+"...");
+				for( int j = 0; j < polygons.length; j++) {
+					g.drawPolygon(polygons[j]);
+				}
 			}
 		}
 
@@ -1477,13 +1471,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 				v2.add(e.vertex1);
 			}
-			/*
+			
 			System.out.println("v's:");
 			for( java.util.Map.Entry<Vertex,Vector<Vertex>> ve: connecting_vertexes.entrySet()) {
-				System.out.println("  "+ve.getKey()+": "+ve.getValue().size());
+				if( ve.getValue().size() == 2) {
+					continue;
+				}
+				//System.out.println("  "+ve.getKey()+": "+ve.getValue().size());
 			
 			}
-			*/
+			
 			
 			
 			//now start at a vertex and iterate through, collecting all polygons
@@ -1495,27 +1492,40 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				boolean valid = true;
 				while( true) {
 					vpolygon.add(v);
-					Vector<Vertex> vs = connecting_vertexes.remove(v);
+					Vector<Vertex> vs = connecting_vertexes.get(v);
 					if( vs == null) {
 						valid = false;
-						System.out.println("vertex not found!");
+						//System.out.println("vertex not found! "+v.id+" "+v.x+" "+v.y+" "+vpolygon.size());
 						break;
+					}
+					vs.remove(v);
+					if( vs.size() == 0) {
+						connecting_vertexes.remove(v);
 					}
 					Vertex next = null;
 					for( int i = 0; i < vs.size(); i++) {
 						if( vs.get(i) != v &&  vs.get(i) != null) {
 							next = vs.remove(i);
+							if( vs.size() == 0) {
+								connecting_vertexes.remove(v);
+							}
+							break;
 						}
 					}
 					//Vertex next = vs.remove(0);
 					v = next;
-					if( v == first_vertex || v == null) {
-						System.out.println("fully connected");
+					if( v == null) {
+						//System.out.println("is null "+vpolygon.size()+" "+v);
+						//valid = false;
+						break;
+					}
+					if( v == first_vertex) {
+						//System.out.println("fully connected "+vpolygon.size()+" "+v);
 						break;
 					}
 				}
 				//System.out.println("adding polygon "+vpolygons.size()+" length: "+vpolygon.size());
-				if( valid || true) {
+				if( valid) {
 					vpolygons.add(vpolygon);
 				}
 			}
