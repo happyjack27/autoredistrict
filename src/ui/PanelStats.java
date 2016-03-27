@@ -873,12 +873,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Settings.num_maps_to_draw = 1;
 		
 		boolean maplines = Feature.outline_vtds;
+		boolean outline_state = Feature.outline_state;
+		boolean outline_county = Feature.outline_counties;
 		boolean draw_labels = Feature.showDistrictLabels;
 		Feature.outline_vtds = outline;
+		Feature.outline_state = true;
+		Feature.outline_counties = false;
 		MapPanel.FSAA = 4;//Feature.outline_vtds ? 4 : 1;
 		
 		
 		///====begin insert
+		Feature.outline_districts = true;
 		Feature.showDistrictLabels = true;
 		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
@@ -896,14 +901,18 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
 		Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;			
+		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;			
+		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
 		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;			
+		Feature.outline_districts = false;
+
+		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;		
+		Feature.outline_counties = true;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_splits.png",res,res);
+		Feature.outline_counties = false;
 		System.out.println("4");
 	
 		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
@@ -913,15 +922,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		System.out.println("5");
 	
 	
+		Feature.outline_counties = true;
 		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
+		Feature.outline_counties = false;
 	
-	
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
 	
 		Feature.showDistrictLabels = draw_labels;
 		Feature.outline_vtds = maplines;
+		Feature.outline_counties = outline_county;
+		Feature.outline_state = outline_state;
 		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		Settings.num_maps_to_draw = num_maps_temp;
 		Feature.display_mode = display_mode_temp;
@@ -977,6 +987,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		exportMaps(write_folder,1024,true);
 	
 		System.out.println("6");
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
+		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+		System.out.println("7");
+	
+
 
 
 		String html = "";
