@@ -4897,25 +4897,35 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(chckbxmntmOutlineState);
 		
-		mntmOutlineDistricts = new JMenuItem("Outline districts");
+		mntmOutlineDistricts = new JCheckBoxMenuItem("Outline districts");
 		mntmOutlineDistricts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.outline_districts = mntmOutlineDistricts.isSelected();
-				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-
+				try {
+					Feature.outline_districts = mntmOutlineDistricts.isSelected();
+					MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+					mapPanel.invalidate();
+					mapPanel.repaint();
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
 			}
 		});
 		mnView.add(mntmOutlineDistricts);
 		
-		mntmOutlineCounties = new JMenuItem("Outline counties");
+		mntmOutlineCounties = new JCheckBoxMenuItem("Outline counties");
 		mntmOutlineCounties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.outline_counties = mntmOutlineCounties.isSelected();
-				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
-				mapPanel.invalidate();
-				mapPanel.repaint();
+				try {
+					Feature.outline_counties = mntmOutlineCounties.isSelected();
+					MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+					mapPanel.invalidate();
+					mapPanel.repaint();
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+
 
 			}
 		});
@@ -6368,8 +6378,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JLabel lblQuotaMethod;
 	public JSeparator separator_15;
 	public JCheckBoxMenuItem chckbxmntmOutlineState;
-	public JMenuItem mntmOutlineDistricts;
-	public JMenuItem mntmOutlineCounties;
+	public JCheckBoxMenuItem mntmOutlineDistricts;
+	public JCheckBoxMenuItem mntmOutlineCounties;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

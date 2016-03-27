@@ -738,17 +738,51 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         }
 		if( Feature.outline_districts && !MainFrame.mainframe.evolving) {
 			g.setColor(Color.BLACK);
-			/*
-			ecology.population.get(0).
-			for( int i = 0; i < geometry.polygons.length; i++) {
-
-				if( geometry.isDistrict && false) {
-					g.fillPolygon(geometry.polygons[i]);
-				} else {
-					g.drawPolygon(geometry.polygons[i]);
-				}
+			Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.district_column);
+			System.out.println("drawing polys...");
+			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+				double[][][] coords = outline.getValue();
+				//for( int i = 0; i < coords.length; i++) {
+					//System.out.println("making poly "+i+"...");
+					Polygon[] polygons = Geometry.makePolys(coords);
+					//System.out.println("drawing poly "+i+"...");
+					for( int j = 0; j < polygons.length; j++) {
+						g.drawPolygon(polygons[j]);
+					}
+				//}
 			}
-			*/
+		}
+		if( Feature.outline_state && !MainFrame.mainframe.evolving) {
+			g.setColor(Color.BLACK);
+			Hashtable<String,double[][][]> outlines = getOutlines("STATEFP10");
+			System.out.println("drawing polys...");
+			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+				double[][][] coords = outline.getValue();
+				//for( int i = 0; i < coords.length; i++) {
+					//System.out.println("making poly "+i+"...");
+					Polygon[] polygons = Geometry.makePolys(coords);
+					//System.out.println("drawing poly "+i+"...");
+					for( int j = 0; j < polygons.length; j++) {
+						g.drawPolygon(polygons[j]);
+					}
+				//}
+			}
+		}
+		if( Feature.outline_counties && !MainFrame.mainframe.evolving) {
+			g.setColor(Color.BLACK);
+			Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.county_column);
+			System.out.println("drawing polys...");
+			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+				double[][][] coords = outline.getValue();
+				//for( int i = 0; i < coords.length; i++) {
+					//System.out.println("making poly "+i+"...");
+					Polygon[] polygons = Geometry.makePolys(coords);
+					//System.out.println("drawing poly "+i+"...");
+					for( int j = 0; j < polygons.length; j++) {
+						g.drawPolygon(polygons[j]);
+					}
+				//}
+			}
 		}
 
         
@@ -1400,6 +1434,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		Hashtable<String,double[][][]> outlines = new Hashtable<String,double[][][]>();
 		Hashtable<String,Vector<Edge>> new_polys = new Hashtable<String,Vector<Edge>>();
 		
+		System.out.println("collecting edges ");
 		for( Feature f : features) {
 			String current_district = f.properties.get(key).toString();
 			Vector<Edge> outer_edges = new_polys.get(current_district);
@@ -1408,13 +1443,22 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				new_polys.put(current_district,outer_edges);
 			}
 			for(Edge e : f.edges) {
-				String s = e.otherFeature(f).feature.properties.get(key).toString();
+				String s = "hiu24-no match- 554af5";
+				Feature f0 = e.otherFeature(f);
+				if( f0 != null) {
+					s = e.otherFeature(f).feature.properties.get(key).toString();
+				}
 				if( !s.equals(current_district)) {
 					outer_edges.add(e);
 				}
 			}	
 		}
+		
+		System.out.println("making polygons  ");
+
 		for( java.util.Map.Entry<String, Vector<Edge>> entry : new_polys.entrySet()) {
+			String skey = entry.getKey();
+			System.out.println("processing key "+skey);
 		
 			//get all connecting vertexes
 			Hashtable<Vertex,Vector<Vertex>> connecting_vertexes = new Hashtable<Vertex,Vector<Vertex>>();
@@ -1429,10 +1473,18 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				Vector<Vertex> v2 = connecting_vertexes.get(e.vertex2);
 				if( v2 == null) {
 					v2 = new Vector<Vertex>();
-					connecting_vertexes.put(e.vertex1,v2);
+					connecting_vertexes.put(e.vertex2,v2);
 				}
 				v2.add(e.vertex1);
-			}	
+			}
+			/*
+			System.out.println("v's:");
+			for( java.util.Map.Entry<Vertex,Vector<Vertex>> ve: connecting_vertexes.entrySet()) {
+				System.out.println("  "+ve.getKey()+": "+ve.getValue().size());
+			
+			}
+			*/
+			
 			
 			//now start at a vertex and iterate through, collecting all polygons
 			Vector<Vector<Vertex>> vpolygons = new Vector<Vector<Vertex>>();
@@ -1440,21 +1492,35 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				Vector<Vertex> vpolygon = new Vector<Vertex>();
 				Vertex first_vertex = connecting_vertexes.keys().nextElement();
 				Vertex v = first_vertex;
+				boolean valid = true;
 				while( true) {
 					vpolygon.add(v);
 					Vector<Vertex> vs = connecting_vertexes.remove(v);
 					if( vs == null) {
+						valid = false;
 						System.out.println("vertex not found!");
 						break;
 					}
-					Vertex next = vs.remove(0);
+					Vertex next = null;
+					for( int i = 0; i < vs.size(); i++) {
+						if( vs.get(i) != v &&  vs.get(i) != null) {
+							next = vs.remove(i);
+						}
+					}
+					//Vertex next = vs.remove(0);
 					v = next;
-					if( v == first_vertex) {
+					if( v == first_vertex || v == null) {
+						System.out.println("fully connected");
 						break;
 					}
 				}
-				vpolygons.add(vpolygon);
+				//System.out.println("adding polygon "+vpolygons.size()+" length: "+vpolygon.size());
+				if( valid || true) {
+					vpolygons.add(vpolygon);
+				}
 			}
+			//System.out.println("done polygon "+vpolygons.size());
+
 			
 			//now convert to double[][][].
 			double[][][] polys = new double[vpolygons.size()][][];
@@ -1466,9 +1532,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					polys[i][j] = new double[]{v.x,v.y};
 				}
 			}
+			System.out.println("done2 polygon "+vpolygons.size());
+
 			outlines.put(entry.getKey(),polys);
 		}
-		
+		System.out.println("done gathering outlines...");
+
 		return outlines;
 	}
 }
