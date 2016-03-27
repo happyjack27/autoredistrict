@@ -356,7 +356,10 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		}
-		
+		if(command.equals("EXIT")) {
+			addHistory("EXIT");
+			System.exit(0);
+		} else		
 		if( command.equals("LOAD")) {
 			Download.prompt = false;
 			Download.cyear = 2010;
@@ -452,6 +455,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		//instruction select statement
 		//LOAD,SET,GO,STOP,WHEN,SAVE,EXPORT,EXIT
 		if(command.equals("EXIT")) {
+			addHistory("EXIT");
 			System.exit(0);
 		} else		
 		if( command.equals("SET") && instruction_words.length > 3 && instruction_words[1].equals("ELECTION")  && instruction_words[2].equals("COLUMNS")) {

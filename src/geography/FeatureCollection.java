@@ -80,7 +80,15 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public void rescaleElections() {
 		MainFrame.mainframe.ip.addHistory("RESCALE ELECTIONS");
-		double tot = 0;
+		double dm = 63424648.0/65915796.0;
+		double rm = 63424648.0/60933500.0;
+		double tot_dm = getColumnTotal("PRES12_DEM")*dm;
+		double tot_rm = getColumnTotal("PRES12_REP")*rm;
+		rescaleFeature("PRES12_D50",""+tot_dm,null,null);
+		rescaleFeature("PRES12_R50",""+tot_rm,null,null);
+		/*
+		double tot_rm = 0;
+		double tots = 0;
 		Vector<String> cls = MainFrame.mainframe.project.election_columns;
 		for( int i = 0; i < cls.size(); i++) {
 			tot += getColumnTotal(cls.get(i));
@@ -88,7 +96,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		tot /= cls.size();
 		for( int i = 0; i < cls.size(); i++) {
 			rescaleFeature(cls.get(i),""+tot,null,null);
-		}
+		}*/
 	}
 	public double getColumnTotal(String dest) {
 		double tot = 0;
@@ -147,7 +155,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public void copyFeature(String source, String dest) {
 		MainFrame.mainframe.ip.addHistory("COPY FEATURE "+source+" "+dest);
 		for( Feature feat : features) {
-			feat.properties.put(dest,feat.properties.get(source));
+			try {
+				feat.properties.put(dest,feat.properties.get(source));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				feat.properties.put(dest,"");	
+			}
 		}
 	}
 	public void addFeature(String dest) {
@@ -440,6 +453,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				String county = f.properties.get(county_column).toString();
 				int[] ii = counties.get(county);
 				if( ii == null) {
+					/*
+					int red = f.geometry.fillColor.getRed();
+					int gre = f.geometry.fillColor.getGreen();
+					int blu = f.geometry.fillColor.getBlue();
+					f.geometry.fillColor = new Color((red+256)/3,(gre+256)/3,(blu+256)/3);
+					*/
 					f.geometry.fillColor = DEFAULT_COLOR;
 				}
 			}

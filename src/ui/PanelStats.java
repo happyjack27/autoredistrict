@@ -867,15 +867,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		getStats();
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
-	public void exportMaps(String write_folder, int res) {
+	public void exportMaps(String write_folder, int res,boolean outline) {
 		int num_maps_temp = Settings.num_maps_to_draw;
 		int display_mode_temp = Feature.display_mode;
 		Settings.num_maps_to_draw = 1;
 		
 		boolean maplines = Feature.outline_vtds;
 		boolean draw_labels = Feature.showDistrictLabels;
-		Feature.outline_vtds = true;
-		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
+		Feature.outline_vtds = outline;
+		MapPanel.FSAA = 4;//Feature.outline_vtds ? 4 : 1;
 		
 		
 		///====begin insert
@@ -942,7 +942,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			f.geometry.makePolysFull();
 			f.geometry.makePolys();
 		}
-		exportMaps(write_folder,1024);
+		exportMaps(write_folder,1024,false);
 		Settings.national_map = t;
 		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
 			f.geometry.makePolysFull();
@@ -974,7 +974,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
 		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
 
-		exportMaps(write_folder,1024);
+		exportMaps(write_folder,1024,true);
 	
 		System.out.println("6");
 

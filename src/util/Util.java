@@ -11,7 +11,23 @@ import java.util.Map.Entry;
 import ui.Download;
 
 public class Util {
-	
+	/*
+	 Minnesota
+Illinois
+Ohio
+Louisianna
+Texas
+Maine
+California
+Florida
+South Dakota
+Vermount
+Maryland
+Masschtuses
+Nevada
+New Mexico
+	 * 
+	 */
 
 	public static void mergeTransparentImages(String path, String column, String image_name, int width, int height, String separator) {
 		System.out.println("<?php ");
@@ -283,7 +299,7 @@ public class Util {
 					//|| state.equals("Rhode Island")
 					//|| state.equals("Kentucky")
 					) {
-				//continue;
+				continue;
 			}
 			
 			if( true
@@ -317,38 +333,28 @@ public class Util {
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			
+			
 			/*
+			sb.append("MERGE\n");
+			sb.append("IMPORT COUNTY\n");
+			
 			for( int j = 0; j < states_vtd.length; j++) {
 				if( states_vtd[j].equals(Download.states[i])) {
 					sb.append("IMPORT ELECTIONS\n");
 					sb.append("SAVE\n");
 					break;
 				}
-			}*/
+			}
 			
-			//sb.append("MERGE\n");
-			//sb.append("SAVE\n");
-			//sb.append("EXIT\n");
-			/*
-			sb.append("IMPORT BDISTRICTING\n");
-			sb.append("SAVE\n");
-			sb.append("IMPORT CURRENT_DISTRICTS\n");
-			sb.append("SAVE\n");
-			*/
-
 			
-			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
-			//sb.append("IMPORT POPULATION\n");
-			//sb.append("IMPORT CURRENT_DISTRICTS\n");
 			//sb.append("IMPORT BDISTRICTING\n");
-			//sb.append("SAVE");
-			
-			//sb.append("SET ELECTION COLUMNS PRES12_DEM PRES12_REP\n");
+			//sb.append("IMPORT CURRENT_DISTRICTS\n");
+			*/
 			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
 			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("RESCALE ELECTIONS\n");
-			sb.append("SAVE\n");
+			//sb.append("SAVE\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
@@ -371,6 +377,7 @@ public class Util {
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("EXPORT NATIONAL\n");
 
+			/*
 			if( Download.apportionments[i] <= 5) {
 				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
 			} else {
@@ -382,9 +389,10 @@ public class Util {
 			} else {
 				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			}
-			sb.append("EXPORT NATIONAL\n");
+			sb.append("EXPORT\n");
+			*/
 			//sb.append("SAVE\n");
-			sb.append("EXIT\n");
+			sb.append("EXIT\nEXIT\n\n");
 /*
 			if( false
 					|| Download.apportionments[i] <= 7  //6=3+3,8=5+3
@@ -445,7 +453,7 @@ public class Util {
 
 
 	public static void main(String[] args) {
-		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 2048, 2048, "/");
+		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 1024, 1024, "/");
 		mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
 
 		//"http://localhost:8888/autoredistrict"
@@ -748,6 +756,11 @@ public class Util {
 		if( tie) {
 			return null;
 		}
+		//max 6 changes, 1/4.
+		if( ibest > 6 || ibest > sbest.length()/4) {
+			return null;
+		}
+		System.out.println("matched "+source_string+" to "+sbest);
 		return new Triplet<String,Feature,Integer>(sbest,obest,ibest);
 	}
 }

@@ -7039,6 +7039,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportDemographics extends Thread {
 		Thread nextThread = null;
 		public void run() {
+			if( true)
+				return;
 			dlbl.setText("Importing demographics...");
 
 			String state = Download.states[Download.istate];
