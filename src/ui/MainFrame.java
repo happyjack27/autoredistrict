@@ -1588,8 +1588,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenu mnWindows = new JMenu("Windows");
 	public JButton btnElection2Columns = new JButton("Election 2 columns");
 	public JCheckBox chckbxSecondElection = new JCheckBox("Second election");
-	public JCheckBox chckbxThirdElection;
-	public JButton btnElection3Columns;
 	public JMenuItem mntmPublicMappingProject;
 	public JPanel panel_5;
 	public JLabel srlblSplitReduction;
@@ -3472,7 +3470,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	
 	public void setSubstituteColumns() {
-		int max = chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
+		int max = 1;//chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
 		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2, FeatureCollection.buncontested3};
 		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.election_columns, project.election_columns_2, project.election_columns_3};
 		
@@ -3596,85 +3594,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		if( is_evolving) { featureCollection.ecology.startEvolving(); }
 	}
-	public void selectLayers2() {
-		boolean is_evolving = this.evolving;
-		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
-		setDistrictColumn(project.district_column);
-		//featureCollection.loadDistrictsFromProperties(project.district_column);
-		DialogSelectLayers dlg = new DialogSelectLayers();
-		dlg.setData(featureCollection,project.election_columns_2);
-		dlg.show();
-		if( !dlg.ok) {
-			if( is_evolving) { featureCollection.ecology.startEvolving(); }
-			return;
-		}
-		
-
-		try {
-			project.election_columns_2 = dlg.in;
-			if( project.election_columns_2.size() != project.election_columns.size()) {
-				JOptionPane.showMessageDialog(mainframe, "Election columns and second election columns must match one-to-one.");
-				chckbxSecondElection.doClick();//.setSelected(false);
-				//remove from demographics
-			} else {
-				//set as demographics
-				setElectionColumns2();
-			}
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
-		//mntmShowDemographics.setSelected(true);
-		//Feature.display_mode = 1;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		
-		if( is_evolving) { featureCollection.ecology.startEvolving(); }
-	}
 	public void setMaxElections() {
-		int imax = chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
+		int imax = 1;//chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
 		for( Feature f : featureCollection.features) {
 			while( f.elections.size() > imax) {
 				f.elections.remove(imax-1);//.add(new Vector<Demographic>());
 			}
 			f.resetOutcomes();
 		}
-	}
-	
-	public void selectLayers3() {
-		boolean is_evolving = this.evolving;
-		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
-		setDistrictColumn(project.district_column);
-		//featureCollection.loadDistrictsFromProperties(project.district_column);
-		DialogSelectLayers dlg = new DialogSelectLayers();
-		dlg.setData(featureCollection,project.election_columns_3);
-		dlg.show();
-		if( !dlg.ok) {
-			if( is_evolving) { featureCollection.ecology.startEvolving(); }
-			return;
-		}
-		
-
-		try {
-			project.election_columns_3 = dlg.in;
-			if( project.election_columns_3.size() != project.election_columns.size()) {
-				JOptionPane.showMessageDialog(mainframe, "Election columns and second election columns must match one-to-one.");
-				chckbxThirdElection.doClick();//.setSelected(false);
-				//remove from demographics
-			} else {
-				//set as demographics
-				setElectionColumns3();
-			}
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
-		//mntmShowDemographics.setSelected(true);
-		//Feature.display_mode = 1;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		
-		if( is_evolving) { featureCollection.ecology.startEvolving(); }
 	}
 	
 	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
@@ -4157,8 +4084,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 		separator_7 = new JSeparator();
 		mnWindows = new JMenu("Windows");
-		btnElection2Columns = new JButton("Election 2 columns");
-		chckbxSecondElection = new JCheckBox("Second election");
 		
 		
 		//========CONTAINERS
@@ -5921,78 +5846,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		chckbxSubstituteColumns.setBounds(6, 439, 178, 23);
 		panel.add(chckbxSubstituteColumns);
-		btnElection2Columns.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectLayers2();
-			}
-		});
-		btnElection2Columns.setEnabled(false);
-		btnElection2Columns.setBounds(7, 333, 184, 23);
-		
-		panel.add(btnElection2Columns);
-		chckbxSecondElection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean b = chckbxSecondElection.isSelected();
-				if( b && false) {
-					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
-					chckbxSecondElection.setSelected(false);
-					return;
-				}
-				btnElection2Columns.setEnabled(b);
-				chckbxThirdElection.setEnabled(b);
-				//Settings.substitute_uncontested = b;
-				if( b) {
-					if( project.election_columns == null || project.election_columns.size() < 1) {
-						JOptionPane.showMessageDialog(mainframe, "Must select election columns first.");
-						chckbxSecondElection.doClick();
-					} else {
-						btnElection2Columns.doClick();
-					}
-				} else {
-					setMaxElections();					
-				}
-			}
-		});
-		chckbxSecondElection.setBounds(6, 301, 178, 23);
-		
-		panel.add(chckbxSecondElection);
-		
-		chckbxThirdElection = new JCheckBox("Third election");
-		chckbxThirdElection.setEnabled(false);
-		chckbxThirdElection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				boolean b = chckbxThirdElection.isSelected();
-				if( b && false) {
-					JOptionPane.showMessageDialog(mainframe, "Not implemented.");
-					chckbxThirdElection.setSelected(false);
-					return;
-				}
-				btnElection3Columns.setEnabled(b);
-				//Settings.substitute_uncontested = b;
-				if( b) {
-					if( project.election_columns_2 == null || project.election_columns_2.size() < 1) {
-						JOptionPane.showMessageDialog(mainframe, "Must select second election columns first.");
-						chckbxThirdElection.doClick();
-					} else {
-						btnElection3Columns.doClick();
-					}
-				} else {
-					setMaxElections();					
-				}
-			}
-		});
-		chckbxThirdElection.setBounds(6, 373, 178, 23);
-		panel.add(chckbxThirdElection);
-		
-		btnElection3Columns = new JButton("Election 3 columns");
-		btnElection3Columns.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				selectLayers3();
-			}
-		});
-		btnElection3Columns.setEnabled(false);
-		btnElection3Columns.setBounds(7, 405, 184, 23);
-		panel.add(btnElection3Columns);
 		
 		panel_5 = new JPanel();
 		panel_5.setBounds(200, 397, 200, 252);
@@ -6286,16 +6139,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		comboBoxQuota.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String s = (String) comboBoxQuota.getSelectedItem();
-				if( s.equals("STV")) { 
-					Settings.quota_method = Settings.QUOTA_METHOD_STV;
+				if( s.equals("DROOP")) { 
+					Settings.quota_method = Settings.QUOTA_METHOD_DROOP;
 				} else {
-					Settings.quota_method = Settings.QUOTA_METHOD_PARTY;
+					Settings.quota_method = Settings.QUOTA_METHOD_HARE;
 				}
 			}
 		});
 		comboBoxQuota.setBounds(52, 178, 136, 27);
-		comboBoxQuota.addItem("PARTY LIST");
-		comboBoxQuota.addItem("STV");
+		comboBoxQuota.addItem("DROOP");
+		comboBoxQuota.addItem("HARE");
 		panel.add(comboBoxQuota);
 		
 		lblQuotaMethod = new JLabel("Quota");

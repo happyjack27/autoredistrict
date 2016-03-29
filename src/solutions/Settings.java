@@ -244,9 +244,9 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static boolean minimize_absolute_deviation = false;
 	public static boolean hush_mutate_rate = false;
 	public static double fv_pvi_adjust = -0.0385;
-	public static int QUOTA_METHOD_STV = 1;
-	public static int QUOTA_METHOD_PARTY = 1;
-	public static int quota_method = QUOTA_METHOD_STV;
+	public static int QUOTA_METHOD_DROOP = 1;
+	public static int QUOTA_METHOD_HARE = 2;
+	public static int quota_method = QUOTA_METHOD_DROOP;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

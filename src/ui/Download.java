@@ -8,7 +8,7 @@ import java.util.zip.*;
 
 import javax.swing.*;
 
-import util.BiMap;
+import util.*;
 
 //http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
 //http://www.census.gov/geo/maps-data/data/baf_description.html description
@@ -523,6 +523,9 @@ public class Download extends Thread {
 	
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
 		try {
+			if( url.indexOf("ftp:") == 0) {
+				return FTPDownload.download(url, dest_path+dest_name);
+			}
 		System.out.println("downloading:");
 		System.out.println("url :"+url);
 		System.out.println("path:"+dest_path);

@@ -16,13 +16,13 @@ public class FTPDownload {
 	public static void main(String[] args) {
 		resume(test,"C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\test2.zip",0);
 	}
-	public static void download(String surl, String dest_file) {
+	public static boolean download(String surl, String dest_file) {
 		long last = 0;
 		for( int i = 0; i < 32; i++) {
 			try {
 				long[] dd = resume(surl,dest_file,last);
 				if( dd[0] == dd[1] && dd[1] > 0) {
-					return;
+					return true;
 				}
 				last = dd[0];
 				Logd("Connection interrupted, resuming... "+i+" / 32");
@@ -30,6 +30,7 @@ public class FTPDownload {
 				ex.printStackTrace();
 			}
 		}
+		return false;
 	}
 	public static long[] resume(String surl, String dest_file, long start_at) {
 		Logd("url: "+surl);

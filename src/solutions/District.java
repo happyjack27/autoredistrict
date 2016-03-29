@@ -498,7 +498,7 @@ public class District extends JSONObject {
 	}
 
 	public static double[] popular_vote_to_elected(double[] ds, int i) {
-		if( Settings.quota_method == Settings.QUOTA_METHOD_STV) {
+		if( Settings.quota_method == Settings.QUOTA_METHOD_DROOP) {
 			return popular_vote_to_elected_droop(ds,i);
 		}
 		double[] res = new double[ds.length];
@@ -543,16 +543,36 @@ public class District extends JSONObject {
 	public static double[] popular_vote_to_elected_droop(double[] ds, int i) {
 		double pct_d = ds[0]/(ds[0]+ds[1]);
 		double seats = Settings.seats_in_district(i);
-		double safe_d = Math.floor((pct_d-0.08)*(seats+1));
+		double safe_d = Math.floor((pct_d)*(seats+1.0));
+		double safe_r = Math.floor((1.0-pct_d)*(seats+1.0));
+		if( safe_d+safe_r > seats) {
+			if( safe_d > safe_r) {
+				safe_d--;
+			} else {
+				safe_r--;
+			}
+		}
+		if( safe_d+safe_r == seats) {
+			return new double[]{safe_d,safe_r};
+		}
+		double reaminder_d = pct_d-safe_d*(1/(seats+1.0));
+		double reaminder_r = (1-pct_d)-safe_r*(1/(seats+1.0));
 
+		if( reaminder_d > reaminder_r) {
+			safe_d++;
+		} else {
+			safe_r++;
+		}
+		/*
 		double threshold_d = Math.round((seats+1)*pct_d)/(seats+1);
 		double remainder_d = pct_d-threshold_d;
 		
-		if( remainder_d >= 0) {
+		if( remainder_d < 0) {
 			safe_d++;
 		}
 
 		double safe_r = seats - safe_d;
+		*/
 
 		return new double[]{safe_d,safe_r};
 	}
