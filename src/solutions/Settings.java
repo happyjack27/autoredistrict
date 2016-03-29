@@ -1,5 +1,7 @@
 package solutions;
 
+import geography.Feature;
+
 import java.util.Vector;
 
 import serialization.JSONObject;
@@ -7,7 +9,7 @@ import ui.MainFrame;
 
 public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	
-	public static boolean national_map = true;
+	public static boolean national_map = false;
 	public static double uncontested_threshold = 0.02;
 	public static int num_maps_to_draw = 1;
 	public static boolean use_annealing_floor = true;
@@ -325,5 +327,15 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			//System.out.println("s5: "+s5+" s4: "+s4+" s3: "+s3+" tot: "+tot+" totseat: "+totseat);
 		}
 		return getSeatDistribution_cached;
+	}
+	public static void setNationalMap(boolean national) {
+		national_map = national;
+		MainFrame.mainframe.getMinMaxXY();
+		MainFrame.mainframe.resetZoom();
+		for( Feature f : MainFrame.mainframe.featureCollection.features) {
+			f.geometry.makePolys();
+		}
+		MainFrame.mainframe.mapPanel.invalidate();
+		MainFrame.mainframe.mapPanel.repaint();
 	}
 }

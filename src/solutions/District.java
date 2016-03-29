@@ -498,6 +498,9 @@ public class District extends JSONObject {
 	}
 
 	public static double[] popular_vote_to_elected(double[] ds, int i) {
+		if( Settings.quota_method == Settings.QUOTA_METHOD_STV) {
+			return popular_vote_to_elected_droop(ds,i);
+		}
 		double[] res = new double[ds.length];
 		for( int j = 0; j < res.length; j++) {
 			res[j] = 0;
@@ -534,6 +537,24 @@ public class District extends JSONObject {
 			res[n]++;
 		}
 		return res;
+	}
+	
+
+	public static double[] popular_vote_to_elected_droop(double[] ds, int i) {
+		double pct_d = ds[0]/(ds[0]+ds[1]);
+		double seats = Settings.seats_in_district(i);
+		double safe_d = Math.floor((pct_d-0.08)*(seats+1));
+
+		double threshold_d = Math.round((seats+1)*pct_d)/(seats+1);
+		double remainder_d = pct_d-threshold_d;
+		
+		if( remainder_d >= 0) {
+			safe_d++;
+		}
+
+		double safe_r = seats - safe_d;
+
+		return new double[]{safe_d,safe_r};
 	}
 
 	public static double[] popular_vote_to_FV_stats(double[] ds, int i) {

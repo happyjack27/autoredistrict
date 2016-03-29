@@ -40,6 +40,9 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 		if( shiftx != shiftx) shiftx = 0;
 		if( shifty != shifty) shifty = 0;
 		
+		//System.out.println("makepolys s "+shiftx+" "+shiftx);
+		//System.out.println("makepolys r "+scalex+" "+scalex);
+		
 		int[] xpolys;
 		int[] ypolys;
 		

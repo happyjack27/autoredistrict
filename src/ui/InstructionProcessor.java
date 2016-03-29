@@ -320,6 +320,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 	@Override
 	public void eventOccured() {
+		System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
@@ -329,6 +330,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		//System.out.println("eventOccured");
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
 			lblFinished.setVisible(true);
 			return;
 		}
@@ -337,6 +339,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
+		System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION PROCESS: "+current_instruction);
+
 		//System.out.println("processing "+current_instruction);
 		String[] instruction_words = current_instruction.split(" ");
 		for( int i = 0; i < instruction_words.length; i++) {
@@ -398,8 +402,19 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("RESCALE") && instruction_words[1].equals("ELECTIONS")) {
 			MainFrame.mainframe.featureCollection.rescaleElections();
 		}
+		//importURL(String url, String fk, String pk, String[] cols) {
 		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
 			mainFrame.importBlockBdistricting();
+		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("URL")) {
+			String url = instruction_words[2];
+			String fk = instruction_words[3];
+			String pk = instruction_words[4];
+			String[] cols = new String[instruction_words.length-5];
+			for( int i = 0; i < cols.length; i++) {
+				cols[i] = instruction_words[i+5];
+			}
+			mainFrame.importURL( url,  fk,  pk, cols);
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
 			mainFrame.importBlockElection();
@@ -506,15 +521,18 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
 		} else
 		if(command.equals("EXPORT")) {
-			if( instruction_words[1].equals("NATIONAL")) {
-				mainFrame.panelStats.exportTransparent();
-			} else
-			if( instruction_words[1].equals("BLOCKS")) {
-				
+			if( instruction_words.length> 1) {
+				if( instruction_words[1].equals("NATIONAL")) {
+					mainFrame.panelStats.exportTransparent();
+				} else
+				if( instruction_words[1].equals("BLOCKS")) {
+						
+				} else
+				if( instruction_words[1].equals("STATS")) {
+					mainFrame.panelStats.exportToHtml();					
+				} 
 			} else {
-				for(ActionListener a: mainFrame.panelStats.btnNewButton.getActionListeners()) {
-				    a.actionPerformed(new ActionEvent(mainFrame.panelStats.btnNewButton, 0, ""));
-				}
+				mainFrame.panelStats.exportToHtml();
 			}
 		} else
 		if(command.equals("WHEN")) {

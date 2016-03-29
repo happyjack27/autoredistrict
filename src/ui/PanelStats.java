@@ -72,9 +72,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		 */
 	}
 	public void saveAsPng2(JComponent component, String path, int width, int height) {
+		System.out.println("saveAsPng2 mode "+Feature.display_mode+" "+Settings.national_map+" "+Feature.outline_vtds);
 		String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
         Dimension d = component.getSize();
-        
+        MainFrame.mainframe.mapPanel.invalidate();
+        MainFrame.mainframe.mapPanel.repaint();
         if( true) {
         	component.setSize(width,height);
         	component.doLayout();
@@ -83,6 +85,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         	width = d.width;
         	height = d.height;
         }
+        MainFrame.mainframe.mapPanel.invalidate();
+        MainFrame.mainframe.mapPanel.repaint();
         //BufferedImage.TYPE_INT_ARGB
         
 		BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
@@ -108,11 +112,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
         MainFrame.mainframe.resetZoom();
         
-        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+        //component.invalidate();
+        //component.repaint();
         component.paint(graphics1);
-        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+        //component.invalidate();
         component.print(graphics1);
-        try { Thread.sleep(200); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+        component.print(graphics1);
+        try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
         graphics2.drawImage(image1,0,0,width/2,height/2,null);
         graphics4.drawImage(image2,0,0,width/4,height/4,null);
  
@@ -734,14 +743,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		});
 		button_2.setBounds(728, 143, 89, 23);
 		add(button_2);
-		btnNewButton.addActionListener(new ActionListener() {
+		toHTMLButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exportToHtml();
 			}
 		});
-		btnNewButton.setBounds(89, 8, 117, 29);
+		toHTMLButton.setBounds(89, 8, 117, 29);
 		
-		add(btnNewButton);
+		add(toHTMLButton);
 	}
 	public FeatureCollection featureCollection;
 	private JTable districtsTable;
@@ -758,7 +767,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JScrollPane scrollPane_3;
 	public JButton button_2;
 	public JTable ethnicityTable;
-	public final JButton btnNewButton = new JButton("to html");
+	public final JButton toHTMLButton = new JButton("to html");
 	
 	public void saveURL(final String filename, final URL url) {
 	    BufferedInputStream in = null;
@@ -876,11 +885,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		boolean outline_state = Feature.outline_state;
 		boolean outline_county = Feature.outline_counties;
 		boolean draw_labels = Feature.showDistrictLabels;
-		Feature.outline_vtds = outline;
+		Feature.outline_vtds = false;//outline;
 		Feature.outline_state = true;
 		Feature.outline_counties = false;
 		MapPanel.FSAA = 4;//Feature.outline_vtds ? 4 : 1;
-		
 		
 		///====begin insert
 		Feature.outline_districts = true;
@@ -947,21 +955,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		boolean t = Settings.national_map;
 		
-		Settings.national_map = true;
-		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
-			f.geometry.makePolysFull();
-			f.geometry.makePolys();
-		}
-		exportMaps(write_folder,1024,false);
-		Settings.national_map = t;
-		for( Feature f : MainFrame.mainframe.featureCollection.features ) {
-			f.geometry.makePolysFull();
-			f.geometry.makePolys();
-		}
+		Settings.setNationalMap( true);
 		
+		exportMaps(write_folder,1024,false);
+
+		Settings.setNationalMap( t);
 	}
 	public void exportToHtml() {
 		System.out.println("1");
+		boolean national = Settings.national_map;
+		Settings.setNationalMap(false);
 		MainFrame.mainframe.ip.addHistory("EXPORT HTML");
 
 		String partiesStr = getAsHtml(partiesTable);
@@ -1094,6 +1097,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		excel.ExportThread thread = new excel.ExportThread();
 		thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
 		*/
+		
+		Settings.setNationalMap(national);
 	}
 	
 	public static double[] getSeats(double pct_d, double seats) {

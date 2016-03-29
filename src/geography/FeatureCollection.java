@@ -344,6 +344,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		//dlonlat = Math.cos((lat0+lat1)/2);
 		dlonlat = Math.cos((Math.toRadians(lat0)+Math.toRadians(lat1))/2.0);
+		//System.out.println("dlonlat: "+dlonlat);
 
 		//dlonlat = 1.0/Math.cos(Math.toRadians((lat0+lat1)/2.0));
 		double x0 = lon0 * dlonlat;
@@ -737,45 +738,81 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         	f.draw(g);
         }
 		if( Feature.outline_districts && !MainFrame.mainframe.evolving) {
-			g.setColor(Color.BLACK);
-			Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.district_column);
-			System.out.println("drawing polys...");
-			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
-				double[][][] coords = outline.getValue();
-				//System.out.println("making poly "+i+"...");
-				Polygon[] polygons = Geometry.makePolys(coords);
-				//System.out.println("drawing poly "+i+"...");
-				for( int j = 0; j < polygons.length; j++) {
-					g.drawPolygon(polygons[j]);
+			try {
+				g.setColor(Color.BLACK);
+				Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.district_column);
+				Stroke str = ((Graphics2D)g).getStroke();
+				if( !Settings.national_map) {
+					((Graphics2D)g).setStroke(new BasicStroke(2));
 				}
+				for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+					try {
+						double[][][] coords = outline.getValue();
+						Polygon[] polygons = Geometry.makePolys(coords);
+						for( int j = 0; j < polygons.length; j++) {
+							g.drawPolygon(polygons[j]);
+						}
+					} catch (Exception ex) {
+						System.out.println("ex outline districts "+ex);
+						ex.printStackTrace();
+					}
+				}
+				((Graphics2D)g).setStroke(str);
+			} catch (Exception ex) {
+				System.out.println("ex2 outline districts "+ex);
+				ex.printStackTrace();
 			}
 		}
 		if( Feature.outline_state && !MainFrame.mainframe.evolving) {
-			g.setColor(Color.BLACK);
-			Hashtable<String,double[][][]> outlines = getOutlines("STATEFP10");
-			System.out.println("drawing polys...");
-			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
-				double[][][] coords = outline.getValue();
-				//System.out.println("making poly "+i+"...");
-				Polygon[] polygons = Geometry.makePolys(coords);
-				//System.out.println("drawing poly "+i+"...");
-				for( int j = 0; j < polygons.length; j++) {
-					g.drawPolygon(polygons[j]);
+			try {
+				g.setColor(Color.BLACK);
+				Hashtable<String,double[][][]> outlines = getOutlines("STATEFP10");
+				Stroke str = ((Graphics2D)g).getStroke();
+				if( !Settings.national_map) {
+					((Graphics2D)g).setStroke(new BasicStroke(4));
+				} else {
+					((Graphics2D)g).setStroke(new BasicStroke(3));
 				}
+				//System.out.println("drawing polys...");
+				for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+					try {
+						double[][][] coords = outline.getValue();
+						Polygon[] polygons = Geometry.makePolys(coords);
+						for( int j = 0; j < polygons.length; j++) {
+							g.drawPolygon(polygons[j]);
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				((Graphics2D)g).setStroke(str);
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 		if( Feature.outline_counties && !MainFrame.mainframe.evolving) {
-			g.setColor(Color.BLACK);
-			Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.county_column);
-			System.out.println("drawing polys...");
-			for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
-				double[][][] coords = outline.getValue();
-				//System.out.println("making poly "+i+"...");
-				Polygon[] polygons = Geometry.makePolys(coords);
-				//System.out.println("drawing poly "+i+"...");
-				for( int j = 0; j < polygons.length; j++) {
-					g.drawPolygon(polygons[j]);
+			try {
+				g.setColor(Color.BLACK);
+				Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.county_column);
+				Stroke str = ((Graphics2D)g).getStroke();
+				if( !Settings.national_map) {
+					((Graphics2D)g).setStroke(new BasicStroke(2));
 				}
+				//System.out.println("drawing polys...");
+				for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+					try {
+						double[][][] coords = outline.getValue();
+						Polygon[] polygons = Geometry.makePolys(coords);
+						for( int j = 0; j < polygons.length; j++) {
+							g.drawPolygon(polygons[j]);
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+				((Graphics2D)g).setStroke(str);
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
 		}
 
@@ -1428,7 +1465,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		Hashtable<String,double[][][]> outlines = new Hashtable<String,double[][][]>();
 		Hashtable<String,Vector<Edge>> new_polys = new Hashtable<String,Vector<Edge>>();
 		
-		System.out.println("collecting edges ");
+		//System.out.println("collecting edges ");
 		for( Feature f : features) {
 			String current_district = f.properties.get(key).toString();
 			Vector<Edge> outer_edges = new_polys.get(current_district);
@@ -1448,11 +1485,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}	
 		}
 		
-		System.out.println("making polygons  ");
+		//System.out.println("making polygons  ");
 
 		for( java.util.Map.Entry<String, Vector<Edge>> entry : new_polys.entrySet()) {
 			String skey = entry.getKey();
-			System.out.println("processing key "+skey);
+			//System.out.println("processing key "+skey);
 		
 			//get all connecting vertexes
 			Hashtable<Vertex,Vector<Vertex>> connecting_vertexes = new Hashtable<Vertex,Vector<Vertex>>();
@@ -1472,7 +1509,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				v2.add(e.vertex1);
 			}
 			
-			System.out.println("v's:");
+			/*System.out.println("v's:");
 			for( java.util.Map.Entry<Vertex,Vector<Vertex>> ve: connecting_vertexes.entrySet()) {
 				if( ve.getValue().size() == 2) {
 					continue;
@@ -1480,8 +1517,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				//System.out.println("  "+ve.getKey()+": "+ve.getValue().size());
 			
 			}
-			
-			
+			*/
 			
 			//now start at a vertex and iterate through, collecting all polygons
 			Vector<Vector<Vertex>> vpolygons = new Vector<Vector<Vertex>>();
@@ -1542,11 +1578,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					polys[i][j] = new double[]{v.x,v.y};
 				}
 			}
-			System.out.println("done2 polygon "+vpolygons.size());
+			//System.out.println("done2 polygon "+vpolygons.size());
 
 			outlines.put(entry.getKey(),polys);
 		}
-		System.out.println("done gathering outlines...");
+		//System.out.println("done gathering outlines...");
 
 		return outlines;
 	}

@@ -292,9 +292,11 @@ New Mexico
 			if( false
 					//|| state.equals("Alaska")
 					//|| state.equals("California")
-					|| state.equals("Texas")
-					|| state.equals("Florida")
-					|| state.equals("California")
+					//|| state.equals("Texas")
+					//|| state.equals("Florida")
+					//|| state.equals("California")
+					|| state.equals("Illinois")
+					|| state.equals("Oklahoma")
 					//|| state.equals("Louisianna")
 					//|| state.equals("Rhode Island")
 					//|| state.equals("Kentucky")
@@ -354,6 +356,7 @@ New Mexico
 			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("RESCALE ELECTIONS\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			//sb.append("SAVE\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
@@ -370,14 +373,17 @@ New Mexico
 			
 			
 			sb.append("SET DISTRICTS COLUMN CD_BD\n");
-			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("SET DISTRICTS SEATS_PER_DISTRICT 1\n");
+			//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("EXPORT\n");
 			sb.append("EXPORT NATIONAL\n");
 
 			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
-			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("EXPORT\n");
 			sb.append("EXPORT NATIONAL\n");
 
-			/*
+			
 			if( Download.apportionments[i] <= 5) {
 				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
 			} else {
@@ -390,7 +396,8 @@ New Mexico
 				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
 			}
 			sb.append("EXPORT\n");
-			*/
+			sb.append("EXPORT NATIONAL\n");
+			
 			//sb.append("SAVE\n");
 			sb.append("EXIT\nEXIT\n\n");
 /*
@@ -454,12 +461,12 @@ New Mexico
 
 	public static void main(String[] args) {
 		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 1024, 1024, "/");
-		mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
+		//mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
 
 		//"http://localhost:8888/autoredistrict"
 		//sfds
 		//writeHTML();
-		//make_scripts();
+		make_scripts();
 		//processVTD();
 		System.exit(0);
 		

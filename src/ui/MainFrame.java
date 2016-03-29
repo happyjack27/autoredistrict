@@ -4881,6 +4881,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
+		chckbxmntmFitToNation = new JCheckBoxMenuItem("Fit to nation");
+		chckbxmntmFitToNation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.setNationalMap(chckbxmntmFitToNation.isSelected());
+
+			}
+		});
+		mnView.add(chckbxmntmFitToNation);
+		
 		separator_15 = new JSeparator();
 		mnView.add(separator_15);
 		mnView.add(chckbxmntmHideMapLines);
@@ -6380,6 +6389,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem chckbxmntmOutlineState;
 	public JCheckBoxMenuItem mntmOutlineDistricts;
 	public JCheckBoxMenuItem mntmOutlineCounties;
+	public JCheckBoxMenuItem chckbxmntmFitToNation;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -8033,6 +8043,127 @@ ui.Mainframe:
 				} catch (Exception ex) {}
 			}
 		}
+	}
+	
+	public void importURL(String url, String fk, String pk, String[] cols) {
+		String s0 = "IMPORT URL "+url+" "+fk+" "+pk;
+		for( int i = 0; i < cols.length; i++) {
+			s0 += " "+cols[i];
+		}
+		ip.addHistory(s0);
+		
+		String[] dots = url.split(".");
+		String ext = "."+dots[dots.length-1].toLowerCase();
+
+		String dest_path = Download.getStartPath();
+		String dest_name = "temp"+ext;
+		try {
+			if( !Download.download(url,dest_path,dest_name)) {
+				System.out.println("failed to download "+url+"!");
+				return;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("failed to download "+url+"!");
+			return;
+		}
+		
+		File fi = new File(dest_path+dest_name);
+
+		String fn = fi.getName();
+		DataAndHeader dh = null;
+		if( ext.equals("csv")) {
+			String s = getFile(fi).toString();
+			dh = readDelimited(s,",",true);
+		} else
+		if( ext.equals("txt") || ext.equals("tsv")) {
+			String s = getFile(fi).toString();
+			dh = readDelimited(s,"\t",true);
+		} else
+		if( ext.equals("dbf")) {
+			String s = getFile(fi).toString();
+			dh = readDBF(fi.getAbsolutePath());
+		}
+		
+		int fk_index = -1;
+		for( int i = 0; i < dh.header.length; i++) {
+			if( dh.header[i].equals(fk)) {
+				fk_index = i;
+				break;
+			}
+		}
+		int[] col_indices;
+		if( cols == null) {
+			cols = dh.header;
+		}
+		
+		col_indices	= new int[cols.length];
+		for( int i = 0; i < cols.length; i++) {
+			col_indices[i] = -1;
+			for( int j = 0; j < dh.header.length; j++) {
+				if( dh.header[j].equals(cols[i])) {
+					col_indices[i] = j;
+					break;
+				}
+			}
+		}
+		
+		for( Feature f : featureCollection.features) {
+			f.temp_bool = false;
+		}	
+		
+		Hashtable<String,Feature> hmmap = new Hashtable<String,Feature>();
+		for( Feature f : featureCollection.features) {
+			hmmap.put(f.properties.get(pk).toString(), f);
+		}
+		
+		for( int i = 0; i < dh.data.length; i++) {
+			try {
+				if( i % 10 == 0) {
+					System.out.print(".");
+				}
+				if( i % (100 * 10) == 0) {
+					System.out.println(""+i);
+				}
+				if( hmmap.containsKey(dh.data[i][fk_index])) {
+					Feature f = hmmap.get(dh.data[i][fk_index]);
+					if( f == null) {
+						System.out.println("f is null!");
+					}
+					f.temp_bool = true;
+					for( int j = 0; j < cols.length; j++) {
+						f.properties.put(cols[j], dh.data[i][col_indices[j]]);
+					}
+				} else {
+					System.out.println("key not found "+dh.data[i][fk_index]);
+					
+				}
+			} catch (Exception ex) {
+				System.out.println("ex "+ex);
+				ex.printStackTrace();
+			}
+		}
+
+		project.district_column = (String) comboBoxDistrictColumn.getSelectedItem();
+		project.population_column = (String) comboBoxPopulation.getSelectedItem();
+		
+		fillComboBoxes();
+		
+		hushcomboBoxPopulation = true;
+		comboBoxPopulation.setSelectedItem("");
+		hushcomboBoxPopulation = false;
+		comboBoxPopulation.setSelectedItem(project.population_column);
+		
+		setElectionColumns();
+
+		hushcomboBoxDistrict = true;
+		comboBoxDistrictColumn.setSelectedItem("");
+		hushcomboBoxDistrict = false;
+		comboBoxDistrictColumn.setSelectedItem(project.district_column);
+		
+		mapPanel.invalidate();
+		mapPanel.repaint();
 	}
 }
 
