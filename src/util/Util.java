@@ -312,7 +312,7 @@ New Mexico
 		StringBuffer main = new StringBuffer();
 		int i0 = 0;
 		//while( !Download.states[i0].equals("Indiana")) { i0++; }
-		for( int i = 0; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
+		for( int i = 24; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
 			if( Download.apportionments[i] < 6) {
 				//continue;
 			}
@@ -335,7 +335,7 @@ New Mexico
 				}
 			}
 			if( hit) {
-				//continue;
+				continue;
 			}
 
 			StringBuffer sb = new StringBuffer();
@@ -376,7 +376,7 @@ done county data merge
 
 			 */
 			
-			*/
+			
 			
 			if( hit) {
 				sb.append("SAVE\n");

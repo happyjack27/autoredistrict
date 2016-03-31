@@ -247,6 +247,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int QUOTA_METHOD_DROOP = 1;
 	public static int QUOTA_METHOD_HARE = 2;
 	public static int quota_method = QUOTA_METHOD_DROOP;
+	public static double descr_rep_weight;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

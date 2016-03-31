@@ -4027,6 +4027,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxConstrain_1.setBounds(133, 37, 61, 23);
 		panel_4.add(chckbxConstrain_1);
 		
+		lblDescriptiveRepr = new JLabel("Descriptive representation");
+		lblDescriptiveRepr.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
+		lblDescriptiveRepr.setFont(new Font("Tahoma", Font.PLAIN, 10));
+		lblDescriptiveRepr.setBounds(10, 265, 172, 16);
+		panel_4.add(lblDescriptiveRepr);
+		
+		slider = new JSlider();
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				Settings.descr_rep_weight = slider.getValue()/100.0;
+				ip.addHistory("SET WEIGHT DESCRIPTIVE "+Settings.descr_rep_weight);
+
+			}
+		});
+		slider.setValue(0);
+		slider.setBounds(10, 285, 180, 29);
+		panel_4.add(slider);
+		
 		Settings.mutation_rate = 0; 
 		Settings.mutation_boundary_rate = boundary_mutation_rate_multiplier*Math.exp(-(100-slider_mutation.getValue())/Settings.exp_mutate_factor);
 		Settings.geo_or_fair_balance_weight = sliderBalance.getValue()/100.0;
@@ -4039,6 +4057,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
 		Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
 		Settings.vote_dilution_weight = sliderVoteDilution.getValue()/100.0;
+		Settings.descr_rep_weight = slider.getValue()/100.0;
 		Settings.mutate_all = true;
 		
 		Settings.mutation_rateChangeListeners.add(this);
@@ -5411,7 +5430,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		splitPane.setLeftComponent(panel);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(400, 55, 200, 301);
+		panel_2.setBounds(400, 55, 200, 274);
 		panel.add(panel_2);
 		panel_2.setLayout(null);
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -5455,7 +5474,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		rdbtnMinimizeMaxDev.setSelected(true);
 		rdbtnMinimizeMaxDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		rdbtnMinimizeMaxDev.setBounds(16, 220, 169, 23);
+		rdbtnMinimizeMaxDev.setBounds(6, 220, 169, 23);
 		
 		panel_2.add(rdbtnMinimizeMaxDev);
 		rdbtnMinimizeMeanDev.addActionListener(new ActionListener() {
@@ -5464,7 +5483,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		rdbtnMinimizeMeanDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		rdbtnMinimizeMeanDev.setBounds(16, 255, 169, 23);
+		rdbtnMinimizeMeanDev.setBounds(6, 244, 169, 23);
 		
 		panel_2.add(rdbtnMinimizeMeanDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMeanDev);
@@ -5721,7 +5740,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel_4.setLayout(null);
-		panel_4.setBounds(400, 356, 200, 293);
+		panel_4.setBounds(400, 329, 200, 320);
 		panel.add(panel_4);
 		
 		JLabel lblContiguency = new JLabel("Proportional");
@@ -6249,6 +6268,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem mntmOutlineDistricts;
 	public JCheckBoxMenuItem mntmOutlineCounties;
 	public JCheckBoxMenuItem chckbxmntmFitToNation;
+	public JLabel lblDescriptiveRepr;
+	public JSlider slider;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -7481,7 +7502,15 @@ ui.Mainframe:
 
     		dlbl.setText("Creating blockid to feature hash...");
     		System.out.println("Creating blockid to feature hash...");
+    		int n = 0;
 		    while (dbfReader.hasNextRecord()) {
+		    	if( n % 100 == 0) {
+		    		System.out.print(".");
+		    	}
+		    	if( n % 10000 == 0) {
+		    		System.out.println(""+n);
+		    	}
+		    	n++;
 		    	try {
 		    		Object[] oo = dbfReader.nextRecord(Charset.defaultCharset());
 		    		String[] ss = new String[oo.length];
@@ -7510,6 +7539,7 @@ ui.Mainframe:
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		    System.out.println();
 
 //resort features
 			Feature.compare_centroid = false;

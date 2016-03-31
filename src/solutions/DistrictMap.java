@@ -59,6 +59,43 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	}
     }
     
+    public double getDescrVoteImbalance() {
+		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
+		if( dem_col_names.length == 0) {
+			return 0;
+		}
+		double[][] demo = getDemographicsByDistrict();
+		double[] winners_by_ethnicity = new double[dem_col_names.length];
+		double[] total_demo = new double[demo[0].length];
+		double total_pop = 0;
+		double total_seats = 0;
+		
+		for( int j = 0; j < total_demo.length; j++) {
+			winners_by_ethnicity[j] = 0;
+			total_demo[j] = 0;
+		}
+		
+		for( int i = 0; i < districts.size(); i++) {
+			double[] demo_result = District.popular_vote_to_elected(demo[i], i);
+			
+			for( int j = 0; j < demo_result.length; j++) {
+				winners_by_ethnicity[j] += demo_result[j];
+				total_demo[j] += demo[i][j];
+				
+				total_seats +=  demo_result[j];
+				total_pop += demo[i][j];
+			}
+		}
+		double pop_per_seat = total_pop/total_seats;
+		
+		double MAD = 0;
+		for( int i = 0; i < dem_col_names.length; i++) {
+			MAD += Math.abs(winners_by_ethnicity[i]*pop_per_seat - total_demo[i]);
+		}
+		
+		return MAD;
+	}
+    
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
 		boolean has_districts = true;
@@ -1677,6 +1714,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 Settings.diagonalization_weight   *1.0,
         };
     	 */
+    	
+    	
         fairnessScores = new double[]{
         		length
         		,disproportional_representation
@@ -1688,7 +1727,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,sva
         		,deviation_from_diagonal
         		,Settings.reduce_splits ? countSplits() : 0
-        		,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()
+                ,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()
+                ,Settings.descr_rep_weight == 0 ? 0 : this.getDescrVoteImbalance()
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;

@@ -634,6 +634,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( parsed && item.equals("PROPORTIONAL")) { mainFrame.sliderRepresentation.setValue((int)(d*100)); }
 			if( parsed && item.equals("PARTISAN")) { mainFrame.sliderSeatsVotes.setValue((int)(d*100)); }
 			if( parsed && item.equals("RACIAL")) { mainFrame.sliderVoteDilution.setValue((int)(d*100)); }
+			if( parsed && item.equals("DESCRIPTIVE")) { mainFrame.slider.setValue((int)(d*100)); }
 			
 			if( item.equals("COUNT_SPLITS")) { mainFrame.chckbxReduceSplits.setSelected(value.equals("TRUE")); }
 		} else

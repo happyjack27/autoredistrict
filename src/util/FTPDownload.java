@@ -38,6 +38,7 @@ import java.nio.*;
 import java.net.*;
 
 public class FTPDownload {
+	private static final int TIMEOUT_VALUE = 10000; //10 seconds
 	static long scale = 1;
 	static long mDownloadFileLength = 0;
 	static boolean mFlagDisableAsyncTask = false;
@@ -53,6 +54,7 @@ public class FTPDownload {
 			try {
 				long[] dd = resume(surl,dest_file,last);
 				if( dd[0] == dd[1] && dd[1] > 0) {
+					System.out.println("ftp done downloading");
 					return true;
 				}
 				last = dd[0];
@@ -61,6 +63,7 @@ public class FTPDownload {
 				ex.printStackTrace();
 			}
 		}
+		System.out.println("ftp failed downloading");
 		return false;
 	}
 	public static long[] resume(String surl, String dest_file, long start_at) {
@@ -82,6 +85,8 @@ public class FTPDownload {
 		    // Setup connection.
 		    URL url = new URL(surl);
 		    URLConnection connection = url.openConnection();
+		    connection.setConnectTimeout(TIMEOUT_VALUE);
+		    connection.setReadTimeout(TIMEOUT_VALUE);
 		    downloaded = start_at;
 			Logd("2 "+downloaded);
             if (downloaded == 0) {
