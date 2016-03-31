@@ -276,8 +276,11 @@ public class Download extends Thread {
 		}
 		System.out.println("done downloading. extracting...");
 		try {
-			if( download_vtd) {
-				System.out.println("Extracting vtd shapfile...");
+			File f = new File(census_vtd_path+census_vtd_dbf_filename(istate,cyear,vyear));
+					
+					///Users/jimbrill/autoredistrict_data/Illinois/2010/2012/vtd/tl_2012_17_vtd10.shp
+			if( download_vtd || !f.exists()) {
+				System.out.println("Extracting vtd shapefile...");
 				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting vtd shapfile..."); }
 				unzip(census_vtd_path+"vtds.zip", census_vtd_path);
 			}
@@ -524,6 +527,7 @@ public class Download extends Thread {
 	public static boolean download(String url, String dest_path, String dest_name) throws Exception {
 		try {
 			if( url.indexOf("ftp:") == 0) {
+				new File(dest_path).mkdirs();
 				return FTPDownload.download(url, dest_path+dest_name);
 			}
 		System.out.println("downloading:");

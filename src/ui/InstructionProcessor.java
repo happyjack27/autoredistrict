@@ -419,6 +419,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
 			mainFrame.importBlockElection();
 		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("TRANSLATIONS")) {
+			mainFrame.importTranslations();
+		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("CURRENT_DISTRICTS")) {
 			mainFrame.importBlockCurrentDistricts();
 		} else

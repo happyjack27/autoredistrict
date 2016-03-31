@@ -782,6 +782,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	            fout.write(data, 0, count);
 	        }
 	    } catch (Exception ex) {
+	    	System.out.println("url: "+url);
 	    	ex.printStackTrace();
 	    } finally {
             try {

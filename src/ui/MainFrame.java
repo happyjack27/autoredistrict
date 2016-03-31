@@ -244,6 +244,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ivtd.nextThread = new ThreadFinishImport();
 		ivtd.start();
 	}
+	public void importTranslations() {
+		ip.addHistory("IMPORT TRANSLATIONS");
+		ImportTranslations ivtd = new ImportTranslations();	
+		ivtd.nextThread = new ThreadFinishImport();
+		ivtd.start();
+	}
 	public void importBlockElection() {
 		ip.addHistory("IMPORT ELECTIONS");
 		ImportFeatureLevel ivtd = new ImportFeatureLevel();	
@@ -1318,7 +1324,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ImportCensus2Thread() { super(); }
     	public void run() { 
     		dlbl.setText("Loading population...");
-    		importBlockDataDBF(Download.census_pop_file.getAbsolutePath(),"POPULATION","POPULATION",false);
+    		importBlockDataDBF(Download.census_pop_file.getAbsolutePath(),"POPULATION","POP",false);
     	}
     	public void importBlockDataDBF(String path, String column, String source_column, boolean MAJORITY_VOTE) {
     		try {
@@ -2164,7 +2170,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					break;
 				}
 			}
-			String skey2="FeatureST";
+			String skey2="VTDST";
 			for( int i = 0; i < headers.length; i++) {
 				if( headers[i].indexOf(skey2) == 0) {
 					skey2 = headers[i];
@@ -6508,7 +6514,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	        url = new URL(path);
 	        is = url.openStream();  // throws an IOException
 	        br = new BufferedReader(new InputStreamReader(is));
-	        v.add( new String[]{"STATE","STATEFP","COUNTYFP","COUNTY_NAME","FeatureST","FeatureNAME","CTYFP_FUL","FeatureST_FUL","FeatureST_HLF","GEO"});
+	        v.add( new String[]{"STATE","STATEFP","COUNTYFP","COUNTY_NAME","VTDST","VTDNAME","CTYFP_FUL","VTDST_FUL","VTDST_HLF","GEO"});
 	        int i = 0;
 
 	        while ((line = br.readLine()) != null) {
@@ -6695,7 +6701,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			for( int i = 0; i < header.length; i++) {
 				String s = header[i].toUpperCase().trim();
 				if( vtd_start < 0) {
-					if( header[i].equals("Feature NAME") || header[i].equals("NAME")) {
+					if( header[i].equals("VTD NAME") || header[i].equals("NAME")) {
 						vtd_start = i;
 					}
 				}
@@ -6868,15 +6874,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Collections.sort(featureCollection.features);
 
 			System.out.println("import vtd level start");
-			//String path = "ftp://autoredistrict.org/pub/county_level_stats/Feature%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
-			String path = "http://autoredistrict.org/county_level_stats/Feature%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
+			//String path = "ftp://autoredistrict.org/pub/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate]+".txt";
+			String path = "http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20"+Download.states[Download.istate].replaceAll(" ", "%20")+".txt";
 			
 			int[] ii;
 			int[] matches = new int[2];
 			int[] non_matches = new int[2];
 			for( int m = 0; m < 2; m++) {
-				ii =  joinToTxt(true,path, "FeatureNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+				if( ii[0] == 0 && ii[1] == 0) {
+					if( nextThread != null) {
+						nextThread.start();
+						nextThread = null;
+					}
+					return;
+				}
 				matches[m] = ii[0];
 				non_matches[m] = ii[1];
 			}
@@ -6884,12 +6897,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			double match_pct1 = ((double)matches[1])/(double)(matches[1]+non_matches[1]);
 			if( match_pct1 > 0.95 && matches[1] >= matches[0]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "FeatureNAME", 4, 1, new int[]{5,6,7,8,9,10,11,12}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(false,path, "VTDNAME", 4, 1, new int[]{5,6,7,8,9,10,11,12}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			if( match_pct0 > 0.95 && matches[0] > matches[1]) {
 				System.out.println("trying shifting columns by 1...");
-				ii =  joinToTxt(false,path, "FeatureNAME", 3, 1, new int[]{4,5,6,7,8,9,10,11}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
+				ii =  joinToTxt(false,path, "VTDNAME", 3, 1, new int[]{4,5,6,7,8,9,10,11}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
 				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 			}
 			
@@ -6966,7 +6979,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			column_renames.put("INTPTLAT","INTPTLAT");
 			column_renames.put("INTPTLON","INTPTLON");
-			column_renames.put("Feature","Feature");
+			column_renames.put("VTD","VTD");
 			
 			column_renames.put("P0020001","POP_TOTAL");
 			column_renames.put("P0020002","POP_HISPAN");
@@ -6991,7 +7004,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String[] headers = new String[]{
 					"INTPTLAT",
 					"INTPTLON",
-					"Feature",
+					"VTD",
 					
 					"POP_TOTAL",
 					"POP_HISPAN",
@@ -7074,7 +7087,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			while( yr.length() < 2) {
 				yr = "0"+yr;
 			}
-			String primary_key = "FeatureST"+yr;
+			String primary_key = "VTDST"+yr;
 			int foreign_key = 2;
 			
 			//collect primary keys;

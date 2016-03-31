@@ -11,6 +11,25 @@ import java.util.Map.Entry;
 import ui.Download;
 
 public class Util {
+	
+	public static String[] bad_states = new String[]{
+		"Illinois",
+		"Louisiana",
+		"Maine",
+		"Maryland",
+		"Massachusetts",
+		"Minnessota",
+		"New Jersey",
+		"Ohio",
+		"Oklahoma",
+		"Oregon",
+		"Pennsylvania",
+		"South Dakota",
+		"Texas",
+		"Vermont",
+		"Viriginia",
+	};
+
 	/*
 	 Minnesota
 Illinois
@@ -28,6 +47,26 @@ Nevada
 New Mexico
 	 * 
 	 */
+	
+	/*
+
+	"Illinois",
+	"Louisiana",
+	"Maine",
+	"Maryland",
+	"Massachusetts",
+	"Minnessota",
+	"New Jersey",
+	"Ohio",
+	"Oklahoma",
+	"Pennsylvania",
+	"South Dakota",
+	"Texas",
+	"Washington",//?
+
+	 */
+	
+
 
 	public static void mergeTransparentImages(String path, String column, String image_name, int width, int height, String separator) {
 		System.out.println("<?php ");
@@ -288,50 +327,17 @@ New Mexico
 			}
 			String state = Download.states[i];
 			
-			
-			if( false
-					//|| state.equals("Alaska")
-					//|| state.equals("California")
-					//|| state.equals("Texas")
-					//|| state.equals("Florida")
-					//|| state.equals("California")
-					|| state.equals("Illinois")
-					|| state.equals("Oklahoma")
-					//|| state.equals("Louisianna")
-					//|| state.equals("Rhode Island")
-					//|| state.equals("Kentucky")
-					) {
-				continue;
+			boolean hit = false;
+			for( int j = 0; j < bad_states.length; j++) {
+				if( bad_states[j].equals(state)) {
+					hit = true;
+					break;
+				}
 			}
-			
-			if( true
-					&& !state.equals("Texas")
-					&& !state.equals("Florida")
-					&& !state.equals("California")
-
-					//&& !state.equals("New York")
-					//&& !state.equals("Oklahoma")
-					//&& !state.equals("Alaska")
-					//&& !state.equals("Louisiana")
-					//|| state.equals("California")
-					//|| state.equals("Texas")
-					
-					//&& !state.equals("Rhode Island")
-					//&& !state.equals("Kentucky")
-					//&& !state.equals("Oregon") //missing election data!
-					//&& !state.equals("Montana")
-					/*
-					&& !state.equals("Delaware")
-					&& !state.equals("Hawaii")
-					&& !state.equals("North Dakota")
-					&& !state.equals("Vermont")
-					&& !state.equals("Michigan")
-					&& !state.equals("Indiana")
-					&& !state.equals("Virginia")
-					&& !state.equals("Wisconsin")*/
-					) {
+			if( hit) {
 				//continue;
 			}
+
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			
@@ -347,17 +353,47 @@ New Mexico
 					break;
 				}
 			}
+			/*
+			 * url: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txt
+0
+0.0
+0.1
+1
+2
+ex java.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txtjava.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txt
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
+	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
+	at java.net.URL.openStream(URL.java:1038)
+	at ui.MainFrame.joinToTxt(MainFrame.java:6671)
+	at ui.MainFrame$ImportFeatureLevel.run(MainFrame.java:6884)
+total found: 0
+total not found: 0
+setting columns final...
+ found POPULATION
+ found COUNTYFP10
+no ecology attached {}
+done county data merge
+
+			 */
 			
-			
-			//sb.append("IMPORT BDISTRICTING\n");
-			//sb.append("IMPORT CURRENT_DISTRICTS\n");
 			*/
+			
+			if( hit) {
+				sb.append("SAVE\n");
+				sb.append("EXIT\nEXIT\n");
+				sb.append("IMPORT TRANSLATIONS\n");
+				sb.append("IMPORT COUNTY\n");
+			}
+			sb.append("IMPORT BDISTRICTING\n");
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			
+			
 			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
 			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("RESCALE ELECTIONS\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-			//sb.append("SAVE\n");
+			sb.append("SAVE\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
@@ -383,20 +419,21 @@ New Mexico
 			sb.append("EXPORT\n");
 			sb.append("EXPORT NATIONAL\n");
 
-			
-			if( Download.apportionments[i] <= 5) {
-				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
-			} else {
-				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+			if( !hit) {
+				if( Download.apportionments[i] <= 5) {
+					sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
+				} else {
+					sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+				}
+				sb.append("SET DISTRICTS COLUMN CD_FV\n");
+				if( Download.apportionments[i] <= 5) {
+					sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
+				} else {
+					sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+				}
+				sb.append("EXPORT\n");
+				sb.append("EXPORT NATIONAL\n");
 			}
-			sb.append("SET DISTRICTS COLUMN CD_FV\n");
-			if( Download.apportionments[i] <= 5) {
-				sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
-			} else {
-				sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-			}
-			sb.append("EXPORT\n");
-			sb.append("EXPORT NATIONAL\n");
 			
 			//sb.append("SAVE\n");
 			sb.append("EXIT\nEXIT\n\n");
@@ -441,6 +478,9 @@ New Mexico
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			if( hit) {
+				main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete "+i+"\n");
 			}
 			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
 			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
