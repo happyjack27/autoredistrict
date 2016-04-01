@@ -18,7 +18,7 @@ public class Util {
 		"Maine",
 		"Maryland",
 		"Massachusetts",
-		"Minnessota",
+		"Minnesota",//Minnesota
 		"New Jersey",
 		"Ohio",
 		"Oklahoma",
@@ -27,7 +27,7 @@ public class Util {
 		"South Dakota",
 		"Texas",
 		"Vermont",
-		"Viriginia",
+		"Virginia",
 	};
 
 	/*
@@ -312,7 +312,7 @@ New Mexico
 		StringBuffer main = new StringBuffer();
 		int i0 = 0;
 		//while( !Download.states[i0].equals("Indiana")) { i0++; }
-		for( int i = 24; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
+		for( int i = 0; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
 			if( Download.apportionments[i] < 6) {
 				//continue;
 			}
@@ -334,7 +334,7 @@ New Mexico
 					break;
 				}
 			}
-			if( hit) {
+			if( !hit) {
 				continue;
 			}
 
@@ -379,10 +379,11 @@ done county data merge
 			
 			
 			if( hit) {
-				sb.append("SAVE\n");
-				sb.append("EXIT\nEXIT\n");
+				//sb.append("SAVE\n");
+				//sb.append("EXIT\nEXIT\n");
 				sb.append("IMPORT TRANSLATIONS\n");
 				sb.append("IMPORT COUNTY\n");
+				sb.append("IMPORT URL http://autoredistrict.org/all50/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state));
 			}
 			sb.append("IMPORT BDISTRICTING\n");
 			sb.append("IMPORT CURRENT_DISTRICTS\n");

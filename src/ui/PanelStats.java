@@ -303,7 +303,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			double wasted_0 = 0;
 			double wasted_1 = 0;
 			
-			String[] dcolumns = new String[17+Settings.num_candidates*2+dem_col_names.length*2];
+			String[] dcolumns = new String[16+Settings.num_candidates*2+dem_col_names.length*2];
 			String[][] ddata = new String[dm.districts.size()][];
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Settings.num_candidates][];
@@ -319,23 +319,23 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dcolumns[1] = "Population";
 			dcolumns[2] = "Winner";
 			dcolumns[3] = "PVI"; //
-			dcolumns[4] = "FV PVI"; //
+			//dcolumns[4] = "FV PVI"; //
 			
-			dcolumns[5] = "Vote gap";
-			dcolumns[6] = "Wasted votes";
+			dcolumns[4] = "Vote gap";
+			dcolumns[5] = "Wasted votes";
 			
-			dcolumns[7] = "FV Safe D";
-			dcolumns[8] = "FV Lean D";
-			dcolumns[9] = "FV Tossup";
-			dcolumns[10] = "FV Lean R";
-			dcolumns[11] = "FV Safe R";			
+			dcolumns[6] = "FV Safe D";
+			dcolumns[7] = "FV Lean D";
+			dcolumns[8] = "FV Tossup";
+			dcolumns[9] = "FV Lean R";
+			dcolumns[10] = "FV Safe R";			
 			//vote_gap_by_district
 			
-			dcolumns[12] = "Pop per seats";//"Self-entropy";
-			dcolumns[13] = "Compactness";
-			dcolumns[14] = "Area";
-			dcolumns[15] = "Paired edge length";
-			dcolumns[16] = "Unpaired edge length";
+			dcolumns[11] = "Pop per seats";//"Self-entropy";
+			dcolumns[12] = "Compactness";
+			dcolumns[13] = "Area";
+			dcolumns[14] = "Paired edge length";
+			dcolumns[15] = "Unpaired edge length";
 			
 			
 			for( int i = 0; i < Settings.num_candidates; i++) {
@@ -467,38 +467,38 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][1] = integer.format(d.getPopulation());
 				ddata[i][2] = ""+winner;
 				ddata[i][3] = ""+pviw;
-				ddata[i][4] = ""+fv_pviw;
+				//ddata[i][4] = ""+fv_pviw;
 				
-				ddata[i][5] = ""+dm.vote_gap_by_district[i];
-				ddata[i][6] = ""+dm.wasted_votes_by_district[i];
+				ddata[i][4] = ""+dm.vote_gap_by_district[i];
+				ddata[i][5] = ""+dm.wasted_votes_by_district[i];
 				
-				ddata[i][7] = ""+seats[0];
-				ddata[i][8] = ""+seats[1];
-				ddata[i][9] = ""+seats[2];
-				ddata[i][10] = ""+seats[3];
-				ddata[i][11] = ""+seats[4];
+				ddata[i][6] = ""+seats[0];
+				ddata[i][7] = ""+seats[1];
+				ddata[i][8] = ""+seats[2];
+				ddata[i][9] = ""+seats[3];
+				ddata[i][10] = ""+seats[4];
 				
-				ddata[i][12] = ""+integer.format(d.getPopulation()/Settings.seats_in_district(i));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
-				ddata[i][13] = ""+d.iso_quotient;
-				ddata[i][14] = ""+d.area;
-				ddata[i][15] = ""+d.paired_edge_length;
-				ddata[i][16] = ""+d.unpaired_edge_length;
-				for( int j = 17; j < ddata[i].length; j++) {
+				ddata[i][11] = ""+integer.format(d.getPopulation()/Settings.seats_in_district(i));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][12] = ""+d.iso_quotient;
+				ddata[i][13] = ""+d.area;
+				ddata[i][14] = ""+d.paired_edge_length;
+				ddata[i][15] = ""+d.unpaired_edge_length;
+				for( int j = 16; j < ddata[i].length; j++) {
 					ddata[i][j] = "";
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+17] = ""+(result[0][j]/total);
+					ddata[i][j+16] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+17+Settings.num_candidates] = ""+integer.format(result[0][j]);
+					ddata[i][j+16+Settings.num_candidates] = ""+integer.format(result[0][j]);
 				}	
 				for( int j = 0; j < dem_col_names.length; j++) {
-					ddata[i][j+17+Settings.num_candidates*2] = ""+decimal.format(demo_pct[i][j]);
+					ddata[i][j+16+Settings.num_candidates*2] = ""+decimal.format(demo_pct[i][j]);
 					votes_by_dem[j] += total_votes*demo_pct[i][j];
 					vote_margins_by_dem[j] += dm.vote_gap_by_district[i]*demo_pct[i][j];
 				}	
 				for( int j = 0; j < dem_col_names.length; j++) {
-					ddata[i][j+17+Settings.num_candidates*2+dem_col_names.length] = ""+integer.format(demo[i][j]);
+					ddata[i][j+16+Settings.num_candidates*2+dem_col_names.length] = ""+integer.format(demo[i][j]);
 				}	
 				} catch (Exception ex) {
 					System.out.println("ex stats 1 "+ex);
@@ -745,7 +745,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(button_2);
 		toHTMLButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				exportToHtml();
+				exportToHtml(true);
 			}
 		});
 		toHTMLButton.setBounds(89, 8, 117, 29);
@@ -962,7 +962,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		Settings.setNationalMap( t);
 	}
-	public void exportToHtml() {
+	public void exportToHtml(boolean images) {
 		System.out.println("1");
 		boolean national = Settings.national_map;
 		Settings.setNationalMap(false);
@@ -985,15 +985,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		System.out.println("1");
 
 		//MapPanel.override_size = 1024;
-		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
-		saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
-
-		exportMaps(write_folder,1024,true);
+		if( images) {
+			saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panel,write_folder+"seats_votes.png");
+			saveAsPng(MainFrame.mainframe.frameSeatsVotesChart.panelRanked.panel,write_folder+"sorted_districts.png");
 	
-		System.out.println("6");
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
-		MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
-		System.out.println("7");
+			exportMaps(write_folder,1024,true);
+		
+			System.out.println("6");
+			MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
+			MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+			System.out.println("7");
+		}
 	
 
 
@@ -1028,10 +1030,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing</a></center></td>";
 		html +="<td align='center'><center><a href='./map_district_wasted_votes.png'><img src='./map_district_wasted_votes_small.png' width=100></br>Wasted votes by party</a></center></td>";
 		html +="</tr>";
+		/*
 		html +="<tr>";
 		html +="<td>Counties</td>";
 		html +="<td align='center'><center><a href='./map_counties.png'><img src='./map_counties_small.png' width=100></br>Counties</a></center></td>";
 		html +="</tr>";
+		*/
 		html +="<tr>";
 		html +="<td>VTDs</td>";
 		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes_small.png' width=100></br>VTD vote balance</a></center></td>";

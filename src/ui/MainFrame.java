@@ -2391,8 +2391,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			trySetGroupColumns();
 			System.out.println("done county data merge");
 			if( nextThread == null) {
+				System.out.println("no next thread");
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			} else {
+				System.out.println("starting next thread");
 				nextThread.start();
 				nextThread = null;
 			}
@@ -4604,7 +4606,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmExportToHtml = new JMenuItem("Export to html");
 		mntmExportToHtml.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				panelStats.exportToHtml();
+				panelStats.exportToHtml(true);
 			}
 		});
 		mnFile.add(mntmExportToHtml);
@@ -6814,6 +6816,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 				}
 			}
+			if( vf != null) {
+				total_match_distance += incounty.length();
+			}
 			if( vf == null) {
 				Triplet<String,Feature,Integer> best_match = util.Util.findBestMatch(incounty,dictionary);
 				if( best_match == null) {
@@ -6822,6 +6827,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					total_edit_distance += incounty.length();
 					continue;
 				} else {
+					found++;
 					incounty = best_match.a;
 					total_edit_distance += best_match.c;
 					total_match_distance += incounty.length() - best_match.c;
@@ -6903,13 +6909,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int[] non_matches = new int[2];
 			for( int m = 0; m < 2; m++) {
 				ii =  joinToTxt(true,path, "VTDNAME", 3+m, 1, new int[]{4+m,5+m,6+m,7+m,8+m,9+m,10+m,11+m}, new String[]{"PRES12_DEM","PRES12_REP","PRES08_DEM","PRES08_REP","PRES04_DEM","PRES04_REP","CD12_DEM","CD12_REP"});
-				System.out.println("total found: "+ii[0]+"\ntotal not found: "+ii[1]);
+				System.out.println("m="+m+" total found: "+ii[0]+"\ntotal not found: "+ii[1]);
 				if( ii[0] == 0 && ii[1] == 0) {
+					/*
 					if( nextThread != null) {
 						nextThread.start();
 						nextThread = null;
 					}
 					return;
+					*/
 				}
 				matches[m] = ii[0];
 				non_matches[m] = ii[1];
@@ -6935,9 +6943,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("done county data merge");
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
+				System.out.println("no next thread!");
 			}
 
 			if( nextThread != null) {
+				System.out.println("starting next thread");
 				nextThread.start();
 				nextThread = null;
 			}
@@ -6946,13 +6956,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	class ImportDemographics extends Thread {
 		Thread nextThread = null;
 		public void run() {
-			if( true)
-				return;
 			dlbl.setText("Importing demographics...");
 
 			String state = Download.states[Download.istate];
 			
-			getDemographics(state,Download.state_to_abbr.get(state),""+Download.cyear);
+			if( false) {
+				getDemographics(state,Download.state_to_abbr.get(state),""+Download.cyear);
+			}
 		
 			System.out.println("done nextThred: "+nextThread);
 			if( nextThread != null) {
