@@ -1,5 +1,27 @@
 Changelog:
 
+V. 1.26
+
+* bug fix: fixed map aspect ratio
+* bug fix: added ftp resume manager (so doesn't get stuck on california, texas)
+
+* added a new criteria / slider for descriptive representation (to help compensate for weaknesses in droop quota)
+* added ability to show vote packing on a per-square-mile scale rather than per-district
+
+* added ability to use either droop or hare quota for multi-member districts
+* can now import specific columns from a url (need to document this)
+* added command to rescale column values
+* added 1/4 size thumbnails for html exported images
+* splits can now be highlighted
+* added merge menu
+* html export now lists county splits
+* added ability to outline districts/counties/state
+* changed the folder that html export exports to (now named after the column used)
+* added ability to create / export nation-wide transparent maps
+* added spellcheck in merge routine so you it'll match up even if there are some typos
+* can import block assignment lists
+* can export block assignment lists
+
 V. 1.25
 
 * joined in vtd-level election data
