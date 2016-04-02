@@ -318,8 +318,14 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		eventOccured();
 	}
 
+	public static boolean duplicateThread = false;
 	@Override
 	public void eventOccured() {
+		if( duplicateThread) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": canceling duplicate thread "+this.instruction_pointer);
+			return;
+		}
+		duplicateThread = true;
 		System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
 		try {
 			Thread.sleep(2000);
@@ -327,6 +333,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		duplicateThread = false;
 		//System.out.println("eventOccured");
 		Download.init();
 		if( instruction_pointer >= instructions.size()) {
@@ -407,7 +414,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			mainFrame.importBlockBdistricting();
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("URL")) {
-			String url = instruction_words[2];
+			String url = current_instruction.split(" ")[2];//instruction_words[2];
 			String fk = instruction_words[3];
 			String pk = instruction_words[4];
 			String[] cols = new String[instruction_words.length-5];

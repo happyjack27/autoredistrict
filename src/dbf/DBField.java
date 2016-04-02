@@ -36,6 +36,12 @@ public class DBField {
 				if (obj == null) {
 					obj = new Double(0.0D);
 				}
+				if( obj instanceof String) {
+					obj = new Double(Double.parseDouble(obj.toString()));
+				} else if (obj instanceof Number) {
+				} else {
+					obj = new Double(0);
+				}
 				if (obj instanceof Number) {
 					Number number = (Number) obj;
 					StringBuffer sb = new StringBuffer(length);

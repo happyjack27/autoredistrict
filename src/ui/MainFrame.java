@@ -2976,7 +2976,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			minx = -127.50;
 			miny = 28.70;
 			maxx = -55.90;
-			maxy = 48.85;
+			maxy = 49.10;
 			System.out.println(""+minx+","+miny);
 			System.out.println(""+maxx+","+maxy);
 			featureCollection.recalcDlonlat();
@@ -3672,7 +3672,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Object[] oo = new Object[data[i].length];
 			for( int j = 0; j < fields.length; j++) {
 				if( fields[j].type == 'N') {
-					if(  data[i][j] == null) {
+					if(  data[i][j] == null || data[i][j].equals("<null>")) {
 						oo[j] = new Double(0);
 					} else {
 						try {
@@ -3982,8 +3982,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		} 
 
 		jbInit();
-		chckbxmntmHideMapLines.setSelected(true);
-		Feature.outline_vtds = chckbxmntmHideMapLines.isSelected();
+		chckbxmntmOutlineState.setSelected(true);
+		Feature.outline_state = chckbxmntmOutlineState.isSelected();
 		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
@@ -4892,6 +4892,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmOutlineCounties);
 		
+		separator_16 = new JSeparator();
+		mnView.add(separator_16);
+		
+		chckbxmntmDividePackingBy = new JCheckBoxMenuItem("Divide packing by area");
+		chckbxmntmDividePackingBy.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.divide_packing_by_area = chckbxmntmDividePackingBy.isSelected();
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		chckbxmntmDividePackingBy.setSelected(true);
+		mnView.add(chckbxmntmDividePackingBy);
+		
 		
 		separator_6 = new JSeparator();
 		mnView.add(separator_6);
@@ -4962,7 +4976,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorPartisanPacking = new JMenuItem("Color by district partisan vote packing");
 				mntmColorPartisanPacking.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;
+						Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
 						mapPanel.invalidate();
 						mapPanel.repaint();
 					}
@@ -4972,7 +4986,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorRacialPacking = new JMenuItem("Color by district racial vote packing");
 				mntmColorRacialPacking.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;
+						Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;
 						mapPanel.invalidate();
 						mapPanel.repaint();
 					}
@@ -6272,6 +6286,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBoxMenuItem chckbxmntmFitToNation;
 	public JLabel lblDescriptiveRepr;
 	public JSlider slider;
+	public JSeparator separator_16;
+	public JCheckBoxMenuItem chckbxmntmDividePackingBy;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -7952,17 +7968,25 @@ ui.Mainframe:
 	}
 	
 	public void importURL(String url, String fk, String pk, String[] cols) {
+		try {
 		String s0 = "IMPORT URL "+url+" "+fk+" "+pk;
 		for( int i = 0; i < cols.length; i++) {
 			s0 += " "+cols[i];
 		}
 		ip.addHistory(s0);
 		
-		String[] dots = url.split(".");
-		String ext = "."+dots[dots.length-1].toLowerCase();
+		System.out.println("0: ");
+		String[] dots = url.split("\\.");
+		System.out.println("1: ");
+		String ext = ""+dots[dots.length-1].toLowerCase();
+		System.out.println("2: ");
 
 		String dest_path = Download.getStartPath();
-		String dest_name = "temp"+ext;
+		String dest_name = "temp."+ext;
+		System.out.println("download: ");
+		System.out.println(url);
+		System.out.println(dest_path);
+		System.out.println(dest_name);
 		try {
 			if( !Download.download(url,dest_path,dest_name)) {
 				System.out.println("failed to download "+url+"!");
@@ -7978,6 +8002,7 @@ ui.Mainframe:
 		File fi = new File(dest_path+dest_name);
 
 		String fn = fi.getName();
+		System.out.println("file: "+fn);
 		DataAndHeader dh = null;
 		if( ext.equals("csv")) {
 			String s = getFile(fi).toString();
@@ -7991,7 +8016,7 @@ ui.Mainframe:
 			String s = getFile(fi).toString();
 			dh = readDBF(fi.getAbsolutePath());
 		}
-		
+		System.out.println("read "+dh.data.length+" rows");
 		int fk_index = -1;
 		for( int i = 0; i < dh.header.length; i++) {
 			if( dh.header[i].equals(fk)) {
@@ -8070,6 +8095,10 @@ ui.Mainframe:
 		
 		mapPanel.invalidate();
 		mapPanel.repaint();
+		} catch (Exception ex) {
+			System.out.println("ex "+ex);
+			ex.printStackTrace();
+		}
 	}
 }
 

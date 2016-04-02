@@ -435,6 +435,10 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					try {
 						int color = di;
 						if( color < c.length) {
+							if( color < 0) {
+								System.out.println("invalid fill color for feature! "+color);
+								color = 0;
+							}
 							geo.fillColor = c[color];
 						}
 					} catch (Exception ex) {
@@ -697,7 +701,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			} else
-			if( Feature.display_mode == Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM) {
+			if( Feature.display_mode == Feature.DISPLAY_MODE_RACIAL_PACKING) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];
@@ -714,7 +718,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			} else
-			if( Feature.display_mode == Feature.DISPLAY_MODE_VICTORY_MARGIN) {
+			if( Feature.display_mode == Feature.DISPLAY_MODE_PARTISAN_PACKING) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];

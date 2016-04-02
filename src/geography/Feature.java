@@ -27,8 +27,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static final int DISPLAY_MODE_WASTED_VOTES = 7;
 	public static final int DISPLAY_MODE_DEMOGRAPHICS = 8;
 	public static final int DISPLAY_MODE_COUNTIES = 9;
-	public static final int DISPLAY_MODE_VICTORY_MARGIN = 10;
-	public static final int DISPLAY_MODE_WASTED_VOTES_BY_DEM = 11;
+	public static final int DISPLAY_MODE_PARTISAN_PACKING = 10;
+	public static final int DISPLAY_MODE_RACIAL_PACKING = 11;
 	public static final int DISPLAY_MODE_DIST_DEMO = 12;
 	public static final int DISPLAY_MODE_COUNTY_SPLITS = 13;
 

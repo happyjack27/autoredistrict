@@ -126,7 +126,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					has_districts = false;
 					vtd_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
 				} else {
-					vtd_districts[i] = Integer.parseInt((String)f.properties.get(column_name))-(zero_indexed ? 0 : 1);//((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
+					vtd_districts[i] = Integer.parseInt(f.properties.get(column_name).toString())-(zero_indexed ? 0 : 1);//((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
 				}
 			} catch (Exception ex) {
 				System.out.println("parse error2 "+ex);
@@ -2009,8 +2009,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	//vote gap_by_district
 	boolean hasStats = false;
 		public double getVoteGapForDistrict(int k) {
+			double multiplier = 1;
 			if( !hasStats) {
 				this.calcDemographicStatistics();
+			}
+			if( Settings.divide_packing_by_area) {
+				multiplier = 2.522667664609363E11; //2.522667664609363E9;
+				multiplier /= (double)districts.get(k).area;
+				System.out.println("dividing by area "+districts.get(k).area);
 			}
 			double[] votes = districts.get(k).getAnOutcome();//getElectionResults()[0];
 			double[] seats = District.popular_vote_to_elected(votes, k);
@@ -2025,7 +2031,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			
 			System.out.println("dem_res: "+dem_res);
 			System.out.println("rep_res: "+rep_res);
-			return (dem_res-rep_res)/num_seats;
+			return multiplier*(dem_res-rep_res)/num_seats;
 		}
 		public Color getVoteGapByDemoColor(int k) {
 			double[] votes = districts.get(k).getAnOutcome();

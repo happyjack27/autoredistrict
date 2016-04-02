@@ -882,6 +882,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		int display_mode_temp = Feature.display_mode;
 		Settings.num_maps_to_draw = 1;
 		
+		boolean divide_packing = Settings.divide_packing_by_area;
 		boolean maplines = Feature.outline_vtds;
 		boolean outline_state = Feature.outline_state;
 		boolean outline_county = Feature.outline_counties;
@@ -890,6 +891,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Feature.outline_state = true;
 		Feature.outline_counties = false;
 		MapPanel.FSAA = 4;//Feature.outline_vtds ? 4 : 1;
+		
 		
 		///====begin insert
 		Feature.outline_districts = true;
@@ -912,10 +914,19 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",res,res);
 		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_VICTORY_MARGIN;
+		
+		Settings.divide_packing_by_area = false;
+		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES_BY_DEM;			
+		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
+				
+		Settings.divide_packing_by_area = true;
+		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
+		
 		Feature.outline_districts = false;
 
 		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;		
@@ -945,6 +956,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Settings.num_maps_to_draw = num_maps_temp;
 		Feature.display_mode = display_mode_temp;
 		MapPanel.override_size = -1;
+		Settings.divide_packing_by_area = divide_packing;
 	}
 
 	
@@ -978,6 +990,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		URL style_sheet = Applet.class.getResource("/resources/styles2.css");
 		
 		String write_folder = Download.getStartPath()+MainFrame.mainframe.project.district_column+File.separator;
+		String write_folder2 = Download.getStartPath();
 		new File(write_folder).mkdirs();
 		
 		saveURL(write_folder+"style.css",style_sheet);
@@ -992,8 +1005,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			exportMaps(write_folder,1024,true);
 		
 			System.out.println("6");
-			MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.txt"), 1,false);
-			MainFrame.mainframe.saveData(new File(write_folder+"vtd_data.dbf"), 2,false);
+			MainFrame.mainframe.saveData(new File(write_folder2+"vtd_data.txt"), 1,false);
+			MainFrame.mainframe.saveData(new File(write_folder2+"vtd_data.dbf"), 2,false);
 			System.out.println("7");
 		}
 	
@@ -1006,8 +1019,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<i>This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.</i><br/><br/>\n";
 
 		html +="<h3>VTD district assignments</h3><br/>\n";
-		html +="<a href='./vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
-		html +="<a href='./vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
+		html +="<a href='../vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
+		html +="<a href='../vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
 		html +="<br/><br/>\n";
 
 		html +="<h3>Maps (click to enlarge)</h3><br/>\n";
@@ -1026,9 +1039,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="</tr>";
 		html +="<tr>";
 		html +="<td>Fairness</td>";
-		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing</a></center></td>";
 		html +="<td align='center'><center><a href='./map_district_wasted_votes.png'><img src='./map_district_wasted_votes_small.png' width=100></br>Wasted votes by party</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing<br/>(per district)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing<br/>(per district)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_partisan_packing_area.png'><img src='./map_district_partisan_packing_area_small.png' width=100></br>Partisan vote packing<br/>(per sq. mile)</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_racial_packing_area.png'><img src='./map_district_racial_packing_area_small.png' width=100></br>Racial vote packing<br/>(per sq. mile)</a></center></td>";
 		html +="</tr>";
 		/*
 		html +="<tr>";
