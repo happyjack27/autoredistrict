@@ -58,7 +58,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		d.invalidate();
     	}
     }
-    
+    /*
     public double getDescrVoteImbalance() {
 		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
 		if( dem_col_names.length == 0) {
@@ -95,6 +95,58 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		
 		return MAD;
 	}
+	*/
+    public double getDescrVoteImbalance() {
+		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
+		if( dem_col_names.length == 0) {
+			return 0;
+		}
+		double[][] demo = getDemographicsByDistrict();
+		double[] winners_by_ethnicity = new double[dem_col_names.length];
+		double[] total_demo = new double[demo[0].length];
+		double total_pop = 0;
+		double total_seats = 0;
+		
+		for( int j = 0; j < total_demo.length; j++) {
+			winners_by_ethnicity[j] = 0;
+			total_demo[j] = 0;
+		}
+		
+		double[] min_votes_needed_for_seat = new double[dem_col_names.length];
+		for( int i = 0; i < districts.size(); i++) {
+			int num_seats = Settings.seats_in_district(i);
+			double[] demo_result = District.popular_vote_to_elected(demo[i], i);
+			double[] needed = District.votes_needed_for_another_seat(demo[i], i);
+			for( int j = 0; j < needed.length; j++) {
+				if( i == 0 || needed[j] < min_votes_needed_for_seat[j]) {
+					min_votes_needed_for_seat[j] = needed[j];
+				}
+			}
+			
+			for( int j = 0; j < demo_result.length; j++) {
+				winners_by_ethnicity[j] += demo_result[j];
+				total_demo[j] += demo[i][j];
+				
+				total_seats +=  demo_result[j];
+				total_pop += demo[i][j];
+			}
+		}
+		double pop_per_seat = total_pop/total_seats;
+		
+		double MAD = 0;
+		for( int i = 0; i < dem_col_names.length; i++) {
+			double unrepresented = total_demo[i]-winners_by_ethnicity[i]*pop_per_seat;
+			if( unrepresented <= pop_per_seat) {
+				continue;
+			}
+			unrepresented -= pop_per_seat;
+			unrepresented += min_votes_needed_for_seat[i];
+			//(pop_per_seat - min_votes_needed_for_seat[i])
+			MAD += unrepresented;//Math.abs(winners_by_ethnicity[i]*pop_per_seat - total_demo[i]);
+		}
+		
+		return MAD;
+	}
     
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
@@ -107,7 +159,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					System.out.println("key missing");
 				} else {
 					try {
-						if( Integer.parseInt((String)f.properties.get(column_name)) == 0) {
+						if( Integer.parseInt(f.properties.get(column_name).toString()) == 0) {
 							zero_indexed = true;
 						}
 					} catch (Exception ex) {
@@ -2016,7 +2068,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			if( Settings.divide_packing_by_area) {
 				multiplier = 2.522667664609363E11; //2.522667664609363E9;
 				multiplier /= (double)districts.get(k).area;
-				System.out.println("dividing by area "+districts.get(k).area);
+				//System.out.println("dividing by area "+districts.get(k).area);
 			}
 			double[] votes = districts.get(k).getAnOutcome();//getElectionResults()[0];
 			double[] seats = District.popular_vote_to_elected(votes, k);
@@ -2029,21 +2081,27 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			if( dem_res < 0) { dem_res += votes_per_seat; } //seats[0]--;
 			if( rep_res < 0) { rep_res += votes_per_seat; } //seats[1]--;
 			
-			System.out.println("dem_res: "+dem_res);
-			System.out.println("rep_res: "+rep_res);
+			//System.out.println("dem_res: "+dem_res);
+			//System.out.println("rep_res: "+rep_res);
 			return multiplier*(dem_res-rep_res)/num_seats;
 		}
-		public Color getVoteGapByDemoColor(int k) {
+		public double getVoteGapPct(int k) {
 			double[] votes = districts.get(k).getAnOutcome();
 			double vote_gap = getVoteGapForDistrict(k);
 			vote_gap /= (votes[0]+votes[1]);
+			return vote_gap;
+		}
+		public Color getVoteGapByDemoColor(int k) {
+			//double[] votes = districts.get(k).getAnOutcome();
+			double vote_gap = getVoteGapPct(k);
+			//vote_gap /= (votes[0]+votes[1]);
 			vote_gap = Math.abs(vote_gap);
 			double[] amts1 = districts.get(k).getDemographics();
 			double tot = 0;
 			for( int i = 0; i < amts1.length; i++) {
 				tot += amts1[i];
 			}
-			System.out.println("tot: "+tot);
+			//System.out.println("tot: "+tot);
 			tot = vote_gap/tot;
 			for( int i = 0; i < amts1.length; i++) {
 				amts1[i] *= tot;
@@ -2074,10 +2132,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
 		}
 		public Color getVoteGapByPartyColor(int k) {
-			double votes[] = districts.get(k).getAnOutcome();
-			double vote_gap = getVoteGapForDistrict(k);
-			vote_gap /= (votes[0]+votes[1]);
-			System.out.println("vote_gap: "+vote_gap);
+			//double votes[] = districts.get(k).getAnOutcome();
+			double vote_gap = getVoteGapPct(k);
+			//vote_gap /= (votes[0]+votes[1]);
+			//System.out.println("vote_gap: "+vote_gap);
 			double[] amts1 = new double[]{vote_gap > 0 ? vote_gap : 0,vote_gap < 0 ? -vote_gap : 0};
 		
 			double[] rgb = new double[]{0,0,0};

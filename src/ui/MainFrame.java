@@ -5017,6 +5017,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmShowDemographics);
 		
+		mntmColorByVtd = new JMenuItem("Color by vtd vote packing");
+		mntmColorByVtd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING2;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByVtd);
+		
+		mntmColorByVtd_1 = new JMenuItem("Color by vtd demographic packing");
+		mntmColorByVtd_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING2;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByVtd_1);
+		
 		separator_11 = new JSeparator();
 		mnView.add(separator_11);
 		
@@ -6288,6 +6308,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider slider;
 	public JSeparator separator_16;
 	public JCheckBoxMenuItem chckbxmntmDividePackingBy;
+	public JMenuItem mntmColorByVtd;
+	public JMenuItem mntmColorByVtd_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6976,7 +6998,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			String state = Download.states[Download.istate];
 			
-			if( false) {
+			if( true) {
 				getDemographics(state,Download.state_to_abbr.get(state),""+Download.cyear);
 			}
 		
@@ -7000,7 +7022,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String base_url = "http://www2.census.gov/census_2010/01-Redistricting_File--PL_94-171/";
 			
 			String fn_zipfile = stateabbr.toLowerCase()+year+".pl.zip";
-			String url = base_url+statename+"/"+fn_zipfile;
+			String url = base_url+statename.replaceAll(" ", "_")+"/"+fn_zipfile;
 			String path = Download.census_tract_path+"demographics"+File.separator;
 
 			Download.download(url,path,fn_zipfile);
@@ -7163,9 +7185,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( feat.properties.POPULATION == 0) {
 					Double d = new Double(0);
 					try { 
-						Double.parseDouble(feat.properties.get(project.population_column).toString());
+						d = Double.parseDouble(feat.properties.get(project.population_column).toString());
 					} catch (Exception ex) {
-						ex.printStackTrace();
+						//ex.printStackTrace();
 					}
 					feat.properties.POPULATION = d.intValue();
 				}

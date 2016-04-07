@@ -34,6 +34,8 @@ public class Util {
 		"Ohio",
 		"Texas",
 		"Virginia",
+		"Pennsylvania",
+		"Oregon"
 	};
 
 	/*
@@ -341,11 +343,29 @@ New Mexico
 				}
 			}
 			if( !hit) {
-				continue;
+				//continue;
 			}
 
 			StringBuffer sb = new StringBuffer();
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			sb.append("IMPORT DEMOGRAPHICS\n");
+			
+			if( Download.apportionments[i] == 1) {
+				sb.append("COPY FEATURE CD_BD CD_NOW\n");
+				
+			}
+			sb.append("COPY FEATURE CD_NOW CD_2000\n");
+			/*
+			sb.append("SAVE\n");
+			if( state.equals("Alabama")) {
+				sb.append("IMPORT BDISTRICTING\n");
+				sb.append("SAVE\n");
+			}*/
+			sb.append("SAVE\n");
+
+			sb.append("LOAD "+i+ " 2010 2012\n");
+			
+
 			
 			
 			/*
@@ -389,26 +409,66 @@ done county data merge
 				//sb.append("EXIT\nEXIT\n");
 				//sb.append("IMPORT TRANSLATIONS\n");
 				//sb.append("IMPORT COUNTY\n");
-				sb.append("IMPORT URL http://autoredistrict.org/all50/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state));
-				sb.append("SAVE\n");
+				//sb.append("IMPORT URL http://autoredistrict.org/all50/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20"));
+				//sb.append("SAVE\n");
 			}
 			//sb.append("IMPORT BDISTRICTING\n");
 			//sb.append("IMPORT CURRENT_DISTRICTS\n");
-			
 			/*
+COPY FEATURE PRES12_DEM PRES12_D50
+COPY FEATURE PRES12_REP PRES12_R50
+SET ELECTION COLUMNS PRES12_D50 PRES12_R50
+RESCALE ELECTIONS
+			 */
+			
 			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
 			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("RESCALE ELECTIONS\n");
-			*/
+			
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-			//sb.append("SAVE\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
-			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
-			sb.append("SET WEIGHT COUNT_SPLITS TRUE\n");
-			sb.append("SET COUNTY COLUMN COUNTY_NAM\n");
 			sb.append("SET ETHNICITY COLUMNS VAP_WHITE VAP_BLACK VAP_HISPAN VAP_ASIAN VAP_INDIAN VAP_OTHER\n");
+			
+			sb.append("STOP\n");
+			sb.append("SET EVOLUTION POPULATION 200\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("SET DISTRICTS COLUMN CD_FV\n");
+			sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");
+			sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.75\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+			sb.append("SET EVOLUTION POPULATION 200\n");
+			sb.append("SET EVOLUTION MUTATE_RATE 1.0\n");
+			sb.append("SET EVOLUTION ANNEAL_RATE 0.76\n");
+			sb.append("SET EVOLUTION ELITE_FRAC 0.50\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
+			sb.append("SET WEIGHT POPULATION 0.5\n");
+			if( Download.apportionments[i] > 5) {
+				sb.append("GO\n");
+				sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET WEIGHT CONTIGUITY 1.0\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.5\n");
+				sb.append("SET MUTATE_RATE 0.80\n");
+				sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET MUTATE_RATE 0.80\n");
+				sb.append("SET WEIGHT CONTIGUITY 0.5\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.1\n");
+				sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET WEIGHT POPULATION 1.0\n");
+				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 0.5\n");
+				sb.append("SET MUTATE_RATE 1.00\n");
+				sb.append("WHEN MUTATE_RATE 0.3\n");
+				sb.append("STOP\n");
+				sb.append("SAVE\n");
+			}
+			sb.append("EXPORT\n");
+			sb.append("EXPORT_NATIONAL\n");
+			sb.append("EXIT\n");
+			sb.append("EXIT\n");
+			
+			
+			
 			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
 			//sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
 			//sb.append("COPY FEATURE AR_RESULT CONGRESS_F\n");
@@ -416,8 +476,9 @@ done county data merge
 			//sb.append("SAVE\n");
 			//sb.append("EXIT\n");
 			
+			/*
 			sb.append("SET DISTRICTS SEATS_PER_DISTRICT 1\n");		
-			if( state.equals("Texas")) {
+			//if( state.equals("Texas")) {
 				sb.append("SET DISTRICTS COLUMN CD_BD\n");
 				//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 				sb.append("EXPORT\n");
@@ -427,21 +488,55 @@ done county data merge
 				//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 				sb.append("EXPORT\n");
 				sb.append("EXPORT NATIONAL\n");
-			}
+			//}
+				*/
 			
 
-			if( hit) {
+			if( hit || true) {
 				if( Download.apportionments[i] <= 5) {
-					sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
+					sb.append("SET DISTRICTS SEATS_PER_DISTRICT [SEATS]\n");//"+Download.apportionments[i]+"\n"); 			
 				} else {
-					sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
+					sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
 				}
 				sb.append("SET DISTRICTS COLUMN CD_FV\n");
-				if( Download.apportionments[i] <= 5) {
-					sb.append("SET DISTRICTS SEATS_PER_DISTRICT "+Download.apportionments[i]+"\n"); 			
-				} else {
-					sb.append("SET DISTRICTS FAIRVOTE_SEATS "+Download.apportionments[i]+"\n"); 
-				}
+				//if( Download.apportionments[i] <= 5) {
+				//	sb.append("SET DISTRICTS SEATS_PER_DISTRICT [SEATS]\n");//"+Download.apportionments[i]+"\n"); 			
+				//} else {
+					sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+				//}
+					/*
+					 * 
+					 * 
+STOP
+SET ELECTION COLUMNS PRES12_D50 PRES12_R50
+SET DISTRICTS COLUMN CD_FV
+SET DISTRICTS FAIRVOTE_SEATS [SEATS]
+SET WEIGHT GEOMETRY_FAIRNESS 1.0
+SET WEIGHT DESCRIPTIVE 0.50
+SET EVOLUTION POPULATION 200
+SET EVOLUTION MUTATE_RATE 1.0
+SET EVOLUTION ANNEAL_RATE 0.76
+SET EVOLUTION ELITE_FRAC 0.50
+SET WEIGHT DESCRIPTIVE 1.0
+SET WEIGHT POPULATION 0.5
+GO
+WHEN MUTATE_RATE 0.25
+SET WEIGHT CONTIGUITY 1.0
+SET WEIGHT GEOMETRY_FAIRNESS 0.5
+SET MUTATE_RATE 1.00
+WHEN MUTATE_RATE 0.25
+SET WEIGHT CONTIGUITY 0.5
+SET EVOLUTION ELITE_MUTATE_FRAC 0.5
+SET MUTATE_RATE 1.00
+WHEN MUTATE_RATE 0.25
+STOP
+SAVE
+EXPORT
+EXPORT_NATIONAL
+EXIT
+EXIT
+
+					 */
 				sb.append("EXPORT\n");
 				sb.append("EXPORT NATIONAL\n");
 			}

@@ -31,6 +31,8 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	public static final int DISPLAY_MODE_RACIAL_PACKING = 11;
 	public static final int DISPLAY_MODE_DIST_DEMO = 12;
 	public static final int DISPLAY_MODE_COUNTY_SPLITS = 13;
+	public static final int DISPLAY_MODE_PARTISAN_PACKING2 = 14;
+	public static final int DISPLAY_MODE_RACIAL_PACKING2 = 15;
 
 	public static boolean show_seats = true;
 	
@@ -299,10 +301,64 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				g.setColor(elections != null && elections.size() > 0 ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 			} else if( display_mode == DISPLAY_MODE_TEST2) {
 				g.setColor(has_census_results ? FeatureCollection.DEFAULT_COLOR :  Color.black);
+				//getVoteGapPct(k);
+			} else 
+			if( display_mode == DISPLAY_MODE_RACIAL_PACKING2) {
+				double tot = 0;
+				double red = 0;
+				double green = 0;
+				
+				double blue = 0;
+				//for( int k = 0; k < elections.size(); k++) {
+					//Vector<Election> dem = elections.get(k);
+					for( int i = 0; i < demographics.length && i < colors.length; i++) {
+						int pop = (int)demographics[i];
+						tot += pop;
+						red += colors[i].getRed()*pop;
+						green += colors[i].getGreen()*pop;
+						blue += colors[i].getBlue()*pop;
+					}
+				//}
+				red /= tot;
+				green /= tot;
+				blue /= tot;
+				
+				red = 255-(255-red)*geometry.color_multiplier;
+				green = 255-(255-green)*geometry.color_multiplier;
+				blue = 255-(255-blue)*geometry.color_multiplier;
+				
+				Color c = new Color((int)red,(int)green,(int)blue);
+				g.setColor(c);
+			} else if( display_mode == DISPLAY_MODE_PARTISAN_PACKING2) {
+				double tot = 0;
+				double red = 0;
+				double green = 0;
+				double blue = 0;
+				for( int k = 0; k < elections.size(); k++) {
+					Vector<Election> dem = elections.get(k);
+					for( int i = 0; i < dem.size() && i < colors.length; i++) {
+						int pop = dem.get(i).population;
+						tot += pop;
+						red += colors[i].getRed()*pop;
+						green += colors[i].getGreen()*pop;
+						blue += colors[i].getBlue()*pop;
+					}
+				}
+				red /= tot;
+				green /= tot;
+				blue /= tot;
+				
+				red = 255-(255-red)*geometry.color_multiplier;
+				green = 255-(255-green)*geometry.color_multiplier;
+				blue = 255-(255-blue)*geometry.color_multiplier;
+				
+				Color c = new Color((int)red,(int)green,(int)blue);
+				g.setColor(c);
 			} else if( display_mode == DISPLAY_MODE_DEMOGRAPHICS) {
 				double tot = 0;
 				double red = 0;
 				double green = 0;
+				
 				double blue = 0;
 				//for( int k = 0; k < elections.size(); k++) {
 					//Vector<Election> dem = elections.get(k);

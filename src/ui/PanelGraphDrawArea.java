@@ -26,7 +26,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Competitiveness (victory margin)",
     		"Partisan symmetry",
     		"Racial vote dilution",
-    		"",//"Voting power imbalance",
+    		"Undescribed voters",//"Voting power imbalance",
 
     		//9
     		"",//"Annealing floor",

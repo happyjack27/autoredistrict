@@ -53,14 +53,14 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			return seats_number_per_district;
 		} else {
 			int test = 0;
-			//System.out.println("seats_number_total: "+seats_number_total);
+			//System.out.println("seats_number_total: "+seats_number_total+" looking for district: "+n);
 			int[] sc = getSeatDistribution(seats_number_total);
 			for(int i = sc.length-1; i > 0; i--) {
 				test += sc[i];
-				//System.out.println("i: "+i+" sc[i]: "+sc[i]+" test: "+test+" n: "+n);
+				//System.out.println("n: "+n+" i: "+i+" sc[i]: "+sc[i]+" test: "+test+" n: "+n);
 				if( n < test) {
 					//System.out.println(" seats_in_district test: "+test+" "+n+": "+i);
-					return i;
+					return i;//sc[i];
 				}
 			}
 			//System.out.println(" seats_in_district fall "+seats_number_total+" "+test+" "+n+" : 1");
@@ -270,7 +270,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 			int s5 = (seats-sm5) / 5;
 			int s4 = 0;
 			int s3 = 0;
-			if( no4s) {
+			if( (no4s && seats != 7) || (true && seats != 7)) {
 				switch( sm5) {
 				case 0:
 					s5 -= 0;

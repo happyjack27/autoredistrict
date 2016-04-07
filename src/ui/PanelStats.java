@@ -253,8 +253,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					//dm.fairnessScores[1]*conversion_to_bits, //REP IMBALANCE
 					//dm.fairnessScores[6], //WASTED VOTES IMBALANCE
 					dm.fairnessScores[7], //seats / votes asymmetry
-					dm.fairnessScores[10],
-					dm.fairnessScores[4], //POWER IMBALANCE
+					dm.fairnessScores[10], //racial vote dilution
+					dm.fairnessScores[11], //descr. rep.
 					/*
 					 *    		"Proportionalness (global)",
     		"Competitiveness (victory margin)",
@@ -342,14 +342,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				try {
 					elec_counts[i] = 0;
 					vote_counts[i] = 0;
-					dcolumns[i+17] = ""+cands.get(i)+" vote %";
-					dcolumns[i+17+Settings.num_candidates] = ""+cands.get(i)+" votes";
+					dcolumns[i+16] = ""+cands.get(i)+" vote %";
+					dcolumns[i+16+Settings.num_candidates] = ""+cands.get(i)+" votes";
 				} catch (Exception ex) { }
 			}
 			for( int i = 0; i < dem_col_names.length; i++) {
 				try {
-				dcolumns[i+17+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
-				dcolumns[i+17+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
+				dcolumns[i+16+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
+				dcolumns[i+16+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
 			} catch (Exception ex) { }
 			}
 			
@@ -580,7 +580,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
 					//new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
 					//new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
-					new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
+					//new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
+					new String[]{""+decimal.format(dm.fairnessScores[11]*conversion_to_bits),"Undescribed voters"},
+					//Descriptive representation
 					new String[]{"",""},
 					new String[]{""+tot_seats[0],"FV Safe D"},
 					new String[]{""+tot_seats[1],"FV Lean D"},

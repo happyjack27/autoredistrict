@@ -700,6 +700,24 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						geo.fillColor = district_colors[di];
 					}
 				}
+			} else 
+			if( Feature.display_mode == Feature.DISPLAY_MODE_PARTISAN_PACKING2 || Feature.display_mode == Feature.DISPLAY_MODE_RACIAL_PACKING2) {
+				DistrictMap dm  = ecology.population.get(shown_map);
+				double[] districts = new double[Settings.num_districts];
+				for( int i = 0; i < districts.length; i++) {
+					districts[i] = Math.abs(dm.getVoteGapPct(i));
+					if( districts[i] > 1) {
+						districts[i] = 1;
+					}
+				}
+	
+				for( int i = 0; i < features.size(); i++) {
+					Feature f = features.get(i);
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[f.id];
+					geo.color_multiplier = districts[di];
+					f.draw(g);
+				}
 			} else
 			if( Feature.display_mode == Feature.DISPLAY_MODE_RACIAL_PACKING) {
 				if( shown_map < ecology.population.size()) {

@@ -325,33 +325,54 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			System.out.println(" ----------- "+new Date().toLocaleString()+": canceling duplicate thread "+this.instruction_pointer);
 			return;
 		}
+		if( instruction_pointer >= instructions.size()) {
+			//System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
+			lblFinished.setVisible(true);
+			return;
+		}
 		duplicateThread = true;
-		System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if( !mainFrame.evolving) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 1000");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		duplicateThread = false;
 		//System.out.println("eventOccured");
 		Download.init();
-		if( instruction_pointer >= instructions.size()) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
-			lblFinished.setVisible(true);
-			return;
-		}
 		lblFinished.setVisible(false);
 		try {
 		
 		//get instruction words
 		String current_instruction = instructions.get(instruction_pointer).trim();
-		System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION PROCESS: "+current_instruction);
+		if( !mainFrame.evolving) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION PROCESS: "+current_instruction);
+		}
+		try {
+			if( Download.istate >= 0) {
+			current_instruction = current_instruction.replaceAll("\\[SEATS\\]",""+Download.apportionments[Download.istate]);
+			String fips = (""+Download.istate).length() < 1 ? ("0"+Download.istate) : (""+Download.istate);
+			current_instruction = current_instruction.replaceAll("\\[FIPS\\]",fips);
+			current_instruction = current_instruction.replaceAll("\\[STATE\\]",Download.states[Download.istate]);
+			current_instruction = current_instruction.replaceAll("\\[STATEURL\\]",Download.states[Download.istate].replaceAll(" ", "%20"));
+			current_instruction = current_instruction.replaceAll("\\[STATEUNDERSCORE\\]",Download.states[Download.istate].replaceAll(" ", "_"));
+			current_instruction = current_instruction.replaceAll("\\[ABBR\\]",Download.state_to_abbr.get(Download.states[Download.istate]));
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		if( !mainFrame.evolving) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION REPARSE: "+current_instruction);
+		}
 
 		//System.out.println("processing "+current_instruction);
-		String[] instruction_words = current_instruction.split(" ");
+		String[] instruction_words_original = current_instruction.split(" ");
+		String[] instruction_words = new String[instruction_words_original.length];
 		for( int i = 0; i < instruction_words.length; i++) {
-			instruction_words[i] = instruction_words[i].toUpperCase().trim();
+			instruction_words[i] = instruction_words_original[i].toUpperCase().trim();
 		}
 		String command = instruction_words[0];
 		
@@ -423,9 +444,15 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			}
 			mainFrame.importURL( url,  fk,  pk, cols);
 		} else
-		if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
-			mainFrame.importBlockElection();
-		} else
+			if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
+				mainFrame.importBlockElection();
+			} else
+				if( command.equals("IMPORT") && instruction_words[1].equals("DEMOGRAPHICS")) {
+					mainFrame.importBlockDemographics();
+					instruction_pointer++;
+					textFieldIP.setText(""+(instruction_pointer+1));
+					return;
+				} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("TRANSLATIONS")) {
 			mainFrame.importTranslations();
 		} else
@@ -529,6 +556,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if(command.equals("SAVE")) {
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
+		} else
+		if(command.equals("EXTRACT")) {
+			Download.downloadAndExtract(instruction_words_original[1], instruction_words_original[2]);
 		} else
 		if(command.equals("EXPORT")) {
 			if( instruction_words.length> 1) {
@@ -649,12 +679,23 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( item.equals("COUNT_SPLITS")) { mainFrame.chckbxReduceSplits.setSelected(value.equals("TRUE")); }
 		} else
 		if( category.equals("DISTRICTS")) {
-			if( item.equals("NUM_DISTRICTS")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldNumDistricts.setText(value); }
-			if( item.equals("SEATS_PER_DISTRICT")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldSeatsPerDistrict.setText(value); }
-			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); Settings.seats_number_total = Integer.parseInt(mainFrame.textFieldTotalSeats.getText()); mainFrame.textFieldTotalSeats.setText(value); }
+			if( item.equals("NUM_DISTRICTS")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldNumDistricts.setText(value); fireAction(mainFrame.textFieldNumDistricts); }
+			if( item.equals("SEATS_PER_DISTRICT")) { mainFrame.lblMembersPerDistrict.setSelected(true); mainFrame.setSeatsMode(); mainFrame.textFieldSeatsPerDistrict.setText(value); fireAction( mainFrame.textFieldSeatsPerDistrict); }
+			if( item.equals("FAIRVOTE_SEATS")) { mainFrame.lblTotalSeats.setSelected(true); mainFrame.setSeatsMode(); Settings.seats_number_total = Integer.parseInt(mainFrame.textFieldTotalSeats.getText()); 
+				mainFrame.textFieldTotalSeats.setText(value); 
+				fireAction( mainFrame.textFieldTotalSeats);
+			}
 			if( item.equals("ALLOW_4_SEATS")) { mainFrame.chckbxNewCheckBox.setSelected(value.equals("FALSE")); }
 			if( item.equals("COLUMN")) { mainFrame.comboBoxDistrictColumn.setSelectedItem(value); mainFrame.setDistrictColumn(value); }
 		}
+	}
+	public static void fireAction(JTextField p) {
+		for( ActionListener a : p.getActionListeners()) {
+			try {
+				a.actionPerformed(null);
+			} catch (Exception ex) {}
+		}
+		
 	}
 
 

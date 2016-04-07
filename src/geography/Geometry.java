@@ -20,6 +20,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	public Color fillColor = FeatureCollection.DEFAULT_COLOR;
 	public boolean isDistrict = true;
 	public double[] full_centroid;
+	public double color_multiplier = 1;
 
 	
 	public static boolean isLatLon = true; 
