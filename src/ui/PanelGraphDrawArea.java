@@ -43,8 +43,8 @@ public class PanelGraphDrawArea extends JPanel {
     public boolean[] b_draw = new boolean[]{
     		false,false,false,
     		true,
-    		true,true,true,true,false,
-    		true,
+    		true,true,true,true,true,
+    		false,
     		true,true,true,true,
     		false,
     		//true,true,
@@ -61,9 +61,9 @@ public class PanelGraphDrawArea extends JPanel {
     		Color.cyan,
     		Color.green,
     		Color.red,
-    		Color.magenta,
+    		Color.magenta, //to
     		
-    		Color.gray,
+    		Color.gray, //from
     		
     		Color.blue.darker(),
     		Color.cyan.darker(),

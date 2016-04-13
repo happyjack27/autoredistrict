@@ -639,10 +639,24 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 				for( int i = 0; i < Settings.num_districts; i++) {
+					double multiplier = 1;
+					if( Settings.divide_packing_by_area) {
+						multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+						if( multiplier > 1) {
+							multiplier = 1;
+						}
+					}
+					red[i] = (255.0-(red[i]/tot[i]))*multiplier;
+					blue[i] = (255.0-(blue[i]/tot[i]))*multiplier;
+					green[i] = (255.0-(green[i]/tot[i]))*multiplier;
+					red[i] = 255.0-red[i];
+					blue[i] = 255.0-blue[i];
+					green[i] = 255.0-green[i];
+
 					district_colors[i] = new Color(
-							(int)(red[i] / tot[i]),
-							(int)(green[i] / tot[i]),
-							(int)(blue[i] / tot[i])
+							(int)(red[i]),
+							(int)(green[i]),
+							(int)(blue[i])
 					);
 				}			
 				for( int i = 0; i < features.size(); i++) {
@@ -687,11 +701,27 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 						//}
 					}
 					for( int i = 0; i < Settings.num_districts; i++) {
+						double multiplier = 1;
+						if( Settings.divide_packing_by_area) {
+							multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+							if( multiplier > 1) {
+								multiplier = 1;
+							}
+						}
+						red[i] = (255.0-(red[i]/tot[i]))*multiplier;
+						blue[i] = (255.0-(blue[i]/tot[i]))*multiplier;
+						green[i] = (255.0-(green[i]/tot[i]))*multiplier;
+						red[i] = 255.0-red[i];
+						blue[i] = 255.0-blue[i];
+						green[i] = 255.0-green[i];
+
+
 						district_colors[i] = new Color(
-								(int)(red[i] / tot[i]),
-								(int)(green[i] / tot[i]),
-								(int)(blue[i] / tot[i])
+								(int)(red[i]),
+								(int)(green[i]),
+								(int)(blue[i])
 						);
+
 					}			
 					for( int i = 0; i < features.size(); i++) {
 						Feature f = features.get(i);

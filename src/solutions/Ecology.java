@@ -35,8 +35,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	static int num_threads = 8;
 
-	public static double[] fairnessScoreEmaVars = new double[11];
-	public static double[] fairnessScoreEmaMeans = new double[11];
+	public static double[] fairnessScoreEmaVars = new double[12];
+	public static double[] fairnessScoreEmaMeans = new double[12];
 
     int cutoff;
     int speciation_cutoff;
@@ -421,9 +421,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	            double mult = 1.0/(double)population.size();
 	            for( int j = 0; j < population.size(); j++) {
 	                DistrictMap map = population.get(j);
-	                if( map.fairnessScores[i] != 0) {
+	                //if( map.fairnessScores[i] != 0 || i == 11) {
 	                	map.fairnessScores[i] = ((double)j)*mult;
-	                }
+	                //}
 	            }
 	        }
         } else

@@ -11,6 +11,19 @@ import java.util.Map.Entry;
 import ui.Download;
 
 public class Util {
+	static int apportionment_threshold = 15;
+	public static String[] redo_states = new String[]{
+		//"Illinois",
+		//"California",
+		//"Florida",
+		"Texas",
+		//"Massachusetts",
+		"Virginia",
+		"New Jersey",
+		"New York",
+		"Ohio",
+	};
+	
 	public static String[] bad_states_round1 = new String[]{
 		"Illinois",
 		"Louisiana",
@@ -321,6 +334,10 @@ New Mexico
 		int i0 = 0;
 		//while( !Download.states[i0].equals("Indiana")) { i0++; }
 		for( int i = 0; i < Download.apportionments.length; i++){// && !Download.states[i].equals("Colorado"); i++) {
+			if( i == 6) {
+				//continue; //skip cali for now
+			}
+		
 			if( Download.apportionments[i] < 6) {
 				//continue;
 			}
@@ -336,17 +353,21 @@ New Mexico
 			String state = Download.states[i];
 			
 			boolean hit = false;
-			for( int j = 0; j < bad_states.length; j++) {
-				if( bad_states[j].equals(state)) {
+			for( int j = 0; j < redo_states.length; j++) {
+				if( redo_states[j].equals(state)) {
 					hit = true;
 					break;
 				}
 			}
+			if( Download.apportionments[i] > apportionment_threshold) {
+				//hit = true;
+			}
 			if( !hit) {
-				//continue;
+				continue;
 			}
 
 			StringBuffer sb = new StringBuffer();
+			/*
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			sb.append("IMPORT DEMOGRAPHICS\n");
 			
@@ -355,115 +376,105 @@ New Mexico
 				
 			}
 			sb.append("COPY FEATURE CD_NOW CD_2000\n");
+			sb.append("SAVE\n");
+			*/
 			/*
 			sb.append("SAVE\n");
 			if( state.equals("Alabama")) {
 				sb.append("IMPORT BDISTRICTING\n");
 				sb.append("SAVE\n");
 			}*/
-			sb.append("SAVE\n");
+			
 
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			
-
 			
-			
-			/*
-			sb.append("MERGE\n");
-			sb.append("IMPORT COUNTY\n");
-			
-			for( int j = 0; j < states_vtd.length; j++) {
-				if( states_vtd[j].equals(Download.states[i])) {
-					sb.append("IMPORT ELECTIONS\n");
-					sb.append("SAVE\n");
-					break;
-				}
+			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
+			if( i != 25 && i != 17) {
+			//sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+			//sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
+			//sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
+			//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			//sb.append("RESCALE ELECTIONS\n");
+			//sb.append("SAVE\n");
+			//sb.append("LOAD "+i+ " 2010 2012\n");
 			}
-			/*
-			 * url: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txt
-0
-0.0
-0.1
-1
-2
-ex java.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txtjava.io.FileNotFoundException: http://autoredistrict.org/county_level_stats/VTD%20Detail%20Estimates%20--%20Maryland.txt
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream0(HttpURLConnection.java:1835)
-	at sun.net.www.protocol.http.HttpURLConnection.getInputStream(HttpURLConnection.java:1440)
-	at java.net.URL.openStream(URL.java:1038)
-	at ui.MainFrame.joinToTxt(MainFrame.java:6671)
-	at ui.MainFrame$ImportFeatureLevel.run(MainFrame.java:6884)
-total found: 0
-total not found: 0
-setting columns final...
- found POPULATION
- found COUNTYFP10
-no ecology attached {}
-done county data merge
 
-			 */
-			
-			
-			
-			if( hit) {
-				//sb.append("SAVE\n");
-				//sb.append("EXIT\nEXIT\n");
-				//sb.append("IMPORT TRANSLATIONS\n");
-				//sb.append("IMPORT COUNTY\n");
-				//sb.append("IMPORT URL http://autoredistrict.org/all50/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20"));
-				//sb.append("SAVE\n");
-			}
-			//sb.append("IMPORT BDISTRICTING\n");
-			//sb.append("IMPORT CURRENT_DISTRICTS\n");
-			/*
-COPY FEATURE PRES12_DEM PRES12_D50
-COPY FEATURE PRES12_REP PRES12_R50
-SET ELECTION COLUMNS PRES12_D50 PRES12_R50
-RESCALE ELECTIONS
-			 */
-			
-			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
-			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
-			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-			sb.append("RESCALE ELECTIONS\n");
-			
+			sb.append("SET WEIGHT DESCRIPTIVE 0.45\n");
+
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			
 			sb.append("SET POPULATION COLUMN POPULATION\n");
 			sb.append("SET ETHNICITY COLUMNS VAP_WHITE VAP_BLACK VAP_HISPAN VAP_ASIAN VAP_INDIAN VAP_OTHER\n");
+
+			/*
+			sb.append("SET DISTRICTS COLUMN CD_BD\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+			sb.append("EXPORT\n");
+			sb.append("EXPORT NATIONAL\n");
+			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+			sb.append("EXPORT\n");
+			sb.append("EXPORT NATIONAL\n");
+			sb.append("SET DISTRICTS COLUMN CD_2000\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+			sb.append("EXPORT\n");
+			sb.append("EXPORT NATIONAL\n");
+			*/
 			
 			sb.append("STOP\n");
 			sb.append("SET EVOLUTION POPULATION 200\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 			sb.append("SET DISTRICTS COLUMN CD_FV\n");
 			sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");
-			sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.75\n");
-			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+			sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.5\n");
+			//sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
 			sb.append("SET EVOLUTION POPULATION 200\n");
 			sb.append("SET EVOLUTION MUTATE_RATE 1.0\n");
-			sb.append("SET EVOLUTION ANNEAL_RATE 0.76\n");
+			sb.append("SET EVOLUTION ANNEAL_RATE 0.80\n");
 			sb.append("SET EVOLUTION ELITE_FRAC 0.50\n");
-			sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
 			sb.append("SET WEIGHT POPULATION 0.5\n");
+			sb.append("SET WEIGHT DESCRIPTIVE 0.5\n");
+
+			if( Download.states[i].equals("Texas") || Download.states[i].equals("New York") || Download.states[i].equals("New Jersey")) {
 			if( Download.apportionments[i] > 5) {
 				sb.append("GO\n");
-				sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
+				sb.append("SET WEIGHT COMPETITION 0.25\n");
+				sb.append("SET WEIGHT PROPORTIONAL 0.1\n");
+				sb.append("SET WEIGHT PARTISAN 0.1\n");
+				sb.append("SET WEIGHT RACIAL 0.1\n");
+				sb.append("SET EVOLUTION MUTATE_RATE 1.0\n");
+				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 1.0\n");
+				//sb.append("SET EVOLUTION POPULATION 200\n");
 				sb.append("SET WEIGHT CONTIGUITY 1.0\n");
-				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.5\n");
-				sb.append("SET MUTATE_RATE 0.80\n");
+				//sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.9\n");
+				//sb.append("SET MUTATE_RATE 0.80\n");
+				
 				sb.append("WHEN MUTATE_RATE 0.5\n");
-				sb.append("SET MUTATE_RATE 0.80\n");
-				sb.append("SET WEIGHT CONTIGUITY 0.5\n");
-				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.1\n");
+				sb.append("SET EVOLUTION MUTATE_RATE 0.80\n");
+				sb.append("SET WEIGHT CONTIGUITY 1.0\n");
+				sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
+				sb.append("SET WEIGHT PROPORTIONAL 0.5\n");
+				sb.append("SET WEIGHT PARTISAN 0.5\n");
+
+
 				sb.append("WHEN MUTATE_RATE 0.5\n");
-				sb.append("SET WEIGHT POPULATION 1.0\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.2\n");
 				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 0.5\n");
-				sb.append("SET MUTATE_RATE 1.00\n");
+				sb.append("SET WEIGHT POPULATION 0.5\n");
+				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 0.5\n");
+				sb.append("SET EVOLUTION MUTATE_RATE 1.00\n");
 				sb.append("WHEN MUTATE_RATE 0.3\n");
 				sb.append("STOP\n");
 				sb.append("SAVE\n");
 			}
-			sb.append("EXPORT\n");
+			}
+			
 			sb.append("EXPORT_NATIONAL\n");
+			sb.append("EXPORT\n");
+			
 			sb.append("EXIT\n");
 			sb.append("EXIT\n");
 			

@@ -37,7 +37,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public Vector<District> districts = new Vector<District>();
     
     public int[] vtd_districts = new int[]{};
-    public double[] fairnessScores = new double[11];
+    public double[] fairnessScores = new double[12];
     public double fitness_score = 0;
     
     public static double[] metrics = new double[10];
@@ -97,6 +97,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	}
 	*/
     public double getDescrVoteImbalance() {
+    	try {
+    		//System.out.println(".");
 		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
 		if( dem_col_names.length == 0) {
 			return 0;
@@ -112,41 +114,123 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			total_demo[j] = 0;
 		}
 		
-		double[] min_votes_needed_for_seat = new double[dem_col_names.length];
 		for( int i = 0; i < districts.size(); i++) {
 			int num_seats = Settings.seats_in_district(i);
-			double[] demo_result = District.popular_vote_to_elected(demo[i], i);
-			double[] needed = District.votes_needed_for_another_seat(demo[i], i);
+			total_seats += num_seats;
+			for( int j = 0; j < demo[i].length; j++) {
+				total_pop += demo[i][j];
+				total_demo[j] += demo[i][j];
+			}
+		}
+
+		double[] targets = District.popular_vote_to_elected_for_seats(total_demo,(int)total_seats,-1,false);
+/*
+		double[] targets = new double[demo[0].length];
+		//double total_seats = Settings.total_seats();
+		for( int i = 0; i < targets.length; i++) {
+			targets[i] = Math.round(total_seats*total_demo[i]/total_pop);
+		}
+*/
+		
+		double pop_per_seat = total_pop/total_seats;
+		double pop_per_seat_wrong = total_pop/(total_seats+1);
+		if( Settings.quota_method == Settings.QUOTA_METHOD_HARE) {
+			pop_per_seat_wrong = pop_per_seat;
+		}
+		double[] min_votes_needed_for_seat = this.getMinVotesNeededForSeat(demo, pop_per_seat_wrong);
+		
+
+		
+		for( int i = 0; i < districts.size(); i++) {
+			double[] demo_result = District.popular_vote_to_elected(demo[i], i, -1);
+			for( int j = 0; j < demo_result.length; j++) {
+				winners_by_ethnicity[j] += demo_result[j];
+			}
+		}
+
+		double MAD = 0;
+		
+		for( int i = 0; i < dem_col_names.length; i++) {
+			if( min_votes_needed_for_seat[i] > pop_per_seat) {
+				min_votes_needed_for_seat[i] = pop_per_seat;
+			}
+			//double winners = winners_by_ethnicity[i]*pop_per_seat;// + pop_per_seat - min_votes_needed_for_seat[i];
+			//double unrepresented = total_demo[i]-winners;//targets[i]*pop_per_seat - winners;
+		//	System.out.println("t: "+winners_by_ethnicity[i]+" "+targets[i]+" "+min_votes_needed_for_seat[i]);
+			double unrepresented = (targets[i] - winners_by_ethnicity[i])*pop_per_seat;
+			if( unrepresented < 0) {
+				unrepresented = Math.abs(unrepresented);
+				unrepresented += pop_per_seat - min_votes_needed_for_seat[i];
+				if( unrepresented < 0) {
+					unrepresented = 0;
+				}
+			} else if( unrepresented > 0) {
+				unrepresented += min_votes_needed_for_seat[i] - pop_per_seat;
+				if( unrepresented < 0) {
+					unrepresented = 0;
+				}
+			}
+			//unrepresented += min_votes_needed_for_seat[i]-pop_per_seat_wrong;
+			//System.out.println("i "+i+" "+targets[i]+" "+winners_by_ethnicity[i]+" "+unrepresented+" "+ min_votes_needed_for_seat[i]);
+
+			/*
+				MAD -= unrepresented;
+				MAD += pop_per_seat_wrong-min_votes_needed_for_seat[i];
+			} else {
+				if(unrepresented + min_votes_needed_for_seat[i]-pop_per_seat_wrong > 0) {
+					unrepresented += min_votes_needed_for_seat[i]-pop_per_seat_wrong;///pop_per_seat_wrong;
+				}
+			}*/
+			MAD += Math.abs(unrepresented)/2.0;//Math.abs(winners_by_ethnicity[i]*pop_per_seat - total_demo[i]);
+			/*
+			double unrepresented = total_demo[i]-winners_by_ethnicity[i]*pop_per_seat;
+			double pct = ((double)min_votes_needed_for_seat[i])/pop_per_seat_wrong;
+			//System.out.println("unr "+i+" "+unrepresented+" "+min_votes_needed_for_seat[i]+" "+pct);
+			if( unrepresented < 0) {
+				//System.out.println("overrepresented ");
+				continue;
+			}
+			if( unrepresented > pop_per_seat*0.60) { //if should get another seat
+				double amt = min_votes_needed_for_seat[i] - pop_per_seat_wrong;
+				if( amt+unrepresented < 0) {
+					continue;
+				} else {
+					unrepresented += amt;
+				}
+				//System.out.println("adjusted "+amt);
+			}
+			//System.out.println("adding "+unrepresented); 
+			
+			//(pop_per_seat - min_votes_needed_for_seat[i])
+			 
+			MAD += unrepresented;//Math.abs(winners_by_ethnicity[i]*pop_per_seat - total_demo[i]);
+			*/
+		}
+		//System.out.println("returning "+MAD);
+		
+		return MAD;
+    	} catch (Exception ex) {
+    		System.out.println("Ex "+ex);
+    		ex.printStackTrace();
+    		return 0;
+    	}
+	}
+    
+    public double[] getMinVotesNeededForSeat(double[][] demo, double pop_per_seat_wrong) {
+		
+		double[] min_votes_needed_for_seat = new double[demo[0].length];
+		for( int i = 0; i < districts.size(); i++) {
+			int num_seats = Settings.seats_in_district(i);
+			double[] demo_result = District.popular_vote_to_elected(demo[i], i, pop_per_seat_wrong);
+			double[] needed = District.votes_needed_for_another_seat(demo[i], i, pop_per_seat_wrong);
 			for( int j = 0; j < needed.length; j++) {
-				if( i == 0 || needed[j] < min_votes_needed_for_seat[j]) {
+				if( i == 0 || (needed[j] < min_votes_needed_for_seat[j] && needed[j] > 0)) {
 					min_votes_needed_for_seat[j] = needed[j];
 				}
 			}
-			
-			for( int j = 0; j < demo_result.length; j++) {
-				winners_by_ethnicity[j] += demo_result[j];
-				total_demo[j] += demo[i][j];
-				
-				total_seats +=  demo_result[j];
-				total_pop += demo[i][j];
-			}
 		}
-		double pop_per_seat = total_pop/total_seats;
-		
-		double MAD = 0;
-		for( int i = 0; i < dem_col_names.length; i++) {
-			double unrepresented = total_demo[i]-winners_by_ethnicity[i]*pop_per_seat;
-			if( unrepresented <= pop_per_seat) {
-				continue;
-			}
-			unrepresented -= pop_per_seat;
-			unrepresented += min_votes_needed_for_seat[i];
-			//(pop_per_seat - min_votes_needed_for_seat[i])
-			MAD += unrepresented;//Math.abs(winners_by_ethnicity[i]*pop_per_seat - total_demo[i]);
-		}
-		
-		return MAD;
-	}
+		return min_votes_needed_for_seat;
+    }
     
 	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
@@ -968,7 +1052,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			//double[][] result = d.getElectionResults();
 			double[][] result = new double[2][];//d.getElectionResults();
 			result[0] = d.getAnOutcome();
-			result[1] = District.popular_vote_to_elected(result[0], i);
+			result[1] = District.popular_vote_to_elected(result[0], i,0);
 
 			double total_votes = result[0][0]+result[0][1];
 			if( total_votes == 0) {
@@ -1354,7 +1438,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				}
 				totseats += Settings.seats_in_district(i);
 				double[] pv = new double[]{vote_count_districts[i][0]*dempct,vote_count_districts[i][1]*reppct};
-				double[] winners = District.popular_vote_to_elected( pv,i);
+				double[] winners = District.popular_vote_to_elected( pv,i,0);
 				demseats += winners[0];
 			}
 			double demseatpct = demseats/totseats;
@@ -1512,7 +1596,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 	//double[][] res = district.getElectionResults();
             		double[][] res = new double[2][];//d.getElectionResults();
             		res[0] = district.getAnOutcome();
-            		res[1] = District.popular_vote_to_elected(res[0], k);
+            		res[1] = District.popular_vote_to_elected(res[0], k, 0);
             		
 
                 	//pops[k] = res[4][0];
@@ -1766,8 +1850,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 Settings.diagonalization_weight   *1.0,
         };
     	 */
-    	
-    	
         fairnessScores = new double[]{
         		length
         		,disproportional_representation
@@ -2066,12 +2148,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				this.calcDemographicStatistics();
 			}
 			if( Settings.divide_packing_by_area) {
-				multiplier = 2.522667664609363E11; //2.522667664609363E9;
-				multiplier /= (double)districts.get(k).area;
+				multiplier = Settings.density_multiplier*(double)districts.get(k).getPopulation()/(double)districts.get(k).area;
 				//System.out.println("dividing by area "+districts.get(k).area);
 			}
 			double[] votes = districts.get(k).getAnOutcome();//getElectionResults()[0];
-			double[] seats = District.popular_vote_to_elected(votes, k);
+			double[] seats = District.popular_vote_to_elected(votes, k, 0);
 			double num_seats = Settings.seats_in_district(k);
 			
 			double total_votes = votes[0]+votes[1];

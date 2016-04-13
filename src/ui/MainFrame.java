@@ -2289,7 +2289,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			//collect counties;
 			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
-			HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
+			HashMap<String,Double> county_pops = new HashMap<String,Double>();
 			for( Feature feat : featureCollection.features) {
 				try {
 				String county = (String) feat.properties.get(county_column);
@@ -2304,15 +2304,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					county_feats.put(county,vf);
 				}
 				vf.add(feat);
-				Integer i = county_pops.get(county);
+				Double i = county_pops.get(county);
 				if( i == null) { 
-					i = new Integer(0);
+					i = new Double(0);
 					county_pops.put(county,i);
 				}
-				if( feat.properties.POPULATION == 0) {
-					Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
-					feat.properties.POPULATION = d.intValue();
-				}
+				//if( feat.properties.POPULATION == 0) {
+				Double d = Double.parseDouble(feat.properties.get(project.population_column).toString());
+				feat.properties.POPULATION = d.intValue();
+				//}
 				i += feat.properties.POPULATION;
 				county_pops.put(county,i);
 				} catch (Exception ex) {
@@ -2367,15 +2367,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					dd[i] = Double.parseDouble(ss[i]);///total_pop;
 				}
+				double confirm_tot = 0;
+				//double[] dd0 = new double[ss.length];
 				for(Feature feat : vf) {
 					double feat_pop = feat.properties.POPULATION;
+					confirm_tot += feat_pop/total_pop;
 					for( int i = 0; i < ss.length; i++) {
 						if( i == iCountyColumn || headers[i].equals("COUNTY_NAME") || headers[i].equals("COUNTY_FIPS")) {
 							continue;
 						}
-						feat.properties.put(headers[i], ""+(dd[i]*feat_pop/total_pop));
+						double add = (dd[i]*feat_pop/total_pop);
+						feat.properties.put(headers[i], ""+add);
 					}
 				}
+				System.out.println("found!: "+incounty+" "+total_pop+" "+confirm_tot+" "+dd[0]+" "+dd[1]);
+
 				} catch (Exception ex) {
 					System.out.println("ex: "+ex);
 					ex.printStackTrace();
@@ -3982,11 +3988,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		} 
 
 		jbInit();
+		/*
 		chckbxmntmOutlineState.setSelected(true);
 		Feature.outline_state = chckbxmntmOutlineState.isSelected();
 		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
+		*/
 		
 		try {
 			UIManager.setLookAndFeel(className);
@@ -4895,7 +4903,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		separator_16 = new JSeparator();
 		mnView.add(separator_16);
 		
-		chckbxmntmDividePackingBy = new JCheckBoxMenuItem("Divide packing by area");
+		chckbxmntmDividePackingBy = new JCheckBoxMenuItem("Divide by population density");
 		chckbxmntmDividePackingBy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.divide_packing_by_area = chckbxmntmDividePackingBy.isSelected();
@@ -7182,7 +7190,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					i = new Integer(0);
 					county_pops.put(county,i);
 				}
-				if( feat.properties.POPULATION == 0) {
+				//if( feat.properties.POPULATION == 0) {
 					Double d = new Double(0);
 					try { 
 						d = Double.parseDouble(feat.properties.get(project.population_column).toString());
@@ -7190,11 +7198,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						//ex.printStackTrace();
 					}
 					feat.properties.POPULATION = d.intValue();
-				}
+				//}
 				i += feat.properties.POPULATION;
 				county_pops.put(county,i);
 				} catch (Exception ex) {
-					System.out.println("ex aa "+ex);
+					System.out.println("ex aa4 "+ex);
 					ex.printStackTrace();
 					//System.exit(0);
 				}

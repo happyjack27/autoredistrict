@@ -42,6 +42,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 
 	// public static boolean border_length_area_weighted = true;
 	public static final boolean make_unique = false; // not the cost of this is
+	public static final double density_multiplier = 2.522667664609363E11/(double)2000000.0;
 														// population times
 														// population times
 														// precinct count.
@@ -212,7 +213,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	//
 	public static int num_ward_outcomes = 16;
 	public static double elite_fraction = 0.25;
-	public static double unpaired_edge_length_weight = 0.66666;
+	public static double unpaired_edge_length_weight = 0.75;
 	public static boolean ignore_uncontested = false;
 	public static boolean substitute_uncontested = false;
 	public static boolean reduce_splits;

@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.*;
+import java.util.regex.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -332,9 +333,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		duplicateThread = true;
 		if( !mainFrame.evolving) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 1000");
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 500");
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -369,7 +370,22 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 
 		//System.out.println("processing "+current_instruction);
-		String[] instruction_words_original = current_instruction.split(" ");
+		
+		Vector<String> list = new Vector<String>();
+		Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(current_instruction);
+		while (m.find()) {
+		    //list.add(m.group(1));//.replace("\"", ""));// to remove surrounding quotes.
+		    list.add(m.group(1).replaceAll("\"", ""));// to remove surrounding quotes.
+		}
+		String[] instruction_words_original = new String[list.size()];
+		for( int i = 0; i < instruction_words_original.length; i++) {
+			instruction_words_original[i] = list.get(i);
+		}
+
+
+		
+		
+		// = current_instruction.split(" ");
 		String[] instruction_words = new String[instruction_words_original.length];
 		for( int i = 0; i < instruction_words.length; i++) {
 			instruction_words[i] = instruction_words_original[i].toUpperCase().trim();
@@ -650,7 +666,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			mainFrame.setMuniColumn();
 		} else
 		if( category.equals("EVOLUTION")) {
-			if( parsed && item.equals("POPULATION")) { mainFrame.textField.setText(value); }
+			if( parsed && item.equals("POPULATION")) { mainFrame.textField.setText(value); fireAction(mainFrame.textField); }
 			if( parsed && item.equals("MUTATE_RATE")) { mainFrame.slider_mutation.setValue((int)(d*100)); }
 			if( parsed && item.equals("ANNEAL_RATE")) { mainFrame.slider_anneal.setValue((int)(d*100)); }
 			if( parsed && item.equals("ELITE_FRAC")) { mainFrame.sliderElitism.setValue((int)(d*100)); }
@@ -671,8 +687,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			if( parsed && item.equals("SPLITS")) { mainFrame.sliderSplitReduction.setValue((int)(d*100)); }
 			
 			if( parsed && item.equals("COMPETITION")) { mainFrame.sliderWastedVotesTotal.setValue((int)(d*100)); }
-			if( parsed && item.equals("PROPORTIONAL")) { mainFrame.sliderRepresentation.setValue((int)(d*100)); }
-			if( parsed && item.equals("PARTISAN")) { mainFrame.sliderSeatsVotes.setValue((int)(d*100)); }
+			if( parsed && item.equals("PROPORTIONAL")) { mainFrame.sliderRepresentation.setValue((int)(d*100)); mainFrame.sliderRepresentation.setValue((int)(d*100));}
+			if( parsed && item.equals("PARTISAN")) { mainFrame.sliderSeatsVotes.setValue((int)(d*100)); mainFrame.sliderSeatsVotes.setValue((int)(d*100)); }
 			if( parsed && item.equals("RACIAL")) { mainFrame.sliderVoteDilution.setValue((int)(d*100)); }
 			if( parsed && item.equals("DESCRIPTIVE")) { mainFrame.slider.setValue((int)(d*100)); }
 			

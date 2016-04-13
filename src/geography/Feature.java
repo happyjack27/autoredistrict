@@ -322,6 +322,13 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 				red /= tot;
 				green /= tot;
 				blue /= tot;
+				double multiplier = 1;
+				if( Settings.divide_packing_by_area) {
+					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					if( multiplier > 1) {
+						multiplier = 1;
+					}
+				}
 				
 				red = 255-(255-red)*geometry.color_multiplier;
 				green = 255-(255-green)*geometry.color_multiplier;
@@ -370,9 +377,21 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 						blue += colors[i].getBlue()*pop;
 					}
 				//}
-				red /= tot;
-				green /= tot;
-				blue /= tot;
+
+				double multiplier = 1;
+				if( Settings.divide_packing_by_area) {
+					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					if( multiplier > 1) {
+						multiplier = 1;
+					}
+				}
+				red = (255.0-(red/tot))*multiplier;
+				blue = (255.0-(blue/tot))*multiplier;
+				green = (255.0-(green/tot))*multiplier;
+				red = 255.0-red;
+				blue = 255.0-blue;
+				green = 255.0-green;
+
 				g.setColor(new Color((int)red,(int)green,(int)blue));
 			} else if( display_mode == DISPLAY_MODE_VOTES) {
 				double tot = 0;
@@ -389,9 +408,20 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 						blue += colors[i].getBlue()*pop;
 					}
 				}
-				red /= tot;
-				green /= tot;
-				blue /= tot;
+				double multiplier = 1;
+				if( Settings.divide_packing_by_area) {
+					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					if( multiplier > 1) {
+						multiplier = 1;
+					}
+				}
+				red = (255.0-(red/tot))*multiplier;
+				blue = (255.0-(blue/tot))*multiplier;
+				green = (255.0-(green/tot))*multiplier;
+				red = 255.0-red;
+				blue = 255.0-blue;
+				green = 255.0-green;
+
 				g.setColor(new Color((int)red,(int)green,(int)blue));
 			} else {
 				if( state == 1) {

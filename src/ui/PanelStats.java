@@ -121,7 +121,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         component.print(graphics1);
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
         component.print(graphics1);
-        try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
         graphics2.drawImage(image1,0,0,width/2,height/2,null);
         graphics4.drawImage(image2,0,0,width/4,height/4,null);
  
@@ -385,9 +385,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//String population = ""+(int)d.getPopulation();
 				double[][] result = new double[2][];//d.getElectionResults();
 				result[0] = d.getAnOutcome();
-				result[1] = District.popular_vote_to_elected(result[0], i);
+				result[1] = District.popular_vote_to_elected(result[0], i,0);
 				
-				double[] demo_result = District.popular_vote_to_elected(demo[i], i);
+				double[] demo_result = District.popular_vote_to_elected(demo[i], i, 0);
 				for( int j = 0; j < demo_result.length; j++) {
 					winners_by_ethnicity[j] += demo_result[j];
 				}
@@ -525,8 +525,20 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				tot_vote = 1;
 			}
 			double ravg = 1.0 / (tot_margin / tot_vote);
+			double total_seats = Settings.total_seats();
+			double[] targets = District.popular_vote_to_elected_for_seats(pop_by_dem,(int)total_seats,-1,false);
+			/*for( int i = 0; i < targets.length; i++) {
+				targets[i] = Math.round(total_seats*pop_by_dem[i]/tot_pop);
+			}*/
 			
-			String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Victory margins","Votes","Straight vote descr. rep."};
+			double pop_per_seat = tot_pop/total_seats;
+			double pop_per_seat_wrong = tot_pop/(total_seats+1);
+			if( Settings.quota_method == Settings.QUOTA_METHOD_HARE) {
+				pop_per_seat_wrong = pop_per_seat;
+			}
+			double[] min_votes_needed_for_seat = dm.getMinVotesNeededForSeat(demo, pop_per_seat_wrong);
+			
+			String[] ecolumns = new String[]{"Ethnicity","Population","Vote dilution","% Wasted votes","Victory margins","Votes","Straight vote descr. rep.","Target seats","Votes for next seat"};
 			String[][] edata = new String[dem_col_names.length+1][];
 			for( int i = 0; i < dem_col_names.length; i++) {
 				edata[i] = new String[]{
@@ -537,6 +549,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						decimal.format(vote_margins_by_dem[i]),
 						decimal.format(votes_by_dem[i]),
 						integer.format(winners_by_ethnicity[i]),
+						integer.format(targets[i]),
+						integer.format(min_votes_needed_for_seat[i]),
 				};
 			}
 			edata[dem_col_names.length] = new String[]{
@@ -581,7 +595,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					//new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
 					//new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					//new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
-					new String[]{""+decimal.format(dm.fairnessScores[11]*conversion_to_bits),"Undescribed voters"},
+					new String[]{""+integer.format(dm.getDescrVoteImbalance()),"Undescribed voters"},
 					//Descriptive representation
 					new String[]{"",""},
 					new String[]{""+tot_seats[0],"FV Safe D"},
@@ -626,6 +640,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	        }			
 			TableModel tm2 = new DefaultTableModel(cdata,ccolumns);
 			partiesTable.setModel(tm2);
+			
+			populateCountiesTable();
 		} catch (Exception ex) {
 			System.out.println("ex ad "+ex);
 			ex.printStackTrace();
@@ -646,14 +662,68 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			ex.printStackTrace();
 		}
 	}
+	
+	public void populateCountiesTable() {
+		
+		String pop_col = Applet.mainFrame.project.population_column;
+		String county_col = Applet.mainFrame.project.county_column;
+		String[] demonames = Applet.mainFrame.project.demographic_columns_as_array();
+		String[] ecolumns = new String[2+demonames.length];
+		ecolumns[0] = "COUNTY";
+		ecolumns[1] = "POPULATION";
+		for( int i = 0; i < demonames.length; i++) {
+			ecolumns[i+2] = demonames[i];
+		}
+		Vector<String> countynames = new Vector<String>();
+		Hashtable<String,Vector<Feature>> hash = new Hashtable<String,Vector<Feature>>();
+		for( int i = 0; i < featureCollection.features.size(); i++) {
+			Feature f = featureCollection.features.get(i);
+			String s = f.properties.get(county_col).toString();
+			Vector<Feature> vf = hash.get(s);
+			if( vf == null) {
+				vf = new Vector<Feature>();
+				hash.put(s,vf);
+				countynames.add(s);
+			}
+			vf.add(f);
+		}
+		Collections.sort(countynames);
+		String[][] edata = new String[countynames.size()][];
+		for( int i = 0; i < countynames.size(); i++) {
+			String scounty = countynames.get(i);
+			double[] dd = new double[demonames.length];
+			double pop = 0;
+			for( int j = 0; j < dd.length; j++) {
+				dd[j] = 0;
+			}
+			edata[i] = new String[2+dd.length];
+			edata[i][0] = scounty;
+			Vector<Feature> vf = hash.get(scounty);
+			for( int k = 0; k < vf.size(); k++) {
+				geography.Properties p = vf.get(k).properties;
+				pop += Double.parseDouble(p.get(pop_col).toString().replaceAll(",",""));
+				for( int j = 0; j < dd.length; j++) {
+					double d = Double.parseDouble(p.get(demonames[j]).toString().replaceAll(",",""));
+					dd[j] += d;
+				}
+			}
+			edata[i][1] = ""+pop;
+			for( int j = 0; j < demonames.length; j++) {
+				edata[i][j+2] = ""+dd[j];
+			}
+		}
+
+		TableModel tm0 = new DefaultTableModel(edata,ecolumns);
+		countyTable.setModel(tm0);
+	}
 	public PanelStats() {
 
 		initComponents();
 	}
 	private void initComponents() {
 		this.setLayout(null);
-		this.setSize(new Dimension(449, 510));
-		this.setPreferredSize(new Dimension(838, 650));
+		this.setSize(new Dimension(449, 882));
+		this.setPreferredSize(new Dimension(838, 801));
 		
 		rightRenderer.setHorizontalAlignment(SwingConstants.RIGHT);
 		
@@ -733,6 +803,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		add(scrollPane_3);
 		
 		ethnicityTable = new JTable();
+		ethnicityTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
 		scrollPane_3.setViewportView(ethnicityTable);
 		
 		button_2 = new JButton("copy");
@@ -753,6 +825,28 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		toHTMLButton.setBounds(89, 8, 117, 29);
 		
 		add(toHTMLButton);
+		
+		lblByCounty = new JLabel("By county");
+		lblByCounty.setBounds(26, 620, 226, 14);
+		add(lblByCounty);
+		
+		scrollPane_4 = new JScrollPane();
+		scrollPane_4.setBounds(26, 646, 791, 136);
+		add(scrollPane_4);
+		
+		countyTable = new JTable();
+		scrollPane_4.setViewportView(countyTable);
+		
+		button_3 = new JButton("copy");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ActionEvent nev = new ActionEvent(countyTable, ActionEvent.ACTION_PERFORMED, "copy");
+				countyTable.selectAll();
+				countyTable.getActionMap().get(nev.getActionCommand()).actionPerformed(nev);				
+			}
+		});
+		button_3.setBounds(728, 614, 89, 23);
+		add(button_3);
 	}
 	public FeatureCollection featureCollection;
 	private JTable districtsTable;
@@ -770,6 +864,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JButton button_2;
 	public JTable ethnicityTable;
 	public final JButton toHTMLButton = new JButton("to html");
+	public JLabel lblByCounty;
+	public JScrollPane scrollPane_4;
+	public JTable countyTable;
+	public JButton button_3;
 	
 	public void saveURL(final String filename, final URL url) {
 	    BufferedInputStream in = null;
@@ -898,7 +996,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		///====begin insert
 		Feature.outline_districts = true;
 		Feature.showDistrictLabels = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;				
+		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;		
+		Settings.divide_packing_by_area = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
 		Feature.showDistrictLabels = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
@@ -906,9 +1005,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		System.out.println("2");
 	
 	
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
-		System.out.println("3");
 	
 		Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
@@ -917,17 +1013,29 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
 		
-		Settings.divide_packing_by_area = false;
+
 		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
 		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
+		
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics.png",res,res);
 				
 		Settings.divide_packing_by_area = true;
 		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area.png",res,res);
 		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
+		
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics_area.png",res,res);
+		System.out.println("3");
+		Settings.divide_packing_by_area = false;
 		
 		Feature.outline_districts = false;
 
@@ -942,11 +1050,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",res,res);
 		System.out.println("5");
+		
+		Settings.divide_packing_by_area = true;
+		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes_area.png",res,res);
+		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics_area.png",res,res);
 	
 	
 		Feature.outline_counties = true;
 		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
+		//saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
 		Feature.outline_counties = false;
 	
 	
@@ -1040,12 +1154,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<td align='center'><center><a href='./map_splits.png'><img src='./map_splits_small.png' width=100></br>Splits</a></center></td>";
 		html +="</tr>";
 		html +="<tr>";
-		html +="<td>Fairness</td>";
-		html +="<td align='center'><center><a href='./map_district_wasted_votes.png'><img src='./map_district_wasted_votes_small.png' width=100></br>Wasted votes by party</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing<br/>(per district)</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing<br/>(per district)</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_partisan_packing_area.png'><img src='./map_district_partisan_packing_area_small.png' width=100></br>Partisan vote packing<br/>(per sq. mile)</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_racial_packing_area.png'><img src='./map_district_racial_packing_area_small.png' width=100></br>Racial vote packing<br/>(per sq. mile)</a></center></td>";
+		html +="<td>Fairness - by district</td>";
+		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_votes.png'><img src='./map_district_votes_small.png' width=100></br>District vote balance</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_demographics.png'><img src='./map_district_demographics_small.png' width=100></br>District demographics</a></center></td>";
+		html +="</tr>";
+		html +="<td>Fairness - by density</td>";
+		html +="<td align='center'><center><a href='./map_district_partisan_packing_area.png'><img src='./map_district_partisan_packing_area_small.png' width=100></br>Partisan vote packing</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_racial_packing_area.png'><img src='./map_district_racial_packing_area_small.png' width=100></br>Racial vote packing</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_votes_area.png'><img src='./map_district_votes_area_small.png' width=100></br>District vote balance</a></center></td>";
+		html +="<td align='center'><center><a href='./map_district_demographics_area.png'><img src='./map_district_demographics_area_small.png' width=100></br>District demographics</a></center></td>";
 		html +="</tr>";
 		/*
 		html +="<tr>";
@@ -1056,7 +1175,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<tr>";
 		html +="<td>VTDs</td>";
 		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes_small.png' width=100></br>VTD vote balance</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_votes_area.png'><img src='./map_vtd_votes_area_small.png' width=100></br>VTD vote balance<br/>(density)</a></center></td>";
 		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics_small.png' width=100></br>VTD demographics</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_demographics_area.png'><img src='./map_vtd_demographics_area_small.png' width=100></br>VTD demographics<br/>(density)</a></center></td>";
 		html +="</tr>";
 		html +="</table>";
 		html +="</br>";
@@ -1178,5 +1299,4 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
 	}
-	
 }
