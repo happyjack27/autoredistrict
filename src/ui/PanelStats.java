@@ -119,9 +119,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
         //component.invalidate();
         component.print(graphics1);
-        try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
         component.print(graphics1);
-        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+        try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
         graphics2.drawImage(image1,0,0,width/2,height/2,null);
         graphics4.drawImage(image2,0,0,width/4,height/4,null);
  
@@ -1145,7 +1145,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<td>Districts</td>";
 		html +="<td align='center'><center><a href='./map_districts_labels.png'><img src='./map_districts_labels_small.png' width=100></br>Labeled districts</a></center></td>";
 		html +="<td align='center'><center><a href='./map_districts.png'><img src='./map_districts_small.png' width=100></br>Unlabeled districts</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_votes.png'><img src='./map_district_votes_small.png' width=100></br>Vote balance</a></center></td>";
 		html +="</tr>";
 		html +="<tr>";
 		html +="<td>Geometry</td>";
@@ -1175,8 +1174,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		html +="<tr>";
 		html +="<td>VTDs</td>";
 		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes_small.png' width=100></br>VTD vote balance</a></center></td>";
-		html +="<td align='center'><center><a href='./map_vtd_votes_area.png'><img src='./map_vtd_votes_area_small.png' width=100></br>VTD vote balance<br/>(density)</a></center></td>";
 		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics_small.png' width=100></br>VTD demographics</a></center></td>";
+		html +="<td align='center'><center><a href='./map_vtd_votes_area.png'><img src='./map_vtd_votes_area_small.png' width=100></br>VTD vote balance<br/>(density)</a></center></td>";
 		html +="<td align='center'><center><a href='./map_vtd_demographics_area.png'><img src='./map_vtd_demographics_area_small.png' width=100></br>VTD demographics<br/>(density)</a></center></td>";
 		html +="</tr>";
 		html +="</table>";

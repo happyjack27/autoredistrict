@@ -333,9 +333,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		duplicateThread = true;
 		if( !mainFrame.evolving) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 500");
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 1000");
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -449,6 +449,19 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		//importURL(String url, String fk, String pk, String[] cols) {
 		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
 			mainFrame.importBlockBdistricting();
+		} else
+		if( instruction_words[1].equals("BLOCKS")) {
+			//public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
+			//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
+//	importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"},false);
+			
+			Applet.mainFrame.importBlockData(
+				instruction_words_original[2], 
+				instruction_words[3].equals("TRUE"), instruction_words[4].equals("TRUE"), 
+				new String[]{instruction_words[5]}, new String[]{instruction_words[6]},false
+			);
+
+				
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("URL")) {
 			String url = current_instruction.split(" ")[2];//instruction_words[2];
@@ -581,9 +594,17 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				if( instruction_words[1].equals("NATIONAL")) {
 					mainFrame.panelStats.exportTransparent();
 				} else
+					/*
 				if( instruction_words[1].equals("BLOCKS")) {
-						
+					//public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
+					//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
+					Applet.mainFrame.exportBlockData(
+						instruction_words_original[2], 
+						instruction_words[3].equals("TRUE"), instruction_words[4].equals("TRUE"), 
+						new String[]{instruction_words[5]}, new String[]{instruction_words[6]}
+					);	
 				} else
+				*/
 				if( instruction_words[1].equals("STATS")) {
 					mainFrame.panelStats.exportToHtml(true);					
 				} 

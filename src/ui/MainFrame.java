@@ -2368,6 +2368,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					dd[i] = Double.parseDouble(ss[i]);///total_pop;
 				}
 				double confirm_tot = 0;
+				double confirm_tot2 = 0;
+				double confirm_tot3 = 0;
 				//double[] dd0 = new double[ss.length];
 				for(Feature feat : vf) {
 					double feat_pop = feat.properties.POPULATION;
@@ -2378,9 +2380,19 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 						double add = (dd[i]*feat_pop/total_pop);
 						feat.properties.put(headers[i], ""+add);
+						if( i == 3) {
+							confirm_tot2 += add;
+						}
+						if( i == 4) {
+							confirm_tot3 += add;
+						}
 					}
 				}
-				System.out.println("found!: "+incounty+" "+total_pop+" "+confirm_tot+" "+dd[0]+" "+dd[1]);
+				System.out.println("found!: "+incounty+" "+total_pop+" "+confirm_tot+" "
+						+dd[3]+" "+confirm_tot2+" "+dd[4]+" "+confirm_tot3+" "
+						+ss.length
+						+" "+headers[3]+" "+headers[4]
+						);
 
 				} catch (Exception ex) {
 					System.out.println("ex: "+ex);
@@ -6728,6 +6740,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Hashtable<String,Feature> dictionary = new Hashtable<String,Feature>();
 		for( int i = 0; i < featureCollection.features.size(); i++) {
 			Feature f =  featureCollection.features.get(i);
+			Object o = f.properties.get(primary_key);
+			if( o == null) {
+				System.out.println("primary key not found!");
+			}
 			dictionary.put(f.properties.get(primary_key).toString(),f);
 		}
 		int total_edit_distance = 0;
@@ -7170,7 +7186,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			//collect primary keys;
 			HashMap<String,double[]> from_import = new HashMap<String,double[]>();
 			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
-			HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
+			HashMap<String,Double> county_pops = new HashMap<String,Double>();
 			for( Feature feat : featureCollection.features) {
 				try {
 				String county = (String) feat.properties.get(primary_key);
@@ -7185,9 +7201,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					county_feats.put(county,vf);
 				}
 				vf.add(feat);
-				Integer i = county_pops.get(county);
+				Double i = county_pops.get(county);
 				if( i == null) { 
-					i = new Integer(0);
+					i = new Double(0);
 					county_pops.put(county,i);
 				}
 				//if( feat.properties.POPULATION == 0) {
@@ -7224,6 +7240,20 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( geo_line == null) {
 					break;
 				}
+				
+				String pseudo_or_actual = ""+geo_line.charAt(167);
+				String summary_level = geo_line.substring(8,11);
+				//System.out.print(summary_level+pseudo_or_actual);
+				//ignore non-vtd's.
+				if( !summary_level.equals("700")) {
+					continue;
+				}
+
+				/*
+				these are "SUMLEV"'; census summary levels
+				700 = vtd
+				150 = block group
+				*/
 				
 				String[] geo_ss = parse_fixed_width(geo_line, geo_header);
 				String[] part1_ss = part1_line.split(",");
@@ -7332,19 +7362,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 							incounty = incounty.split("-")[1];
 							vf = county_feats.get(incounty);
 							if( vf == null) {
-								//System.out.println("not found!: "+orig);
-								not_found++;
-								continue;
+								incounty = "0"+incounty;
+								vf = county_feats.get(incounty);
+								if( vf == null) {
+									System.out.println("not found!: "+orig);
+									not_found++;
+									continue;
+								}
 							}
 						}
 					}
 					county_feats.remove(incounty);
 					found++;
 					double total_pop = (double)county_pops.get(incounty);
-					//System.out.println("found!: "+incounty+" "+total_pop);
-					
+					System.out.println("found!: "+incounty+" "+total_pop);
+					System.out.println("feat size "+vf.size());
 					for(Feature feat : vf) {
 						double feat_pop = feat.properties.POPULATION;
+						System.out.println("setting "+feat.properties.get("VTDST10").toString()+" "+feat_pop+" "+total_pop+" "+dd[0]+" "+dd[1]);
 						for( int i = 0; i < dd.length; i++) {
 							feat.properties.put(headers[i+DATA_STARTS_AT], ""+(dd[i]*feat_pop/total_pop));
 						}

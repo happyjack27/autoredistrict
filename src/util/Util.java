@@ -13,15 +13,26 @@ import ui.Download;
 public class Util {
 	static int apportionment_threshold = 15;
 	public static String[] redo_states = new String[]{
-		//"Illinois",
-		//"California",
-		//"Florida",
+		"Oklahoma",
+		"Virginia",
 		"Texas",
-		//"Massachusetts",
+		"New York",
+		"Virgina",
+		"Washington",
+		"Wisconsin",
+		"Michigan",
+		"Ohio",
+		"South Carolina",
+		/*
+		"Illinois",
+		"California",
+		"Florida",
+		"Texas",
+		"Massachusetts",
 		"Virginia",
 		"New Jersey",
 		"New York",
-		"Ohio",
+		"Ohio",*/
 	};
 	
 	public static String[] bad_states_round1 = new String[]{
@@ -384,14 +395,52 @@ New Mexico
 				sb.append("IMPORT BDISTRICTING\n");
 				sb.append("SAVE\n");
 			}*/
+			/*
+			if( Download.states[i].equals("New York")) {
+				continue;
+			}
 			
-
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			
+			if( i > 37) {
+				sb.append("IMPORT COUNTY\n");	
+				if( !Download.states[i].equals("Louisiana") && !Download.states[i].equals("Texas")) {
+					sb.append("IMPORT ELECTIONS\n");
+				}
+			}
+			
+			sb.append("SAVE\n");
+			
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("IMPORT BDISTRICTING\n");
+			sb.append("COPY FEATURE CD_NOW CD_2000\n");
+			if( !hit) {
+				sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+
+			}
+			
+			sb.append("SAVE\n");
+			sb.append("LOAD "+i+ " 2010 2012\n");
+
+			//sb.append("IMPORT CURRENT_DISTRICTS\n");
+			//if( Download.states[i].equals("Vermont") || Download.states[i].equals("New Mexico")) {
+				sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
+				sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
+				sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+				sb.append("RESCALE ELECTIONS\n");
+				sb.append("SAVE\n");
+
+				//sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+			//}
+				*/
+			sb.append("LOAD "+i+ " 2010 2012\n");
+
+			appendExport(sb);
+
 			
 			
 			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
 			if( i != 25 && i != 17) {
-			//sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
 			//sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
 			//sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			//sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
@@ -400,18 +449,8 @@ New Mexico
 			//sb.append("LOAD "+i+ " 2010 2012\n");
 			}
 
-			sb.append("SET WEIGHT DESCRIPTIVE 0.45\n");
-
-			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-			
-			sb.append("SET POPULATION COLUMN POPULATION\n");
-			sb.append("SET ETHNICITY COLUMNS VAP_WHITE VAP_BLACK VAP_HISPAN VAP_ASIAN VAP_INDIAN VAP_OTHER\n");
 
 			/*
-			sb.append("SET DISTRICTS COLUMN CD_BD\n");
-			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
-			sb.append("EXPORT\n");
-			sb.append("EXPORT NATIONAL\n");
 			sb.append("SET DISTRICTS COLUMN CD_NOW\n");
 			sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
 			sb.append("EXPORT\n");
@@ -422,22 +461,23 @@ New Mexico
 			sb.append("EXPORT NATIONAL\n");
 			*/
 			
+			
 			sb.append("STOP\n");
-			sb.append("SET EVOLUTION POPULATION 200\n");
-			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-			sb.append("SET DISTRICTS COLUMN CD_FV\n");
-			sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");
-			sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.5\n");
-			//sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
-			sb.append("SET EVOLUTION POPULATION 200\n");
-			sb.append("SET EVOLUTION MUTATE_RATE 1.0\n");
-			sb.append("SET EVOLUTION ANNEAL_RATE 0.80\n");
-			sb.append("SET EVOLUTION ELITE_FRAC 0.50\n");
-			sb.append("SET WEIGHT POPULATION 0.5\n");
-			sb.append("SET WEIGHT DESCRIPTIVE 0.5\n");
 
-			if( Download.states[i].equals("Texas") || Download.states[i].equals("New York") || Download.states[i].equals("New Jersey")) {
+			if( Download.states[i].equals("Texas") || Download.states[i].equals("New York")  || Download.states[i].equals("Virginia") || Download.states[i].equals("New Jersey")) {
 			if( Download.apportionments[i] > 5) {
+				sb.append("SET WEIGHT DESCRIPTIVE 0.45\n");
+				sb.append("SET EVOLUTION POPULATION 200\n");
+				sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+				sb.append("SET DISTRICTS COLUMN CD_FV\n");
+				sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.5\n");
+				sb.append("SET EVOLUTION POPULATION 200\n");
+				sb.append("SET EVOLUTION MUTATE_RATE 1.0\n");
+				sb.append("SET EVOLUTION ANNEAL_RATE 0.80\n");
+				sb.append("SET EVOLUTION ELITE_FRAC 0.50\n");
+				sb.append("SET WEIGHT POPULATION 0.5\n");
+				sb.append("SET WEIGHT DESCRIPTIVE 0.5\n");
 				sb.append("GO\n");
 				sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
 				sb.append("SET WEIGHT COMPETITION 0.25\n");
@@ -453,32 +493,25 @@ New Mexico
 				//sb.append("SET MUTATE_RATE 0.80\n");
 				
 				sb.append("WHEN MUTATE_RATE 0.5\n");
+				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.25\n");
 				sb.append("SET EVOLUTION MUTATE_RATE 0.80\n");
 				sb.append("SET WEIGHT CONTIGUITY 1.0\n");
 				sb.append("SET WEIGHT DESCRIPTIVE 1.0\n");
-				sb.append("SET WEIGHT PROPORTIONAL 0.5\n");
-				sb.append("SET WEIGHT PARTISAN 0.5\n");
+				sb.append("SET WEIGHT PROPORTIONAL 0.1\n");
+				sb.append("SET WEIGHT PARTISAN 0.1\n");
 
 
 				sb.append("WHEN MUTATE_RATE 0.5\n");
 				sb.append("SET WEIGHT GEOMETRY_FAIRNESS 0.2\n");
 				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 0.5\n");
-				sb.append("SET WEIGHT POPULATION 0.5\n");
+				sb.append("SET WEIGHT POPULATION 1.0\n");
 				sb.append("SET EVOLUTION ELITE_MUTATE_FRAC 0.5\n");
 				sb.append("SET EVOLUTION MUTATE_RATE 1.00\n");
 				sb.append("WHEN MUTATE_RATE 0.3\n");
 				sb.append("STOP\n");
 				sb.append("SAVE\n");
 			}
-			}
-			
-			sb.append("EXPORT_NATIONAL\n");
-			sb.append("EXPORT\n");
-			
-			sb.append("EXIT\n");
-			sb.append("EXIT\n");
-			
-			
+			}			
 			
 			//sb.append("SET ELECTION COLUMNS CD12_DEM CD12_REP\n");
 			//sb.append("COPY FEATURE CONGRESS_F CD_FV\n");
@@ -548,6 +581,7 @@ EXIT
 EXIT
 
 					 */
+					sb.append("EXPORT NATIONAL\n");
 				sb.append("EXPORT\n");
 				sb.append("EXPORT NATIONAL\n");
 			}
@@ -927,4 +961,31 @@ EXIT
 		System.out.println("matched "+source_string+" to "+sbest);
 		return new Triplet<String,Feature,Integer>(sbest,obest,ibest);
 	}
+	public static void appendExport(StringBuffer sb) {
+		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		/*
+		sb.append("COPY FEATURE CD_2000 CD_NOW");
+		sb.append("SET DISTRICTS COLUMN CD_NOW\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+		*/
+
+		sb.append("SET DISTRICTS COLUMN CD_FV\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+	}
+
 }
