@@ -27,14 +27,14 @@ public class DialogMultiColumnSelect extends JDialog {
     	super.paint(graphics0);
     	try {
     		Graphics2D g = (Graphics2D)graphics0;
-    		for(int i = 0; i < Feature.colors.length; i++) {
+    		for(int i = 0; i < VTD.colors.length; i++) {
     			/*
     			 * 286
     			 * 11
     			 * 182
     			 * 361
     			 */
-    			g.setColor(Feature.colors[i]);
+    			g.setColor(VTD.colors[i]);
     			//g.fillOval(286+182+5, 11+2+i*12, 9, 9);
     			g.fillOval(286-12, 11+27+i*17, 10, 10);
     		}

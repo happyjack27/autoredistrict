@@ -22,7 +22,7 @@ import solutions.District;
 import solutions.DistrictMap;
 import solutions.Ecology;
 import solutions.Settings;
-import geography.Feature;
+import geography.VTD;
 import ui.MainFrame;
 import ui.MapPanel;
 import util.Quadruplet;
@@ -32,9 +32,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 	public HashMap<String,Quadruplet<String,Integer,Integer,Byte>> header_data = new HashMap<String,Quadruplet<String,Integer,Integer,Byte>>();
 	public String type;
-	public Vector<Feature> features = new Vector<Feature>();
-	public Vector<Feature> vtds;
-	public HashMap<String,Feature> wardHash;
+	public Vector<VTD> features = new Vector<VTD>();
+	public Vector<VTD> vtds;
+	public HashMap<String,VTD> wardHash;
 	public Ecology ecology = new Ecology();
 	double snap_to_grid_resolution = 10000.0*10.0*10.0;
 	public static double xy = 1;
@@ -52,7 +52,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	
 	Vector<String> locked_counties = new Vector<String>();
 
-	public Vector<Feature> sortedFeatures;
+	public Vector<VTD> sortedFeatures;
 	
 	public static Vector<Integer> vuncontested1 = new Vector<Integer>();
 	public static Vector<Integer> vuncontested2 = new Vector<Integer>();
@@ -68,7 +68,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		MainFrame.mainframe.ip.addHistory(s);
 		
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			double d = 0;
 			for( int i = 0; i < sources.length; i++) {
 				try {
@@ -100,7 +100,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public double getColumnTotal(String dest) {
 		double tot = 0;
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			try {
 				tot += Double.parseDouble(feat.properties.get(dest).toString());
 			} catch (Exception ex) { }
@@ -121,7 +121,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		
 		double tot = 0;
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			if( filter != null) {
 				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
 					continue;
@@ -135,7 +135,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		dscale /= tot;
 
 		
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			if( filter != null) {
 				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
 					continue;
@@ -154,7 +154,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public void copyFeature(String source, String dest) {
 		MainFrame.mainframe.ip.addHistory("COPY FEATURE "+source+" "+dest);
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			try {
 				feat.properties.put(dest,feat.properties.get(source));
 			} catch (Exception ex) {
@@ -165,13 +165,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	public void addFeature(String dest) {
 		MainFrame.mainframe.ip.addHistory("CREATE FEATURE "+dest);
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			feat.properties.put(dest,"");
 		}
 	}
 	public void deleteFeature(String dest) {
 		MainFrame.mainframe.ip.addHistory("DELETE FEATURE "+dest);
-		for( Feature feat : features) {
+		for( VTD feat : features) {
 			feat.properties.remove(dest);
 		}
 	}
@@ -304,7 +304,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public String[][] getData(String[] headers) {
 		String[][] data = new String[features.size()][headers.length];
 		for( int j = 0; j < features.size(); j++) {
-			Feature f = features.get(j);
+			VTD f = features.get(j);
 			for( int k = 0; k < headers.length; k++) {
 				try {
 					data[j][k] = f.properties.get(headers[k]).toString();
@@ -412,7 +412,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					if( di >= Settings.num_districts) {
@@ -449,12 +449,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		if( Feature.display_mode == Feature.DISPLAY_MODE_COUNTY_SPLITS) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_COUNTY_SPLITS) {
 			Hashtable<String,int[]> counties =  ecology.population.get(shown_map).getSplitCounties();
 
 			//enumerate counties
 			String county_column = MainFrame.mainframe.project.county_column;
-			for( Feature f : features) {
+			for( VTD f : features) {
 				String county = f.properties.get(county_column).toString();
 				int[] ii = counties.get(county);
 				if( ii == null) {
@@ -468,13 +468,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 			}
 		}
-		if( Feature.display_mode == Feature.DISPLAY_MODE_COUNTIES) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_COUNTIES) {
 
 			//enumerate counties
 			String county_column = MainFrame.mainframe.project.county_column;
 			Hashtable<String,Integer> counties = new Hashtable<String,Integer>();
 			int i = 0;
-			for( Feature f : features) {
+			for( VTD f : features) {
 				String county = f.properties.get(county_column).toString();
 				Integer s = counties.get(county);
 				if( s == null) {
@@ -483,7 +483,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 
 			//now apply colors
-			for( Feature f: features) {
+			for( VTD f: features) {
 				String county = f.properties.get(county_column).toString();
 				int s = counties.get(county).intValue();
 
@@ -491,7 +491,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				geo.fillColor = standard_district_colors[s % standard_district_colors.length];
 			}
 		}
-		if( Feature.display_mode == Feature.DISPLAY_MODE_WASTED_VOTES) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_WASTED_VOTES) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				Color[] district_colors = new Color[Settings.num_districts];
@@ -500,7 +500,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					geo.fillColor = district_colors[di];
@@ -508,7 +508,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			//wasted_votes_by_district_and_party
 		} else
-		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_POP) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_DIST_POP) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				int total = 0;
@@ -543,7 +543,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					geo.fillColor = district_colors[di];
@@ -552,7 +552,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		double mavg_min = 0; 
 		double mavg_max = 0; 
-		if( Feature.display_mode == Feature.DISPLAY_MODE_COMPACTNESS) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_COMPACTNESS) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				dm.getReciprocalIsoPerimetricQuotient();
@@ -599,14 +599,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					*/
 				}
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					geo.fillColor = district_colors[di];
 				}
 			}
 		}
-		if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_VOTE) {
+		if( VTD.display_mode == VTD.DISPLAY_MODE_DIST_VOTE) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				int total = 0;
@@ -623,7 +623,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				double[] blue = new double[Settings.num_districts];
 				
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					
@@ -660,14 +660,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					);
 				}			
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					geo.fillColor = district_colors[di];
 				}
 			}
 		} else {
-			if( Feature.display_mode == Feature.DISPLAY_MODE_DIST_DEMO) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_DIST_DEMO) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					int total = 0;
@@ -684,7 +684,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					double[] blue = new double[Settings.num_districts];
 					
 					for( int i = 0; i < features.size(); i++) {
-						Feature f = features.get(i);
+						VTD f = features.get(i);
 						//Feature b = f.vtd;
 						Geometry geo = features.get(i).geometry;
 						int di = dm.vtd_districts[f.id];
@@ -724,14 +724,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 					}			
 					for( int i = 0; i < features.size(); i++) {
-						Feature f = features.get(i);
+						VTD f = features.get(i);
 						Geometry geo = features.get(i).geometry;
 						int di = dm.vtd_districts[f.id];
 						geo.fillColor = district_colors[di];
 					}
 				}
 			} else 
-			if( Feature.display_mode == Feature.DISPLAY_MODE_PARTISAN_PACKING2 || Feature.display_mode == Feature.DISPLAY_MODE_RACIAL_PACKING2) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING2 || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING2) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				double[] districts = new double[Settings.num_districts];
 				for( int i = 0; i < districts.length; i++) {
@@ -742,14 +742,14 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				}
 	
 				for( int i = 0; i < features.size(); i++) {
-					Feature f = features.get(i);
+					VTD f = features.get(i);
 					Geometry geo = features.get(i).geometry;
 					int di = dm.vtd_districts[f.id];
 					geo.color_multiplier = districts[di];
 					f.draw(g);
 				}
 			} else
-			if( Feature.display_mode == Feature.DISPLAY_MODE_RACIAL_PACKING) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];
@@ -758,7 +758,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 
 					for( int i = 0; i < features.size(); i++) {
-						Feature f = features.get(i);
+						VTD f = features.get(i);
 						//Feature b = f.vtd;
 						Geometry geo = features.get(i).geometry;
 						int di = dm.vtd_districts[f.id];
@@ -766,7 +766,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			} else
-			if( Feature.display_mode == Feature.DISPLAY_MODE_PARTISAN_PACKING) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];
@@ -775,7 +775,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 
 					for( int i = 0; i < features.size(); i++) {
-						Feature f = features.get(i);
+						VTD f = features.get(i);
 						//Feature b = f.vtd;
 						Geometry geo = features.get(i).geometry;
 						int di = dm.vtd_districts[f.id];
@@ -785,11 +785,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 		}
 		//System.out.println("drawing features...");
-        for( Feature f : features) {
+        for( VTD f : features) {
         	f.geometry.makePolys();
         	f.draw(g);
         }
-		if( Feature.outline_districts && !MainFrame.mainframe.evolving) {
+		if( VTD.outline_districts && !MainFrame.mainframe.evolving) {
 			try {
 				g.setColor(Color.BLACK);
 				Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.district_column);
@@ -815,7 +815,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				ex.printStackTrace();
 			}
 		}
-		if( Feature.outline_state && !MainFrame.mainframe.evolving) {
+		if( VTD.outline_state && !MainFrame.mainframe.evolving) {
 			try {
 				g.setColor(Color.BLACK);
 				Hashtable<String,double[][][]> outlines = getOutlines("STATEFP10");
@@ -842,7 +842,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				ex.printStackTrace();
 			}
 		}
-		if( Feature.outline_counties && !MainFrame.mainframe.evolving) {
+		if( VTD.outline_counties && !MainFrame.mainframe.evolving) {
 			try {
 				g.setColor(Color.BLACK);
 				Hashtable<String,double[][][]> outlines = getOutlines(MainFrame.mainframe.project.county_column);
@@ -869,8 +869,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 
         
-        if( Feature.showPoints) {
-        	for( Feature feature : features) {
+        if( VTD.showPoints) {
+        	for( VTD feature : features) {
         		if( feature.points == null) {
         			continue;
         		}
@@ -897,7 +897,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
         	
         }
 		if( ecology.population != null && ecology.population.size() > 0) {
-	        if( Feature.showDistrictLabels) {
+	        if( VTD.showDistrictLabels) {
 	        	DecimalFormat sdm = new DecimalFormat("###,###,##0.00000");  
 	        	DecimalFormat sdm0 = new DecimalFormat("###,###,##0");  
 				int total = 0;
@@ -1010,16 +1010,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			System.out. println("null key!");
 		}
 		if( key.equals("features")) {
-			return new Feature();
+			return new VTD();
 		}
 		return super.instantiateObject(key);
 	}
 	
 	public void initFeatures() {
-		vtds = new Vector<Feature>();
-		wardHash = new HashMap<String,Feature>();
-		Feature.id_enumerator = 0;
-		for( Feature f : features) {
+		vtds = new Vector<VTD>();
+		wardHash = new HashMap<String,VTD>();
+		VTD.id_enumerator = 0;
+		for( VTD f : features) {
 			//f.ward.name = f.properties.DISTRICT;
 			if( f.properties.POPULATION > 0) {
 				f.population = f.properties.POPULATION;
@@ -1028,35 +1028,35 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			vtds.add(f);
 			//precinctHash.put(f.ward.name,f.ward);
 		}
-		sortedFeatures = new Vector<Feature>();
-		for( Feature f : features) {
+		sortedFeatures = new Vector<VTD>();
+		for( VTD f : features) {
 			sortedFeatures.add(f);
 		}
 		collectVertexes();
 		collectEdges();
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.feature = f;
 		}
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.collectNeighbors();
 		}
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.syncNeighbors();
 		}
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.collectNeighborLengths();
 		}
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.calcArea();
 		}
 		Geometry.shiftx = Geometry.shifty = 0;
 		Geometry.scalex = Geometry.scaley = 1;
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.geometry.makePolysFull();
 		}
 		
 		//now if has no neighbors, add nearest.
-		for( Feature f : features) {
+		for( VTD f : features) {
 			if( f.neighbors.size() == 0) {
 				if( f.geometry == null || f.geometry.polygons == null) {
 					f.geometry.makePolys();
@@ -1065,7 +1065,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					continue;
 				}
 
-				Feature nearest = getNearestFeature(f);
+				VTD nearest = getNearestFeature(f);
 
 				//new way, just add the unpaired edge length of the no-neighbors feature.
 				double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
@@ -1105,23 +1105,23 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		//TODO: connect everything to largest region
 		System.out.println("connecting islands...");
-		Vector<Feature> unassigned = new Vector<Feature>();
+		Vector<VTD> unassigned = new Vector<VTD>();
 		unassigned.addAll(vtds);
 		System.out.println("total "+unassigned.size()+" vtds");
-		for( Feature vtd : vtds) {
+		for( VTD vtd : vtds) {
 			vtd.temp_bool = false;
 		}
 		
 		//first find all the islands (breadth-first, queue-based "island" is the queue.)
-		Vector<Vector<Feature>> islands = new Vector<Vector<Feature>>();
+		Vector<Vector<VTD>> islands = new Vector<Vector<VTD>>();
 		while( unassigned.size() > 0) {
-			Vector<Feature> island = new Vector<Feature>();
-			Feature v0 = unassigned.remove(0);
+			Vector<VTD> island = new Vector<VTD>();
+			VTD v0 = unassigned.remove(0);
 			v0.temp_bool = true;
 			island.add(v0);
 			for( int i = 0; i < island.size(); i++) {
-				Feature v1 = island.get(i);
-				for( Feature v2 : v1.neighbors) {
+				VTD v1 = island.get(i);
+				for( VTD v2 : v1.neighbors) {
 					if( !v2.temp_bool) {
 						v2.temp_bool = true;
 						unassigned.remove(v2);
@@ -1134,7 +1134,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		}
 		System.out.println("found "+islands.size()+" islands...");
 
-		for( Feature vtd : vtds) {
+		for( VTD vtd : vtds) {
 			vtd.temp_bool = false;
 		}
 
@@ -1147,22 +1147,22 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				max_index = i;
 			}
 		}
-		Vector<Feature> core = islands.remove(max_index);
-		for( Feature vtd : core) {
+		Vector<VTD> core = islands.remove(max_index);
+		for( VTD vtd : core) {
 			vtd.temp_bool = true;
 		}
 		while( islands.size() > 0) {
-			Feature closest_inland_Feature = null;
+			VTD closest_inland_Feature = null;
 			double closest_distance = -1;
 			int closest_island = -1;
-			Feature closest_island_Feature = null;
+			VTD closest_island_Feature = null;
 			for( int icore = 0; icore < core.size(); icore++) {
-				Feature vtd0 = core.get(icore);
+				VTD vtd0 = core.get(icore);
 				double[] c0 =  vtd0.feature.geometry.full_centroid;
 				for( int iisland = 0; iisland < islands.size(); iisland++) {
-					Vector<Feature> vtds2 = islands.get(iisland);
+					Vector<VTD> vtds2 = islands.get(iisland);
 					for( int ivtd = 0; ivtd < vtds2.size(); ivtd++) {
-						Feature vtd2 = vtds2.get(ivtd);
+						VTD vtd2 = vtds2.get(ivtd);
 						double[] c2 = vtd2.feature.geometry.full_centroid;
 						double dx = c2[0]-c0[0];
 						double dy = c2[1]-c0[1];
@@ -1176,16 +1176,16 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			}
-			Vector<Feature> adding = islands.remove(closest_island);
+			Vector<VTD> adding = islands.remove(closest_island);
 			System.out.println("found closest island: "+closest_island);
-			for( Feature vtd : adding) {
+			for( VTD vtd : adding) {
 				vtd.temp_bool = true;
 				core.add(vtd);
 			}
 			//now join the two Feature's: closest_inland_Feature & closest_island_Feature
 			{
-				Feature f = closest_inland_Feature.feature;
-				Feature nearest = closest_island_Feature.feature;
+				VTD f = closest_inland_Feature.feature;
+				VTD nearest = closest_island_Feature.feature;
 				double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
 				for( int i = 0; i < nearest.neighbor_lengths.length; i++) {
 					new_neighbbor_lengths[i] = nearest.neighbor_lengths[i]; 
@@ -1203,9 +1203,9 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		
 		//create geographically sorted vector
-		Feature.compare_centroid = true;
+		VTD.compare_centroid = true;
 		Collections.sort(sortedFeatures);
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 
 		
 		
@@ -1227,7 +1227,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		//vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		//edgeHash = new HashMap<Vertex,HashMap<Vertex,Edge>>();
 	}
-	public static double[] getAvgCentroid(Feature f) {
+	public static double[] getAvgCentroid(VTD f) {
 		double[] source = new double[]{0,0};
 		if( f.geometry == null || f.geometry.polygons == null) {
 			f.geometry.makePolys();
@@ -1255,12 +1255,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		source[1] /= (double)f.geometry.coordinates.length;//f.geometry.polygons.length;
 		return source;
 	}
-	public Feature getNearestFeature(Feature f) {
+	public VTD getNearestFeature(VTD f) {
 		double[] target = getAvgCentroid(f);
-		Feature best = null;
+		VTD best = null;
 		double best_r = 0;
 		for( int i = 0; i < features.size(); i++) {
-			Feature test = features.get(i);
+			VTD test = features.get(i);
 			if( test == f || test.neighbors.size() == 0) {
 				continue;
 			}
@@ -1283,17 +1283,27 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 
 	public void storeDistrictsToProperties(String column_name) {
+		//ignore if column name blank.
+		if( column_name == null || column_name.length() == 0) {
+			return;
+		}
 		if( ecology.population == null) {
 			ecology.population = new Vector<DistrictMap>();
 		}
 		if( ecology.population.size() < 1) {
 			ecology.population.add(new DistrictMap(vtds,Settings.num_districts));
 		}
-		ecology.population.get(0).storeDistrictsToProperties(this, column_name);
+		try {
+			if( ecology.population != null && ecology.population.size() > 0) {
+				ecology.population.get(0).storeDistrictsToProperties(this, column_name);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	public void loadDistrictsFromProperties(String column_name) {
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 		Collections.sort(features);
 		
 		
@@ -1316,19 +1326,19 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 	
 	public void recalcEdgeLengths() {
-		for( Feature f : features) {
+		for( VTD f : features) {
 			for( Edge e : f.edges) {
 				e.setLength();
 			}
 		}
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.collectNeighborLengths();
 		}
 
 	}
 	void collectEdges() {
 		edgeHash = new HashMap<Integer,HashMap<Integer,Edge>>();
-		for( Feature f : features) {
+		for( VTD f : features) {
 			f.edges = new Vector<Edge>();
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
@@ -1394,7 +1404,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double miny = 0;
 		double maxy = 0;
 		boolean point_added = false;
-		for( Feature f : features) {
+		for( VTD f : features) {
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
@@ -1417,7 +1427,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		vertexHash = new HashMap<Double,HashMap<Double,Vertex>>();
 		int id = 0;
-		for( Feature f : features) {
+		for( VTD f : features) {
 			for( int i = 0; i < f.geometry.coordinates.length; i++) {
 				double[][] c = f.geometry.coordinates[i];
 				for( int j = 0; j < c.length; j++) {
@@ -1461,7 +1471,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		int maxdec = 0;
 		boolean isnumeric = true;
 		for( int i = 0; i < features.size(); i++) {
-			Feature f = features.get(i);
+			VTD f = features.get(i);
 			Object o = f.properties.get(s);
 			if( o == null) {
 				continue;
@@ -1518,7 +1528,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		Hashtable<String,Vector<Edge>> new_polys = new Hashtable<String,Vector<Edge>>();
 		
 		//System.out.println("collecting edges ");
-		for( Feature f : features) {
+		for( VTD f : features) {
 			String current_district = f.properties.get(key).toString();
 			Vector<Edge> outer_edges = new_polys.get(current_district);
 			if( outer_edges == null) {
@@ -1527,7 +1537,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			for(Edge e : f.edges) {
 				String s = "hiu24-no match- 554af5";
-				Feature f0 = e.otherFeature(f);
+				VTD f0 = e.otherFeature(f);
 				if( f0 != null) {
 					s = e.otherFeature(f).feature.properties.get(key).toString();
 				}

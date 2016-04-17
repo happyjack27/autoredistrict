@@ -33,7 +33,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public Vector<double[]> seats_votes = new Vector<double[]>();  
     
     public static int num_districts = 0;
-	public Vector<Feature> vtds = new Vector<Feature>();
+	public Vector<VTD> vtds = new Vector<VTD>();
 	public Vector<District> districts = new Vector<District>();
     
     public int[] vtd_districts = new int[]{};
@@ -238,7 +238,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		boolean zero_indexed = false;
 		for( int i = 0; i < collection.features.size(); i++) {
 			try {
-				Feature f = collection.features.get(i);
+				VTD f = collection.features.get(i);
 				if( !f.properties.containsKey(column_name)) {
 					System.out.println("key missing");
 				} else {
@@ -256,7 +256,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		for( int i = 0; i < collection.features.size(); i++) {
 			try {
-				Feature f = collection.features.get(i);
+				VTD f = collection.features.get(i);
 				if( !f.properties.containsKey(column_name)) {
 					System.out.println("district missing ("+column_name+"), randomizing");
 					has_districts = false;
@@ -281,7 +281,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	
 	public void storeDistrictsToProperties(FeatureCollection collection, String column_name) {
 		for( int i = 0; i < collection.features.size(); i++) {
-			Feature f = collection.features.get(i);
+			VTD f = collection.features.get(i);
 			f.properties.put(column_name, vtd_districts[i]+1);
 		}
 	}
@@ -420,14 +420,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	ward_connected[i] = false;
 	        }
 	        for( int i = 0; i < districts.size(); i++) {
-	        	Vector<Feature> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
+	        	Vector<VTD> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
 	        	double pop = districts.get(i).getRegionPopulation(vw);
 	        	if( pop < 20000 || vw == null || vw.size() < 5) {
 	        		for(int j = 0; j < vtd_districts.length; j++) {
 	        			ward_connected[j] |=  vtd_districts[j] == i;
 	        		}
 	        	} else {
-		        	for( Feature w : vw) {
+		        	for( VTD w : vw) {
 		        		ward_connected[w.id] = true;
 		        	}
 	        	}
@@ -467,9 +467,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( FeatureCollection.locked_wards[i]) {
     		return;
     	}
-    	Feature ward = vtds.get(i);
+    	VTD ward = vtds.get(i);
     	boolean border = false;
-        for( Feature bn : ward.neighbors) {
+        for( VTD bn : ward.neighbors) {
         	if( vtd_districts[bn.id] != vtd_districts[i]) {
         		border = true;
         		break;
@@ -501,7 +501,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
        			for( int j = 0; j < ward.neighbor_lengths.length; j++) {
     				mutate_to -= ward.neighbor_lengths[j];
     				if( mutate_to < 0) {
-    					Feature b = ward.neighbors.get(j);
+    					VTD b = ward.neighbors.get(j);
     					int d1 = vtd_districts[i];
     					int d2 = vtd_districts[b.id];
     					if( d1 >= districts.size()) {
@@ -572,7 +572,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    						double length_to = 0;
 	    						double length_other = 0;
 	    						double length_unpaired = ward.unpaired_edge_length;
-	    						Feature vtd = vtds.get(i);
+	    						VTD vtd = vtds.get(i);
 	    						for( int k = 0; k < vtd.neighbors.size(); k++) {
 	    							int neighbor_id = vtd_districts[vtd.neighbors.get(k).id];
 	    							int neighbor_district = neighbor_id < 0 ? -1 : vtd_districts[neighbor_id];
@@ -757,14 +757,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     //constructors
-    public DistrictMap(Vector<Feature> wards, int num_districts, int[] genome) {
+    public DistrictMap(Vector<VTD> wards, int num_districts, int[] genome) {
         this(wards,num_districts);
         setGenome(genome);
     }
     
     public void fillDistrictwards() {
     	for( District d : districts) {
-    		d.vtds = new Vector<Feature>();
+    		d.vtds = new Vector<VTD>();
     	}
 		while( Settings.num_districts > districts.size()) {
 			districts.add(new District());
@@ -825,7 +825,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     
     }
-    public DistrictMap(Vector<Feature> wards, int num_districts) {
+    public DistrictMap(Vector<VTD> wards, int num_districts) {
         this.num_districts = num_districts;
         this.vtds = wards;
         //System.out.println(" districtmap constructor numdists "+num_districts);
@@ -1053,6 +1053,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			double[][] result = new double[2][];//d.getElectionResults();
 			result[0] = d.getAnOutcome();
 			result[1] = District.popular_vote_to_elected(result[0], i,0);
+			
+			if( result[0].length == 0) {
+				return new double[][]{new double[]{},new double[]{}};
+			}
 
 			double total_votes = result[0][0]+result[0][1];
 			if( total_votes == 0) {
@@ -1111,6 +1115,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double getRacialVoteDilution() {
     	//returns population-weighted mean absolute deviation.
     	double[][] ddd = calcDemographicStatistics();
+    	if( ddd.length == 0 || ddd[0].length == 0) {
+    		return 0;
+    	}
     	double tot = 0;
     	double tot_score = 0;
     	for( int i = 0; i < ddd.length-1; i++) {
@@ -1138,7 +1145,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 	    	try { 
 			for( int i = 0; i < vtds.size(); i++) {
-				Feature vtd = vtds.get(i);
+				VTD vtd = vtds.get(i);
 				int[] dists = counties.get(vtd.county);
 				if( dists == null) {
 					dists = new int[Settings.num_districts];
@@ -1184,7 +1191,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 	    	try { 
 			for( int i = 0; i < vtds.size(); i++) {
-				Feature vtd = vtds.get(i);
+				VTD vtd = vtds.get(i);
 				int[] dists = counties.get(vtd.muni);
 				if( dists == null) {
 					dists = new int[Settings.num_districts];
@@ -1236,7 +1243,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	try { 
 	    		//colllect vtds into counties
 				for( int i = 0; i < vtds.size(); i++) {
-					Feature vtd = vtds.get(i);
+					VTD vtd = vtds.get(i);
 					int[] dists = counties.get(vtd.county);
 					if( dists == null) {
 						dists = new int[Settings.num_districts];
@@ -1282,7 +1289,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 	    	try { 
 			for( int i = 0; i < vtds.size(); i++) {
-				Feature vtd = vtds.get(i);
+				VTD vtd = vtds.get(i);
 				int[] dists = counties.get(vtd.muni);
 				if( dists == null) {
 					dists = new int[Settings.num_districts];
@@ -1335,7 +1342,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( MainFrame.mainframe.project.county_column != null && MainFrame.mainframe.project.county_column.length() > 0) {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 			for( int i = 0; i < vtds.size(); i++) {
-				Feature vtd = vtds.get(i);
+				VTD vtd = vtds.get(i);
 				int[] dists = counties.get(vtd.county);
 				if( dists == null) {
 					dists = new int[Settings.num_districts];
@@ -1364,7 +1371,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	if( MainFrame.mainframe.project.muni_column != null && MainFrame.mainframe.project.muni_column.length() > 0) {
 	    	HashMap<String,int[]> counties = new HashMap<String,int[]>();
 			for( int i = 0; i < vtds.size(); i++) {
-				Feature vtd = vtds.get(i);
+				VTD vtd = vtds.get(i);
 				int[] dists = counties.get(vtd.muni);
 				if( dists == null) {
 					dists = new int[Settings.num_districts];
@@ -1405,6 +1412,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			//double[][] result = d.getElectionResults();
 			double[][] result = new double[2][];//d.getElectionResults();
 			result[0] = d.getAnOutcome();
+			if( result[0].length == 0) {
+				return;
+			}
 			//result[1] = District.popular_vote_to_elected(result[0], i);
 
 			for( int j = 0; j < 2; j++) {
@@ -1557,6 +1567,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		}
     		
     	}
+	    double[][] elected = new double[districts.size()][];
+
     	if( true) { //Settings.disenfranchise_weight > 0 || Settings.competitiveness_weight > 0 || Settings.wasted_votes_imbalance_weight > 0) {
     		//System.out.println("num t "+trials);
         	//===fairness score: proportional representation
@@ -1597,6 +1609,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             		double[][] res = new double[2][];//d.getElectionResults();
             		res[0] = district.getAnOutcome();
             		res[1] = District.popular_vote_to_elected(res[0], k, 0);
+            		elected[k] = res[1];
             		
 
                 	//pops[k] = res[4][0];
@@ -1850,6 +1863,22 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 Settings.diagonalization_weight   *1.0,
         };
     	 */
+    	if( Settings.seats_mode == Settings.SEATS_MODE_TOTAL && Settings.total_seats() > 5) {
+    		boolean shutout = false;
+    		for( int i = 0; i < elected.length; i++) {
+    			if( elected[i][0] == 0 || elected[i][1] == 0) {
+    				total_vote_gap += 2000000; //2M
+    				System.out.println("penalizing "+total_vote_gap);
+    				shutout = true;
+    				//break;
+    			}
+    		}
+    		/*
+    		if( shutout) {
+    			total_vote_gap += 1000000;
+    		}*/
+    	//sadfs
+    	}
         fairnessScores = new double[]{
         		length
         		,disproportional_representation
@@ -1990,7 +2019,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double[] paired_lengths = new double[districts.size()]; 
     	double[] unpaired_lengths = new double[districts.size()]; 
     	double[] areas = new double[districts.size()]; 
-        for( Feature b : vtds) {
+        for( VTD b : vtds) {
         	int d1 = vtd_districts[b.id];
         	areas[d1] += b.area;
         	unpaired_lengths[d1] += b.unpaired_edge_length;
@@ -2069,7 +2098,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     double getEdgeLength() {
         double length = 0;
-        for( Feature b : vtds) {
+        for( VTD b : vtds) {
         	int d1 = vtd_districts[b.id];
         	for( int i = 0; i < b.neighbor_lengths.length; i++) {
         		int b2id = b.neighbors.get(i).id;
@@ -2085,7 +2114,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     Vector<Edge> getOuterEdges(int[] ward_districts) {
         Vector<Edge> outerEdges = new Vector<Edge>();
-        for( Feature ward : vtds)
+        for( VTD ward : vtds)
             for( Edge edge : ward.edges)
                 if( !edge.areBothSidesSameDistrict(ward_districts))
                     outerEdges.add(edge);
@@ -2253,7 +2282,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 			try { 
 				for( int i = 0; i < vtds.size(); i++) {
-					Feature vtd = vtds.get(i);
+					VTD vtd = vtds.get(i);
 					int[] dists = counties.get(vtd.county);
 					if( dists == null) {
 						dists = new int[Settings.num_districts];

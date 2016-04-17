@@ -488,7 +488,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				
 				int count = 0;
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 	    		}
 	    		
@@ -526,7 +526,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-			    		Feature feat = getHit(dlon,dlat);
+			    		VTD feat = getHit(dlon,dlat);
 			    		
 			    		
 			    		if( feat == null) {
@@ -672,7 +672,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 				
 				int count = 0;
-				for( Feature feat : featureCollection.features) {
+				for( VTD feat : featureCollection.features) {
 					feat.geometry.makePolysFull();
 				}
 				
@@ -694,7 +694,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-			    		Feature feat = getHit(dlon,dlat);
+			    		VTD feat = getHit(dlon,dlat);
 			    		
 			    		if( feat == null) {
 			    			System.out.print("x");
@@ -749,6 +749,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	class ExportToBlockLevelThread extends Thread {
 		String output_file = null;
+		boolean include_centroid = false;
+		boolean include_header = false;
+		boolean prompt_includes = true;
+		public ThreadFinishImport nextThread;
 		ExportToBlockLevelThread() { super(); }
     	public void run() { 
     		try {
@@ -813,9 +817,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					ex.printStackTrace();
 				}
 				
-				boolean include_centroid = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include centroid (aka center point)?");
-				boolean include_header = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include header row?");
-
+				if( prompt_includes) {
+					include_centroid = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include centroid (aka center point)?");
+					include_header = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include header row?");
+				}
     			if( include_header) {
     				fos.write(("GEOID10"+output_delimiter+(include_centroid ? ("INTPTLON"+output_delimiter+"INTPTLAT"+output_delimiter) : "")+"DISTRICT"+"\n").getBytes());
     			}
@@ -864,7 +869,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 					
 					int count = 0;
-		    		for( Feature feat : featureCollection.features) {
+		    		for( VTD feat : featureCollection.features) {
 		    			feat.geometry.makePolysFull();
 		    		}
 		    		
@@ -892,7 +897,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 				    		
-				    		Feature feat = getHit(dlon,dlat);
+				    		VTD feat = getHit(dlon,dlat);
 				    		
 				    		if( feat == null) {
 				    			System.out.print("x");
@@ -967,7 +972,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	
 					
 					int count = 0;
-		    		for( Feature feat : featureCollection.features) {
+		    		for( VTD feat : featureCollection.features) {
 		    			feat.geometry.makePolysFull();
 		    		}
 		    		
@@ -995,7 +1000,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 				    		
-				    		Feature feat = getHit(dlon,dlat);
+				    		VTD feat = getHit(dlon,dlat);
 				    		
 				    		if( feat == null) {
 				    			System.out.print("x");
@@ -1057,6 +1062,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
+    		}
+    		if( nextThread != null) {
+    			nextThread.start();
     		}
     	}
 	}
@@ -1153,7 +1161,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				
 				int count = 0;
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 					feat.population = 0;
 	    		}
@@ -1178,7 +1186,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-			    		Feature feat = getHit(dlon,dlat);
+			    		VTD feat = getHit(dlon,dlat);
 			    		if( feat == null) {
 			    			System.out.print("x");
 				    		System.out.println("miss "+dlon+","+dlat+" ");
@@ -1205,7 +1213,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlbl.setText("Finalizing...");
 
 			    
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 				    feat.properties.put("POPULATION",feat.population);
 				    feat.properties.POPULATION = (int) feat.population;
 	    		}
@@ -1261,7 +1269,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				
 				int count = 0;
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 					feat.population = 0;
 	    		}
@@ -1284,7 +1292,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 			    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 			    		
-		    			Feature feat = getHit(dlon,dlat);
+		    			VTD feat = getHit(dlon,dlat);
 				    	if( feat == null) {
 				    		System.out.println();
 				    		System.out.println("miss "+dlon+","+dlat+" ");
@@ -1303,7 +1311,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		
     		dlbl.setText("Finalizing...");
 		    
-    		for( Feature feat : featureCollection.features) {
+    		for( VTD feat : featureCollection.features) {
 			    feat.properties.put("POPULATION",feat.population);
 			    feat.properties.POPULATION = (int) feat.population;
     		}
@@ -1435,7 +1443,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 				
 				int count = 0;
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 					feat.population = 0;
 	    		}
@@ -1481,7 +1489,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    		int ilat = (int)(dlat*Geometry.SCALELATLON);
 			    		int ilon = (int)(dlon*Geometry.SCALELATLON);
 			    		
-			    		Feature feat = getHit(dlon,dlat);
+			    		VTD feat = getHit(dlon,dlat);
 			    		if( feat == null) {
 			    			System.out.print("x");
 				    		System.out.println("miss "+dlon+","+dlat+" "+ilat+","+ilon);
@@ -1508,12 +1516,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    
 	    		dlbl.setText("Finalizing...");
 	    		
-				Feature.compare_centroid = false;
+				VTD.compare_centroid = false;
 				Collections.sort(featureCollection.features);
 
 
 			    
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 				    feat.properties.put("POPULATION",feat.population);
 				    feat.properties.POPULATION = (int) feat.population;
 	    		}
@@ -1530,7 +1538,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
     		}
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 			
     		trySetBasicColumns();
@@ -1608,7 +1616,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider sliderVoteDilution = new JSlider();
 	public JTextField textFieldTotalSeats = new JTextField();
 	public JRadioButton lblTotalSeats = new JRadioButton("Total seats");
-	Feature getHit(double dlon, double dlat) {
+	VTD getHit(double dlon, double dlat) {
 		int ilat = (int)(dlat*Geometry.SCALELATLON);
 		int ilon = (int)(dlon*Geometry.SCALELATLON);
 		dlon *= Geometry.SCALELATLON;
@@ -1662,7 +1670,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		for( int i = 0; i < featureCollection.sortedFeatures.size(); i++ ) {
 			if(  itestx+i < featureCollection.sortedFeatures.size()) {
-				Feature testfeat = featureCollection.sortedFeatures.get(itestx+i);
+				VTD testfeat = featureCollection.sortedFeatures.get(itestx+i);
 				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
 					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
 						hits++;
@@ -1671,7 +1679,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( itestx-i >= 0) {
-				Feature testfeat = featureCollection.sortedFeatures.get(itestx-i);
+				VTD testfeat = featureCollection.sortedFeatures.get(itestx-i);
 				for( int j = 0; j < testfeat.geometry.polygons_full.length; j++ ) {
 					if( testfeat.geometry.polygons_full[j].contains(ilon,ilat)) {
 						hits++;
@@ -1683,7 +1691,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		//old way
 		System.out.print("n");
-		for( Feature feat : featureCollection.sortedFeatures) {
+		for( VTD feat : featureCollection.sortedFeatures) {
 			Polygon[] polys = feat.geometry.polygons_full;
 			for( int i = 0; i < polys.length; i++) {
 				if( polys[i].contains(ilon,ilat)) {
@@ -1726,10 +1734,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	public void run() {
     		boolean CONTAINS_HEADER = false; 
     		boolean MAJORITY_VOTE = false;
-    		importBlockData( f.getName().trim(), true, opt == 1, new String[]{"IMPORTED"}, new String[]{"IMPORTED"});
+   			System.out.println("importBlockData0 "+f.getAbsolutePath());
+   		    		
+    		importBlockData( f.getAbsolutePath().trim(), true, opt == 1, new String[]{"IMPORTED"}, new String[]{"IMPORTED"});
     	}
     	public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
     		try {
+    			System.out.println("importBlockData "+fn);
     			opt = MAJORITY_VOTE ? 1 : 0;
     			f = new File(fn);
 				//String fn = f.getName().trim();
@@ -1741,7 +1752,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		System.out.println("making polygons");
 				int count = 0;
 				
-	    		for( Feature feat : featureCollection.features) {
+	    		for( VTD feat : featureCollection.features) {
 	    			feat.geometry.makePolysFull();
 					feat.population = 0;
 	    		}
@@ -1826,7 +1837,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    						featureCollection.features.get(0).properties.put((String)col_names[j]," ");		
 	    					}
     						//reset hash in all features
-	    					for( Feature feat : featureCollection.features) {
+	    					for( VTD feat : featureCollection.features) {
 	    						feat.properties.temp_hash.clear();
 	    						feat.points = new Vector<double[]>();
 	    					}
@@ -1843,7 +1854,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 					    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 					    		
-				    			Feature feat = getHit(dlon,dlat);
+				    			VTD feat = getHit(dlon,dlat);
 						    	if( feat == null) {
 						    		System.out.println();
 						    		System.out.println("miss "+dlon+","+dlat+" ");
@@ -1890,7 +1901,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					    }
 						String key = ((String)col_names[0]).trim().toUpperCase();
     					if( opt == OVERWRITE) { //overwrite
-    						for( Feature feat : featureCollection.features) {
+    						for( VTD feat : featureCollection.features) {
     							if( feat.properties.temp_hash.size() == 0) {
     								System.out.println("no values");
     								feat.properties.put(key,"1");
@@ -1923,7 +1934,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					System.out.println("key: "+key);
 					
 					if( opt == OVERWRITE) {
-						for( Feature feat : featureCollection.features) {
+						for( VTD feat : featureCollection.features) {
 							feat.setDistFromPoints(key);
 						}
 					}
@@ -1939,7 +1950,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		System.out.println("done");
 
 		    		if( opt == OVERWRITE) {
-						for( Feature feat : featureCollection.features) {
+						for( VTD feat : featureCollection.features) {
 							feat.setDistFromPoints(key);
 						}
 					}
@@ -2032,7 +2043,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 	
-			    			Feature feat = getHit(dlon,dlat);
+			    			VTD feat = getHit(dlon,dlat);
 					    	if( feat == null) {
 					    		System.out.print("x");
 					    	} else {
@@ -2085,6 +2096,36 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		}
     	}
 	}
+	public void exportBlockData(String string, boolean equals) {
+		ip.addHistory("EXPORT BLOCKS");
+		boolean ok = true;
+		if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
+			ok = false;
+		}
+		if( ok && comboBoxDistrictColumn.getSelectedItem() == null) {
+			ok = false;
+		}
+		if( ok && ((String)comboBoxDistrictColumn.getSelectedItem()).length() == 0) {
+			ok = false;
+		}
+		if( ok) {
+			ExportToBlockLevelThread exp = new ExportToBlockLevelThread();
+			exp.nextThread = new ThreadFinishImport();
+			exp.output_file = string;
+			exp.prompt_includes = false;
+			exp.include_centroid = true;
+			exp.include_header = true;
+			exp.start();
+		} else {
+			JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
+		}
+	}
+
+	public void open(File f) {
+		OpenShapeFileThread ot = new OpenShapeFileThread(f);
+		ot.nextThread = new ThreadFinishImport();
+		ot.start();
+	}
 
 	public class OpenShapeFileThread extends FileThread {
 		OpenShapeFileThread(File f) { super(f);  }
@@ -2094,7 +2135,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     			System.out.println("OpenShapeFileThread null file, getting from Download class... ");
     			Download.initPaths(); 
     			this.f = Download.vtd_file; 
-    		}
+    		} else {
+				ip.addHistory("OPEN \""+f.getAbsolutePath()+"\"");
+			}
     		try {
     		    dlbl.setText("Loading file "+f.getName()+"...");
 
@@ -2107,8 +2150,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					panelStats.featureCollection = featureCollection;
 				}
 	
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				featureCollection.features = new Vector<VTD>();
+				HashMap<String,VTD> hmFeatures = new HashMap<String,VTD>();
 	
 				String s = f.getName().toLowerCase();
 				System.out.println("Processing "+s+"...");
@@ -2117,7 +2160,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				stopEvolving();
 				geo_loaded = false;
 				evolving = false;
-				Feature.display_mode = 0;
+				VTD.display_mode = 0;
 				setEnableds();
 				
 				//FeatureCollection fc = new FeatureCollection();
@@ -2127,7 +2170,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				loadShapeFile(f);
 	
 	
-				for( Feature fe : hmFeatures.values()) {
+				for( VTD fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
 				finishLoadingGeography();
@@ -2158,10 +2201,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		public void run() {
 			dlg.show();
 			dlbl.setText("Adding translations...");
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 
-			Hashtable<String,Feature> featmap = new Hashtable<String,Feature>();
+			Hashtable<String,VTD> featmap = new Hashtable<String,VTD>();
 			String skey="GEOID";
 			String[] headers = featureCollection.getHeaders();
 			for( int i = 0; i < headers.length; i++) {
@@ -2181,7 +2224,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			Download.init();
 			String state_abbr = Download.state_to_abbr.get(Download.states[Download.istate]);
 			System.out.println("state_abbr: |"+state_abbr+"|");
-			for(Feature feat : featureCollection.features) {
+			for(VTD feat : featureCollection.features) {
 				featmap.put((String) feat.properties.get(skey),feat);
 			}
 			Vector<String[]> v = processFeaturerenameFile();
@@ -2195,7 +2238,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					//System.out.print(".");
 					continue;
 				}
-				Feature feat = featmap.get(ss[ikey]);
+				VTD feat = featmap.get(ss[ikey]);
 				if( feat == null) {
 					if( ss[ikey].length() >= 6) {
 						ss[ikey] = ss[ikey].substring(3);
@@ -2231,7 +2274,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 
 			System.out.println("import county level start");
@@ -2288,9 +2331,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int iCountyColumn = 0;
 			
 			//collect counties;
-			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+			HashMap<String,Vector<VTD>> county_feats = new HashMap<String,Vector<VTD>>();
 			HashMap<String,Double> county_pops = new HashMap<String,Double>();
-			for( Feature feat : featureCollection.features) {
+			for( VTD feat : featureCollection.features) {
 				try {
 				String county = (String) feat.properties.get(county_column);
 				if(county == null) {
@@ -2298,9 +2341,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				county = county.trim().toUpperCase();
 				
-				Vector<Feature> vf = county_feats.get(county);
+				Vector<VTD> vf = county_feats.get(county);
 				if( vf == null) { 
-					vf = new Vector<Feature>();
+					vf = new Vector<VTD>();
 					county_feats.put(county,vf);
 				}
 				vf.add(feat);
@@ -2331,7 +2374,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String[] tries = new String[]{" COUNTY"," PARISH"," BOROUGH"," CENSUS AREA"," MUNICIPALITY"};
 				try {
 				String incounty = ss[iCountyColumn+1].trim().toUpperCase();
-				Vector<Feature> vf = county_feats.get(incounty);
+				Vector<VTD> vf = county_feats.get(incounty);
 				if( vf == null) {
 					while( incounty.length() > 1 && incounty.substring(0,1).equals("0")) {
 						incounty = incounty.substring(1);
@@ -2371,7 +2414,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				double confirm_tot2 = 0;
 				double confirm_tot3 = 0;
 				//double[] dd0 = new double[ss.length];
-				for(Feature feat : vf) {
+				for(VTD feat : vf) {
 					double feat_pop = feat.properties.POPULATION;
 					confirm_tot += feat_pop/total_pop;
 					for( int i = 0; i < ss.length; i++) {
@@ -2512,12 +2555,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					panelStats.featureCollection = featureCollection;
 				}
 	
-				featureCollection.features = new Vector<Feature>();
-				HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+				featureCollection.features = new Vector<VTD>();
+				HashMap<String,VTD> hmFeatures = new HashMap<String,VTD>();
 				
 				stopEvolving();
 				geo_loaded = false;
-				Feature.display_mode = 0;
+				VTD.display_mode = 0;
 				setEnableds();
 
 				if( panelStats != null) {
@@ -2540,7 +2583,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		//System.out.println("found "+polygons.length+" polys");
 				    	}
 				    	
-						Feature feature = new Feature();
+						VTD feature = new VTD();
 						featureCollection.features.add(feature);
 						feature.properties = new Properties();
 						feature.geometry = new Geometry();
@@ -2590,7 +2633,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    		dlg.setVisible(false);
 	    		
-				for( Feature fe : hmFeatures.values()) {
+				for( VTD fe : hmFeatures.values()) {
 					featureCollection.features.add(fe);
 				}
 				finishLoadingGeography();
@@ -2698,7 +2741,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		//System.out.println("found "+polygons.length+" polys");
 				    	}
 				    	
-						Feature feature = new Feature();
+						VTD feature = new VTD();
 						feature.geometry = new Geometry();
 
 						feature.geometry.coordinates = new double[polygons.length][][];
@@ -2811,8 +2854,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				panelStats.featureCollection = featureCollection;
 			}
 
-			featureCollection.features = new Vector<Feature>();
-			HashMap<String,Feature> hmFeatures = new HashMap<String,Feature>();
+			featureCollection.features = new Vector<VTD>();
+			HashMap<String,VTD> hmFeatures = new HashMap<String,VTD>();
 
 		    dlg.setVisible(true);
 	
@@ -2822,7 +2865,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			stopEvolving();
 			geo_loaded = false;
-			Feature.display_mode = 0;
+			VTD.display_mode = 0;
 			setEnableds();
 			
 			FeatureCollection fc = new FeatureCollection();
@@ -2836,7 +2879,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.println("ex "+ex);
 				ex.printStackTrace();
 			}
-			for( Feature fe : fc.features) {
+			for( VTD fe : fc.features) {
 				featureCollection.features.add(fe);
 				//if( fe.properties.DISTRICT != null && !fe.properties.DISTRICT.toLowerCase().equals("null") ) {
 				/*
@@ -2852,7 +2895,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 		    dlbl.setText("Initializing wards...");
 
-			for( Feature fe : hmFeatures.values()) {
+			for( VTD fe : hmFeatures.values()) {
 				featureCollection.features.add(fe);
 			}
 			finishLoadingGeography();
@@ -3000,14 +3043,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			featureCollection.recalcDlonlat();
 			return;
 		}
-		Vector<Feature> features = featureCollection.features;
+		Vector<VTD> features = featureCollection.features;
 
 		minx = features.get(0).geometry.coordinates[0][0][0];
 		maxx = features.get(0).geometry.coordinates[0][0][0];
 		miny = features.get(0).geometry.coordinates[0][0][1];
 		maxy = features.get(0).geometry.coordinates[0][0][1];
 		HashSet<String> types = new HashSet<String>();
-		for( Feature f : features) {
+		for( VTD f : features) {
 			double[][][] coordinates2 = f.geometry.coordinates;
 			for( int j = 0; j < coordinates2.length; j++) {
 				double[][] coordinates = coordinates2[j];
@@ -3032,7 +3075,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		featureCollection.recalcDlonlat();
 	}
 	public void finishLoadingGeography() {
-		Vector<Feature> features = featureCollection.features;
+		Vector<VTD> features = featureCollection.features;
 		System.out.println(features.size()+" precincts loaded.");
 	    getMinMaxXY();
 		System.out.println("Initializing wards...");
@@ -3162,7 +3205,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean changed = !district.equals(project.district_column);
 		project.district_column = district;
 		if( changed) {
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 			
 			if( featureCollection.features == null || featureCollection.features.size() == 0) {
@@ -3172,7 +3215,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				
 				int min = 999999999;
 				int max = -1;
-				for( Feature feat : featureCollection.features) {
+				for( VTD feat : featureCollection.features) {
 					int d = 0;
 					try {
 
@@ -3267,7 +3310,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory("SET POPULATION COLUMN "+pop_col);
 
 		project.population_column = pop_col;
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			String pop = f.properties.get(pop_col).toString();
 			pop = pop.replaceAll(",","");
 			if( pop == null || pop.length() == 0) {
@@ -3293,7 +3336,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		for( int k = 0; k < featureCollection.features.size(); k++) {
-			Feature f = featureCollection.features.get(k);
+			VTD f = featureCollection.features.get(k);
 			f.demographics = new double[num_candidates];
 			for( int i = 0; i < project.demographic_columns.size(); i++) {
 				try {
@@ -3310,7 +3353,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory("SET COUNTY COLUMN "+project.county_column);
 
 		
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			try {
 				f.county = f.properties.get(project.county_column).toString();
 			} catch (Exception ex) {
@@ -3321,7 +3364,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public void setMuniColumn() {
 		ip.addHistory("SET MUNI COLUMN "+project.muni_column);
 		
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			try {
 				f.muni = f.properties.get(project.muni_column).toString();
 			} catch (Exception ex) {
@@ -3338,13 +3381,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		ip.addHistory(sb.toString());
 
 		
-		for( Feature b : featureCollection.vtds) {
+		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
 		for( int k = 0; k < featureCollection.features.size(); k++) {
-			Feature f = featureCollection.features.get(k);
+			VTD f = featureCollection.features.get(k);
 			f.resetOutcomes();
 			double[] dd = new double[num_candidates];
 			for( int i = 0; i < project.election_columns.size(); i++) {
@@ -3393,12 +3436,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			chckbxSubstituteColumns.doClick();
 		}
 		
-		for( Feature b : featureCollection.vtds) {
+		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			f.resetOutcomes();
 			double[] dd = new double[Settings.num_candidates];
 			for( int i = 0; i < project.election_columns_2.size(); i++) {
@@ -3446,12 +3489,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			chckbxSubstituteColumns.doClick();
 		}
 		
-		for( Feature b : featureCollection.vtds) {
+		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
 		
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			f.resetOutcomes();
 			double[] dd = new double[Settings.num_candidates];
 			for( int i = 0; i < project.election_columns_3.size(); i++) {
@@ -3500,7 +3543,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2, FeatureCollection.buncontested3};
 		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.election_columns, project.election_columns_2, project.election_columns_3};
 		
-		for( Feature b : featureCollection.vtds) {
+		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
@@ -3519,7 +3562,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				
 				for( int id = 0; id < featureCollection.features.size(); id++) {
-					Feature f = featureCollection.features.get(id);
+					VTD f = featureCollection.features.get(id);
 					if( buncontested[idem][dm.vtd_districts[id]]) {
 						continue;
 					}
@@ -3539,7 +3582,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 				
 				for( int id = 0; id < featureCollection.features.size(); id++) {
-					Feature f = featureCollection.features.get(id);
+					VTD f = featureCollection.features.get(id);
 					if( !buncontested[idem][dm.vtd_districts[id]]) {
 						continue;
 					}
@@ -3622,7 +3665,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	public void setMaxElections() {
 		int imax = 1;//chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			while( f.elections.size() > imax) {
 				f.elections.remove(imax-1);//.add(new Vector<Demographic>());
 			}
@@ -3809,7 +3852,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    	  //System.out.println("record number: "+rec_num);
 			          PolygonZShape aPolygon = (PolygonZShape) s;
 			          
-			          Feature feature = new Feature();
+			          VTD feature = new VTD();
 			          featureCollection.features.add(feature);
 			          feature.properties = new Properties();
 			          feature.geometry = new Geometry();
@@ -3841,7 +3884,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			    	  //System.out.println("record number: "+rec_num);
 			          PolygonShape aPolygon = (PolygonShape) s;
 			          
-			          Feature feature = new Feature();
+			          VTD feature = new VTD();
 			          featureCollection.features.add(feature);
 			          feature.properties = new Properties();
 			          feature.geometry = new Geometry();
@@ -3895,13 +3938,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			int num_candidates = lines[0].split("\t").length - 1;
 			
 			Vector<String> not_found_in_geo = new Vector<String>();
-			for( Feature b : featureCollection.vtds) {
+			for( VTD b : featureCollection.vtds) {
 				b.has_election_results = false;
 			}
 			for( int i = 0; i < lines.length; i++) {
 				String[] ss = lines[i].split("\t");
 				String district = ss[0].trim();
-				Feature b = featureCollection.wardHash.get(district);
+				VTD b = featureCollection.wardHash.get(district);
 				if( b == null) {
 					not_found_in_geo.add(district);
 					System.out.println("not in geo: "+district);
@@ -3911,7 +3954,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			Vector<String> not_found_in_census = new Vector<String>();
-			for( Feature b : featureCollection.vtds) {
+			for( VTD b : featureCollection.vtds) {
 				if( b.has_election_results == false) {
 					//not_found_in_census.add(b.name);
 					//System.out.println("not in election: |"+b.name+"|");
@@ -3919,7 +3962,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-				for( Feature b : featureCollection.vtds) {
+				for( VTD b : featureCollection.vtds) {
 					b.has_election_results = false;
 				}
 				JOptionPane.showMessageDialog(null,""
@@ -3955,7 +3998,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			
 			for( Entry<String, double[]> es : votes.entrySet()) {
-				Feature b = featureCollection.wardHash.get(es.getKey());
+				VTD b = featureCollection.wardHash.get(es.getKey());
 				double[] dd = es.getValue();
 				for( int j = 0; j < num_candidates; j++) {
 					Election d = new Election();
@@ -3980,7 +4023,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
 		}
-		Feature.display_mode = 1;
+		VTD.display_mode = 1;
 		mapPanel.invalidate();
 		mapPanel.repaint();
 		election_loaded = true;
@@ -4318,7 +4361,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 
 		
-		mntmBlocklevelCurrentDistricts = new JMenuItem("Block-level current districts");
+		mntmBlocklevelCurrentDistricts = new JMenuItem("Block-level CY2000 districts");
 		mntmBlocklevelCurrentDistricts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				importBlockCurrentDistricts();
@@ -4631,10 +4674,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnFile.add(mntmExportToHtml);
 		
+
+		
 		mntmExportBlockFile = new JMenuItem("Export block file");
 		mntmExportBlockFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ip.addHistory("EXPORT BLOCK");
+				ip.addHistory("EXPORT BLOCKS");
 				boolean ok = true;
 				if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
 					ok = false;
@@ -4705,13 +4750,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String[] lines = s.split("\n");
 					
 					Vector<String> not_found_in_geo = new Vector<String>();
-					for( Feature b : featureCollection.vtds) {
+					for( VTD b : featureCollection.vtds) {
 						b.has_census_results = false;
 					}
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Feature b = featureCollection.wardHash.get(district);
+						VTD b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -4719,13 +4764,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						}
 					}
 					Vector<String> not_found_in_census = new Vector<String>();
-					for( Feature b : featureCollection.vtds) {
+					for( VTD b : featureCollection.vtds) {
 						if( b.has_census_results == false) {
 							//not_found_in_census.add(b.name);
 						}
 					}
 					if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-						for( Feature b : featureCollection.vtds) {
+						for( VTD b : featureCollection.vtds) {
 							b.has_census_results = false;
 						}
 						JOptionPane.showMessageDialog(null,""
@@ -4739,7 +4784,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					for( int i = 0; i < lines.length; i++) {
 						String[] ss = lines[i].split("\t");
 						String district = ss[0].trim();
-						Feature b = featureCollection.wardHash.get(district);
+						VTD b = featureCollection.wardHash.get(district);
 						b.has_census_results = true;
 						b.population = Double.parseDouble(ss[1].replaceAll(",",""));
 						System.out.println("ward "+b.id+" added census "+b.population);
@@ -4748,7 +4793,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					System.out.println("ex "+ex);
 					ex.printStackTrace();
 				}
-				Feature.display_mode = 2;
+				VTD.display_mode = 2;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4814,7 +4859,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		chckbxmntmShowPrecinctLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Feature.showPrecinctLabels = chckbxmntmShowPrecinctLabels.isSelected();
+				VTD.showPrecinctLabels = chckbxmntmShowPrecinctLabels.isSelected();
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4824,7 +4869,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//mnView.add(chckbxmntmShowPrecinctLabels);
 		chckbxmntmShowDistrictLabels.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Feature.showDistrictLabels = chckbxmntmShowDistrictLabels.isSelected();
+				VTD.showDistrictLabels = chckbxmntmShowDistrictLabels.isSelected();
 				mapPanel.invalidate();
 				mapPanel.repaint();
 				//JOptionPane.showMessageDialog(null,"Not implemented");
@@ -4843,11 +4888,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmSimplifyPolygons.setToolTipText("This makes the map draw considerably faster by reducing the number of lines in each polygon.");
 		mnView.add(chckbxmntmSimplifyPolygons);
 		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Outline vtd's");
-		chckbxmntmHideMapLines.setSelected(Feature.outline_vtds );
+		chckbxmntmHideMapLines.setSelected(VTD.outline_vtds );
 		chckbxmntmHideMapLines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.outline_vtds = chckbxmntmHideMapLines.isSelected();
-				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				VTD.outline_vtds = chckbxmntmHideMapLines.isSelected();
+				MapPanel.FSAA = VTD.isOutlineActive() ? 4 : 1;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4869,8 +4914,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxmntmOutlineState = new JCheckBoxMenuItem("Outline state");
 		chckbxmntmOutlineState.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.outline_state = chckbxmntmOutlineState.isSelected();
-				MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+				VTD.outline_state = chckbxmntmOutlineState.isSelected();
+				MapPanel.FSAA = VTD.isOutlineActive() ? 4 : 1;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 
@@ -4882,8 +4927,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOutlineDistricts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Feature.outline_districts = mntmOutlineDistricts.isSelected();
-					MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+					VTD.outline_districts = mntmOutlineDistricts.isSelected();
+					MapPanel.FSAA = VTD.isOutlineActive() ? 4 : 1;
 					mapPanel.invalidate();
 					mapPanel.repaint();
 				} catch (Exception ex) {
@@ -4898,8 +4943,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmOutlineCounties.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Feature.outline_counties = mntmOutlineCounties.isSelected();
-					MapPanel.FSAA = Feature.isOutlineActive() ? 4 : 1;
+					VTD.outline_counties = mntmOutlineCounties.isSelected();
+					MapPanel.FSAA = VTD.isOutlineActive() ? 4 : 1;
 					mapPanel.invalidate();
 					mapPanel.repaint();
 				} catch (Exception ex) {
@@ -4933,7 +4978,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByDistrict = new JMenuItem("Color by district");
 		mntmColorByDistrict.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;
+				VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4943,7 +4988,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByPop = new JMenuItem("Color by district pop imbalance");
 		mntmColorByPop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;
+				VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4953,7 +4998,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByVote = new JMenuItem("Color by district vote");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;
+				VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4963,7 +5008,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByCompactness = new JMenuItem("Color by district compactness");
 		mntmColorByCompactness.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;
+				VTD.display_mode = VTD.DISPLAY_MODE_COMPACTNESS;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4973,7 +5018,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByWasted = new JMenuItem("Color by district wasted votes");
 		mntmColorByWasted.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;
+				VTD.display_mode = VTD.DISPLAY_MODE_WASTED_VOTES;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -4986,7 +5031,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorDistDemo = new JMenuItem("Color by district demographics");
 				mntmColorDistDemo.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;
+						VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;
 						mapPanel.invalidate();
 						mapPanel.repaint();
 					}
@@ -4996,7 +5041,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorPartisanPacking = new JMenuItem("Color by district partisan vote packing");
 				mntmColorPartisanPacking.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
+						VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
 						mapPanel.invalidate();
 						mapPanel.repaint();
 					}
@@ -5006,7 +5051,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorRacialPacking = new JMenuItem("Color by district racial vote packing");
 				mntmColorRacialPacking.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;
+						VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;
 						mapPanel.invalidate();
 						mapPanel.repaint();
 					}
@@ -5015,7 +5060,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		mntmShowVoteBalance.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Feature.display_mode = Feature.DISPLAY_MODE_VOTES;
+				VTD.display_mode = VTD.DISPLAY_MODE_VOTES;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5030,7 +5075,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null,"Not implemented");
 					return;
 				}
-				Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;
+				VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5040,7 +5085,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByVtd = new JMenuItem("Color by vtd vote packing");
 		mntmColorByVtd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING2;
+				VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING2;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5050,7 +5095,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByVtd_1 = new JMenuItem("Color by vtd demographic packing");
 		mntmColorByVtd_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING2;
+				VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING2;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5064,7 +5109,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorByCounty.setEnabled(false);
 		mntmColorByCounty.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;
+				VTD.display_mode = VTD.DISPLAY_MODE_COUNTIES;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5075,7 +5120,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmColorBySplits.setEnabled(false);
 		mntmColorBySplits.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;
+				VTD.display_mode = VTD.DISPLAY_MODE_COUNTY_SPLITS;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 			}
@@ -5272,7 +5317,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					
 					DistrictMap dm = featureCollection.ecology.population.get(0);
 					for( int i = 0; i < dm.vtd_districts.length; i++) {
-						Feature b = featureCollection.ecology.vtds.get(i);
+						VTD b = featureCollection.ecology.vtds.get(i);
 						//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 						//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 					}
@@ -5301,14 +5346,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String[] lines = s.split("\n");
 				
 				Vector<String> not_found_in_geo = new Vector<String>();
-				for( Feature b : featureCollection.vtds) {
+				for( VTD b : featureCollection.vtds) {
 					b.temp = -1;
 				}
 				for( int i = 0; i < lines.length; i++) {
 					try {
 						String[] ss = lines[i].split(",");
 						String district = ss[0].trim();
-						Feature b = featureCollection.wardHash.get(district);
+						VTD b = featureCollection.wardHash.get(district);
 						if( b == null) {
 							not_found_in_geo.add(district);
 						} else {
@@ -5319,13 +5364,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 				}
 				Vector<String> not_found_in_census = new Vector<String>();
-				for( Feature b : featureCollection.vtds) {
+				for( VTD b : featureCollection.vtds) {
 					if( b.temp < 0) {
 						//not_found_in_census.add(b.name);
 					}
 				}
 				if( not_found_in_census.size() > 0 || not_found_in_geo.size() > 0) {
-					for( Feature b : featureCollection.vtds) {
+					for( VTD b : featureCollection.vtds) {
 						b.temp = -1;
 					}
 					JOptionPane.showMessageDialog(null,""
@@ -5362,7 +5407,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					dm.fillDistrictwards();
 				
 				}
-				Feature.display_mode = 0;
+				VTD.display_mode = 0;
 				mapPanel.invalidate();
 				mapPanel.repaint();
 				panelStats.getStats();
@@ -5393,7 +5438,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						
 						DistrictMap dm = featureCollection.ecology.population.get(pop);
 						for( int i = 0; i < dm.vtd_districts.length; i++) {
-							Feature b = featureCollection.ecology.vtds.get(i);
+							VTD b = featureCollection.ecology.vtds.get(i);
 							//sb.append(b.name+", "+dm.ward_districts[i]+"\n\r");
 							//fis.write((""+b.name.trim()+", "+dm.ward_districts[i]+"\r\n").getBytes());
 						}
@@ -6737,9 +6782,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		Vector<String[]> v = new Vector<String[]>();
 
-		Hashtable<String,Feature> dictionary = new Hashtable<String,Feature>();
+		Hashtable<String,VTD> dictionary = new Hashtable<String,VTD>();
 		for( int i = 0; i < featureCollection.features.size(); i++) {
-			Feature f =  featureCollection.features.get(i);
+			VTD f =  featureCollection.features.get(i);
 			Object o = f.properties.get(primary_key);
 			if( o == null) {
 				System.out.println("primary key not found!");
@@ -6809,9 +6854,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		
 		//collect counties;
-		HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+		HashMap<String,Vector<VTD>> county_feats = new HashMap<String,Vector<VTD>>();
 		HashMap<String,Integer> county_pops = new HashMap<String,Integer>();
-		for( Feature feat : featureCollection.features) {
+		for( VTD feat : featureCollection.features) {
 			try {
 			String county = (String) feat.properties.get(primary_key);
 			if( county == null) {
@@ -6820,9 +6865,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			county = county.trim().toUpperCase();
 			
-			Vector<Feature> vf = county_feats.get(county);
+			Vector<VTD> vf = county_feats.get(county);
 			if( vf == null) { 
-				vf = new Vector<Feature>();
+				vf = new Vector<VTD>();
 				county_feats.put(county,vf);
 			}
 			vf.add(feat);
@@ -6850,7 +6895,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String[] tries = new String[]{" COUNTY"," PARISH"," BOROUGH"," CENSUS AREA"," MUNICIPALITY"," VOTING DISTRICT"};
 			try {
 			String incounty = ss[foreign_key].trim().toUpperCase();
-			Vector<Feature> vf = county_feats.get(incounty);
+			Vector<VTD> vf = county_feats.get(incounty);
 			if( vf == null) {
 				if( try_trim_zeros ) {
 					while( incounty.length() > 1 && incounty.substring(0,1).equals("0")) {
@@ -6882,7 +6927,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				total_match_distance += incounty.length();
 			}
 			if( vf == null) {
-				Triplet<String,Feature,Integer> best_match = util.Util.findBestMatch(incounty,dictionary);
+				Triplet<String,VTD,Integer> best_match = util.Util.findBestMatch(incounty,dictionary);
 				if( best_match == null) {
 					System.out.println("not found!: "+incounty);
 					not_found++;
@@ -6914,7 +6959,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 			if( total_pop == total_pop) {
-				for(Feature feat : vf) {
+				for(VTD feat : vf) {
 					double feat_pop = feat.properties.POPULATION;
 					if( !test) {
 						for( int i = 0; i < cols.length; i++) { 
@@ -6959,7 +7004,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			if( nextThread == null) {
 				//JOptionPane.showMessageDialog(null,"nextThread is null!");
 			}
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 
 			System.out.println("import vtd level start");
@@ -7185,9 +7230,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			
 			//collect primary keys;
 			HashMap<String,double[]> from_import = new HashMap<String,double[]>();
-			HashMap<String,Vector<Feature>> county_feats = new HashMap<String,Vector<Feature>>();
+			HashMap<String,Vector<VTD>> county_feats = new HashMap<String,Vector<VTD>>();
 			HashMap<String,Double> county_pops = new HashMap<String,Double>();
-			for( Feature feat : featureCollection.features) {
+			for( VTD feat : featureCollection.features) {
 				try {
 				String county = (String) feat.properties.get(primary_key);
 				county = county.trim().toUpperCase();
@@ -7195,9 +7240,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					county = county.split("-")[1];
 				}
 				
-				Vector<Feature> vf = county_feats.get(county);
+				Vector<VTD> vf = county_feats.get(county);
 				if( vf == null) { 
-					vf = new Vector<Feature>();
+					vf = new Vector<VTD>();
 					county_feats.put(county,vf);
 				}
 				vf.add(feat);
@@ -7352,7 +7397,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String incounty = entry.getKey();
 					String orig = incounty;
 					double[] dd = entry.getValue();
-					Vector<Feature> vf = county_feats.get(incounty);
+					Vector<VTD> vf = county_feats.get(incounty);
 					if( vf == null) {
 						if( incounty.length() > 3) {
 							incounty = incounty.substring(0,2)+"-"+incounty.substring(2);
@@ -7377,7 +7422,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					double total_pop = (double)county_pops.get(incounty);
 					System.out.println("found!: "+incounty+" "+total_pop);
 					System.out.println("feat size "+vf.size());
-					for(Feature feat : vf) {
+					for(VTD feat : vf) {
 						double feat_pop = feat.properties.POPULATION;
 						System.out.println("setting "+feat.properties.get("VTDST10").toString()+" "+feat_pop+" "+total_pop+" "+dd[0]+" "+dd[1]);
 						for( int i = 0; i < dd.length; i++) {
@@ -7423,7 +7468,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 	
 	public void importBlocksBdistricting() {
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 		Collections.sort(featureCollection.features);
 
 		String path = Download.getStartPath()+File.separator+"bdistricting";
@@ -7444,7 +7489,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				break;
 			}
 		}
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 		Collections.sort(featureCollection.features);
 
 		Applet.deleteRecursive(new File(path));
@@ -7452,7 +7497,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 
 	public void importBlocksCurrentDistricts() {
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 		Collections.sort(featureCollection.features);
 
 		String path = Download.getStartPath()+File.separator+"current";
@@ -7477,7 +7522,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		Feature.compare_centroid = false;
+		VTD.compare_centroid = false;
 		Collections.sort(featureCollection.features);
 		
 		Applet.deleteRecursive(new File(path));
@@ -7526,7 +7571,7 @@ ui.Mainframe:
 			int col_lon = -1;
 			int col_geoid_centroid = -1;
 			//Hashtable<String,int[]> hash_centroids = new Hashtable<String,int[]>();
-			Hashtable<String,Feature> hash_geoid_feat = new Hashtable<String,Feature>();
+			Hashtable<String,VTD> hash_geoid_feat = new Hashtable<String,VTD>();
 			
 
 			DBFReader dbfReader;
@@ -7547,7 +7592,7 @@ ui.Mainframe:
 
 			
 			int count = 0;
-    		for( Feature feat : featureCollection.features) {
+    		for( VTD feat : featureCollection.features) {
     			feat.geometry.makePolysFull();
 				feat.population = 0;
     		}
@@ -7611,7 +7656,7 @@ ui.Mainframe:
 		    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
 		    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
 					
-	    			Feature feat = getHit(dlon,dlat);
+	    			VTD feat = getHit(dlon,dlat);
 	    			if( ss != null && ss[col_geoid_centroid] != null && feat != null) {
 	    				hash_geoid_feat.put(ss[col_geoid_centroid],feat);
 	    			}
@@ -7633,7 +7678,7 @@ ui.Mainframe:
 		    System.out.println();
 
 //resort features
-			Feature.compare_centroid = false;
+			VTD.compare_centroid = false;
 			Collections.sort(featureCollection.features);
 							
 //read headers
@@ -7662,7 +7707,7 @@ ui.Mainframe:
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-					for( Feature feat : featureCollection.features) {
+					for( VTD feat : featureCollection.features) {
 						for( int i = 0; i < dest_columns.length; i++) {
 							feat.properties.put(dest_columns[i],"0");
 						}
@@ -7726,11 +7771,11 @@ ui.Mainframe:
     						featureCollection.features.get(0).properties.put((String)dest_columns[j],"");		
     					}
 						//reset hash in all features
-    					for( Feature feat : featureCollection.features) {
+    					for( VTD feat : featureCollection.features) {
     						feat.properties.temp_hash.clear();
     					}
 					} else {
-    					for( Feature feat : featureCollection.features) {
+    					for( VTD feat : featureCollection.features) {
 							for( int i = 0; i < dest_columns.length; i++) {
 								feat.properties.put(dest_columns[i],"0");
 							}
@@ -7744,7 +7789,7 @@ ui.Mainframe:
 					    	if( ss.length > dh.header.length) {
 					    		System.out.print("+"+(ss.length - dh.header.length));
 					    	}
-							Feature feat = hash_geoid_feat.get(ss[col_geoid]);
+							VTD feat = hash_geoid_feat.get(ss[col_geoid]);
 							if( feat == null) {
 								misses++;
 					    		//System.out.println("miss "+dlon+","+dlat+" ");
@@ -7791,8 +7836,8 @@ ui.Mainframe:
 					//note majority vote is only handling 1 column right now!
 					String key = ((String)dest_columns[0]).trim().toUpperCase();
 					if( opt == MAJORITY) { //MAJORITY
-						Vector<Feature> missing = new Vector<Feature>();
-						for( Feature feat : featureCollection.features) {
+						Vector<VTD> missing = new Vector<VTD>();
+						for( VTD feat : featureCollection.features) {
 							if( feat.properties.temp_hash.size() == 0) {
 								System.out.println("no values");
 								missing.add(feat);
@@ -7819,9 +7864,9 @@ ui.Mainframe:
 						
 						//fill in empties with neighbors
 						Hashtable<String,Integer> counts = new Hashtable<String,Integer>(); 
-						for( Feature feat : missing) {
+						for( VTD feat : missing) {
 							counts.clear();
-							for(Feature vtd : feat.neighbors) {
+							for(VTD vtd : feat.neighbors) {
 								String p = vtd.feature.properties.get(key).toString();
 								Integer i = counts.get(p);
 								if( i == null) {
@@ -7881,9 +7926,9 @@ ui.Mainframe:
 		}
 		
 		//find contested and uncontested
-		Vector<Feature> contested_vtds = new Vector<Feature>();
-		Vector<Feature> uncontested_vtds = new Vector<Feature>();
-		for( Feature f : featureCollection.features) {
+		Vector<VTD> contested_vtds = new Vector<VTD>();
+		Vector<VTD> uncontested_vtds = new Vector<VTD>();
+		for( VTD f : featureCollection.features) {
 
 			double tot = 0;
 			for( String s : election_columns) {
@@ -7915,7 +7960,7 @@ ui.Mainframe:
 			election_sums[i] = 0;
 			substitute_sums[i] = 0;
 		}
-		for( Feature f : contested_vtds) {
+		for( VTD f : contested_vtds) {
 			for( int i = 0; i < election_sums.length; i++) {
 				try {
 					election_sums[i] += Double.parseDouble(f.properties.get(election_columns.get(i)).toString());
@@ -7932,7 +7977,7 @@ ui.Mainframe:
 		}
 		
 		//now fill in uncontested, adjusted by vote ratio of contested.
-		for( Feature f : uncontested_vtds) {
+		for( VTD f : uncontested_vtds) {
 			for( int i = 0; i < election_sums.length; i++) {
 				try {
 					double val = Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString())*election_sums[i];
@@ -7951,7 +7996,7 @@ ui.Mainframe:
 		
 		//accumulate by district
 		Hashtable<String,double[]> district_election_sums = new Hashtable<String,double[]>();
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 		
 			//get or create district in hashtable
 			String key = f.properties.get(district_column).toString();
@@ -7973,9 +8018,9 @@ ui.Mainframe:
 		}
 
 		//find contested and uncontested
-		Vector<Feature> contested_vtds = new Vector<Feature>();
-		Vector<Feature> uncontested_vtds = new Vector<Feature>();
-		for( Feature f : featureCollection.features) {
+		Vector<VTD> contested_vtds = new Vector<VTD>();
+		Vector<VTD> uncontested_vtds = new Vector<VTD>();
+		for( VTD f : featureCollection.features) {
 			String key = f.properties.get(district_column).toString();
 			double[] dd = district_election_sums.get(key);
 
@@ -8005,7 +8050,7 @@ ui.Mainframe:
 			election_sums[i] = 0;
 			substitute_sums[i] = 0;
 		}
-		for( Feature f : contested_vtds) {
+		for( VTD f : contested_vtds) {
 			for( int i = 0; i < election_sums.length; i++) {
 				try {
 					election_sums[i] += Double.parseDouble(f.properties.get(election_columns.get(i)).toString());
@@ -8022,7 +8067,7 @@ ui.Mainframe:
 		}
 		
 		//now fill in uncontested, adjusted by vote ratio of contested.
-		for( Feature f : uncontested_vtds) {
+		for( VTD f : uncontested_vtds) {
 			for( int i = 0; i < election_sums.length; i++) {
 				try {
 					double val = Double.parseDouble(f.properties.get(substitute_columns.get(i)).toString())*election_sums[i];
@@ -8105,12 +8150,12 @@ ui.Mainframe:
 			}
 		}
 		
-		for( Feature f : featureCollection.features) {
+		for( VTD f : featureCollection.features) {
 			f.temp_bool = false;
 		}	
 		
-		Hashtable<String,Feature> hmmap = new Hashtable<String,Feature>();
-		for( Feature f : featureCollection.features) {
+		Hashtable<String,VTD> hmmap = new Hashtable<String,VTD>();
+		for( VTD f : featureCollection.features) {
 			hmmap.put(f.properties.get(pk).toString(), f);
 		}
 		
@@ -8123,7 +8168,7 @@ ui.Mainframe:
 					System.out.println(""+i);
 				}
 				if( hmmap.containsKey(dh.data[i][fk_index])) {
-					Feature f = hmmap.get(dh.data[i][fk_index]);
+					VTD f = hmmap.get(dh.data[i][fk_index]);
 					if( f == null) {
 						System.out.println("f is null!");
 					}
@@ -8165,6 +8210,7 @@ ui.Mainframe:
 			ex.printStackTrace();
 		}
 	}
+
 }
 
 

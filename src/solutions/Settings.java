@@ -1,6 +1,6 @@
 package solutions;
 
-import geography.Feature;
+import geography.VTD;
 
 import java.util.Vector;
 
@@ -335,7 +335,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 		national_map = national;
 		MainFrame.mainframe.getMinMaxXY();
 		MainFrame.mainframe.resetZoom();
-		for( Feature f : MainFrame.mainframe.featureCollection.features) {
+		for( VTD f : MainFrame.mainframe.featureCollection.features) {
 			f.geometry.makePolys();
 		}
 		MainFrame.mainframe.mapPanel.invalidate();

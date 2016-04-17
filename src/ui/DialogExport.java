@@ -1,5 +1,5 @@
 package ui;
-import geography.Feature;
+import geography.VTD;
 import geography.FeatureCollection;
 import geography.Properties;
 
@@ -135,14 +135,14 @@ public class DialogExport extends JDialog {
 				int map_index = comboBoxMapLayer.getSelectedIndex();
 				int file_index = comboBoxFileLinkColumn.getSelectedIndex();
 
-				HashMap<String,Feature> hmmap = new HashMap<String,Feature>();
+				HashMap<String,VTD> hmmap = new HashMap<String,VTD>();
 				for( int i = 0; i < map_data.length; i++) {
 					hmmap.put(map_data[i][map_index], fc.features.get(i));
 				}
 				
 				for( int i = 0; i < data.length; i++) {		
 					if( hmmap.containsKey(data[i][file_index])) {
-						Feature f = hmmap.get(data[i][file_index]);
+						VTD f = hmmap.get(data[i][file_index]);
 						/*
 						try {
 							if( load_pop) {

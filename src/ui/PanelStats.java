@@ -1,6 +1,6 @@
 package ui;
 
-import geography.Feature;
+import geography.VTD;
 import geography.FeatureCollection;
 
 import javax.imageio.ImageIO;
@@ -72,7 +72,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		 */
 	}
 	public void saveAsPng2(JComponent component, String path, int width, int height) {
-		System.out.println("saveAsPng2 mode "+Feature.display_mode+" "+Settings.national_map+" "+Feature.outline_vtds);
+		System.out.println("saveAsPng2 mode "+VTD.display_mode+" "+Settings.national_map+" "+VTD.outline_vtds);
 		String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
         Dimension d = component.getSize();
         MainFrame.mainframe.mapPanel.invalidate();
@@ -458,7 +458,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				} catch (Exception ex) {
 					
 				}
-				double[] seats = this.getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(i));
+				double[] seats = new double[]{};
+				if( result[0].length > 0) {
+					seats = this.getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(i));
+				}
 				for( int j = 0; j < seats.length; j++) {
 					tot_seats[j] += seats[j];
 				}
@@ -667,6 +670,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		String pop_col = Applet.mainFrame.project.population_column;
 		String county_col = Applet.mainFrame.project.county_column;
+		if( county_col == null || county_col.length() == 0) {
+			return;
+		}
 		String[] demonames = Applet.mainFrame.project.demographic_columns_as_array();
 		String[] ecolumns = new String[2+demonames.length];
 		ecolumns[0] = "COUNTY";
@@ -675,13 +681,13 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			ecolumns[i+2] = demonames[i];
 		}
 		Vector<String> countynames = new Vector<String>();
-		Hashtable<String,Vector<Feature>> hash = new Hashtable<String,Vector<Feature>>();
+		Hashtable<String,Vector<VTD>> hash = new Hashtable<String,Vector<VTD>>();
 		for( int i = 0; i < featureCollection.features.size(); i++) {
-			Feature f = featureCollection.features.get(i);
+			VTD f = featureCollection.features.get(i);
 			String s = f.properties.get(county_col).toString();
-			Vector<Feature> vf = hash.get(s);
+			Vector<VTD> vf = hash.get(s);
 			if( vf == null) {
-				vf = new Vector<Feature>();
+				vf = new Vector<VTD>();
 				hash.put(s,vf);
 				countynames.add(s);
 			}
@@ -698,7 +704,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			edata[i] = new String[2+dd.length];
 			edata[i][0] = scounty;
-			Vector<Feature> vf = hash.get(scounty);
+			Vector<VTD> vf = hash.get(scounty);
 			for( int k = 0; k < vf.size(); k++) {
 				geography.Properties p = vf.get(k).properties;
 				pop += Double.parseDouble(p.get(pop_col).toString().replaceAll(",",""));
@@ -979,98 +985,98 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	}
 	public void exportMaps(String write_folder, int res,boolean outline) {
 		int num_maps_temp = Settings.num_maps_to_draw;
-		int display_mode_temp = Feature.display_mode;
+		int display_mode_temp = VTD.display_mode;
 		Settings.num_maps_to_draw = 1;
 		
 		boolean divide_packing = Settings.divide_packing_by_area;
-		boolean maplines = Feature.outline_vtds;
-		boolean outline_state = Feature.outline_state;
-		boolean outline_county = Feature.outline_counties;
-		boolean draw_labels = Feature.showDistrictLabels;
-		Feature.outline_vtds = false;//outline;
-		Feature.outline_state = true;
-		Feature.outline_counties = false;
+		boolean maplines = VTD.outline_vtds;
+		boolean outline_state = VTD.outline_state;
+		boolean outline_county = VTD.outline_counties;
+		boolean draw_labels = VTD.showDistrictLabels;
+		VTD.outline_vtds = false;//outline;
+		VTD.outline_state = true;
+		VTD.outline_counties = false;
 		MapPanel.FSAA = 4;//Feature.outline_vtds ? 4 : 1;
 		
 		
 		///====begin insert
-		Feature.outline_districts = true;
-		Feature.showDistrictLabels = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_NORMAL;		
+		VTD.outline_districts = true;
+		VTD.showDistrictLabels = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
 		Settings.divide_packing_by_area = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
-		Feature.showDistrictLabels = false;
+		VTD.showDistrictLabels = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
 		
 		System.out.println("2");
 	
 	
 	
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_POP;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_COMPACTNESS;			
+		VTD.display_mode = VTD.DISPLAY_MODE_COMPACTNESS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_WASTED_VOTES;		
+		VTD.display_mode = VTD.DISPLAY_MODE_WASTED_VOTES;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
 		
 
-		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
 		
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics.png",res,res);
 				
 		Settings.divide_packing_by_area = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_PARTISAN_PACKING;
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_RACIAL_PACKING;			
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
 		
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_VOTE;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_DIST_DEMO;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics_area.png",res,res);
 		System.out.println("3");
 		Settings.divide_packing_by_area = false;
 		
-		Feature.outline_districts = false;
+		VTD.outline_districts = false;
 
-		Feature.display_mode = Feature.DISPLAY_MODE_COUNTY_SPLITS;		
-		Feature.outline_counties = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_COUNTY_SPLITS;		
+		VTD.outline_counties = true;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_splits.png",res,res);
-		Feature.outline_counties = false;
+		VTD.outline_counties = false;
 		System.out.println("4");
 	
-		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
+		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",res,res);
 		System.out.println("5");
 		
 		Settings.divide_packing_by_area = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_VOTES;			
+		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes_area.png",res,res);
-		Feature.display_mode = Feature.DISPLAY_MODE_DEMOGRAPHICS;			
+		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics_area.png",res,res);
 	
 	
-		Feature.outline_counties = true;
-		Feature.display_mode = Feature.DISPLAY_MODE_COUNTIES;			
+		VTD.outline_counties = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_COUNTIES;			
 		//saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
-		Feature.outline_counties = false;
+		VTD.outline_counties = false;
 	
 	
-		Feature.showDistrictLabels = draw_labels;
-		Feature.outline_vtds = maplines;
-		Feature.outline_counties = outline_county;
-		Feature.outline_state = outline_state;
-		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
+		VTD.showDistrictLabels = draw_labels;
+		VTD.outline_vtds = maplines;
+		VTD.outline_counties = outline_county;
+		VTD.outline_state = outline_state;
+		MapPanel.FSAA = VTD.outline_vtds ? 4 : 1;
 		Settings.num_maps_to_draw = num_maps_temp;
-		Feature.display_mode = display_mode_temp;
+		VTD.display_mode = display_mode_temp;
 		MapPanel.override_size = -1;
 		Settings.divide_packing_by_area = divide_packing;
 	}

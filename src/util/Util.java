@@ -1,5 +1,5 @@
 package util;
-import geography.Feature;
+import geography.VTD;
 
 import java.io.*;
 import java.net.URL;
@@ -13,16 +13,19 @@ import ui.Download;
 public class Util {
 	static int apportionment_threshold = 15;
 	public static String[] redo_states = new String[]{
-		"Oklahoma",
-		"Virginia",
-		"Texas",
-		"New York",
-		"Virgina",
-		"Washington",
-		"Wisconsin",
-		"Michigan",
-		"Ohio",
-		"South Carolina",
+		"Pennsylvania",
+		"Tennessee",
+		//"Alabama",
+		//"New York",
+		//"Oklahoma",
+		//"Virginia",
+		//"Texas",
+		//"New York",
+		//"Washington",
+		//"Wisconsin",
+		//"Michigan",
+		//"Ohio",
+		//"South Carolina",
 		/*
 		"Illinois",
 		"California",
@@ -416,7 +419,7 @@ New Mexico
 			sb.append("COPY FEATURE CD_NOW CD_2000\n");
 			if( !hit) {
 				sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
-
+//	IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/Ohio/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV
 			}
 			
 			sb.append("SAVE\n");
@@ -433,8 +436,30 @@ New Mexico
 				//sb.append("IMPORT URL http://autoredistrict.org/all50/version2/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
 			//}
 				*/
+			if( Download.apportionments[i] != 1)  {
+				//continue;
+			}
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("COPY FEATURE CD_NOW CD_2000\n");
+			
+			appendExport2000(sb);
+			
+			if( Download.apportionments[i] == 1) {
+				sb.append("COPY FEATURE CD_BD CD_2000\n");
+				sb.append("COPY FEATURE CD_BD CD_NOW\n");
+			}
+			//sb.append("IMPORT DEMOGRAPHICS\n");
 
+			sb.append("SET DISTRICTS COLUMN CD_2000\n");
+			sb.append("EXPORT\n");
+			sb.append("EXPORT NATIONAL\n");
+
+			sb.append("EXIT\n");
+			sb.append("EXIT\n");
+			
+			sb.append("SAVE\n");
+			sb.append("LOAD "+i+ " 2010 2012\n");
 			appendExport(sb);
 
 			
@@ -922,13 +947,13 @@ EXIT
 	    return sb.toString();
 	}
 	
-	public static Triplet<String,Feature,Integer> findBestMatch(String source_string, Hashtable<String,Feature> dictionary) {
+	public static Triplet<String,VTD,Integer> findBestMatch(String source_string, Hashtable<String,VTD> dictionary) {
 		String test_source_string = source_string.toUpperCase().trim();
 
 		//try for exact match
-		Feature s = dictionary.get(test_source_string);
+		VTD s = dictionary.get(test_source_string);
 		if( s != null) {
-			return new Triplet<String,Feature,Integer>(test_source_string,s,0);
+			return new Triplet<String,VTD,Integer>(test_source_string,s,0);
 		}
 
 
@@ -936,8 +961,8 @@ EXIT
 		boolean tie = false;
 		int ibest = -1;
 		String sbest = "";
-		Feature obest = null;
-		for( Entry<String,Feature> entry: dictionary.entrySet()) {
+		VTD obest = null;
+		for( Entry<String,VTD> entry: dictionary.entrySet()) {
 			String dest_name = entry.getKey();
 			String test_name = dest_name.toUpperCase().trim();
 			int cur = LevenshteinDistance( test_source_string, test_name);
@@ -959,7 +984,7 @@ EXIT
 			return null;
 		}
 		System.out.println("matched "+source_string+" to "+sbest);
-		return new Triplet<String,Feature,Integer>(sbest,obest,ibest);
+		return new Triplet<String,VTD,Integer>(sbest,obest,ibest);
 	}
 	public static void appendExport(StringBuffer sb) {
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
@@ -987,5 +1012,31 @@ EXIT
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
 	}
+	public static void appendExport2000(StringBuffer sb) {
+		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
 
+		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+	}
+	/*
+		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+		sb.append("SET DISTRICTS COLUMN CD_FV\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("EXPORT\n");
+		sb.append("EXPORT NATIONAL\n");
+
+	 */
 }

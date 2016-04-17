@@ -58,7 +58,7 @@ public class DialogManageLocks extends JDialog {
 
 		btnAddLock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Feature feat = MainFrame.mainframe.featureCollection.features.get(0);
+				VTD feat = MainFrame.mainframe.featureCollection.features.get(0);
 				String[] ss = new String[feat.properties.keySet().size()];
 				feat.properties.keySet().toArray(ss);
 				
@@ -75,7 +75,7 @@ public class DialogManageLocks extends JDialog {
 							        ss, // Array of choices
 							        ss[0]); // Initial choice
 				Hashtable<String,String> hash = new Hashtable<String,String>();
-				for( Feature f : MainFrame.mainframe.featureCollection.features) {
+				for( VTD f : MainFrame.mainframe.featureCollection.features) {
 					hash.put(f.properties.get(key).toString(),"");
 				}
 				String[] keyoptions = new String[hash.size()];
@@ -164,7 +164,7 @@ public class DialogManageLocks extends JDialog {
 			counts[i] = 0;
 		}
 		for( int i = 0; i < featureCollection.features.size(); i++) {
-			Feature feat = featureCollection.features.get(i);
+			VTD feat = featureCollection.features.get(i);
 			if( feat.properties.get(key).toString().equals(keychoice)) {
 				int dist = featureCollection.ecology.population.get(0).vtd_districts[i];
 				counts[dist]++;
@@ -181,7 +181,7 @@ public class DialogManageLocks extends JDialog {
 		}
 		
 		for( int i = 0; i < featureCollection.features.size(); i++) {
-			Feature feat = featureCollection.features.get(i);
+			VTD feat = featureCollection.features.get(i);
 			if( feat.properties.get(key).toString().equals(keychoice)) {
 				for( DistrictMap dm : featureCollection.ecology.population) {
 					dm.vtd_districts[i] = max_index;

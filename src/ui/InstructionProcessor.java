@@ -15,6 +15,25 @@ import ui.DialogDownload.EventThread;
 import ui.MainFrame.OpenShapeFileThread;
 import util.Util;
 
+/*
+ * 
+ * 
+EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
+OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+SET DISTRICTS COLUMN CD113FP
+EXPORT BLOCKS
+LOAD [FIPS] 2010 2012
+IMPORT BLOCKS "[START_PATH]CD113/CD113.txt" TRUE TRUE DISTRICTS CD_2010
+ */
+
+/*
+Applet.mainFrame.importBlockData(
+	instruction_words_original[2], 
+	instruction_words[3].equals("TRUE"), instruction_words[4].equals("TRUE"), 
+	new String[]{instruction_words[5]}, new String[]{instruction_words[6]},false
+);
+*/
+
 // show line numbers: http://www.algosome.com/articles/line-numbers-java-jtextarea-jtable.html
 
 public class InstructionProcessor extends JDialog implements iDiscreteEventListener {
@@ -355,12 +374,13 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		try {
 			if( Download.istate >= 0) {
 			current_instruction = current_instruction.replaceAll("\\[SEATS\\]",""+Download.apportionments[Download.istate]);
-			String fips = (""+Download.istate).length() < 1 ? ("0"+Download.istate) : (""+Download.istate);
+			String fips = (""+Download.istate).length() < 2 ? ("0"+Download.istate) : (""+Download.istate);
 			current_instruction = current_instruction.replaceAll("\\[FIPS\\]",fips);
 			current_instruction = current_instruction.replaceAll("\\[STATE\\]",Download.states[Download.istate]);
-			current_instruction = current_instruction.replaceAll("\\[STATEURL\\]",Download.states[Download.istate].replaceAll(" ", "%20"));
-			current_instruction = current_instruction.replaceAll("\\[STATEUNDERSCORE\\]",Download.states[Download.istate].replaceAll(" ", "_"));
+			current_instruction = current_instruction.replaceAll("\\[STATE URL\\]",Download.states[Download.istate].replaceAll(" ", "%20"));
+			current_instruction = current_instruction.replaceAll("\\[STATE UNDERSCORE\\]",Download.states[Download.istate].replaceAll(" ", "_"));
 			current_instruction = current_instruction.replaceAll("\\[ABBR\\]",Download.state_to_abbr.get(Download.states[Download.istate]));
+			current_instruction = current_instruction.replaceAll("\\[START PATH\\]",Download.getStartPath());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -404,6 +424,16 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				}
 			}
 		}
+
+
+		if( command.equals("OPEN")) {
+			String dest =  Download.getStartPath()+File.separator+instruction_words_original[1];
+			File f = new File(dest);
+			Applet.mainFrame.open(f);
+			instruction_pointer++;
+			textFieldIP.setText(""+(instruction_pointer+1));
+			return;
+		} else
 		if(command.equals("EXIT")) {
 			addHistory("EXIT");
 			System.exit(0);
@@ -450,7 +480,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("IMPORT") && instruction_words[1].equals("BDISTRICTING")) {
 			mainFrame.importBlockBdistricting();
 		} else
-		if( instruction_words[1].equals("BLOCKS")) {
+		if( command.equals("IMPORT") && instruction_words[1].equals("BLOCKS")) {
 			//public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
 			//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
 //	importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"},false);
@@ -485,7 +515,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		if( command.equals("IMPORT") && instruction_words[1].equals("TRANSLATIONS")) {
 			mainFrame.importTranslations();
 		} else
-		if( command.equals("IMPORT") && instruction_words[1].equals("CURRENT_DISTRICTS")) {
+		if( command.equals("IMPORT") && (instruction_words[1].equals("CURRENT_DISTRICTS") || instruction_words[1].equals("CY2000_DISTRICTS"))) {
 			mainFrame.importBlockCurrentDistricts();
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("COUNTY")) {
@@ -587,24 +617,31 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
 		} else
 		if(command.equals("EXTRACT")) {
-			Download.downloadAndExtract(instruction_words_original[1], instruction_words_original[2]);
+			//EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_04_cd113.zip" CD113
+			//OPEN tl_rd13_04_cd113.shp
+		
+			String dest = Download.getStartPath()+File.separator+ instruction_words_original[2];
+			File f = new File(dest);
+			f.mkdirs();
+			Download.downloadAndExtract(instruction_words_original[1],dest);
 		} else
 		if(command.equals("EXPORT")) {
 			if( instruction_words.length> 1) {
 				if( instruction_words[1].equals("NATIONAL")) {
 					mainFrame.panelStats.exportTransparent();
 				} else
-					/*
+					
 				if( instruction_words[1].equals("BLOCKS")) {
 					//public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
 					//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
+					//F
+					Download.prompt = false;
 					Applet.mainFrame.exportBlockData(
-						instruction_words_original[2], 
-						instruction_words[3].equals("TRUE"), instruction_words[4].equals("TRUE"), 
-						new String[]{instruction_words[5]}, new String[]{instruction_words[6]}
+						Download.getStartPath()+File.separator+instruction_words_original[2], 
+						instruction_words[3].equals("FALSE")
 					);	
 				} else
-				*/
+				
 				if( instruction_words[1].equals("STATS")) {
 					mainFrame.panelStats.exportToHtml(true);					
 				} 

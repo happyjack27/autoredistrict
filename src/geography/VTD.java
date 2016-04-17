@@ -12,7 +12,7 @@ import serialization.ReflectionJSONObject;
 import solutions.*;
 import ui.MainFrame;
 
-public class Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature> {
+public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	
 	public static Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
@@ -85,7 +85,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	}
 	
 	@Override
-	public int compareTo(Feature o) {
+	public int compareTo(VTD o) {
 		if( compare_centroid) {
 			return this.geometry.full_centroid[0] > o.geometry.full_centroid[0] ? 1 : 
 				 this.geometry.full_centroid[0] < o.geometry.full_centroid[0]  ? -1 :
@@ -246,7 +246,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 
 		if( state == 0) {
 			state = 2;
-			for( Feature b : neighbors) {
+			for( VTD b : neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -257,7 +257,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 			}
 		} else if( state == 2) { 
 			state = 0;
-			for( Feature b : neighbors) {
+			for( VTD b : neighbors) {
 				
 				if( b == null) {
 					continue;
@@ -475,7 +475,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	}
 	   public int id;
 		public static int id_enumerator = 0;
-		public Feature feature = null;
+		public VTD feature = null;
 		public int state = 0;
 		public int temp = -1;
 		public double area = 0;
@@ -485,7 +485,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 
 
 	    public Vector<Edge> edges = new Vector<Edge>();
-	    public Vector<Feature> neighbors = new Vector<Feature>();
+	    public Vector<VTD> neighbors = new Vector<VTD>();
 	    public double[] neighbor_lengths;
 	    public double unpaired_edge_length = 0;
 	    public Vector<Vector<Election>> elections = new Vector<Vector<Election>>();
@@ -540,17 +540,17 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 		public String muni;
 		public boolean temp_bool;
 
-	    public Feature() {
+	    public VTD() {
 	    	super();
 	    	id = id_enumerator++;
 	    }
-	    public boolean equals(Feature b) {
+	    public boolean equals(VTD b) {
 	    	return b != null && b.id == this.id;
 	    }
 	    public void syncNeighbors() {
-			for(Feature b : neighbors) {
+			for(VTD b : neighbors) {
 				boolean is_in = false;
-				for(Feature b2 : b.neighbors) {
+				for(VTD b2 : b.neighbors) {
 					if( b2.id == this.id){
 						is_in = true;
 						break;
@@ -571,7 +571,7 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 			for(Edge e : edges) {
 				boolean found = false;
 		    	for( int i = 0; i < neighbor_lengths.length; i++) {
-		    		Feature b = neighbors.get(i);
+		    		VTD b = neighbors.get(i);
 		    		if( e.ward1_id == b.id || e.ward2_id == b.id){
 		    			neighbor_lengths[i] += e.length;
 		    			found = true;
@@ -587,12 +587,12 @@ public class Feature extends ReflectionJSONObject<Feature> implements Comparable
 	    public void collectNeighbors() {
 	    	//this gets a list of distinct neighbors.
 	    	
-			neighbors = new Vector<Feature>();
+			neighbors = new Vector<VTD>();
 			for( Edge e : edges) {
-				Feature b = e.ward1.id == this.id ? e.ward2 : e.ward1;
+				VTD b = e.ward1.id == this.id ? e.ward2 : e.ward1;
 				if( b != null && b.id != this.id) {
 					boolean is_in = false;
-					for(Feature b2 : neighbors) {
+					for(VTD b2 : neighbors) {
 						if( b2.id == b.id){
 							is_in = true;
 							break;
