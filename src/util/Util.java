@@ -377,7 +377,7 @@ New Mexico
 				//hit = true;
 			}
 			if( !hit) {
-				continue;
+				//continue;
 			}
 
 			StringBuffer sb = new StringBuffer();
@@ -440,9 +440,22 @@ New Mexico
 				//continue;
 			}
 			sb.append("LOAD "+i+ " 2010 2012\n");
+			sb.append("IMPORT DEMOGRAPHICS\n");
+			if( Download.apportionments[i] == 1) {
+				sb.append("COPY FEATURE CD_BD CD_2000\n");
+				sb.append("COPY FEATURE CD_BD CD_NOW\n");
+			}
+			sb.append("SAVE\n");
+			sb.append("EXIT\n");
+			sb.append("EXIT\n");
+			sb.append("LOAD "+i+ " 2010 2012\n");
+			appendExport(sb);
+
 			sb.append("IMPORT CURRENT_DISTRICTS\n");
 			sb.append("COPY FEATURE CD_NOW CD_2000\n");
-			
+			sb.append("SAVE\n");
+			sb.append("EXIT\n");
+			sb.append("EXIT\n");
 			appendExport2000(sb);
 			
 			if( Download.apportionments[i] == 1) {

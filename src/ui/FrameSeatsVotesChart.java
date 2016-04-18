@@ -436,6 +436,9 @@ public class FrameSeatsVotesChart extends JFrame {
 		dm.calcSeatsVotesCurve();
 		double d = dm.calcSeatsVoteAsymmetry();
 		seats_votes = dm.seats_votes;
+		if( seats_votes.size() ==0) {
+			return;
+		}
 		
 		double min = 1;
 		double median = 0.5;

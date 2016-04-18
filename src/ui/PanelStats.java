@@ -474,6 +474,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				
 				ddata[i][4] = ""+dm.vote_gap_by_district[i];
 				ddata[i][5] = ""+dm.wasted_votes_by_district[i];
+				if( seats.length == 0) {
+					seats = new double[5];
+				}
 				
 				ddata[i][6] = ""+seats[0];
 				ddata[i][7] = ""+seats[1];

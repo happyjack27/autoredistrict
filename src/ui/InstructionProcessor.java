@@ -18,10 +18,19 @@ import util.Util;
 /*
  * 
  * 
+ * 
 EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
 OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
 SET DISTRICTS COLUMN CD113FP
-EXPORT BLOCKS
+EXPORT BLOCKS "CD113/blocks.txt"
+LOAD [FIPS] 2010 2012
+IMPORT BLOCKS [START PATH]CD113/blocks.txt TRUE TRUE DISTRICTS CD_2010
+
+ * 
+EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
+OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+SET DISTRICTS COLUMN CD113FP
+EXPORT BLOCKS "CD113/blocks.txt"
 LOAD [FIPS] 2010 2012
 IMPORT BLOCKS "[START_PATH]CD113/CD113.txt" TRUE TRUE DISTRICTS CD_2010
  */
@@ -637,8 +646,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 					//F
 					Download.prompt = false;
 					Applet.mainFrame.exportBlockData(
-						Download.getStartPath()+File.separator+instruction_words_original[2], 
-						instruction_words[3].equals("FALSE")
+						Download.getStartPath()+File.separator+instruction_words_original[2] 
+						//instruction_words[3].equals("FALSE")
 					);	
 				} else
 				

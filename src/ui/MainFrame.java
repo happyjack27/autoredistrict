@@ -315,6 +315,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 
 	}
+	class ThreadFinishThreads extends Thread {
+		public void run() {
+			trySetGroupColumns();
+			dlg.hide();
+			if( Download.exit_when_done) {
+				System.exit(0);
+			}
+			ip.eventOccured();
+		}
+
+	}
 	
 	class CycleThread extends Thread {
 		public int cyear;
@@ -617,7 +628,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    		
 	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
+	    		if( Download.prompt) {
+	    			JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
+	    		}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
@@ -752,7 +765,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean include_centroid = false;
 		boolean include_header = false;
 		boolean prompt_includes = true;
-		public ThreadFinishImport nextThread;
+		public Thread nextThread;
 		ExportToBlockLevelThread() { super(); }
     	public void run() { 
     		try {
@@ -1630,7 +1643,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//System.out.println("max_lon "+max_lon);
 		
 		int itestx = 0;
-		for( int i = 0; i < 100; i++) {
+		for( int i = 0; i < 250; i++) {
 			if( i == 99) {
 				//System.out.println("i0: "+i);
 			}
@@ -2096,7 +2109,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		}
     	}
 	}
-	public void exportBlockData(String string, boolean equals) {
+	public void exportBlockData(String string) {//, boolean equals) {
 		ip.addHistory("EXPORT BLOCKS");
 		boolean ok = true;
 		if( comboBoxDistrictColumn.getSelectedIndex() < 0 ) {
@@ -2110,7 +2123,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		if( ok) {
 			ExportToBlockLevelThread exp = new ExportToBlockLevelThread();
-			exp.nextThread = new ThreadFinishImport();
+			exp.nextThread = new ThreadFinishThreads();
 			exp.output_file = string;
 			exp.prompt_includes = false;
 			exp.include_centroid = true;
@@ -2123,7 +2136,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	public void open(File f) {
 		OpenShapeFileThread ot = new OpenShapeFileThread(f);
-		ot.nextThread = new ThreadFinishImport();
+		ot.nextThread = new ThreadFinishThreads();
 		ot.start();
 	}
 
@@ -7061,6 +7074,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 	}
 	class ImportDemographics extends Thread {
+		final static boolean uselatlon = true;
+		//150,700
+		String SUMMARY_LEVEL = "700";
 		Thread nextThread = null;
 		public void run() {
 			dlbl.setText("Importing demographics...");
@@ -7164,6 +7180,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					"VAP_OTHER",
 					"VAP_MULTI",
 			};
+			int ILAT = 0;
+			int ILON = 1;
+			int FOREIGN_KEY = 2;
 			String[] original_headers = new String[headers.length];
 			for( int i = 0; i < original_headers.length; i++) {
 				original_headers[i] = column_renames.getBackward(headers[i]);
@@ -7226,7 +7245,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				yr = "0"+yr;
 			}
 			String primary_key = "VTDST"+yr;
-			int foreign_key = 2;
+			
+			if( uselatlon) {
+				featureCollection.sortedFeatures = new Vector<VTD>();
+				for( int i = 0; i < featureCollection.vtds.size(); i++) {
+					VTD vtd = featureCollection.vtds.get(i);
+					featureCollection.sortedFeatures.add(vtd);
+					vtd.geometry.makePolysFull();
+					for( int j = DATA_STARTS_AT; j < headers.length; j++) {
+						vtd.properties.put(headers[j],"0");
+					}
+				}
+				VTD.compare_centroid = true;
+				Collections.sort(featureCollection.sortedFeatures);
+				VTD.compare_centroid = false;
+
+			} else {
+				
+			}
 			
 			//collect primary keys;
 			HashMap<String,double[]> from_import = new HashMap<String,double[]>();
@@ -7278,7 +7314,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					System.out.print(".");
 				}
 				if( lline % 100000 == 0) {
-					System.out.print("o");
+					System.out.println(""+lline);
 				}				String geo_line = br_geoheader.readLine();
 				String part1_line =  br_part1.readLine();
 				String part2_line =  br_part2.readLine();
@@ -7290,7 +7326,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String summary_level = geo_line.substring(8,11);
 				//System.out.print(summary_level+pseudo_or_actual);
 				//ignore non-vtd's.
-				if( !summary_level.equals("700")) {
+				
+				if( !summary_level.equals(SUMMARY_LEVEL)) {
+				//if( !summary_level.equals("700")) {
 					continue;
 				}
 
@@ -7348,28 +7386,53 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					//System.out.println(""+i+": "+ss[i]);
 				}
 				
-				String s = ss[foreign_key];
+				String s = ss[FOREIGN_KEY];
 				if( trim_leading_zeros) {
 					while( s.length() > 1 && s.charAt(0) == '0') {
 						s = s.substring(1);
 					}
 				}
 				
-				double[] dd = from_import.get(s);
-				if( dd == null) {
-					dd = new double[ss.length-DATA_STARTS_AT];
-					for( int i = 0; i < dd.length; i++) {
-						dd[i] = 0;
+				if( uselatlon) {
+					
+					double lat = Double.parseDouble(ss[ILAT]);
+					double lon = Double.parseDouble(ss[ILON]);
+					//System.out.println(ss[ILAT]+" "+lat);
+					//System.out.println(ss[ILON]+" "+lon);
+					
+					VTD vtd = getHit(lon,lat);
+					if( vtd == null) {
+						System.out.print("m");
+					} else {
+						for( int j = DATA_STARTS_AT; j < ss.length; j++) {
+							double d0 = 0;
+							double d = Double.parseDouble(ss[j].replaceAll(",",""));
+							Object o = vtd.properties.get(headers[j]);
+							if( o != null) {
+								d0 = Double.parseDouble(vtd.properties.get(headers[j]).toString());
+							}
+							d0 += d;
+							vtd.properties.put(headers[j],""+d0);
+						}
 					}
-					from_import.put(s,dd);
-				}
-				for( int i = 0; i < dd.length; i++) {
-					try {
-						dd[i] += Double.parseDouble(ss[i+DATA_STARTS_AT]);
-					} catch (Exception ex) { 
-						System.out.println("ex cc "+ex+""+i+" "+ss[i+DATA_STARTS_AT]+" "+headers[i+DATA_STARTS_AT]);
-						System.exit(0);
-						ex.printStackTrace(); 
+				} else {
+					
+					double[] dd = from_import.get(s);
+					if( dd == null) {
+						dd = new double[ss.length-DATA_STARTS_AT];
+						for( int i = 0; i < dd.length; i++) {
+							dd[i] = 0;
+						}
+						from_import.put(s,dd);
+					}
+					for( int i = 0; i < dd.length; i++) {
+						try {
+							dd[i] += Double.parseDouble(ss[i+DATA_STARTS_AT]);
+						} catch (Exception ex) { 
+							System.out.println("ex cc "+ex+""+i+" "+ss[i+DATA_STARTS_AT]+" "+headers[i+DATA_STARTS_AT]);
+							System.exit(0);
+							ex.printStackTrace(); 
+						}
 					}
 				}
 			}
@@ -7387,55 +7450,57 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				ex.printStackTrace();
 				System.exit(0);
 			}
-			//System.exit(0);
-			int found = 0;
-			int not_found = 0;
-			
-			//now write it out into features.
-			for( Map.Entry<String,double[]> entry : from_import.entrySet() ) {
-				try { 
-					String incounty = entry.getKey();
-					String orig = incounty;
-					double[] dd = entry.getValue();
-					Vector<VTD> vf = county_feats.get(incounty);
-					if( vf == null) {
-						if( incounty.length() > 3) {
-							incounty = incounty.substring(0,2)+"-"+incounty.substring(2);
-						}
-						vf = county_feats.get(incounty);
+			if( !uselatlon) {
+				//System.exit(0);
+				int found = 0;
+				int not_found = 0;
+				
+				//now write it out into features.
+				for( Map.Entry<String,double[]> entry : from_import.entrySet() ) {
+					try { 
+						String incounty = entry.getKey();
+						String orig = incounty;
+						double[] dd = entry.getValue();
+						Vector<VTD> vf = county_feats.get(incounty);
 						if( vf == null) {
-							incounty = incounty.split("-")[1];
+							if( incounty.length() > 3) {
+								incounty = incounty.substring(0,2)+"-"+incounty.substring(2);
+							}
 							vf = county_feats.get(incounty);
 							if( vf == null) {
-								incounty = "0"+incounty;
+								incounty = incounty.split("-")[1];
 								vf = county_feats.get(incounty);
 								if( vf == null) {
-									System.out.println("not found!: "+orig);
-									not_found++;
-									continue;
+									incounty = "0"+incounty;
+									vf = county_feats.get(incounty);
+									if( vf == null) {
+										System.out.println("not found!: "+orig);
+										not_found++;
+										continue;
+									}
 								}
 							}
 						}
-					}
-					county_feats.remove(incounty);
-					found++;
-					double total_pop = (double)county_pops.get(incounty);
-					System.out.println("found!: "+incounty+" "+total_pop);
-					System.out.println("feat size "+vf.size());
-					for(VTD feat : vf) {
-						double feat_pop = feat.properties.POPULATION;
-						System.out.println("setting "+feat.properties.get("VTDST10").toString()+" "+feat_pop+" "+total_pop+" "+dd[0]+" "+dd[1]);
-						for( int i = 0; i < dd.length; i++) {
-							feat.properties.put(headers[i+DATA_STARTS_AT], ""+(dd[i]*feat_pop/total_pop));
+						county_feats.remove(incounty);
+						found++;
+						double total_pop = (double)county_pops.get(incounty);
+						System.out.println("found!: "+incounty+" "+total_pop);
+						System.out.println("feat size "+vf.size());
+						for(VTD feat : vf) {
+							double feat_pop = feat.properties.POPULATION;
+							System.out.println("setting "+feat.properties.get("VTDST10").toString()+" "+feat_pop+" "+total_pop+" "+dd[0]+" "+dd[1]);
+							for( int i = 0; i < dd.length; i++) {
+								feat.properties.put(headers[i+DATA_STARTS_AT], ""+(dd[i]*feat_pop/total_pop));
+							}
 						}
+					} catch (Exception ex) {
+						System.out.println("ex bb: "+ex);
+						ex.printStackTrace();
+						System.exit(0);
+	
 					}
-				} catch (Exception ex) {
-					System.out.println("ex bb: "+ex);
-					ex.printStackTrace();
-					System.exit(0);
-
-				}
-			}	
+				}	
+			}
 			//finish up unmatched entries.
 			/*
 			for( Entry<String, Vector<Feature>> entry : county_feats.entrySet() ) {
@@ -7678,8 +7743,8 @@ ui.Mainframe:
 		    System.out.println();
 
 //resort features
-			VTD.compare_centroid = false;
-			Collections.sort(featureCollection.features);
+			//VTD.compare_centroid = false;
+			//Collections.sort(featureCollection.features);
 							
 //read headers
     		System.out.println("Reading headers...");

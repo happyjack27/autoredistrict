@@ -1683,7 +1683,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                     	wasted_votes_by_district[k] += amt;
                     	wasted_votes_by_district_and_party[k][j] += amt; 
                     }
-                    if( Settings.seats_in_district(k) == 1) {
+                    if( Settings.seats_in_district(k) == 1 && res[0].length > 0) {
                     	vote_gap_by_district[k] = (int)Math.abs(res[0][0]-res[0][1]);
                     }
                     total_vote_gap += vote_gap_by_district[k];
@@ -1863,12 +1863,13 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
                 Settings.diagonalization_weight   *1.0,
         };
     	 */
+    	double penalty = 0;
     	if( Settings.seats_mode == Settings.SEATS_MODE_TOTAL && Settings.total_seats() > 5) {
     		boolean shutout = false;
     		for( int i = 0; i < elected.length; i++) {
     			if( elected[i][0] == 0 || elected[i][1] == 0) {
-    				total_vote_gap += 2000000; //2M
-    				System.out.println("penalizing "+total_vote_gap);
+    				penalty += 2000000; //2M
+    				//System.out.println("penalizing "+total_vote_gap);
     				shutout = true;
     				//break;
     			}
@@ -1880,18 +1881,18 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//sadfs
     	}
         fairnessScores = new double[]{
-        		length
-        		,disproportional_representation
-        		,Settings.minimize_absolute_deviation ? getMeanPopDiff() : getPopVariance()/*population_imbalance*2.0*/ //getMaxPopDiff()
-        		,disconnected_pops
-        		,power_fairness
+        		length+penalty
+        		,disproportional_representation+penalty
+        		,(Settings.minimize_absolute_deviation ? getMeanPopDiff() : getPopVariance())+penalty/*population_imbalance*2.0*/ //getMaxPopDiff()
+        		,disconnected_pops+penalty
+        		,power_fairness+penalty
         		,total_vote_gap//wasted_votes
-        		,wasted_vote_imbalance
-        		,sva
-        		,deviation_from_diagonal
-        		,Settings.reduce_splits ? countSplits() : 0
-                ,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()
-                ,Settings.descr_rep_weight == 0 ? 0 : this.getDescrVoteImbalance()
+        		,wasted_vote_imbalance+penalty
+        		,sva+penalty
+        		,deviation_from_diagonal+penalty
+        		,Settings.reduce_splits ? countSplits()+penalty : 0
+                ,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()+penalty
+                ,Settings.descr_rep_weight == 0 ? 0 : this.getDescrVoteImbalance()+penalty
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
     	metrics[0] += time1-time0;
