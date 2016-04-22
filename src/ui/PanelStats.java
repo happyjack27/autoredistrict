@@ -970,7 +970,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
     	for( int i = 0; i < rc; i++) {
         	str +="  <tr>\n";
         	for( int j = 0; j < cc; j++) {
-        		str += "    <td>"+(String)t.getValueAt(i, j)+"</td>\n";
+        		String val = (String)t.getValueAt(i, j);
+        		if( val == null || val.equals("null")) {
+        			val = "";
+        		}
+        		str += "    <td>"+val+"</td>\n";
         	}
         	str +="  </tr>\n";
     		

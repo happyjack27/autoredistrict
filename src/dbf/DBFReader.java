@@ -134,6 +134,9 @@ public class DBFReader {
   }
 
   public boolean hasNextRecord() {
+	  if( nextRecord == null) {
+		  System.out.println("read last record");
+	  }
     return nextRecord != null;
   }
   public Object[] nextRecord() throws Exception {
@@ -153,17 +156,21 @@ public class DBFReader {
       stream.readFully(nextRecord);
     }
     catch (EOFException eofexception) {
+    	System.out.println("eofexception");
       nextRecord = null;
     }
     catch (IOException ioexception) {
+    	System.out.println("ioexception");
       throw new Exception(ioexception);
     }
     return aobj;
   }
   
   public Object[] nextRecord(Charset charset) throws Exception {
-    if (!hasNextRecord())
+    if (!hasNextRecord()) {
+    	System.out.println("read last record");
       throw new Exception("No more records available.");
+    }
     Object aobj[] = new Object[nFieldCount];
     int i = 1;
     for (int j = 0; j < aobj.length; j++) {
@@ -178,9 +185,11 @@ public class DBFReader {
       stream.readFully(nextRecord);
     }
     catch (EOFException eofexception) {
+    	System.out.println("eofexception");
       nextRecord = null;
     }
     catch (IOException ioexception) {
+    	System.out.println("ioexception");
       throw new Exception(ioexception);
     }
     return aobj;

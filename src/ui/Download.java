@@ -640,6 +640,8 @@ public class Download extends Thread {
 		Applet.deleteRecursive(new File(getStartPath()));
 	}
 	public static void clean() {
+		new File(getStartPath()+File.separator+"blocks.txt").delete();
+		Applet.deleteRecursive(new File(getStartPath()+File.separator+"CD113"));
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_centroids"));
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+"block_pop"));
 		Applet.deleteRecursive(new File(getStartPath()+File.separator+"demographics"));

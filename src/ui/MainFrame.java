@@ -374,37 +374,43 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	}
 
 	class ExportCustomThread extends Thread {
-		File f;
-		File foutput;
-		boolean bdivide;
-		DialogSelectLayers dlgselect;
+		public File censusdbf_file;
+		public File foutput;
+		public boolean bdivide;
+		public boolean bdivide_choosen = false;
+		public Vector<String> vselected = null;
+		
 		FileOutputStream fos = null;
 		String delimiter = "\t";
+		public Thread nextThread;
 
 		ExportCustomThread() { super(); }
 		public void init() {
-			JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
-			JFileChooser jfc = new JFileChooser();
-			jfc.setCurrentDirectory(new File(Download.getStartPath()));
-			jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-			jfc.showOpenDialog(null);
-			f = jfc.getSelectedFile();
-			if( f == null)  {
+			if( censusdbf_file == null) {
+				JOptionPane.showMessageDialog(mainframe, "Select the .dbf file with census block-level data.\n");
+				JFileChooser jfc = new JFileChooser();
+				jfc.setCurrentDirectory(new File(Download.getStartPath()));
+				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
+				jfc.showOpenDialog(null);
+				censusdbf_file = jfc.getSelectedFile();
+			}
+			if( censusdbf_file == null)  {
 				return;
 			}
-			String fn = f.getName();
+			String fn = censusdbf_file.getName();
 			String ext = fn.substring(fn.length()-3).toLowerCase();
 			if( !ext.equals("dbf")) {
 				JOptionPane.showMessageDialog(null, "File format not recognized.");
 				return;
 			}
-			
-			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
-			JFileChooser jfc2 = new JFileChooser();
-			jfc.setCurrentDirectory(new File(Download.getStartPath()));
-			jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
-			jfc2.showSaveDialog(null);
-			foutput = jfc2.getSelectedFile();
+			if( foutput == null) {
+				JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
+				JFileChooser jfc2 = new JFileChooser();
+				jfc2.setCurrentDirectory(new File(Download.getStartPath()));
+				jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
+				jfc2.showSaveDialog(null);
+				foutput = jfc2.getSelectedFile();
+			}
 			if( foutput == null)  {
 				return;
 			}
@@ -424,16 +430,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 			
 			//select columns to deaggregate
-			dlgselect = new DialogSelectLayers();
-			dlgselect.setData(featureCollection,new Vector<String>());
-			dlgselect.show();
-			if( !dlgselect.ok) {
-				//if( is_evolving) { featureCollection.ecology.startEvolving(); }
-				return;
+			if( vselected == null) {
+				DialogSelectLayers dlgselect;
+				dlgselect = new DialogSelectLayers();
+				dlgselect.setData(featureCollection,new Vector<String>());
+				dlgselect.show();
+				if( !dlgselect.ok) {
+					//if( is_evolving) { featureCollection.ecology.startEvolving(); }
+					return;
+				}
+				vselected = dlgselect.in;
+			
 			}
 			//(select wether to put number as is or divide by points
-			bdivide = JOptionPane.showConfirmDialog(mainframe, "Divide values by number of points?") == JOptionPane.YES_OPTION;
-			
+			if( !bdivide_choosen) {
+				bdivide = JOptionPane.showConfirmDialog(mainframe, "Divide values by number of points?") == JOptionPane.YES_OPTION;
+			}
 			this.start();
 		}
 
@@ -445,7 +457,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlbl.setText("Loading file...");
 	    		
 
-				String dbfname = f.getAbsolutePath();
+				String dbfname = censusdbf_file.getAbsolutePath();
 				//count number of points in each precinct
 	    		double[] points = getCounts(dbfname,bdivide);
  
@@ -509,8 +521,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		
 
     			String s0 = "GEOID"+delimiter+"INTPTLAT"+delimiter+"INTPTLON";
-    			for(int i = 0; i < dlgselect.in.size(); i++) {
-    				s0 += delimiter+dlgselect.in.get(i);
+    			
+    			for(int i = 0; i < vselected.size(); i++) {
+    				s0 += delimiter+vselected.get(i);
     			}
 				try {
 					//System.out.println("writing...");
@@ -546,9 +559,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
 			    		} else {
 			    			String s = ""+geoid+delimiter+dlat+delimiter+dlon;
-			    			for(int i = 0; i < dlgselect.in.size(); i++) {
+			    			for(int i = 0; i < vselected.size(); i++) {
 			    				try {
-			    					String key = dlgselect.in.get(i);
+			    					String key = vselected.get(i);
 		    						if( !bdivide) {
 		    							try {
 						    				Object str = feat.properties.get(key);
@@ -630,6 +643,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    		dlg.setVisible(false);
 	    		if( Download.prompt) {
 	    			JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
+	    		}
+	    		if( nextThread != null) {
+	    			nextThread.start();
 	    		}
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
@@ -760,328 +776,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    }
 	}
 
-	class ExportToBlockLevelThread extends Thread {
-		String output_file = null;
-		boolean include_centroid = false;
-		boolean include_header = false;
-		boolean prompt_includes = true;
-		public Thread nextThread;
-		ExportToBlockLevelThread() { super(); }
-    	public void run() { 
-    		try {
-    			dlg.show();
-    			dlbl.setText("Downloading and extracting census block centroids...");
-    			File test = new File(Download.census_centroid_file.getAbsolutePath());
-    			if( !test.exists()) {
-    				Download.downloadAndExtractCentroids();
-    			}
-    			String ext = "dbf";
-    			String fn = Download.census_centroid_file.getAbsolutePath();
-    			File f = new File(fn);
-    			
-
-    			/*
-    			JOptionPane.showMessageDialog(mainframe, "Select the .dbf or .txt file with census block-level data.\n");
-				JFileChooser jfc = new JFileChooser();
-				jfc.setCurrentDirectory(new File(Download.getStartPath()));
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("dbf file","dbf"));
-				jfc.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
-				jfc.showOpenDialog(null);
-				File f = jfc.getSelectedFile();
-				if( f == null)  {
-					return;
-				}
-				String fn = f.getName();
-				String ext = fn.substring(fn.length()-3).toLowerCase();
-				if( !ext.equals("dbf") && !ext.equals("txt")) {
-					JOptionPane.showMessageDialog(null, "File format not recognized.");
-					return;
-				}
-				*/
-    			dlg.hide();
-    			
-    			File foutput = null;
-    			if( output_file == null) { 
-	    			JOptionPane.showMessageDialog(mainframe, "Select the output file.\n");
-					JFileChooser jfc2 = new JFileChooser();
-					jfc2.setCurrentDirectory(new File(Download.getStartPath()));
-					jfc2.addChoosableFileFilter(new FileNameExtensionFilter("csv file","csv"));
-					jfc2.addChoosableFileFilter(new FileNameExtensionFilter("txt file","txt"));
-					jfc2.showSaveDialog(null);
-					foutput = jfc2.getSelectedFile();
-    			} else {
-    				foutput = new File(output_file);
-    			}
-				if( foutput == null)  {
-					return;
-				}
-				String output_delimiter = ",";
-				FileOutputStream fos = null;
-				try {
-					System.out.println("creating..."+foutput.getAbsolutePath());
-					String ext2 = foutput.getAbsolutePath();
-					ext2 = ext2.trim().toLowerCase();
-					ext2 = ext2.substring(ext2.length()-4);
-					if( ext2.equals(".txt")) {
-						output_delimiter = "\t";
-					}
-					fos = new FileOutputStream(foutput);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-				
-				if( prompt_includes) {
-					include_centroid = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include centroid (aka center point)?");
-					include_header = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(mainframe, "Include header row?");
-				}
-    			if( include_header) {
-    				fos.write(("GEOID10"+output_delimiter+(include_centroid ? ("INTPTLON"+output_delimiter+"INTPTLAT"+output_delimiter) : "")+"DISTRICT"+"\n").getBytes());
-    			}
-
-    			
-	    		dlg.setVisible(true);
-	    		dlbl.setText("Loading file...");
-				if( ext.equals("dbf")) {
 	
-					String dbfname = f.getAbsolutePath();
-					
-					DBFReader dbfreader;
-					try {
-						dbfreader = new DBFReader(dbfname);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-						return;
-					}
-					DataAndHeader dh = new DataAndHeader();
-					
-					int col_lat = -1;
-					int col_lon = -1;
-					int col_geoid = -1;
-					
-		    		dlbl.setText("Reading header...");
-	
-					dh.header = new String[dbfreader.getFieldCount()];
-					for( int i = 0; i < dh.header.length; i++) {
-						dh.header[i] = dbfreader.getField(i).name;
-						if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
-							col_geoid = i;
-						}
-						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
-							col_lat = i;
-						}
-						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
-							col_lon = i;
-						}
-					}
-					if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
-						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
-						return;
-					}
-	
-		    		dlbl.setText("Making polygons...");
-	
-					
-					int count = 0;
-		    		for( VTD feat : featureCollection.features) {
-		    			feat.geometry.makePolysFull();
-		    		}
-		    		
-		    		dlbl.setText("Doing hit tests...");
-					//Feature.compare_centroid = true;
-					//Collections.sort(featureCollection.features);
-		    		
-		    		Hashtable<String,String> used = new Hashtable<String,String>(); 
-	
-	
-				    while (dbfreader.hasNextRecord()) {
-				    	try {
-				    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
-				    		String[] ss = new String[oo.length];
-				    		for( int i = 0; i < oo.length; i++) {
-				    			ss[i] = oo[i].toString();
-				    		}
-				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
-				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-				    		String geoid = ss[col_geoid];
-				    		if( used.get(geoid) != null) {
-				    			System.out.println("duplicate geoid!: "+geoid);
-				    		}
-				    		used.put(geoid, geoid);
-				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
-				    		
-				    		VTD feat = getHit(dlon,dlat);
-				    		
-				    		if( feat == null) {
-				    			System.out.print("x");
-					    		System.out.println();
-					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
-				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.id]);
-		    					
-		    					try {
-		    						//System.out.println("writing...");
-		    						fos.write((""+geoid+output_delimiter+(include_centroid ? (dlon+output_delimiter+dlat+output_delimiter) : "")+district+"\n").getBytes());
-		    					} catch (Exception e) {
-		    						// TODO Auto-generated catch block
-		    						e.printStackTrace();
-		    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-		    						return;
-		    					}
-				    			
-				    		}
-				    		
-				    		count++; 
-				    		if( count % 100 == 0) {
-				    			System.out.print(".");
-					    		dlbl.setText("Doing hit tests... "+count);
-				    		}
-				    		if( count % (100*100) == 0) {
-				    			System.out.println(""+count);
-	
-								try {
-									fos.flush();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-				    		}
-						} catch (Exception e) {
-							// TODO Auto-generated catch ward
-							System.out.println("ex x " +e);
-							e.printStackTrace();
-						}
-				    }
-				} else {
-					String delimiter = "\t";
-					FileReader fr = new FileReader(f);
-					BufferedReader br = new BufferedReader(fr);
-					DataAndHeader dh = new DataAndHeader();
-					dh.header = br.readLine().split(delimiter);
-					
-					//now select the columns
-		    		System.out.println("reading columns");
-					int col_lat = -1;
-					int col_lon = -1;
-					int col_geoid = -1;
-					for( int i = 0; i < dh.header.length; i++) {
-						if( dh.header[i].toUpperCase().trim().indexOf("GEOID") == 0) {
-							col_geoid = i;
-						}
-						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLAT") == 0) {
-							col_lat = i;
-						}
-						if( dh.header[i].toUpperCase().trim().indexOf("INTPTLON") == 0) {
-							col_lon = i;
-						}
-					}
-					if( col_geoid < 0 || col_lat < 0 || col_lon < 0) {
-						JOptionPane.showMessageDialog(mainframe, "Required columns not found.");
-						return;
-					}
-	
-		    		System.out.println("doing hit tests");
-
-		    		dlbl.setText("Making polygons...");
-	
-					
-					int count = 0;
-		    		for( VTD feat : featureCollection.features) {
-		    			feat.geometry.makePolysFull();
-		    		}
-		    		
-		    		dlbl.setText("Doing hit tests...");
-					//Feature.compare_centroid = true;
-					//Collections.sort(featureCollection.features);
-		    		hits = 0;
-		    		misses = 0;
-		    		
-		    		Hashtable<String,String> used = new Hashtable<String,String>(); 
-	
-	
-		    		
-				    String line;
-				    while ((line = br.readLine()) != null) {
-				    	try {
-					    	String[] ss = line.split(delimiter);
-				    		double dlat = Double.parseDouble(ss[col_lat].replaceAll(",","").replaceAll("\\+",""));
-				    		double dlon = Double.parseDouble(ss[col_lon].replaceAll(",","").replaceAll("\\+",""));
-				    		String geoid = ss[col_geoid];
-				    		if( used.get(geoid) != null) {
-				    			System.out.println("duplicate geoid!: "+geoid);
-				    		}
-				    		used.put(geoid, geoid);
-				    		int ilat = (int)(dlat*Geometry.SCALELATLON);
-				    		int ilon = (int)(dlon*Geometry.SCALELATLON);
-				    		
-				    		VTD feat = getHit(dlon,dlat);
-				    		
-				    		if( feat == null) {
-				    			System.out.print("x");
-					    		System.out.println();
-					    		System.out.println("miss "+dlon+","+dlat+" "+geoid+" ");
-				    		} else {
-		    					String district = ""+(1+featureCollection.ecology.population.get(0).vtd_districts[feat.id]);
-		    					
-		    					try {
-		    						//System.out.println("writing...");
-		    						fos.write((""+geoid+output_delimiter+(include_centroid ? (dlon+output_delimiter+dlat+output_delimiter) : "")+district+"\n").getBytes());
-		    					} catch (Exception e) {
-		    						// TODO Auto-generated catch block
-		    						e.printStackTrace();
-		    						JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-		    						return;
-		    					}
-				    			
-				    		}
-				    		
-				    		count++; 
-				    		if( count % 100 == 0) {
-				    			System.out.print(".");
-					    		dlbl.setText("Doing hit tests... "+count);
-				    		}
-				    		if( count % (100*100) == 0) {
-				    			System.out.println(""+count);
-	
-								try {
-									fos.flush();
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-				    		}
-						} catch (Exception e) {
-							// TODO Auto-generated catch ward
-							System.out.println("ex x " +e);
-							e.printStackTrace();
-						}
-				    }
-					
-				}
-			    
-	    		dlbl.setText("Finalizing...");
-				try {
-					fos.flush();
-					System.out.println("closing...");
-					fos.close();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(mainframe,"Save failed!\nDo you have the file open in another program?");
-					return;
-				} 
-
-	    		
-	    		dlg.setVisible(false);
-	    		JOptionPane.showMessageDialog(mainframe,"Done exporting to block level.\n"+foutput.getAbsolutePath());
-    		} catch (Exception ex) {
-    			System.out.println("ex "+ex);
-    			ex.printStackTrace();
-    		}
-    		if( nextThread != null) {
-    			nextThread.start();
-    		}
-    	}
-	}
-
 	class LoadCensusFileThread extends Thread {
 		File f;
 		LoadCensusFileThread() { super(); }
@@ -1752,6 +1447,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		importBlockData( f.getAbsolutePath().trim(), true, opt == 1, new String[]{"IMPORTED"}, new String[]{"IMPORTED"});
     	}
     	public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
+			boolean one_indexed = true;
     		try {
     			System.out.println("importBlockData "+fn);
     			opt = MAJORITY_VOTE ? 1 : 0;
@@ -1874,6 +1570,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						    	} else {
 			    					if( opt == OVERWRITE) { //overwrite
 			    						String dist = ss[col_indexes[0]];
+			    						//ignore zz's
+			    						if(dist.trim().equals("ZZ")) {
+			    							continue;
+			    						}
+			    						if( dist.trim().equals("0")) {
+			    							one_indexed = false;
+			    						}
 			    						feat.points.add(new double[]{dlon,dlat,Integer.parseInt(dist)});
 			    						Integer integer = feat.properties.temp_hash.get(dist);
 			    						if( integer == null) {
@@ -1917,7 +1620,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     						for( VTD feat : featureCollection.features) {
     							if( feat.properties.temp_hash.size() == 0) {
     								System.out.println("no values");
-    								feat.properties.put(key,"1");
+    								//feat.properties.put(key,"1");
     								continue;
     							}
     							String max = "";
@@ -1946,11 +1649,79 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					String key = ((String)col_names[0]).trim().toUpperCase();
 					System.out.println("key: "+key);
 					
+					Vector<VTD> missed = new Vector<VTD>();
 					if( opt == OVERWRITE) {
 						for( VTD feat : featureCollection.features) {
-							feat.setDistFromPoints(key);
+							boolean found = feat.setDistFromPoints(key,false);//one_indexed);
+							if( !found) {
+								missed.add(feat);
+							}
+						}
+						
+						//check for zeros, if none, decrement all.
+						boolean found_zero = false;
+						for( VTD feat : featureCollection.features) {
+							if( feat.get(key) == null) {
+								continue;
+							}
+							int ndx = Integer.parseInt(feat.get(key).toString());
+							if( ndx == 0) {
+								found_zero = true;
+								break;
+							}
+						}
+						if( !found_zero && false) {
+							for( VTD feat : featureCollection.features) {
+								if( feat.get(key) == null) {
+									continue;
+								}
+								int ndx = Integer.parseInt(feat.get(key).toString());
+								feat.put(key,""+(ndx-1));
+							}
 						}
 					}
+					try {
+						
+						//fill in empties with neighbors
+						Hashtable<String,Integer> counts = new Hashtable<String,Integer>();
+						int l = 0;
+						System.out.println(""+missed.size()+" missing");
+						while (l < 5 && missed.size() > 0) {
+							System.out.println(""+missed.size()+" missing");
+							for( int k = 0; k < missed.size(); k++) {
+								VTD feat = missed.get(k);
+								counts.clear();
+								for(VTD vtd : feat.neighbors) {
+									String p = vtd.feature.properties.get(key).toString();
+									Integer i = counts.get(p);
+									if( i == null) {
+										i = new Integer(0);
+										counts.put(p, i);
+									}
+									i++;
+								}
+								String best = "";
+								int max = 0;
+								if( counts.entrySet().size() == 0) {
+									System.out.println("no neighbors found! "+l);
+								} else {
+									missed.remove(feat);
+									k--;
+									for( Entry<String,Integer> entries : counts.entrySet()) {
+										if( entries.getValue() > max) {
+											max = entries.getValue();
+											best = entries.getKey();
+										}
+									}
+									feat.properties.put(key,best);
+								}
+							}
+							l++;
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+
 
 		    		dlg.setVisible(false);
 					
@@ -1964,7 +1735,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		    		if( opt == OVERWRITE) {
 						for( VTD feat : featureCollection.features) {
-							feat.setDistFromPoints(key);
+							feat.setDistFromPoints(key,false);//,one_indexed);
 						}
 					}
 
@@ -2122,13 +1893,49 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			ok = false;
 		}
 		if( ok) {
-			ExportToBlockLevelThread exp = new ExportToBlockLevelThread();
+			/*
+			JFileChooser jfc = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Dbase file", "dbf");
+			jfc.setFileFilter(filter);
+			jfc.showOpenDialog(null);
+			File fd = jfc.getSelectedFile();
+			if( fd == null) {
+				return;
+			}*/
+			//ExportToBlockLevelThread exp = new ExportToBlockLevelThread();
+			/*
+			 		File f;
+		File foutput;
+		boolean bdivide;
+		DialogSelectLayers dlgselect;
+		FileOutputStream fos = null;
+		String delimiter = "\t";
+		public ThreadFinishThreads nextThread;
+
+			 */
+
+			/*
+			public File censusdbf_file;
+			public File foutput;
+			public boolean bdivide;
+			public boolean bdivide_choosen = false;
+			public Vector<String> vselected = null;
+			 */
+			Download.downloadAndExtractCentroids();
+			ExportCustomThread exp = new ExportCustomThread();
 			exp.nextThread = new ThreadFinishThreads();
-			exp.output_file = string;
-			exp.prompt_includes = false;
-			exp.include_centroid = true;
-			exp.include_header = true;
-			exp.start();
+			//Download.census_centroid_file  
+			Download.initPaths();
+			exp.censusdbf_file = Download.census_centroid_file;
+			String output = Download.getStartPath()+"blocks.txt";
+			System.out.println("input: "+exp.censusdbf_file);
+			System.out.println("output: "+exp.foutput);
+			exp.foutput = new File(output);
+			exp.bdivide = false;
+			exp.bdivide_choosen = true;
+			exp.vselected = new Vector<String>();
+			exp.vselected.add(Applet.mainFrame.project.district_column);
+			exp.init();
 		} else {
 			JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
 		}
@@ -4704,7 +4511,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					ok = false;
 				}
 				if( ok) {
-					new ExportToBlockLevelThread().start();
+					ExportCustomThread exp = new ExportCustomThread();
+					exp.init();
+					//new ExportToBlockLevelThread().start();
 				} else {
 					JOptionPane.showMessageDialog(MainFrame.mainframe,"You must select a district column first.");
 				}
@@ -5095,7 +4904,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmShowDemographics);
 		
-		mntmColorByVtd = new JMenuItem("Color by vtd vote packing");
+		mntmColorByVtd = new JMenuItem("Color by vtd partisan packing");
 		mntmColorByVtd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING2;
@@ -7629,9 +7438,10 @@ ui.Mainframe:
 			int ACCUMULATE = 0;
 			int MAJORITY = 1;
 			int opt = MAJORITY_VOTE ? 1 : 0;
+			//TODO - if missed, fill with majority neighbor.
 			
 			DataAndHeader dh = new DataAndHeader();
-			
+
 			int col_lat = -1;
 			int col_lon = -1;
 			int col_geoid_centroid = -1;
@@ -7901,10 +7711,15 @@ ui.Mainframe:
 					//note majority vote is only handling 1 column right now!
 					String key = ((String)dest_columns[0]).trim().toUpperCase();
 					if( opt == MAJORITY) { //MAJORITY
+						Vector<VTD> missed = new Vector<VTD>();
+						for( int i = 0; i < featureCollection.vtds.size(); i++) {
+							missed.add(featureCollection.vtds.get(i));
+						}
+						
 						Vector<VTD> missing = new Vector<VTD>();
 						for( VTD feat : featureCollection.features) {
 							if( feat.properties.temp_hash.size() == 0) {
-								System.out.println("no values");
+								System.out.println("no values! "+key);
 								missing.add(feat);
 								feat.properties.put(key,"");
 								continue;
@@ -7928,27 +7743,40 @@ ui.Mainframe:
 						}
 						
 						//fill in empties with neighbors
-						Hashtable<String,Integer> counts = new Hashtable<String,Integer>(); 
-						for( VTD feat : missing) {
-							counts.clear();
-							for(VTD vtd : feat.neighbors) {
-								String p = vtd.feature.properties.get(key).toString();
-								Integer i = counts.get(p);
-								if( i == null) {
-									i = new Integer(0);
-									counts.put(p, i);
+						Hashtable<String,Integer> counts = new Hashtable<String,Integer>();
+						int l = 0;
+						System.out.println(""+missing.size()+" missing");
+						while (l < 5 && missing.size() > 0) {
+							System.out.println(""+missing.size()+" missing");
+							for( int k = 0; k < missing.size(); k++) {
+								VTD feat = missing.get(k);
+								counts.clear();
+								for(VTD vtd : feat.neighbors) {
+									String p = vtd.feature.properties.get(key).toString();
+									Integer i = counts.get(p);
+									if( i == null) {
+										i = new Integer(0);
+										counts.put(p, i);
+									}
+									i++;
 								}
-								i++;
-							}
-							String best = "";
-							int max = 0;
-							for( Entry<String,Integer> entries : counts.entrySet()) {
-								if( entries.getValue() > max) {
-									max = entries.getValue();
-									best = entries.getKey();
+								String best = "";
+								int max = 0;
+								if( counts.entrySet().size() == 0) {
+									System.out.println("no neighbors found! "+l);
+								} else {
+									missing.remove(feat);
+									k--;
+									for( Entry<String,Integer> entries : counts.entrySet()) {
+										if( entries.getValue() > max) {
+											max = entries.getValue();
+											best = entries.getKey();
+										}
+									}
+									feat.properties.put(key,best);
 								}
 							}
-							feat.properties.put(key,best);
+							l++;
 						}
 					}
 

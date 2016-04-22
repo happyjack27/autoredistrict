@@ -11,10 +11,29 @@ import java.util.Map.Entry;
 import ui.Download;
 
 public class Util {
+	/*
+	 * 
+	 * potential redos (descr rep):
+California
+Massacthuses
+Michigan
+New Jersey
+New York
+Ohio
+Pennsylvania
+Virginia
+Wisconsin
+
+	 
+	 */
 	static int apportionment_threshold = 15;
+	static boolean only_redos = false;
 	public static String[] redo_states = new String[]{
-		"Pennsylvania",
-		"Tennessee",
+		"Oklahoma",
+		//"Kentucky",
+		//"Rhode Island",
+		//"Pennsylvania",
+		//"Tennessee",
 		//"Alabama",
 		//"New York",
 		//"Oklahoma",
@@ -376,8 +395,8 @@ New Mexico
 			if( Download.apportionments[i] > apportionment_threshold) {
 				//hit = true;
 			}
-			if( !hit) {
-				//continue;
+			if( !hit && only_redos) {
+				continue;
 			}
 
 			StringBuffer sb = new StringBuffer();
@@ -439,7 +458,19 @@ New Mexico
 			if( Download.apportionments[i] != 1)  {
 				//continue;
 			}
+			if( i == 1) {
+				continue;
+			}
+ 			sb.append("LOAD "+i+ " 2010 2012\n");
+			import2010(sb,i);
+			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
+			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
+			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+			sb.append("RESCALE ELECTIONS\n");
+			sb.append("SAVE\n");
 			sb.append("LOAD "+i+ " 2010 2012\n");
+
+			appendExport(sb);
 			sb.append("IMPORT DEMOGRAPHICS\n");
 			if( Download.apportionments[i] == 1) {
 				sb.append("COPY FEATURE CD_BD CD_2000\n");
@@ -451,7 +482,7 @@ New Mexico
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			appendExport(sb);
 
-			sb.append("IMPORT CURRENT_DISTRICTS\n");
+			sb.append("IMPORT CY2000_DISTRICTS\n");
 			sb.append("COPY FEATURE CD_NOW CD_2000\n");
 			sb.append("SAVE\n");
 			sb.append("EXIT\n");
@@ -671,7 +702,7 @@ EXIT
 			if( hit) {
 				//main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete "+i+"\n");
 			}
-			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
+			//main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
 			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");
@@ -685,6 +716,34 @@ EXIT
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public static void import2010(StringBuffer sb, int i) {
+		if( Download.apportionments[i] == 1) {
+			sb.append(""
+					+"\nCOPY FEATURE CD_BD CD_2010"
+					+"\nSAVE"
+					);			
+		} else {
+			sb.append(""
+					+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+					+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
+					+"\nSET DISTRICTS COLUMN CD113FP"
+					+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
+					+"\nLOAD [FIPS] 2010 2012"
+					+"\nIMPORT BLOCKS [START PATH]blocks.txt TRUE TRUE CD113FP CD_2010"
+					+"\nSAVE"
+					);
+		}
+		sb.append(""
+				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+				+"\nSET DISTRICTS COLUMN CD_2010"
+				//+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+				+"\nEXPORT"
+				+"\nEXPORT NATIONAL"
+				+"\nEXIT"
+				+"\nEXIT"
+				);
+
 	}
 
 

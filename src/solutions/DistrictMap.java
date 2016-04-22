@@ -2207,6 +2207,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			double vote_gap = getVoteGapPct(k);
 			//vote_gap /= (votes[0]+votes[1]);
 			vote_gap = Math.abs(vote_gap);
+			vote_gap = vote_gap > 1 ? 1 : vote_gap < 0 ? 0 : vote_gap;
+
 			double[] amts1 = districts.get(k).getDemographics();
 			double tot = 0;
 			for( int i = 0; i < amts1.length; i++) {

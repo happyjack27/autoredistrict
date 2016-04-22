@@ -59,9 +59,9 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 		return outline_vtds || outline_state || outline_districts || outline_counties;
 	}
 	
-	public void setDistFromPoints( String colname) {
+	public boolean setDistFromPoints( String colname, boolean one_indexed) {
 		if( points == null || points.size() == 0) {
-			return;
+			return false;
 		}
 		int[] counts = new int[200];
 		for( int i = 0; i < counts.length; i++) {
@@ -78,10 +78,17 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 				maxindex = p;
 			}
 		}
+		points = null;
+		if( one_indexed) {
+			maxindex--;
+		}
+		if( maxindex < 0 || max == 0) {
+			return false;
+		}
 		//System.out.println();
 		//System.out.println(" "+colname+": "+maxindex+" "+max);
 		properties.put(colname,""+maxindex);
-		points = null;
+		return true;
 	}
 	
 	@Override
@@ -433,6 +440,11 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 			}
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				g.fillPolygon(geometry.polygons[i]);
+			}
+			if( !outline_vtds) {
+				for( int i = 0; i < geometry.polygons.length; i++) {
+					g.drawPolygon(geometry.polygons[i]);
+				}
 			}
 		}
 		if( geometry.outlineColor != null && outline_vtds && !MainFrame.mainframe.evolving) {
