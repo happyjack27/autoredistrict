@@ -348,11 +348,6 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			return;
 		}
 		duplicateThread = true;
-		if( instruction_pointer >= instructions.size()) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
-			lblFinished.setVisible(true);
-			return;
-		}
 		if( !mainFrame.evolving) {
 			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
 			try {
@@ -363,6 +358,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			}
 		}
 		duplicateThread = false;
+		if( instruction_pointer >= instructions.size()) {
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
+			lblFinished.setVisible(true);
+			return;
+		}
+
 		//System.out.println("eventOccured");
 		Download.init();
 		lblFinished.setVisible(false);
