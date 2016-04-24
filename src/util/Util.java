@@ -10,6 +10,28 @@ import java.util.Map.Entry;
 
 import ui.Download;
 
+/*
+ * 
+EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
+OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+SET DISTRICTS COLUMN CD113FP
+
+EXPORT BLOCKS "CD113/blocks.txt"
+
+LOAD [FIPS] 2010 2012
+IMPORT BLOCKS "[START PATH]blocks.txt" TRUE TRUE CD113FP CD_2010
+SAVE
+
+
+ * 
+EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
+OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+SET DISTRICTS COLUMN CD113FP
+EXPORT BLOCKS "CD113/blocks.txt"
+LOAD [FIPS] 2010 2012
+IMPORT BLOCKS "[START_PATH]CD113/CD113.txt" TRUE TRUE DISTRICT CD_2010
+ */
+ 
 public class Util {
 	/*
 	 * 
@@ -458,11 +480,16 @@ New Mexico
 			if( Download.apportionments[i] != 1)  {
 				//continue;
 			}
-			if( i == 1) {
-				continue;
+			if( i < 6) {
+				//continue;
 			}
  			sb.append("LOAD "+i+ " 2010 2012\n");
-			import2010(sb,i);
+ 			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
+ 			//sb.append("SAVE\n");
+			//sb.append("LOAD "+i+ " 2010 2012\n");
+			newscript(sb,i);
+			//import2010(sb,i);
+			/*
 			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
 			sb.append("COPY FEATURE PRES12_REP PRES12_R50\n");
 			sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
@@ -505,6 +532,7 @@ New Mexico
 			sb.append("SAVE\n");
 			sb.append("LOAD "+i+ " 2010 2012\n");
 			appendExport(sb);
+			*/
 
 			
 			
@@ -534,7 +562,7 @@ New Mexico
 			sb.append("STOP\n");
 
 			if( Download.states[i].equals("Texas") || Download.states[i].equals("New York")  || Download.states[i].equals("Virginia") || Download.states[i].equals("New Jersey")) {
-			if( Download.apportionments[i] > 5) {
+			if( false && Download.apportionments[i] > 5) {
 				sb.append("SET WEIGHT DESCRIPTIVE 0.45\n");
 				sb.append("SET EVOLUTION POPULATION 200\n");
 				sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
@@ -702,7 +730,7 @@ EXIT
 			if( hit) {
 				//main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete "+i+"\n");
 			}
-			//main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
+			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar "+(gui?"":"nogui ")+"run subscript"+i+"\n");
 			main.append(prepend+"java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean "+i+"\n");
 		}
 		File f = new File(base_dir+"mainscript");
@@ -730,8 +758,18 @@ EXIT
 					+"\nSET DISTRICTS COLUMN CD113FP"
 					+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
 					+"\nLOAD [FIPS] 2010 2012"
+					+"\nIMPORT BLOCKS \"[START PATH]blocks.txt\" TRUE TRUE CD113FP CD_2010"
+					+"\nSAVE"
+
+					/*
+					+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+					+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
+					+"\nSET DISTRICTS COLUMN CD113FP"
+					+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
+					+"\nLOAD [FIPS] 2010 2012"
 					+"\nIMPORT BLOCKS [START PATH]blocks.txt TRUE TRUE CD113FP CD_2010"
 					+"\nSAVE"
+					*/
 					);
 		}
 		sb.append(""
@@ -1111,4 +1149,58 @@ EXIT
 		sb.append("EXPORT NATIONAL\n");
 
 	 */
+	public static void newscript(StringBuffer sb, int i) {
+		sb.append(""
+				/*
+				+"\nCOPY FEATURE CD_FV CD_FV2"
+				+"\nCOPY FEATURE CD_BD CD_SM"
+				+"\nSAVE"				
+				+"\nEXIT"*/
+				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+				+"\nSET DISTRICTS COLUMN CD_FV2"
+			);
+			if( Download.apportionments[i] > 5) {
+					sb.append(""
+					+"\nSET DISTRICTS FAIRVOTE_SEATS [SEATS]"
+					+"\nSET WEIGHT DESCRIPTIVE 1.0"
+					+"\nSET WEIGHT PROPORTIONAL 0.0"
+					+"\nSET WEIGHT PARTISAN 0.0"
+					+"\nSET EVOLUTION ANNEAL_RATE 0.85"
+					+"\nSET EVOLUTION MUTATE_RATE 1.0"
+					+"\nGO"
+					+"\nSET WEIGHT DESCRIPTIVE 1.0"
+					+"\nSET WEIGHT PROPORTIONAL 0.0"
+					+"\nSET WEIGHT PARTISAN 0.0"
+					+"\nWHEN MUTATE_RATE 0.3"
+					);
+				}//			if( Downloads.apportionments[i] < 5) {
+	
+	sb.append(""
+				+"\nSTOP"
+				+"\nSAVE"
+				+"\nEXPORT"
+				+"\nEXPORT NATIONAL"
+				/*
+				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+				+"\nSET DISTRICTS COLUMN CD_SM"
+				+"\nSET WEIGHT DESCRIPTIVE 0.5"
+				+"\nSET WEIGHT PROPORTIONAL 0.0"
+				+"\nSET WEIGHT PARTISAN 0.5"
+				+"\nSET EVOLUTION MUTATE_RATE 0.9"
+				+"\nGO"
+				+"\nSET WEIGHT DESCRIPTIVE 1.0"
+				+"\nSET WEIGHT PROPORTIONAL 0.0"
+				+"\nWHEN MUTATE_RATE 0.3"
+				+"\nSTOP"
+				+"\nSAVE"
+				+"\nEXPORT"
+				+"\nEXPORT NATIONAL"
+				+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+				+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
+				+"\nSET DISTRICTS COLUMN CD113FP"
+				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""*/
+				+"\nEXIT"
+				+"\nEXIT"
+		);
+	}
 }

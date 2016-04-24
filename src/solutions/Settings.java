@@ -212,7 +212,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	// map_population (folder)
 	//
 	public static int num_ward_outcomes = 16;
-	public static double elite_fraction = 0.25;
+	public static double elite_fraction = 0.33;
 	public static double unpaired_edge_length_weight = 0.75;
 	public static boolean ignore_uncontested = false;
 	public static boolean substitute_uncontested = false;

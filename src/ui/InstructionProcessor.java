@@ -23,24 +23,7 @@ creating.../Users/jimbrill/autoredistrict_data/Alabama/2010/blocks.txt
 Tue Apr 19 20:27:15 CDT 2016: url: ftp://ftp2.census.gov/geo/pvs/tiger2010st/01_Alabama/01/tl_2010_01_tabblock10.zip
 Tue Apr 19 20:27:15 CDT 2016: dest_file: /Users/jimbrill/autoredistrict_data/Alabama/2010/block_centroids/downloaded.zip
 
- * 
-EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
-OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
-SET DISTRICTS COLUMN CD113FP
-EXPORT BLOCKS "CD113/blocks.txt"
-LOAD [FIPS] 2010 2012
-IMPORT BLOCKS [START PATH]blocks.txt TRUE TRUE CD113FP CD_2010
-SAVE
 
-
- * 
-EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
-OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
-SET DISTRICTS COLUMN CD113FP
-EXPORT BLOCKS "CD113/blocks.txt"
-LOAD [FIPS] 2010 2012
-IMPORT BLOCKS "[START_PATH]CD113/CD113.txt" TRUE TRUE DISTRICT CD_2010
- */
 
 /*
 Applet.mainFrame.importBlockData(
@@ -71,6 +54,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		setTitle("Scripts");
 		initComponents();
 	}
+	
+	
 	
 	public void initComponents() {
 		getContentPane().setLayout(null);		
@@ -357,6 +342,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public static boolean duplicateThread = false;
 	@Override
 	public void eventOccured() {
+		System.out.println(" ----------- "+new Date().toLocaleString()+": event instruction pointer: "+instruction_pointer);
 		if( duplicateThread) {
 			System.out.println(" ----------- "+new Date().toLocaleString()+": canceling duplicate thread "+this.instruction_pointer);
 			return;

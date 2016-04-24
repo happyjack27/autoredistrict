@@ -33,7 +33,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	public ExecutorService matingThreadPool;
 	public CountDownLatch matingLatch;
 
-	static int num_threads = 8;
+	static int num_threads = Runtime.getRuntime().availableProcessors()*4<=256 ? Runtime.getRuntime().availableProcessors()*4 : 256;
 
 	public static double[] fairnessScoreEmaVars = new double[12];
 	public static double[] fairnessScoreEmaMeans = new double[12];

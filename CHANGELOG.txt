@@ -1,5 +1,20 @@
 Changelog:
 
+V. 1.27
+
+* can now script exporting to block assignment file
+* can now script importing to block assignment file
+* reduced white dots at borders due to geometric rounding
+* can now import block-level cvap (citizen voting age population) demographic data from census.gov
+* fixed bug with import block-level cvap data (was accumulating multiple resolutions on together)
+* can now script downloading and extracting zip files
+* added ability to use quotes in scripts
+* added ability to use tags in script such as [STATE] or [FIPS]
+* added coloring by population density (lower density fades to white)
+* added density-based mas to html export and national map export
+* added county-level stats
+* added descriptive representation optimization criteria - also added to stats and graph.
+
 V. 1.26
 
 * bug fix: fixed map aspect ratio
