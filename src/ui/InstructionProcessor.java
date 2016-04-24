@@ -347,16 +347,16 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			System.out.println(" ----------- "+new Date().toLocaleString()+": canceling duplicate thread "+this.instruction_pointer);
 			return;
 		}
+		duplicateThread = true;
 		if( instruction_pointer >= instructions.size()) {
-			//System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
 			lblFinished.setVisible(true);
 			return;
 		}
-		duplicateThread = true;
 		if( !mainFrame.evolving) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 1000");
+			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -603,6 +603,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			for(ActionListener a: mainFrame.goButton.getActionListeners()) {
 			    a.actionPerformed(new ActionEvent(mainFrame.goButton, 0, ""));
 			}
+			instruction_pointer++;
+			textFieldIP.setText(""+(instruction_pointer+1));
+			return;
 		} else
 		if(command.equals("STOP")) {
 			for(ActionListener a: mainFrame.stopButton.getActionListeners()) {
