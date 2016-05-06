@@ -402,10 +402,13 @@ New Mexico
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
-			if( i < 35) {
+			if( i < 47) {
 				//continue;
 			}
 			String state = Download.states[i];
+			if( !state.equals("Ohio") && !state.equals("Florida")) {
+				//continue;
+			}
 			
 			boolean hit = false;
 			for( int j = 0; j < redo_states.length; j++) {
@@ -484,6 +487,7 @@ New Mexico
 				//continue;
 			}
  			sb.append("LOAD "+i+ " 2010 2012\n");
+ 			appendExportEmbedded(sb,i);
  			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
  			//sb.append("SAVE\n");
 			//sb.append("LOAD "+i+ " 2010 2012\n");
@@ -1122,6 +1126,43 @@ EXIT
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
 	}
+	public static void appendExportEmbedded(StringBuffer sb, int i) {
+		String state = Download.states[i];
+		
+		sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_SM\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+		sb.append("SAVE\n");
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+		
+		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT EMBEDDED\n");
+		sb.append("EXPORT PIE\n");
+		//sb.append("EXPORT NATIONAL\n");
+	
+		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("EXPORT EMBEDDED\n");
+		sb.append("EXPORT PIE\n");
+		//sb.append("EXPORT NATIONAL\n");
+
+
+		sb.append("SET DISTRICTS COLUMN CD_FV\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("EXPORT EMBEDDED\n");
+		sb.append("EXPORT PIE\n");
+		//sb.append("EXPORT HTMLONLY\n");
+
+		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("EXPORT EMBEDDED\n");
+		sb.append("EXPORT PIE\n");
+		//sb.append("EXPORT HTMLONLY\n");
+		
+
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+	}
 	public static void appendExport2000(StringBuffer sb) {
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
@@ -1150,20 +1191,28 @@ EXIT
 
 	 */
 	public static void newscript(StringBuffer sb, int i) {
+		String state = Download.states[i];
+		sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV2\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+
 		sb.append(""
-				/*
-				+"\nCOPY FEATURE CD_FV CD_FV2"
-				+"\nCOPY FEATURE CD_BD CD_SM"
+				//+"\nCOPY FEATURE CD_FV CD_FV2"
+				//+"\nCOPY FEATURE CD_BD CD_SM"
 				+"\nSAVE"				
-				+"\nEXIT"*/
+				//+"\nEXIT"
+				
 				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
 				+"\nSET DISTRICTS COLUMN CD_FV2"
+				+"\nSET DISTRICTS FAIRVOTE_SEATS [SEATS]"
 			);
+		
 			if( Download.apportionments[i] > 5) {
 					sb.append(""
-					+"\nSET DISTRICTS FAIRVOTE_SEATS [SEATS]"
+				+"\nEXIT"
+				+"\nEXIT"
+					
 					+"\nSET WEIGHT DESCRIPTIVE 1.0"
 					+"\nSET WEIGHT PROPORTIONAL 0.0"
+					+"\nSET WEIGHT POPULATION 1.0"
 					+"\nSET WEIGHT PARTISAN 0.0"
 					+"\nSET EVOLUTION ANNEAL_RATE 0.85"
 					+"\nSET EVOLUTION MUTATE_RATE 1.0"
@@ -1173,32 +1222,53 @@ EXIT
 					+"\nSET WEIGHT PARTISAN 0.0"
 					+"\nWHEN MUTATE_RATE 0.3"
 					);
-				}//			if( Downloads.apportionments[i] < 5) {
+				}
 	
 	sb.append(""
 				+"\nSTOP"
 				+"\nSAVE"
 				+"\nEXPORT"
 				+"\nEXPORT NATIONAL"
-				/*
+				+"\nEXIT"
+				+"\nEXIT"
+			);
+				
+			sb.append(""
 				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
 				+"\nSET DISTRICTS COLUMN CD_SM"
-				+"\nSET WEIGHT DESCRIPTIVE 0.5"
-				+"\nSET WEIGHT PROPORTIONAL 0.0"
-				+"\nSET WEIGHT PARTISAN 0.5"
-				+"\nSET EVOLUTION MUTATE_RATE 0.9"
-				+"\nGO"
-				+"\nSET WEIGHT DESCRIPTIVE 1.0"
-				+"\nSET WEIGHT PROPORTIONAL 0.0"
-				+"\nWHEN MUTATE_RATE 0.3"
-				+"\nSTOP"
-				+"\nSAVE"
+				);
+				if( Download.apportionments[i] > 1) {
+					sb.append(""
+					+"\nSET WEIGHT DESCRIPTIVE 0.5"
+					+"\nSET WEIGHT PROPORTIONAL 0.0"
+					+"\nSET WEIGHT PARTISAN 0.5"
+					+"\nSET EVOLUTION MUTATE_RATE 1.0"
+					+"\nSET EVOLUTION ANNEAL_RATE 0.7"
+					+"\nSET EVOLUTION POPULATION 200"
+					
+					+"\nGO"
+					+"\nSET WEIGHT DESCRIPTIVE 0.5"
+					+"\nSET WEIGHT PROPORTIONAL 0.0"
+					+"\nWHEN MUTATE_RATE 0.4"
+					+"\nSET EVOLUTION MUTATE_RATE 1.0"
+					+"\nWHEN MUTATE_RATE 0.4"
+					+"\nSTOP"
+					+"\nSAVE"
+					);
+				}
+				sb.append(""
 				+"\nEXPORT"
 				+"\nEXPORT NATIONAL"
+				);
+				/*
+				sb.append(""
 				+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
 				+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
 				+"\nSET DISTRICTS COLUMN CD113FP"
-				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""*/
+				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
+				);
+				*/
+		sb.append(""
 				+"\nEXIT"
 				+"\nEXIT"
 		);

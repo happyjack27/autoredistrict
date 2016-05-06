@@ -171,6 +171,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		textFieldIP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					System.out.println("ip set text "+textFieldIP.getText());
 					//System.out.println("textFieldIP.getText() "+textFieldIP.getText());
 					instruction_pointer = Integer.parseInt(textFieldIP.getText())-1;
 					   try {
@@ -342,7 +343,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public static boolean duplicateThread = false;
 	@Override
 	public void eventOccured() {
-		System.out.println(" ----------- "+new Date().toLocaleString()+": event instruction pointer: "+instruction_pointer);
+		//System.out.println(" ----------- "+new Date().toLocaleString()+": event instruction pointer: "+instruction_pointer);
 		if( duplicateThread) {
 			System.out.println(" ----------- "+new Date().toLocaleString()+": canceling duplicate thread "+this.instruction_pointer);
 			return;
@@ -356,6 +357,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else {
+			//System.out.println(" ----------- "+new Date().toLocaleString()+": no sleep - evolving");
+			
 		}
 		duplicateThread = false;
 		if( instruction_pointer >= instructions.size()) {
@@ -653,12 +657,18 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				
 				if( instruction_words[1].equals("STATS")) {
 					mainFrame.panelStats.exportToHtml(true);					
-				} 
+				} else 
 				if( instruction_words[1].equals("HTMLONLY")) {
 					mainFrame.panelStats.exportToHtml(false);					
-				} 
-			} else {
-				mainFrame.panelStats.exportToHtml(true);
+				} else
+				if( instruction_words[1].equals("EMBEDDED")) {
+					mainFrame.panelStats.exportToHtml(false,true);					
+				} else
+				if( instruction_words[1].equals("PIE")) {
+					mainFrame.panelStats.exportPieCharts();				
+				} else 
+					mainFrame.panelStats.exportToHtml(true);
+				
 			}
 		} else
 		if(command.equals("WHEN")) {

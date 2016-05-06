@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import solutions.*;
+import util.Triplet;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -25,6 +26,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
 	double[] tot_seats = new double[5];
+	
+	BufferedImage pie_party_votes;
+	BufferedImage pie_party_seats;
+	BufferedImage pie_party_seats_frac;
+	BufferedImage pie_eth_pop;
+	BufferedImage pie_eth_target;
+	BufferedImage pie_eth_descr;
+	BufferedImage pie_eth_power;
+	BufferedImage pie_eth_packing;
+	BufferedImage pie_party_packing;
 	
     private static BufferedImage imageToBufferedImage(Image image) {
 
@@ -294,7 +305,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		double[][] demo = dm.getDemographicsByDistrict();
 		double[][] demo_pct = new double[demo.length][];
 		double[] winners_by_ethnicity = new double[dem_col_names.length];
-		
+		double[] elec_counts = new double[Settings.num_candidates];
+		double[] vote_counts = new double[Settings.num_candidates];
+		double[] targets = new double[]{};
+
 		try {
 			double total_pvi = 0;
 			double counted_districts = 0;
@@ -307,8 +321,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			String[][] ddata = new String[dm.districts.size()][];
 			String[] ccolumns = new String[]{"Party","Delegates","Pop. vote","Wasted votes","% del","% pop vote"};
 			String[][] cdata = new String[Settings.num_candidates][];
-			double[] elec_counts = new double[Settings.num_candidates];
-			double[] vote_counts = new double[Settings.num_candidates];
 			double tot_votes = 0;
 			//=== by district
 			try {
@@ -532,7 +544,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			double ravg = 1.0 / (tot_margin / tot_vote);
 			double total_seats = Settings.total_seats();
-			double[] targets = District.popular_vote_to_elected_for_seats(pop_by_dem,(int)total_seats,-1,false);
+			targets = District.popular_vote_to_elected_for_seats(pop_by_dem,(int)total_seats,-1,false);
 			/*for( int i = 0; i < targets.length; i++) {
 				targets[i] = Math.round(total_seats*pop_by_dem[i]/tot_pop);
 			}*/
@@ -653,8 +665,70 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			ex.printStackTrace();
 		}
 		
+		pie_party_votes = piechart.drawPieChart(200,vote_counts,FeatureCollection.standard_district_colors); 
+		pie_party_seats = piechart.drawPieChart(200,elec_counts,FeatureCollection.standard_district_colors); 
+		pie_party_seats_frac = piechart.drawPieChart(200,new double[]{
+				tot_seats[0],
+				tot_seats[1],
+				tot_seats[2],
+				tot_seats[3],
+				tot_seats[4],
+		},new Color[]{
+				 new Color(0x00,0,0xff),
+				 new Color(0x40,0,0xb0),
+				 new Color(0x80,0,0x80),
+				 new Color(0xb0,0,0x40),
+				 new Color(0xff,0,0x00),
+		});
+		pie_eth_pop    = piechart.drawPieChart(200,pop_by_dem,FeatureCollection.standard_district_colors); 
+		pie_eth_target = piechart.drawPieChart(200,targets,FeatureCollection.standard_district_colors); 
+		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.standard_district_colors);
+		
+		double[] dr = new double[votes_by_dem.length];
+		for( int i = 0; i < dr.length; i++) {
+			if( votes_by_dem[i] < 500) {
+				dr[i] = 0;
+				continue;
+			}
+			dr[i] = 1.0-vote_margins_by_dem[i]/votes_by_dem[i];
+			if( dr[i] < 0) {
+				dr[i] = 0;
+			}
+		}
+		pie_eth_power  = piechart.drawPieChart(200,dr,FeatureCollection.standard_district_colors); 
+
+		boolean t = Settings.divide_packing_by_area;
+		Settings.divide_packing_by_area = false;
+
+		Vector<Triplet<Double,Color,Integer>> triplet  = new Vector<Triplet<Double,Color,Integer>>();
+		for( int i = 0; i < Settings.num_districts; i++) {
+			Color c = dm.getVoteGapByPartyColor(i);
+			double p = c.getRed()-c.getBlue();
+			triplet.add(new Triplet<Double,Color,Integer>(p,c,i));
+		}
+		Collections.sort(triplet);
+		double[] dd = new double[triplet.size()];
+		Color[] cc = new Color[triplet.size()];
+		double[] dd_r = new double[triplet.size()];
+		Color[] cc_r = new Color[triplet.size()];
+		for( int i = 0; i < dd.length; i++) {
+			int dist = triplet.get(i).c;
+			dd[i] = Settings.seats_in_district(dist);
+			cc[i] = triplet.get(i).b;
+			dd_r[i] = dd[i];
+			cc_r[i] = dm.getVoteGapByDemoColor(dist);
+		}	
+		pie_party_packing = piechart.drawPieChart(200,dd,cc);
+		pie_eth_packing = piechart.drawPieChart(200,dd_r,cc_r);
+
+		Settings.divide_packing_by_area = t;
+
+		
+
+		
 		this.invalidate();
 		this.repaint();
+	
 		} catch (Exception ex) {
 			System.out.println("ex af "+ex);
 			ex.printStackTrace();
@@ -663,6 +737,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			MainFrame.mainframe.frameSeatsVotesChart.setData(featureCollection.ecology.population.get(0));
 			MainFrame.mainframe.frameSeatsVotesChart.panelRanked.setData(ranked_dists);
 		}
+
+		
 		} catch (Exception ex) {
 			System.out.println("ex in PanelStats.getStats: "+ex);
 			ex.printStackTrace();
@@ -1104,6 +1180,47 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Settings.setNationalMap( t);
 	}
 	public void exportToHtml(boolean images) {
+		exportToHtml(images,false);
+	}
+	public void exportPieCharts() {
+		MainFrame.mainframe.ip.addHistory("EXPORT PIE");
+
+		String write_folder = Download.getStartPath()+MainFrame.mainframe.project.district_column+File.separator;
+
+		/*
+		BufferedImage pie_party_votes;
+		BufferedImage pie_party_seats;
+		BufferedImage pie_party_seats_frac;
+		BufferedImage pie_eth_pop;
+		BufferedImage pie_eth_target;
+		BufferedImage pie_eth_descr;
+		BufferedImage pie_eth_power;
+		*/
+		//pie_eth_packing
+		
+        try { ImageIO.write(pie_party_votes,"png", new File(write_folder+"pie_party_votes.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_seats,"png", new File(write_folder+"pie_party_seats.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_seats_frac,"png", new File(write_folder+"pie_party_seats_frac.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_eth_pop,"png", new File(write_folder+"pie_eth_pop.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_eth_target,"png", new File(write_folder+"pie_eth_target.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_eth_descr,"png", new File(write_folder+"pie_eth_descr.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_eth_power,"png", new File(write_folder+"pie_eth_power.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+
+        try { ImageIO.write(pie_eth_packing,"png", new File(write_folder+"pie_eth_packing.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_packing,"png", new File(write_folder+"pie_party_packing.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+	
+	}
+	
+	public void exportToHtml(boolean images, boolean embedded) {
 		System.out.println("1");
 		boolean national = Settings.national_map;
 		Settings.setNationalMap(false);
@@ -1140,62 +1257,66 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		}
 	
 
-
+		String prepend = Download.states[Download.istate]+"/"+Download.cyear+"/"+Applet.mainFrame.project.district_column+"/";
+		prepend = prepend.replaceAll(" ", "%20");
 
 		String html = "";
-
-		html += getURLtext(header_path);
-		html +="<i>This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.</i><br/><br/>\n";
-
-		html +="<h3>VTD district assignments</h3><br/>\n";
-		html +="<a href='../vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
-		html +="<a href='../vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
-		html +="<br/><br/>\n";
+		if( !embedded) {
+			prepend = "";
+			html += getURLtext(header_path);
+			html +="<i>This page was generated on "+ new SimpleDateFormat("yyyy.MM.dd").format(new Date())+" by <a href='http://autoredistrict.org'>Auto-Redistrict</a>.</i><br/><br/>\n";
+		}
+		if( !embedded) {
+			html +="<h3>VTD district assignments</h3><br/>\n";
+			html +="<a href='"+prepend+"../vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
+			html +="<a href='"+prepend+"../vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
+			html +="<br/><br/>\n";
+		}
 
 		html +="<h3>Maps (click to enlarge)</h3><br/>\n";
-		html +="<table>";
-		html +="<tr>";
-		html +="<td>Districts</td>";
-		html +="<td align='center'><center><a href='./map_districts_labels.png'><img src='./map_districts_labels_small.png' width=100></br>Labeled districts</a></center></td>";
-		html +="<td align='center'><center><a href='./map_districts.png'><img src='./map_districts_small.png' width=100></br>Unlabeled districts</a></center></td>";
-		html +="</tr>";
-		html +="<tr>";
-		html +="<td>Geometry</td>";
-		html +="<td align='center'><center><a href='./map_district_pop.png'><img src='./map_district_pop_small.png' width=100></br>Population difference</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_compactness.png'><img src='./map_district_compactness_small.png' width=100></br>Compactness</a></center></td>";
-		html +="<td align='center'><center><a href='./map_splits.png'><img src='./map_splits_small.png' width=100></br>Splits</a></center></td>";
-		html +="</tr>";
-		html +="<tr>";
-		html +="<td>Fairness - by district</td>";
-		html +="<td align='center'><center><a href='./map_district_partisan_packing.png'><img src='./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_racial_packing.png'><img src='./map_district_racial_packing_small.png' width=100></br>Racial vote packing</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_votes.png'><img src='./map_district_votes_small.png' width=100></br>District vote balance</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_demographics.png'><img src='./map_district_demographics_small.png' width=100></br>District demographics</a></center></td>";
-		html +="</tr>";
-		html +="<td>Fairness - by density</td>";
-		html +="<td align='center'><center><a href='./map_district_partisan_packing_area.png'><img src='./map_district_partisan_packing_area_small.png' width=100></br>Partisan vote packing</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_racial_packing_area.png'><img src='./map_district_racial_packing_area_small.png' width=100></br>Racial vote packing</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_votes_area.png'><img src='./map_district_votes_area_small.png' width=100></br>District vote balance</a></center></td>";
-		html +="<td align='center'><center><a href='./map_district_demographics_area.png'><img src='./map_district_demographics_area_small.png' width=100></br>District demographics</a></center></td>";
-		html +="</tr>";
+		html +="<table>\n";
+		html +="<tr>\n";
+		html +="<td>Districts</td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_districts_labels.png'><img src='"+prepend+"./map_districts_labels_small.png' width=100></br>Labeled districts</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_districts.png'><img src='"+prepend+"./map_districts_small.png' width=100></br>Unlabeled districts</a></center></td>\n";
+		html +="</tr>\n";
+		html +="<tr>\n";
+		html +="<td>Geometry</td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_pop.png'><img src='"+prepend+"./map_district_pop_small.png' width=100></br>Population difference</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_compactness.png'><img src='"+prepend+"./map_district_compactness_small.png' width=100></br>Compactness</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_splits.png'><img src='"+prepend+"./map_splits_small.png' width=100></br>Splits</a></center></td>\n";
+		html +="</tr>\n";
+		html +="<tr>\n";
+		html +="<td>Fairness - by district</td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_partisan_packing.png'><img src='"+prepend+"./map_district_partisan_packing_small.png' width=100></br>Partisan vote packing</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_racial_packing.png'><img src='"+prepend+"./map_district_racial_packing_small.png' width=100></br>Racial vote packing</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_votes.png'><img src='"+prepend+"./map_district_votes_small.png' width=100></br>District vote balance</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_demographics.png'><img src='"+prepend+"./map_district_demographics_small.png' width=100></br>District demographics</a></center></td>\n";
+		html +="</tr>\n";
+		html +="<td>Fairness - by density</td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_partisan_packing_area.png'><img src='"+prepend+"./map_district_partisan_packing_area_small.png' width=100></br>Partisan vote packing</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_racial_packing_area.png'><img src='"+prepend+"./map_district_racial_packing_area_small.png' width=100></br>Racial vote packing</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_votes_area.png'><img src='"+prepend+"./map_district_votes_area_small.png' width=100></br>District vote balance</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_district_demographics_area.png'><img src='"+prepend+"./map_district_demographics_area_small.png' width=100></br>District demographics</a></center></td>\n";
+		html +="</tr>\n";
 		/*
-		html +="<tr>";
-		html +="<td>Counties</td>";
-		html +="<td align='center'><center><a href='./map_counties.png'><img src='./map_counties_small.png' width=100></br>Counties</a></center></td>";
-		html +="</tr>";
+		html +="<tr>\n";
+		html +="<td>Counties</td>\n";
+		html +="<td align='center'><center><a href='./map_counties.png'><img src='"+prepend+"./map_counties_small.png' width=100></br>Counties</a></center></td>\n";
+		html +="</tr>\n";
 		*/
-		html +="<tr>";
-		html +="<td>VTDs</td>";
-		html +="<td align='center'><center><a href='./map_vtd_votes.png'><img src='./map_vtd_votes_small.png' width=100></br>VTD vote balance</a></center></td>";
-		html +="<td align='center'><center><a href='./map_vtd_demographics.png'><img src='./map_vtd_demographics_small.png' width=100></br>VTD demographics</a></center></td>";
-		html +="<td align='center'><center><a href='./map_vtd_votes_area.png'><img src='./map_vtd_votes_area_small.png' width=100></br>VTD vote balance<br/>(density)</a></center></td>";
-		html +="<td align='center'><center><a href='./map_vtd_demographics_area.png'><img src='./map_vtd_demographics_area_small.png' width=100></br>VTD demographics<br/>(density)</a></center></td>";
-		html +="</tr>";
-		html +="</table>";
-		html +="</br>";
+		html +="<tr>\n";
+		html +="<td>VTDs</td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_vtd_votes.png'><img src='"+prepend+"./map_vtd_votes_small.png' width=100></br>VTD vote balance</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_vtd_demographics.png'><img src='"+prepend+"./map_vtd_demographics_small.png' width=100></br>VTD demographics</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_vtd_votes_area.png'><img src='"+prepend+"./map_vtd_votes_area_small.png' width=100></br>VTD vote balance<br/>(density)</a></center></td>\n";
+		html +="<td align='center'><center><a target='_blank' href='"+prepend+"./map_vtd_demographics_area.png'><img src='"+prepend+"./map_vtd_demographics_area_small.png' width=100></br>VTD demographics<br/>(density)</a></center></td>\n";
+		html +="</tr>\n";
+		html +="</table>\n";
+		html +="</br>\n";
 
 		html +="<h3>Seats / votes curve - Vote packing</h3><br/>\n";
-		html +="<center><img src='./seats_votes.png'> <img src='./sorted_districts.png'></center><br/>\n";
+		html +="<center><img src='"+prepend+"./seats_votes.png'> <img src='"+prepend+"./sorted_districts.png'></center><br/>\n";
 
 		html +="<h3>Summary</h3>\n";
 		html += sumStr+"\n";
@@ -1221,28 +1342,60 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		for( int i = 0; i < vs.size(); i++) {
 			html += vs.get(i)+"<br/>\n";
 		}
+		if( embedded) {
+			html +="<br/><br/>\n";
+			html +="<h3>VTD district assignments</h3><br/>\n";
+			html +="<a href='"+prepend+"../vtd_data.txt'>vtd_data.txt (tab-delimited)</a><br/>\n";
+			html +="<a href='"+prepend+"../vtd_data.dbf'>vtd_data.dbf (dbase/ESRI)</a><br/>\n";
+			html +="<br/><br/>\n";
+		}
 
 		html +="<br/><br/>\n";
 		
 		System.out.println("8");
 
-
-		html += getURLtext(footer_path);
+		if( !embedded) {
+			html += getURLtext(footer_path);
+		}
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats_summary.html");
+			fos.write(sumStr.getBytes());
+			fos.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats_party.html");
+			fos.write(partiesStr.getBytes());
+			fos.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats_district.html");
+			fos.write(districtsStr.getBytes());
+			fos.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats_race.html");
+			fos.write(raceStr.getBytes());
+			fos.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
 
 
 		try {
-			FileOutputStream fos = new FileOutputStream(write_folder+"stats.html");
+			FileOutputStream fos = new FileOutputStream(write_folder+(embedded?"embedded_":"")+"stats.html");
 			fos.write(html.getBytes());
 			fos.close();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		String url = "file:///"+(write_folder+"stats.html").replaceAll("\\\\", "/").replaceAll(" ", "%20");
+		
+		String url = "file:///"+(write_folder+(embedded?"embedded_":"")+"stats.html").replaceAll("\\\\", "/").replaceAll(" ", "%20");
 		
 		System.out.println("9");
 
 		//url = URLEncoder.encode(url);
-		Applet.browseTo(url);
+		if( !embedded) {
+			Applet.browseTo(url);
+		}
 		
 		///=====end insert
 		
