@@ -232,8 +232,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		return min_votes_needed_for_seat;
     }
     
-	
 	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name) {
+		return  loadDistrictsFromProperties( collection,  column_name, false);
+		
+	}
+	public boolean loadDistrictsFromProperties(FeatureCollection collection, String column_name, boolean zero_is_dead) {
 		boolean has_districts = true;
 		boolean zero_indexed = false;
 		for( int i = 0; i < collection.features.size(); i++) {
@@ -262,13 +265,27 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					has_districts = false;
 					vtd_districts[i] = (int)(Math.random()*(double)Settings.num_districts);
 				} else {
-					vtd_districts[i] = Integer.parseInt(f.properties.get(column_name).toString())-(zero_indexed ? 0 : 1);//((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
+					String s = f.properties.get(column_name).toString();
+					try {
+						vtd_districts[i] = Integer.parseInt(s)-(zero_indexed ? 0 : 1);//((int)f.properties.getDouble(column_name))-(zero_indexed ? 0 : 1);
+					} catch (Exception ex) {
+						System.out.println("parse error3 "+s+" "+ex);
+						ex.printStackTrace();
+					}
+				}
+				if( zero_is_dead) {
+					vtd_districts[i] = vtd_districts[i] == 0 ? 0 : vtd_districts[i]-1;
 				}
 			} catch (Exception ex) {
 				System.out.println("parse error2 "+ex);
 			}
 		}
-		fillDistrictwards();
+		boolean pass = fillDistrictwards(true);
+		int pop = (int)districts.get(0).getPopulation();
+		if( (pop < 10 || !pass) && !zero_is_dead) {
+			System.out.println("failed, collapsing..."+ pop+" "+pass);
+			//return loadDistrictsFromProperties( collection,  column_name,true);
+		}
 		try {
 			setGenome(vtd_districts);
 		} catch (Exception ex) {
@@ -761,8 +778,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         this(wards,num_districts);
         setGenome(genome);
     }
-    
-    public void fillDistrictwards() {
+    public boolean fillDistrictwards() {
+    	return fillDistrictwards(false);
+    }
+    public boolean fillDistrictwards(boolean from_import) {
     	for( District d : districts) {
     		d.vtds = new Vector<VTD>();
     	}
@@ -774,7 +793,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		int district = vtd_districts[i];
     		if( district >= Settings.num_districts) {
     			while( district  >= Settings.num_districts) {
-    				district = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    				System.out.println("districting above # districts... "+district);
+    				if( from_import) {
+    					//return false;
+    				} else {
+    					district = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    				}
     			}
     			vtd_districts[i] = district;
     		}
@@ -790,6 +814,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
     		District d = districts.get(i);
     		if( d.vtds.size() == 0) {
+    			System.out.println("district "+i+" has zero wards, adding.");
     			int num_to_get = vtds.size() / (districts.size());
     			if( num_to_get < 1) {
     				num_to_get = 1;
@@ -812,6 +837,11 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    		districts.get(i).resetPopulation();
 	    		int pop = (int)districts.get(i).getPopulation();
 	    		if( pop <= 10) {
+	    			
+	    			//this is so 2010 districts import
+	    			if( i == 0) {
+	    				continue;
+	    			}
 	    			int num = vtd_districts.length / Settings.num_districts;
 	    			System.out.println("pop below 10 ("+pop+") for district "+i+" assigning "+num+" vtds");
 	    			for( int j = 0; j < num; j++) {
@@ -822,7 +852,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    		}
 	    	}
     	}
+		if( districts.size() > 0) {
+    		districts.get(0).resetPopulation();
+    		int pop = (int)districts.get(0).getPopulation();
+    		if( pop <= 10) { //need to shift all down, combining this with district 1. ??
+    			return false;
+    		}    			
+		}
 
+    	return true;
     
     }
     public DistrictMap(Vector<VTD> wards, int num_districts) {

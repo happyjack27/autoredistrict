@@ -1448,6 +1448,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     	}
     	public void importBlockData(String fn, boolean CONTAINS_HEADER, boolean MAJORITY_VOTE, String[] source_column_names,String[] dest_column_names) {
 			boolean one_indexed = true;
+			Object[] col_names = null;
     		try {
     			System.out.println("importBlockData "+fn);
     			opt = MAJORITY_VOTE ? 1 : 0;
@@ -1519,7 +1520,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 					
 		    		dlg.setVisible(true);
-					Object[] col_names = dsc.in.toArray();
+					col_names = dsc.in.toArray();
 					int[] col_indexes = new int[dsc.in.size()]; 
 					for( int i = 0; i < col_indexes.length; i++) {
 						String test = ((String)col_names[i]).toUpperCase().trim();
@@ -1794,7 +1795,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					}
 					
 		    		dlg.setVisible(true);
-					Object[] col_names = dsc.in.toArray();
+					col_names = dsc.in.toArray();
 					int[] col_indexes = new int[dsc.in.size()]; 
 					for( int i = 0; i < col_indexes.length; i++) {
 						String test = ((String)col_names[i]).toUpperCase().trim();
@@ -1877,6 +1878,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
     		} catch (Exception ex) {
     			System.out.println("ex "+ex);
     			ex.printStackTrace();
+    		}
+    		if( opt == 1) {
+    			for( int i = 0; i < col_names.length; i++) {
+    				featureCollection.fixDistrictAssociations((String)col_names[i]);
+    			}	
     		}
     	}
 	}
@@ -8102,6 +8108,17 @@ ui.Mainframe:
 			System.out.println("ex "+ex);
 			ex.printStackTrace();
 		}
+	}
+
+	public void impute(String[] ss) {
+		String s = "IMPUTE";
+		project.substitute_columns.clear();
+		for( int i = 0; i < ss.length; i++) {
+			project.substitute_columns.add(ss[i]);
+			s += " "+ss[i];
+		}
+		ip.addHistory(s);
+		setSubstituteColumns();		
 	}
 
 }

@@ -685,12 +685,21 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.standard_district_colors);
 		
 		double[] dr = new double[votes_by_dem.length];
+		double tot = 0;
+		for( int i = 0; i < votes_by_dem.length; i++) {
+			tot += votes_by_dem[i];
+		}
+		tot *= 0.003;
+		//System.out.println("tot: "+tot);
 		for( int i = 0; i < dr.length; i++) {
-			if( votes_by_dem[i] < 500) {
+			//System.out.println("i votes: "+votes_by_dem[i]);
+			if( votes_by_dem[i] < tot) { //2000
 				dr[i] = 0;
+				
 				continue;
 			}
 			dr[i] = 1.0-vote_margins_by_dem[i]/votes_by_dem[i];
+			//System.out.println("i dr: "+dr[i]);
 			if( dr[i] < 0) {
 				dr[i] = 0;
 			}

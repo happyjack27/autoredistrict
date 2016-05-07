@@ -1648,4 +1648,49 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 		return outlines;
 	}
+	
+	public void fixDistrictAssociations(String column_name) {
+		MainFrame.mainframe.ip.addHistory("FIX "+column_name);
+		Hashtable<Integer,Vector<VTD>> hashvtds = new Hashtable<Integer,Vector<VTD>>();
+		for( int i = 0; i < features.size(); i++) {
+			VTD f = features.get(i);
+			int n = -1;
+			if( !f.properties.containsKey(column_name)) {
+			} else {
+				String s = f.properties.get(column_name).toString();
+				try {
+					n = Integer.parseInt(s);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					n = -2;
+				}
+			}
+			
+			Vector<VTD> vs = hashvtds.get(n);
+			if( vs == null) {
+				vs = new Vector<VTD>();
+				hashvtds.put(n,vs);
+			}
+			vs.add(f);
+		}
+		int dist_num = 0;
+		for( int i = -2; i < 500; i++) {
+			Vector<VTD> vs = hashvtds.get(i);
+			if(vs == null) {
+				continue;
+			}
+			int pop = 0;
+			System.out.println("assigning "+i+" "+dist_num);
+			for( int j = 0; j < vs.size(); j++) {
+				VTD v = vs.get(j);
+				pop += v.population;
+				v.properties.put(column_name, dist_num);
+			}
+			if( pop > 10) {
+				dist_num++;
+			}
+		}
+		
+		
+	}
 }

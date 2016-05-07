@@ -46,7 +46,7 @@ public class ScriptMaker {
 					|| state.equals("Texas")
 					|| state.equals("Florida")
 					|| state.equals("California")) {
-				continue;
+				//continue;
 			}
 			
 			String s = "LOAD "+i+ " 2010 2012\n"+template+"\nEXIT\n";

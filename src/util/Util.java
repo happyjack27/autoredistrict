@@ -1129,14 +1129,27 @@ EXIT
 	public static void appendExportEmbedded(StringBuffer sb, int i) {
 		String state = Download.states[i];
 		
-		sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_SM\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+		//sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_SM\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+		//sb.append("SAVE\n");
+		//sb.append("EXIT\n");
+		//sb.append("EXIT\n");
+		
+		sb.append("FIX CD_2010\n");
 		sb.append("SAVE\n");
-		sb.append("EXIT\n");
-		sb.append("EXIT\n");
 		
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
-		sb.append("SET DISTRICTS COLUMN CD_BD\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
+		sb.append("SET DISTRICTS COLUMN CD_2010\n");
+		sb.append("EXPORT EMBEDDED\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT html\n");
+		sb.append("EXPORT national\n");
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+
+		
+		sb.append("SET DISTRICTS COLUMN CD_BD\n");
 		sb.append("EXPORT EMBEDDED\n");
 		sb.append("EXPORT PIE\n");
 		//sb.append("EXPORT NATIONAL\n");
@@ -1146,11 +1159,12 @@ EXIT
 		sb.append("EXPORT PIE\n");
 		//sb.append("EXPORT NATIONAL\n");
 
-
+/*
 		sb.append("SET DISTRICTS COLUMN CD_FV\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
 		sb.append("EXPORT EMBEDDED\n");
 		sb.append("EXPORT PIE\n");
+		*/
 		//sb.append("EXPORT HTMLONLY\n");
 
 		sb.append("SET DISTRICTS COLUMN CD_FV2\n");

@@ -86,10 +86,10 @@ public class piechart extends JPanel {
 		drawPieChart(g,size/2,size/2,size,vals,cols);
 	}
 	public static void drawPieChart(Graphics g,int x, int y,int size, double[] vals, Color[] cols) {
-		 int width = size;
-		 int height = size;
-		 int xs = x-size/2;
-		 int ys = y-size/2;
+		 int width = size-2;
+		 int height = size-2;
+		 int xs = x-size/2+1;
+		 int ys = y-size/2+1;
 		 
 			BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
 		 
@@ -109,11 +109,14 @@ public class piechart extends JPanel {
 		 for( int i = 0; i < vals.length; i++) {
 			 double arc = vals[i]*360.0/tot;
 			 g.setColor(cols[i]);
+			 g.drawArc(xs,ys,width,height,(int)cumarc,(int)(cumarc+arc)-(int)(cumarc));
 			 g.fillArc(xs,ys,width,height,(int)cumarc,(int)(cumarc+arc)-(int)(cumarc));
 			 g.setColor(Color.black);
 			 //g.drawArc(0,0,width,height,(int)cumarc,(int)(arc));
 			 cumarc += arc;
 		 }
+		 g.setColor(Color.black);
+		 g.drawOval(xs,ys,width,height);
 		 
 		 
 		 //g.setColor(Color.black);

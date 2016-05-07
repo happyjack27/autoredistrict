@@ -668,8 +668,17 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 					mainFrame.panelStats.exportPieCharts();				
 				} else 
 					mainFrame.panelStats.exportToHtml(true);
-				
 			}
+		} else
+			if( command.equals("FIX")) {
+				mainFrame.featureCollection.fixDistrictAssociations(instruction_words[1]);
+			} else 
+		if( command.equals("IMPUTE")) {
+			String[] ss = new String[instruction_words.length-1];
+			for( int i = 0; i < ss.length; i++) {
+				ss[i] = instruction_words[i+1];
+			}
+			mainFrame.impute(ss);
 		} else
 		if(command.equals("WHEN")) {
 			//System.out.println("processing when "+instruction_words[1]);
