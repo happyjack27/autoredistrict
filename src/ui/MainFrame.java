@@ -61,6 +61,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public Project project = new Project();
 	public DemographicSet activeDemographicSet = new DemographicSet();
 	public JRadioButton lblMembersPerDistrict;
+	
+	public ButtonGroup groupColoringMode = new ButtonGroup();
 
 	
 	//========PRIMITIVES
@@ -103,13 +105,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public PanelGraph panelGraph = new PanelGraph();
 
 	//===========COMPONENTS - MENU ITEMS
-	JMenuItem mntmColorDistDemo;
-	JMenuItem mntmColorPartisanPacking;
-	JMenuItem mntmColorRacialPacking;
+	JRadioButtonMenuItem mntmColorDistDemo;
+	JRadioButtonMenuItem mntmColorPartisanPacking;
+	JRadioButtonMenuItem mntmColorRacialPacking;
 	JMenuItem mntmExportToHtml;
 	public ButtonGroup selectionType = new ButtonGroup();
-	JMenuItem mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
-	JMenuItem mntmShowDemographics = new JMenuItem("Color by demographic");;
+	JRadioButtonMenuItem mntmShowVoteBalance = new JRadioButtonMenuItem("Color by vote balance");;
+	JRadioButtonMenuItem mntmShowDemographics = new JRadioButtonMenuItem("Color by demographic");;
 	JCheckBoxMenuItem chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 	JCheckBoxMenuItem chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 	JCheckBoxMenuItem chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
@@ -1287,16 +1289,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmSixteenMaps;
 	public JSeparator separator_5;
 	public JSeparator separator_6;
-	public JMenuItem mntmColorByDistrict;
-	public JMenuItem mntmColorByPop;
-	public JMenuItem mntmColorByVote;
-	public JMenuItem mntmColorByCompactness;
+	public JRadioButtonMenuItem mntmColorByDistrict;
+	public JRadioButtonMenuItem mntmColorByPop;
+	public JRadioButtonMenuItem mntmColorByVote;
+	public JRadioButtonMenuItem mntmColorByCompactness;
 	public JLabel lblElitism;
 	public JSlider sliderElitism;
 	public JRadioButton rdbtnTruncationSelection;
 	public JRadioButton rdbtnRankSelection;
 	public JRadioButton rdbtnRouletteSelection;
-	public JMenuItem mntmColorByWasted = new JMenuItem("Color by wasted votes");
+	public JRadioButtonMenuItem mntmColorByWasted = new JRadioButtonMenuItem("Color by wasted votes");
 	public JMenuItem mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 	public JSeparator separator_7 = new JSeparator();
 	public JMenuItem mntmHarvardElectionData;
@@ -4015,8 +4017,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		//===========COMPONENTS - MENU ITEMS
 		selectionType = new ButtonGroup();
-		mntmShowVoteBalance = new JMenuItem("Color by vote balance");;
-		mntmShowDemographics = new JMenuItem("Color by demographic");;
+		mntmShowVoteBalance = new JRadioButtonMenuItem("Color by vote balance");;
+		mntmShowDemographics = new JRadioButtonMenuItem("Color by demographic");;
 		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 		chckbxmntmHideMapLines = new JCheckBoxMenuItem("Show map lines");
 		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
@@ -4058,10 +4060,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		manageLocks = new DialogManageLocks();
 		seatsPanel = new PanelSeats();
 		progressBar = new JProgressBar();
-		frameSeatsVotesChart = new FrameSeatsVotesChart();
-
-		mntmShowVoteBalance = new JMenuItem("Color by vtd vote");;
-		mntmShowDemographics = new JMenuItem("Color by vtd demographic");;
+		frameSeatsVotesChart = new FrameSeatsVotesChart();;;
 		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
 		chckbxmntmFlipVertical = new JCheckBoxMenuItem("Flip vertical");
 		chckbxmntmFlipHorizontal = new JCheckBoxMenuItem("Flip horizontal");
@@ -4803,7 +4802,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		separator_6 = new JSeparator();
 		mnView.add(separator_6);
 		
-		mntmColorByDistrict = new JMenuItem("Color by district");
+		mntmColorByDistrict = new JRadioButtonMenuItem("Color by district");
 		mntmColorByDistrict.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;
@@ -4813,7 +4812,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByDistrict);
 		
-		mntmColorByPop = new JMenuItem("Color by district pop imbalance");
+		mntmColorByPop = new JRadioButtonMenuItem("Color by district pop imbalance");
 		mntmColorByPop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;
@@ -4823,7 +4822,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByPop);
 		
-		mntmColorByVote = new JMenuItem("Color by district vote");
+		mntmColorByVote = new JRadioButtonMenuItem("Color by district vote");
 		mntmColorByVote.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;
@@ -4833,7 +4832,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		
-		mntmColorByCompactness = new JMenuItem("Color by district compactness");
+		mntmColorByCompactness = new JRadioButtonMenuItem("Color by district compactness");
 		mntmColorByCompactness.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				VTD.display_mode = VTD.DISPLAY_MODE_COMPACTNESS;
@@ -4843,7 +4842,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByCompactness);
 		
-		mntmColorByWasted = new JMenuItem("Color by district wasted votes");
+		mntmColorByWasted = new JRadioButtonMenuItem("Color by district wasted votes");
 		mntmColorByWasted.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				VTD.display_mode = VTD.DISPLAY_MODE_WASTED_VOTES;
@@ -4853,87 +4852,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		
 		mnView.add(mntmColorByWasted);
-		mnView.add(mntmColorByVote);
 		
-		//add before the jseparator
-				mntmColorDistDemo = new JMenuItem("Color by district demographics");
-				mntmColorDistDemo.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;
-						mapPanel.invalidate();
-						mapPanel.repaint();
-					}
-				});
-				mnView.add(mntmColorDistDemo);
-
-				mntmColorPartisanPacking = new JMenuItem("Color by district partisan vote packing");
-				mntmColorPartisanPacking.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
-						mapPanel.invalidate();
-						mapPanel.repaint();
-					}
-				});
-				mnView.add(mntmColorPartisanPacking);
-
-				mntmColorRacialPacking = new JMenuItem("Color by district racial vote packing");
-				mntmColorRacialPacking.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;
-						mapPanel.invalidate();
-						mapPanel.repaint();
-					}
-				});
-				mnView.add(mntmColorRacialPacking);
-		
-		mntmShowVoteBalance.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				VTD.display_mode = VTD.DISPLAY_MODE_VOTES;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		
-		separator_8 = new JSeparator();
-		mnView.add(separator_8);
-		mnView.add(mntmShowVoteBalance);
-		mntmShowDemographics.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if( false) {
-					JOptionPane.showMessageDialog(null,"Not implemented");
-					return;
-				}
-				VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		mnView.add(mntmShowDemographics);
-		
-		mntmColorByVtd = new JMenuItem("Color by vtd partisan packing");
-		mntmColorByVtd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING2;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		mnView.add(mntmColorByVtd);
-		
-		mntmColorByVtd_1 = new JMenuItem("Color by vtd demographic packing");
-		mntmColorByVtd_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING2;
-				mapPanel.invalidate();
-				mapPanel.repaint();
-			}
-		});
-		mnView.add(mntmColorByVtd_1);
-		
-		separator_11 = new JSeparator();
-		mnView.add(separator_11);
-		
-		mntmColorByCounty = new JMenuItem("Color by county");
+		mntmColorByCounty = new JRadioButtonMenuItem("Color by county");
 		mntmColorByCounty.setEnabled(false);
 		mntmColorByCounty.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -4944,7 +4864,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnView.add(mntmColorByCounty);
 		
-		mntmColorBySplits = new JMenuItem("Color by splits");
+		mntmColorBySplits = new JRadioButtonMenuItem("Color by splits");
 		mntmColorBySplits.setEnabled(false);
 		mntmColorBySplits.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -4954,6 +4874,108 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnView.add(mntmColorBySplits);
+		
+		separator_17 = new JSeparator();
+		mnView.add(separator_17);
+		
+				mntmShowVoteBalance = new JRadioButtonMenuItem("Color by vtd vote");
+				
+				mntmShowVoteBalance.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						VTD.display_mode = VTD.DISPLAY_MODE_VOTES;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmShowVoteBalance);
+		mnView.add(mntmColorByVote);
+		
+		//add before the jseparator
+				mntmColorDistDemo = new JRadioButtonMenuItem("Color by district demographics");
+				mntmColorDistDemo.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				
+								mntmColorPartisanPacking = new JRadioButtonMenuItem("Color by district partisan vote packing");
+								mntmColorPartisanPacking.addActionListener(new ActionListener() {
+									public void actionPerformed(ActionEvent e) {
+										VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
+										mapPanel.invalidate();
+										mapPanel.repaint();
+									}
+								});
+								mnView.add(mntmColorPartisanPacking);
+				
+				mntmColorByVtd = new JRadioButtonMenuItem("Color by vtd partisan packing");
+				mntmColorByVtd.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING2;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				
+				mntmColorByCentered = new JRadioButtonMenuItem("Color by centered partisan vote packing");
+				mntmColorByCentered.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmColorByCentered);
+				mnView.add(mntmColorByVtd);
+				
+				separator_18 = new JSeparator();
+				mnView.add(separator_18);
+				mntmShowDemographics = new JRadioButtonMenuItem("Color by vtd demographic");
+				mntmShowDemographics.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						if( false) {
+							JOptionPane.showMessageDialog(null,"Not implemented");
+							return;
+						}
+						VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmShowDemographics);
+				mnView.add(mntmColorDistDemo);
+
+				mntmColorRacialPacking = new JRadioButtonMenuItem("Color by district racial vote packing");
+				mntmColorRacialPacking.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;
+						mapPanel.invalidate();
+						mapPanel.repaint();
+					}
+				});
+				mnView.add(mntmColorRacialPacking);
+		
+		mntmColorByVtd_1 = new JRadioButtonMenuItem("Color by vtd racial packing");
+		mntmColorByVtd_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING2;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		
+		mntmColorByCentered_1 = new JRadioButtonMenuItem("Color by centered racial vote packing");
+		mntmColorByCentered_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+			}
+		});
+		mnView.add(mntmColorByCentered_1);
+		mnView.add(mntmColorByVtd_1);
 		
 		
 		mnView.add(new JSeparator());
@@ -6149,6 +6171,30 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			frameSeatsVotesChart.show();
 			frameStats.show();
 		}
+		JRadioButtonMenuItem[] mapModes = new JRadioButtonMenuItem[]{
+				mntmShowVoteBalance,
+				mntmShowDemographics,
+				mntmColorByDistrict,
+				mntmColorByPop,
+				mntmColorByCompactness,
+				mntmColorByVote,
+				mntmColorByCounty,
+				mntmColorBySplits,
+				mntmShowVoteBalance,
+				mntmColorDistDemo,
+				mntmColorPartisanPacking,
+				mntmColorByVtd,
+				mntmColorByCentered,
+				mntmShowDemographics,
+				mntmColorRacialPacking,
+				mntmColorByVtd_1,
+				mntmColorByCentered_1,
+				mntmColorByWasted,
+			};
+			for( int i = 0; i < mapModes.length; i++) {
+				groupColoringMode.add(mapModes[i]);
+			}
+			mntmColorByDistrict.setSelected(true);
 		
 	}
 	public boolean hush_setSeatsMode = false;
@@ -6166,16 +6212,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
-	public JSeparator separator_8;
 	public JSlider slider_anneal;
 	public JCheckBox chckbxNewCheckBox_1;
 	public JCheckBox chckbxConstrain;
 	public JCheckBox chckbxConstrain_1;
 	public JMenuItem mntmShowScripts;
-	public JSeparator separator_11;
-	public JMenuItem mntmColorByCounty;
+	public JRadioButtonMenuItem mntmColorByCounty;
 	public JMenuItem mntmMergeInElection;
-	public JMenuItem mntmColorBySplits;
+	public JRadioButtonMenuItem mntmColorBySplits;
 	public JMenu mnMerge;
 	public JMenuItem mntmCountyVote;
 	public JMenuItem mntmVtdVote;
@@ -6201,8 +6245,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSlider slider;
 	public JSeparator separator_16;
 	public JCheckBoxMenuItem chckbxmntmDividePackingBy;
-	public JMenuItem mntmColorByVtd;
-	public JMenuItem mntmColorByVtd_1;
+	public JRadioButtonMenuItem mntmColorByVtd;
+	public JRadioButtonMenuItem mntmColorByVtd_1;
+	public JSeparator separator_17;
+	public JSeparator separator_18;
+	public JRadioButtonMenuItem mntmColorByCentered;
+	public JRadioButtonMenuItem mntmColorByCentered_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -8120,7 +8168,6 @@ ui.Mainframe:
 		ip.addHistory(s);
 		setSubstituteColumns();		
 	}
-
 }
 
 

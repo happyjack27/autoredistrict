@@ -2210,7 +2210,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 	//vote gap_by_district
 	boolean hasStats = false;
-		public double getVoteGapForDistrict(int k) {
+		public double getVoteGapForDistrict(int k, boolean mean_centered) {
 			double multiplier = 1;
 			if( !hasStats) {
 				this.calcDemographicStatistics();
@@ -2219,7 +2219,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				multiplier = Settings.density_multiplier*(double)districts.get(k).getPopulation()/(double)districts.get(k).area;
 				//System.out.println("dividing by area "+districts.get(k).area);
 			}
+		
 			double[] votes = districts.get(k).getAnOutcome();//getElectionResults()[0];
+			if( mean_centered) {
+				double[] d = getMeanCenteringMults();
+				for( int i = 0; i < d.length && i < votes.length; i++) {
+					votes[i] *= d[i];
+				}
+			}
 			double[] seats = District.popular_vote_to_elected(votes, k, 0);
 			double num_seats = Settings.seats_in_district(k);
 			
@@ -2234,15 +2241,32 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			//System.out.println("rep_res: "+rep_res);
 			return multiplier*(dem_res-rep_res)/num_seats;
 		}
-		public double getVoteGapPct(int k) {
+		public double[] getMeanCenteringMults() {
+			double[] v2 = new double[2];
+			for( int i = 0; i < districts.size(); i++) {
+				double[] v = districts.get(i).getAnOutcome();
+				v2[0] += v[0];
+				v2[1] += v[1];
+			}
+			double s = (v2[0]+v2[1])/2.0;
+			return new double[]{s/v2[0],s/v2[1]};
+		}
+		public double getVoteGapPct(int k, boolean mean_centered) {
 			double[] votes = districts.get(k).getAnOutcome();
-			double vote_gap = getVoteGapForDistrict(k);
+			double vote_gap = getVoteGapForDistrict(k,  mean_centered);
+			if( mean_centered) {
+				double[] d = getMeanCenteringMults();
+				for( int i = 0; i < d.length && i < votes.length; i++) {
+					votes[i] *= d[i];
+				}
+			}
 			vote_gap /= (votes[0]+votes[1]);
 			return vote_gap;
 		}
-		public Color getVoteGapByDemoColor(int k) {
+
+		public Color getVoteGapByDemoColor(int k, boolean mean_centered) {
 			//double[] votes = districts.get(k).getAnOutcome();
-			double vote_gap = getVoteGapPct(k);
+			double vote_gap = getVoteGapPct(k,mean_centered);
 			//vote_gap /= (votes[0]+votes[1]);
 			vote_gap = Math.abs(vote_gap);
 			vote_gap = vote_gap > 1 ? 1 : vote_gap < 0 ? 0 : vote_gap;
@@ -2282,9 +2306,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			}
 			return getComplement(new Color((int)rgb[0],(int)rgb[1],(int)rgb[2]));
 		}
-		public Color getVoteGapByPartyColor(int k) {
+		public Color getVoteGapByPartyColor(int k, boolean mean_centered) {
 			//double votes[] = districts.get(k).getAnOutcome();
-			double vote_gap = getVoteGapPct(k);
+			double vote_gap = getVoteGapPct(k, mean_centered);
 			//vote_gap /= (votes[0]+votes[1]);
 			//System.out.println("vote_gap: "+vote_gap);
 			double[] amts1 = new double[]{vote_gap > 0 ? vote_gap : 0,vote_gap < 0 ? -vote_gap : 0};

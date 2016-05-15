@@ -34,8 +34,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	BufferedImage pie_eth_target;
 	BufferedImage pie_eth_descr;
 	BufferedImage pie_eth_power;
+	
 	BufferedImage pie_eth_packing;
 	BufferedImage pie_party_packing;
+	BufferedImage pie_eth_packingm;
+	BufferedImage pie_party_packingm;
+	
+	BufferedImage pie_eth_packing_byvoter;
+	BufferedImage pie_party_packing_byvoter;
+	BufferedImage pie_eth_packingm_byvoter;
+	BufferedImage pie_party_packingm_byvoter;
 	
     private static BufferedImage imageToBufferedImage(Image image) {
 
@@ -708,10 +716,12 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		boolean t = Settings.divide_packing_by_area;
 		Settings.divide_packing_by_area = false;
+		
+		boolean use_vote_gap_for_arc = false;
 
 		Vector<Triplet<Double,Color,Integer>> triplet  = new Vector<Triplet<Double,Color,Integer>>();
 		for( int i = 0; i < Settings.num_districts; i++) {
-			Color c = dm.getVoteGapByPartyColor(i);
+			Color c = dm.getVoteGapByPartyColor(i,false);
 			double p = c.getRed()-c.getBlue();
 			triplet.add(new Triplet<Double,Color,Integer>(p,c,i));
 		}
@@ -722,14 +732,84 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Color[] cc_r = new Color[triplet.size()];
 		for( int i = 0; i < dd.length; i++) {
 			int dist = triplet.get(i).c;
-			dd[i] = Settings.seats_in_district(dist);
+			dd[i] = use_vote_gap_for_arc ? Math.abs(dm.getVoteGapForDistrict(dist,false)) : Settings.seats_in_district(dist);
 			cc[i] = triplet.get(i).b;
 			dd_r[i] = dd[i];
-			cc_r[i] = dm.getVoteGapByDemoColor(dist);
-		}	
+			cc_r[i] = dm.getVoteGapByDemoColor(dist,false);
+		}
+		//getVoteGapForDistrict
 		pie_party_packing = piechart.drawPieChart(200,dd,cc);
 		pie_eth_packing = piechart.drawPieChart(200,dd_r,cc_r);
 
+
+		triplet  = new Vector<Triplet<Double,Color,Integer>>();
+		for( int i = 0; i < Settings.num_districts; i++) {
+			Color c = dm.getVoteGapByPartyColor(i,true);
+			double p = c.getRed()-c.getBlue();
+			triplet.add(new Triplet<Double,Color,Integer>(p,c,i));
+		}
+		Collections.sort(triplet);
+		dd = new double[triplet.size()];
+		cc = new Color[triplet.size()];
+		dd_r = new double[triplet.size()];
+		cc_r = new Color[triplet.size()];
+		for( int i = 0; i < dd.length; i++) {
+			int dist = triplet.get(i).c;
+			dd[i] = use_vote_gap_for_arc ? Math.abs(dm.getVoteGapForDistrict(dist,true)) : Settings.seats_in_district(dist);
+			cc[i] = triplet.get(i).b;
+			dd_r[i] = dd[i];
+			cc_r[i] = dm.getVoteGapByDemoColor(dist,true);
+		}	
+		pie_party_packingm = piechart.drawPieChart(200,dd,cc);
+		pie_eth_packingm = piechart.drawPieChart(200,dd_r,cc_r);
+		
+		use_vote_gap_for_arc = true;
+
+		triplet  = new Vector<Triplet<Double,Color,Integer>>();
+		for( int i = 0; i < Settings.num_districts; i++) {
+			Color c = dm.getVoteGapByPartyColor(i,false);
+			double p = c.getRed()-c.getBlue();
+			triplet.add(new Triplet<Double,Color,Integer>(p,c,i));
+		}
+		Collections.sort(triplet);
+		dd = new double[triplet.size()];
+		cc = new Color[triplet.size()];
+		dd_r = new double[triplet.size()];
+		cc_r = new Color[triplet.size()];
+		for( int i = 0; i < dd.length; i++) {
+			int dist = triplet.get(i).c;
+			dd[i] = use_vote_gap_for_arc ? Math.abs(dm.getVoteGapForDistrict(dist,false)) : Settings.seats_in_district(dist);
+			cc[i] = triplet.get(i).b;
+			dd_r[i] = dd[i];
+			cc_r[i] = dm.getVoteGapByDemoColor(dist,false);
+		}
+		//getVoteGapForDistrict
+		pie_party_packing_byvoter = piechart.drawPieChart(200,dd,cc);
+		pie_eth_packing_byvoter = piechart.drawPieChart(200,dd_r,cc_r);
+
+
+		triplet  = new Vector<Triplet<Double,Color,Integer>>();
+		for( int i = 0; i < Settings.num_districts; i++) {
+			Color c = dm.getVoteGapByPartyColor(i,true);
+			double p = c.getRed()-c.getBlue();
+			triplet.add(new Triplet<Double,Color,Integer>(p,c,i));
+		}
+		Collections.sort(triplet);
+		dd = new double[triplet.size()];
+		cc = new Color[triplet.size()];
+		dd_r = new double[triplet.size()];
+		cc_r = new Color[triplet.size()];
+		for( int i = 0; i < dd.length; i++) {
+			int dist = triplet.get(i).c;
+			dd[i] = use_vote_gap_for_arc ? Math.abs(dm.getVoteGapForDistrict(dist,true)) : Settings.seats_in_district(dist);
+			cc[i] = triplet.get(i).b;
+			dd_r[i] = dd[i];
+			cc_r[i] = dm.getVoteGapByDemoColor(dist,true);
+		}	
+		pie_party_packingm_byvoter = piechart.drawPieChart(200,dd,cc);
+		pie_eth_packingm_byvoter = piechart.drawPieChart(200,dd_r,cc_r);
+		
+		
 		Settings.divide_packing_by_area = t;
 
 		
@@ -1117,6 +1197,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
 		
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean.png",res,res);
+		
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
@@ -1128,6 +1213,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
 		
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area.png",res,res);
+
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
@@ -1225,6 +1315,21 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         try { ImageIO.write(pie_eth_packing,"png", new File(write_folder+"pie_eth_packing.png")); }
         catch(Exception ex) { ex.printStackTrace(); }
         try { ImageIO.write(pie_party_packing,"png", new File(write_folder+"pie_party_packing.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+
+        try { ImageIO.write(pie_eth_packingm,"png", new File(write_folder+"pie_eth_packingm.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_packingm,"png", new File(write_folder+"pie_party_packingm.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+
+        try { ImageIO.write(pie_eth_packing_byvoter,"png", new File(write_folder+"pie_eth_packing_byvoter.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_packing_byvoter,"png", new File(write_folder+"pie_party_packing_byvoter.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+
+        try { ImageIO.write(pie_eth_packingm_byvoter,"png", new File(write_folder+"pie_eth_packingm_byvoter.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_packingm_byvoter,"png", new File(write_folder+"pie_party_packingm_byvoter.png")); }
         catch(Exception ex) { ex.printStackTrace(); }
 	
 	}

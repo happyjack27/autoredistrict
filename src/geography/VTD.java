@@ -27,12 +27,16 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	public static final int DISPLAY_MODE_WASTED_VOTES = 7;
 	public static final int DISPLAY_MODE_DEMOGRAPHICS = 8;
 	public static final int DISPLAY_MODE_COUNTIES = 9;
-	public static final int DISPLAY_MODE_PARTISAN_PACKING = 10;
-	public static final int DISPLAY_MODE_RACIAL_PACKING = 11;
 	public static final int DISPLAY_MODE_DIST_DEMO = 12;
 	public static final int DISPLAY_MODE_COUNTY_SPLITS = 13;
+	public static final int DISPLAY_MODE_PARTISAN_PACKING = 10;
+	public static final int DISPLAY_MODE_RACIAL_PACKING = 11;
 	public static final int DISPLAY_MODE_PARTISAN_PACKING2 = 14;
 	public static final int DISPLAY_MODE_RACIAL_PACKING2 = 15;
+	public static final int DISPLAY_MODE_PARTISAN_PACKING_MEAN = 16;
+	public static final int DISPLAY_MODE_RACIAL_PACKING_MEAN = 17;
+	public static final int DISPLAY_MODE_PARTISAN_PACKING2_MEAN = 18;
+	public static final int DISPLAY_MODE_RACIAL_PACKING2_MEAN = 19;
 
 	public static boolean show_seats = true;
 	
@@ -310,7 +314,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 				g.setColor(has_census_results ? FeatureCollection.DEFAULT_COLOR :  Color.black);
 				//getVoteGapPct(k);
 			} else 
-			if( display_mode == DISPLAY_MODE_RACIAL_PACKING2) {
+			if( display_mode == DISPLAY_MODE_RACIAL_PACKING2 || display_mode == DISPLAY_MODE_RACIAL_PACKING2_MEAN) {
 				double tot = 0;
 				double red = 0;
 				double green = 0;
@@ -343,7 +347,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 				
 				Color c = new Color((int)red,(int)green,(int)blue);
 				g.setColor(c);
-			} else if( display_mode == DISPLAY_MODE_PARTISAN_PACKING2) {
+			} else if( display_mode == DISPLAY_MODE_PARTISAN_PACKING2 || display_mode == DISPLAY_MODE_PARTISAN_PACKING2_MEAN) {
 				double tot = 0;
 				double red = 0;
 				double green = 0;

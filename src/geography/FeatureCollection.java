@@ -731,11 +731,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			} else 
-			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING2 || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING2) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING2 || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING2
+			|| VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING2_MEAN || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING2_MEAN
+			) {
 				DistrictMap dm  = ecology.population.get(shown_map);
 				double[] districts = new double[Settings.num_districts];
 				for( int i = 0; i < districts.length; i++) {
-					districts[i] = Math.abs(dm.getVoteGapPct(i));
+					districts[i] = Math.abs(dm.getVoteGapPct(i,VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING2_MEAN || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING2_MEAN));
 					if( districts[i] > 1) {
 						districts[i] = 1;
 					}
@@ -749,12 +751,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					f.draw(g);
 				}
 			} else
-			if( VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING || VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];
 					for( int i = 0; i < Settings.num_districts; i++) {
-						district_colors[i] = dm.getVoteGapByDemoColor(i);
+						district_colors[i] = dm.getVoteGapByDemoColor(i,VTD.display_mode == VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN);
 					}
 
 					for( int i = 0; i < features.size(); i++) {
@@ -766,12 +768,12 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 					}
 				}
 			} else
-			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING) {
+			if( VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING || VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN) {
 				if( shown_map < ecology.population.size()) {
 					DistrictMap dm  = ecology.population.get(shown_map);
 					Color[] district_colors = new Color[Settings.num_districts];
 					for( int i = 0; i < Settings.num_districts; i++) {
-						district_colors[i] = dm.getVoteGapByPartyColor(i);
+						district_colors[i] = dm.getVoteGapByPartyColor(i,VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN);
 					}
 
 					for( int i = 0; i < features.size(); i++) {
