@@ -1181,8 +1181,25 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
 		
 		System.out.println("2");
+		
+		
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean.png",res,res);
+
+		Settings.divide_packing_by_area = true;
+		
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area.png",res,res);
+
 	
-	
+		Settings.divide_packing_by_area = false;
+if( false) {
+	return;
+}
 	
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
@@ -1197,11 +1214,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
 		
-		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean.png",res,res);
-		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean.png",res,res);
-		
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
@@ -1212,11 +1224,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
-		
-		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area.png",res,res);
-		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area.png",res,res);
 
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area.png",res,res);

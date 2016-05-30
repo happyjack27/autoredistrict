@@ -4532,6 +4532,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		mnFile.add(mntmExportNationalMaps);
+		
+		mntmExportPieCharts = new JMenuItem("Export pie charts");
+		mntmExportPieCharts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				panelStats.exportPieCharts();
+			}
+		});
+		mnFile.add(mntmExportPieCharts);
 		mnFile.add(mntmExportBlockFile);
 		
 		separator_10 = new JSeparator();
@@ -6251,6 +6259,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSeparator separator_18;
 	public JRadioButtonMenuItem mntmColorByCentered;
 	public JRadioButtonMenuItem mntmColorByCentered_1;
+	public JMenuItem mntmExportPieCharts;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

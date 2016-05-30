@@ -682,9 +682,9 @@ EXIT
 EXIT
 
 					 */
-					sb.append("EXPORT NATIONAL\n");
-				sb.append("EXPORT\n");
-				sb.append("EXPORT NATIONAL\n");
+					sb.append("EXPORT STATS\n");
+				//sb.append("EXPORT\n");
+				//sb.append("EXPORT NATIONAL\n");
 			}
 			
 			//sb.append("SAVE\n");
@@ -1104,12 +1104,12 @@ EXIT
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 		sb.append("SET DISTRICTS COLUMN CD_BD\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
-		sb.append("EXPORT\n");
-		sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT NATIONAL\n");
 
 		sb.append("SET DISTRICTS COLUMN CD_2000\n");
-		sb.append("EXPORT\n");
-		sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT NATIONAL\n");
 
 		/*
 		sb.append("COPY FEATURE CD_2000 CD_NOW");
@@ -1120,8 +1120,8 @@ EXIT
 
 		sb.append("SET DISTRICTS COLUMN CD_FV\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
-		sb.append("EXPORT\n");
-		sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT NATIONAL\n");
 
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
@@ -1129,8 +1129,8 @@ EXIT
 	public static void appendExportEmbedded(StringBuffer sb, int i) {
 		String state = Download.states[i];
 		
-		sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/vtd_data.txt GEOID10 GEOID10 CD_SM\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
-		sb.append("SAVE\n");
+		//sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/vtd_data.txt GEOID10 GEOID10 CD_SM\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
+		//sb.append("SAVE\n");
 		//sb.append("EXIT\n");
 		//sb.append("EXIT\n");
 		
@@ -1142,10 +1142,11 @@ EXIT
 		sb.append("SET DISTRICTS COLUMN CD_SM\n");
 		sb.append("EXPORT EMBEDDED\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT html\n");
+		sb.append("EXPORT STATS\n");
 		sb.append("EXPORT national\n");
-		sb.append("EXIT\n");
-		sb.append("EXIT\n");
+		//sb.append("EXPORT\n");
+		//sb.append("EXIT\n");
+		//sb.append("EXIT\n");
 
 		
 		/*
@@ -1160,20 +1161,17 @@ EXIT
 
 		
 		sb.append("SET DISTRICTS COLUMN CD_BD\n");
-		sb.append("EXPORT EMBEDDED\n");
-		sb.append("EXPORT PIE\n");
-		//sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 
 		
 		sb.append("SET DISTRICTS COLUMN CD_2000\n");
-		sb.append("EXPORT EMBEDDED\n");
-		sb.append("EXPORT PIE\n");
-		//sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 		
 		sb.append("SET DISTRICTS COLUMN CD_2010\n");
-		sb.append("EXPORT EMBEDDED\n");
-		sb.append("EXPORT PIE\n");
-		//sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 
 /*
 		sb.append("SET DISTRICTS COLUMN CD_FV\n");
@@ -1185,9 +1183,8 @@ EXIT
 
 		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
-		sb.append("EXPORT EMBEDDED\n");
-		sb.append("EXPORT PIE\n");
-		//sb.append("EXPORT HTMLONLY\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 		
 
 		sb.append("EXIT\n");
