@@ -1,5 +1,13 @@
 Changelog:
 
+V. 1.28
+
+* added pie chart generation and export ("EXPORT PIE")
+* on exported html, larger version of maps now open in separate tab
+* importing 2010 districts fixed (data origin was mislabeling the districts)
+* made menu items have radio buttons
+* added mean-centered versions of some maps
+
 V. 1.27
 
 * can now script exporting to block assignment file
