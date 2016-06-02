@@ -1181,26 +1181,34 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
 		
 		System.out.println("2");
+		Settings.divide_packing_by_area = false;
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep.png",res,res);
+		Settings.divide_packing_by_area = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_area.png",res,res);
+		Settings.divide_packing_by_area = false;
+		if( true) {
+			return;
+		}
+	
+
 		
 		
+		
+		Settings.divide_packing_by_area = false;		
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean.png",res,res);
 
-		Settings.divide_packing_by_area = true;
-		
+		Settings.divide_packing_by_area = true;		
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area.png",res,res);
-
-	
 		Settings.divide_packing_by_area = false;
-if( false) {
-	return;
-}
-	
+
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_COMPACTNESS;			

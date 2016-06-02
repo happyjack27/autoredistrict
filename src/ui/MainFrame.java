@@ -4985,6 +4985,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mnView.add(mntmColorByCentered_1);
 		mnView.add(mntmColorByVtd_1);
 		
+		rdbtnmntmColorByDescr = new JRadioButtonMenuItem("Color by descr. representation");
+		rdbtnmntmColorByDescr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+
+				//DISPLAY_MODE_DIST_DESCR
+			}
+		});
+		mnView.add(rdbtnmntmColorByDescr);
+		
 		
 		mnView.add(new JSeparator());
 		mntmResetZoom.addActionListener(new ActionListener() {
@@ -6198,6 +6210,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				mntmColorByVtd_1,
 				mntmColorByCentered_1,
 				mntmColorByWasted,
+				rdbtnmntmColorByDescr,
 			};
 			for( int i = 0; i < mapModes.length; i++) {
 				groupColoringMode.add(mapModes[i]);
@@ -6260,6 +6273,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButtonMenuItem mntmColorByCentered;
 	public JRadioButtonMenuItem mntmColorByCentered_1;
 	public JMenuItem mntmExportPieCharts;
+	public JRadioButtonMenuItem rdbtnmntmColorByDescr;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

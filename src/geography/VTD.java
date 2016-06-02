@@ -38,6 +38,9 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	public static final int DISPLAY_MODE_PARTISAN_PACKING2_MEAN = 18;
 	public static final int DISPLAY_MODE_RACIAL_PACKING2_MEAN = 19;
 
+
+	public static final int DISPLAY_MODE_DIST_DESCR = 20;
+
 	public static boolean show_seats = true;
 	
 	public Vector<DBField> dbfFields = new Vector<DBField>();
