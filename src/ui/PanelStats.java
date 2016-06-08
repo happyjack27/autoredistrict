@@ -1180,6 +1180,22 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.showDistrictLabels = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
 		
+
+		
+		Settings.divide_packing_by_area = false;
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won.png",res,res);
+		Settings.divide_packing_by_area = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_area.png",res,res);
+		Settings.divide_packing_by_area = false;
+
+		if( true) {
+			return;
+		}
+	
+
+		
 		System.out.println("2");
 		Settings.divide_packing_by_area = false;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
@@ -1188,10 +1204,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_area.png",res,res);
 		Settings.divide_packing_by_area = false;
-		if( true) {
-			return;
-		}
-	
 
 		
 		
@@ -1523,7 +1535,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		//url = URLEncoder.encode(url);
 		if( !embedded) {
-			Applet.browseTo(url);
+			//Applet.browseTo(url);
 		}
 		
 		///=====end insert

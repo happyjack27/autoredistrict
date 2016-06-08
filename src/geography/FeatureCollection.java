@@ -508,6 +508,58 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			}
 			//wasted_votes_by_district_and_party
 		} else
+		if( VTD.display_mode == VTD.DISPLAY_MODE_DIST_SEATS) {
+			if( shown_map < ecology.population.size()) {
+				DistrictMap dm  = ecology.population.get(shown_map);
+
+				Color[] district_colors = new Color[Settings.num_districts];
+				//double[] district_colors = new Color[Settings.num_districts];
+				double[] tot = new double[Settings.num_districts];
+				double[] red = new double[Settings.num_districts];
+				double[] green = new double[Settings.num_districts];
+				double[] blue = new double[Settings.num_districts];
+				
+				//double[][] demo = dm.districts.get(0).();
+				for( int i = 0; i < Settings.num_districts; i++) {
+					double[] demo_result = District.popular_vote_to_elected(dm.districts.get(i).getAnOutcome(), i, 0);
+					for( int j = 0; j < demo_result.length && j < standard_district_colors.length; j++) {
+						double pop = demo_result[j];
+						tot[i] += pop;
+						red[i] += standard_district_colors[j].getRed()*pop;
+						green[i] += standard_district_colors[j].getGreen()*pop;
+						blue[i] += standard_district_colors[j].getBlue()*pop;
+					}
+					
+					double multiplier = 1;
+					if( Settings.divide_packing_by_area) {
+						multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+						if( multiplier > 1) {
+							multiplier = 1;
+						}
+					}
+					red[i] = (255.0-(red[i]/tot[i]))*multiplier;
+					blue[i] = (255.0-(blue[i]/tot[i]))*multiplier;
+					green[i] = (255.0-(green[i]/tot[i]))*multiplier;
+					red[i] = 255.0-red[i];
+					blue[i] = 255.0-blue[i];
+					green[i] = 255.0-green[i];
+
+
+					district_colors[i] = new Color(
+							(int)(red[i]),
+							(int)(green[i]),
+							(int)(blue[i])
+					);
+
+				}			
+				for( int i = 0; i < features.size(); i++) {
+					VTD f = features.get(i);
+					Geometry geo = features.get(i).geometry;
+					int di = dm.vtd_districts[f.id];
+					geo.fillColor = district_colors[di];
+				}
+			}
+		} else
 		if( VTD.display_mode == VTD.DISPLAY_MODE_DIST_DESCR) {
 			if( shown_map < ecology.population.size()) {
 				DistrictMap dm  = ecology.population.get(shown_map);

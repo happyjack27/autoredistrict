@@ -1141,7 +1141,7 @@ EXIT
 		
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
-		/*
+		
 		sb.append("SET DISTRICTS COLUMN CD_SM\n");
 		sb.append("EXPORT EMBEDDED\n");
 		sb.append("EXPORT PIE\n");

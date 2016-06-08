@@ -40,6 +40,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 
 
 	public static final int DISPLAY_MODE_DIST_DESCR = 20;
+	public static final int DISPLAY_MODE_DIST_SEATS = 21;
 
 	public static boolean show_seats = true;
 	
