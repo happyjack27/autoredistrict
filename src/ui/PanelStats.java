@@ -27,6 +27,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	Color[] dmcolors = null;
 	double[] tot_seats = new double[5];
 	
+	BufferedImage pie_party_comp_digital;
+	BufferedImage pie_party_comp_digital2;
 	BufferedImage pie_party_votes;
 	BufferedImage pie_party_seats;
 	BufferedImage pie_party_seats_frac;
@@ -480,7 +482,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				}
 				double[] seats = new double[]{};
 				if( result[0].length > 0) {
-					seats = this.getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(i));
+					seats = DistrictMap.getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(i));
 				}
 				for( int j = 0; j < seats.length; j++) {
 					tot_seats[j] += seats[j];
@@ -610,6 +612,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					Settings.reduce_splits && dm.countMuniSplitsInteger() > 0 ? new String[]{""+integer.format(dm.countMuniSplitsInteger()),"Muni splits"} : new String[]{"",""},	
 					new String[]{"",""},					
 					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
+					new String[]{""+decimal.format(dm.get_partisan_gerrymandering()),"Packing/cracking asymmetry (%)"},
 					new String[]{""+integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},
 					new String[]{""+decimal.format(dm.fairnessScores[8]),"Representation imbalance (global)"},
 					new String[]{""+decimal.format(dm.getRacialVoteDilution()),"Racial vote dilution"},
@@ -673,6 +676,43 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			ex.printStackTrace();
 		}
 		
+		Color[] district_colors = new Color[Settings.num_districts];
+		Color tossup = new Color(128,0,128);
+		Color lean = new Color(255,128,255);
+		Color safe = new Color(192,192,192);
+		
+		double[] dd0 = new double[3];
+
+		for( int i = 0; i < Settings.num_districts; i++) {
+			dd0[dm.getFVColorIndex(i)]++;
+			
+			//double vote_gap = Math.abs(dm.getVoteGapPct(i, VTD.display_mode == VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN));
+			/*
+			if( vote_gap < 0.04) {
+				dd0[0]++;
+			} else 
+			if( vote_gap < 0.08) {
+				dd0[1]++;
+			} else {
+				dd0[2]++;
+			}
+			*/
+		}
+
+		pie_party_comp_digital2 = piechart.drawPieChart(200,dd0,new Color[]{
+				 tossup,
+				 lean,
+				 safe,
+		});
+		pie_party_comp_digital = piechart.drawPieChart(200,new double[]{
+				tot_seats[0]+tot_seats[4],
+				tot_seats[1]+tot_seats[3],
+				tot_seats[2],
+		},new Color[]{
+				 new Color(0xb0,0xb0,0xb0),
+				 new Color(0xff,0x80,0xff),
+				 new Color(0x80,0x00,0x80),
+		});
 		pie_party_votes = piechart.drawPieChart(200,vote_counts,FeatureCollection.standard_district_colors); 
 		pie_party_seats = piechart.drawPieChart(200,elec_counts,FeatureCollection.standard_district_colors); 
 		pie_party_seats_frac = piechart.drawPieChart(200,new double[]{
@@ -688,9 +728,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				 new Color(0xb0,0,0x40),
 				 new Color(0xff,0,0x00),
 		});
-		pie_eth_pop    = piechart.drawPieChart(200,pop_by_dem,FeatureCollection.standard_district_colors); 
-		pie_eth_target = piechart.drawPieChart(200,targets,FeatureCollection.standard_district_colors); 
-		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.standard_district_colors);
+		pie_eth_pop    = piechart.drawPieChart(200,pop_by_dem,FeatureCollection.demo_district_colors); 
+		pie_eth_target = piechart.drawPieChart(200,targets,FeatureCollection.demo_district_colors); 
+		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.demo_district_colors);
 		
 		double[] dr = new double[votes_by_dem.length];
 		double tot = 0;
@@ -712,7 +752,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				dr[i] = 0;
 			}
 		}
-		pie_eth_power  = piechart.drawPieChart(200,dr,FeatureCollection.standard_district_colors); 
+		pie_eth_power  = piechart.drawPieChart(200,dr,FeatureCollection.demo_district_colors); 
 
 		boolean t = Settings.divide_packing_by_area;
 		Settings.divide_packing_by_area = false;
@@ -1174,13 +1214,40 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		///====begin insert
 		VTD.outline_districts = true;
 		VTD.showDistrictLabels = true;
-		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
 		Settings.divide_packing_by_area = false;
+		VTD.showDistrictLabels = false;
+		
+		VTD.USE_DISCRETE_COLORS = true;
+		Settings.divide_packing_by_area = false;
+
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital.png",res,res);
+		
+
+		if( true) {
+			//return;
+		}
+
+
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_digital.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital.png",res,res);
+
+		VTD.USE_GRAY = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital_gray.png",res,res);
+		VTD.USE_GRAY = false;
+
+		Settings.divide_packing_by_area = false;
+		VTD.USE_DISCRETE_COLORS = false;
+
+		
+		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
+		VTD.showDistrictLabels = true;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
 		VTD.showDistrictLabels = false;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
-		
-
 		
 		Settings.divide_packing_by_area = false;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
@@ -1189,11 +1256,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_area.png",res,res);
 		Settings.divide_packing_by_area = false;
-
-		if( true) {
-			return;
-		}
-	
 
 		
 		System.out.println("2");
@@ -1323,7 +1385,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		BufferedImage pie_eth_power;
 		*/
 		//pie_eth_packing
-		
+
+        try { ImageIO.write(pie_party_comp_digital,"png", new File(write_folder+"pie_party_comp_digital.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
+        try { ImageIO.write(pie_party_comp_digital2,"png", new File(write_folder+"pie_party_comp_digital_district.png")); }
+        catch(Exception ex) { ex.printStackTrace(); }
         try { ImageIO.write(pie_party_votes,"png", new File(write_folder+"pie_party_votes.png")); }
         catch(Exception ex) { ex.printStackTrace(); }
         try { ImageIO.write(pie_party_seats,"png", new File(write_folder+"pie_party_seats.png")); }
@@ -1549,60 +1615,5 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		Settings.setNationalMap(national);
 	}
-	
-	public static double[] getSeats(double pct_d, double seats) {
-		double pct_r = 1.0-pct_d;
-		double safe_d = Math.floor(pct_d*seats);
-		double safe_r = Math.floor(pct_r*seats);
-		
-		double threshold_d = (safe_d+1.0)/(seats+1.0);
-		double threshold_r = (safe_r+1.0)/(seats+1.0);
-		double remainder_d = pct_d-threshold_d;
-		double remainder_r = pct_r-threshold_r;
 
-		safe_d += remainder_d >= 0.08 ? 1 : 0;
-		safe_r += remainder_r >= 0.08 ? 1 : 0;
-		double lean_d = remainder_d < 0.08 && remainder_d >= 0.04 ? 1 : 0;
-		double lean_r = remainder_r < 0.08 && remainder_r >= 0.04 ? 1 : 0;
-		double tossup = remainder_d < 0.04 && remainder_r < 0.04 ? 1 : 0;
-
-		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
-	}
-
-	public static double[] getSeats_alt(double pct_d, double seats) {
-		double pct_r = 1.0-pct_d;
-		double safe_d = Math.floor(pct_d*seats);
-		double safe_r = Math.floor(pct_r*seats);
-		
-		double remainder_d = pct_d*seats-safe_d;
-		double remainder_r = pct_r*seats-safe_r;
-
-		remainder_d -= 0.5;
-		remainder_r -= 0.5;
-
-		safe_d += remainder_d >= 0.08 ? 1 : 0;
-		safe_r += remainder_r >= 0.08 ? 1 : 0;
-		double lean_d = remainder_d < 0.08 && remainder_d >= 0.04 ? 1 : 0;
-		double lean_r = remainder_r < 0.08 && remainder_r >= 0.04 ? 1 : 0;
-		double tossup = remainder_d < 0.04 && remainder_r < 0.04 ? 1 : 0;
-
-		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
-	}
-	public static double[] getSeats_new(double pct_d, double seats) {
-
-		double safe_d = Math.floor((pct_d-0.08)*(seats+1));
-
-		//System.out.println("pct_d "+pct_d+" seats "+seats+" safe_d "+safe_d+" (pct_d-0.08)*seats "+((pct_d-0.08)*(seats+1)));
-
-		double threshold_d = Math.round((seats+1)*pct_d)/(seats+1);
-		double remainder_d = pct_d-threshold_d;
-
-		double lean_d = remainder_d <= 0.08 && remainder_d > 0.04 ? 1 : 0;
-		double tossup = remainder_d <= 0.04 && remainder_d >= -0.04 ? 1 : 0;
-		double lean_r = remainder_d >= -0.08 && remainder_d < -0.04 ? 1 : 0;
-
-		double safe_r = seats - lean_r - tossup - lean_d - safe_d;
-
-		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
-	}
 }

@@ -10,16 +10,16 @@ import java.util.Map.Entry;
 
 import ui.Download;
 
-/*
+/*ftp://ftp2.census.gov/geo/tiger/TIGERrd13/SLDL/
  * 
-EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip" CD113
-OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/SLDL/tl_rd13_[FIPS]_sldl.zip" SLDL
+OPEN "SLDL/tl_rd13_[FIPS]_sldl.shp"
 SET DISTRICTS COLUMN CD113FP
 
-EXPORT BLOCKS "CD113/blocks.txt"
+EXPORT BLOCKS "SLDL/blocks.txt"
 
 LOAD [FIPS] 2010 2012
-IMPORT BLOCKS "[START PATH]blocks.txt" TRUE TRUE CD113FP CD_2010
+IMPORT BLOCKS "[START PATH]blocks.txt" TRUE TRUE sldlst SLDL_2010
 SAVE
 
 
@@ -402,7 +402,7 @@ New Mexico
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
-			if( i < 47) {
+			if( i < 24) {
 				//continue;
 			}
 			String state = Download.states[i];
@@ -1141,7 +1141,7 @@ EXIT
 		
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
-		
+		/*
 		sb.append("SET DISTRICTS COLUMN CD_SM\n");
 		sb.append("EXPORT EMBEDDED\n");
 		sb.append("EXPORT PIE\n");
@@ -1149,7 +1149,7 @@ EXIT
 		sb.append("EXPORT national\n");
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
-		
+		*/
 		//sb.append("EXPORT\n");
 		//sb.append("EXIT\n");
 		//sb.append("EXIT\n");
@@ -1166,16 +1166,28 @@ EXIT
 		*/
 
 		
+		sb.append("SET DISTRICTS COLUMN CD_SM\n");
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT national\n");
+		
 		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
 		sb.append("EXPORT STATS\n");
 		sb.append("EXPORT national\n");
 
 		
 		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
 		sb.append("EXPORT STATS\n");
 		sb.append("EXPORT national\n");
 		
 		sb.append("SET DISTRICTS COLUMN CD_2010\n");
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
 		sb.append("EXPORT STATS\n");
 		sb.append("EXPORT national\n");
 
@@ -1189,6 +1201,8 @@ EXIT
 
 		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
 		sb.append("EXPORT STATS\n");
 		sb.append("EXPORT national\n");
 		

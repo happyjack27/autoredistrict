@@ -58,6 +58,36 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		d.invalidate();
     	}
     }
+    public double get_partisan_gerrymandering() {
+		double[] vote_surpluses = new double[Settings.num_districts];
+		for( int i = 0; i < vote_surpluses.length; i++) {
+			vote_surpluses[i] = getVoteGapPct(i,true);
+		}
+		
+		double mean = 0;
+		for( int i = 0; i < vote_surpluses.length; i++) {
+			mean += vote_surpluses[i];
+		}
+		mean /= (double)vote_surpluses.length;
+
+		double demsq = 0;
+		double repsq = 0;
+		double dem = 0;
+		double rep = 0;
+		for( int i = 0; i < vote_surpluses.length; i++) {
+			double d = vote_surpluses[i]-mean;
+			if( d < 0) {
+				d = -d;
+				demsq += d*d;
+				dem += d;
+			} else {
+				repsq += d*d;
+				rep += d;
+			}
+		}
+		return demsq/dem - repsq/rep; //+ = repub gerrymander, - = dem gerrymander, value = difference in avg. vote packing
+	}
+
     /*
     public double getDescrVoteImbalance() {
 		String[] dem_col_names = MainFrame.mainframe.project.demographic_columns_as_array();
@@ -792,13 +822,18 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for( int i = 0; i < vtd_districts.length; i++) {
     		int district = vtd_districts[i];
     		if( district >= Settings.num_districts) {
-    			while( district  >= Settings.num_districts) {
-    				System.out.println("districting above # districts... "+district);
+    			int n = 0;
+    			while( district  >= Settings.num_districts && n < 10) {
+    				n++;
+    				System.out.println("districting above # districts... "+from_import+" "+district+" "+Settings.num_districts);
     				if( from_import) {
     					//return false;
     				} else {
-    					district = (int)Math.floor(Math.random()*(double)Settings.num_districts);
+    					district = 0;//(int)Math.floor(Math.random()*(double)Settings.num_districts);
     				}
+    			}
+    			if( district  >= Settings.num_districts) {
+    				Settings.num_districts = district;
     			}
     			vtd_districts[i] = district;
     		}
@@ -2379,4 +2414,67 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			
 			return ret;
 		}
+		public static double[] getSeats_new(double pct_d, double seats) {
+			if( Settings.quota_method == Settings.QUOTA_METHOD_HARE) {
+				return getSeats_alt(pct_d,seats);
+			}
+			
+			double add = Settings.quota_method == Settings.QUOTA_METHOD_DROOP ? 1 : 0;
+			double safe_d = Math.floor((pct_d-0.08)*(seats+add));
+		
+			//System.out.println("pct_d "+pct_d+" seats "+seats+" safe_d "+safe_d+" (pct_d-0.08)*seats "+((pct_d-0.08)*(seats+1)));
+		
+			double threshold_d = Math.round((seats+add)*pct_d)/(seats+add);
+			double remainder_d = pct_d-threshold_d;
+		
+			double lean_d = remainder_d <= 0.08 && remainder_d > 0.04 ? 1 : 0;
+			double tossup = remainder_d <= 0.04 && remainder_d >= -0.04 ? 1 : 0;
+			double lean_r = remainder_d >= -0.08 && remainder_d < -0.04 ? 1 : 0;
+		
+			double safe_r = seats - lean_r - tossup - lean_d - safe_d;
+		
+			return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
+		}
+
+
+	public static double[] getSeats_alt(double pct_d, double seats) {
+		double pct_r = 1.0-pct_d;
+		double safe_d = Math.floor(pct_d*seats);
+		double safe_r = Math.floor(pct_r*seats);
+		
+		double remainder_d = pct_d*seats-safe_d;
+		double remainder_r = pct_r*seats-safe_r;
+
+		remainder_d -= 0.5;
+		remainder_r -= 0.5;
+
+		safe_d += remainder_d >= 0.08 ? 1 : 0;
+		safe_r += remainder_r >= 0.08 ? 1 : 0;
+		double lean_d = remainder_d < 0.08 && remainder_d >= 0.04 ? 1 : 0;
+		double lean_r = remainder_r < 0.08 && remainder_r >= 0.04 ? 1 : 0;
+		double tossup = remainder_d < 0.04 && remainder_r < 0.04 ? 1 : 0;
+
+		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
+	}
+		public int getFVColorIndex(int district) {
+			//0 = purple, 1 = light purple, 2 = gray
+			double[][] result = new double[2][];
+			result[0] = districts.get(district).getAnOutcome();
+			result[1] = District.popular_vote_to_elected(result[0], district, 0);
+
+			double[] seats = new double[]{};
+			if( Settings.seats_in_district(district) == 1) {
+				double pct_d = result[0][0]/(result[0][0]+result[0][1]);
+				double pct_r = 1-pct_d;
+				double edge = Math.abs(pct_d-pct_r);
+				return edge > 0.08 ? 2 : edge > 0.04 ? 1 : 0;			
+			} else {
+				if( result[0].length > 0) {
+					seats = getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(district));
+				}
+				
+			}
+			return seats[2] > 0 ? 0 : seats[1] > 0 || seats[3] > 0 ? 1 : 2;
+		}
+
 }

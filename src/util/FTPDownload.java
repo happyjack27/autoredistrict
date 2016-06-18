@@ -50,7 +50,7 @@ public class FTPDownload {
 	}
 	public static boolean download(String surl, String dest_file) {
 		long last = 0;
-		for( int i = 0; i < 32; i++) {
+		for( int i = 0; i < 64; i++) {
 			try {
 				long[] dd = resume(surl,dest_file,last);
 				if( dd[0] == dd[1] && dd[1] > 0) {
@@ -58,7 +58,7 @@ public class FTPDownload {
 					return true;
 				}
 				last = dd[0];
-				Logd("Connection interrupted, resuming... "+i+" / 32");
+				Logd("Connection interrupted, resuming... "+i+" / 64");
 			} catch(Exception ex) {
 				ex.printStackTrace();
 			}

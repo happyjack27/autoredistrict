@@ -6,15 +6,19 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
+import javax.swing.JOptionPane;
+
 import dbf.*;
 import serialization.JSONObject;
 import serialization.ReflectionJSONObject;
 import solutions.*;
 import ui.MainFrame;
+import util.Pair;
 
 public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	
 	public static Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
+	public static Color[] demo_colors = new Color[]{new Color(192,192,192),Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
 	
 	public static final int DISPLAY_MODE_NORMAL = 0;
@@ -41,6 +45,11 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 
 	public static final int DISPLAY_MODE_DIST_DESCR = 20;
 	public static final int DISPLAY_MODE_DIST_SEATS = 21;
+
+
+	public static boolean USE_DISCRETE_COLORS = false;
+	public static boolean USE_GRAY = false;
+
 
 	public static boolean show_seats = true;
 	
@@ -257,6 +266,21 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	}	
 	
 	public void toggleClicked() {
+		String s = "";
+		
+		Vector<Pair<String,String>> vps = new Vector<Pair<String,String>>();
+		for( String key : this.properties.keySet()) {
+			String value = this.properties.getString(key);
+			vps.add(new Pair<String,String>(key,value));
+			//s += key+": "+value+"\n";
+		}
+		Collections.sort(vps);
+		int n = 0;
+		for( Pair<String,String> ps: vps) {
+			n++;
+			s += ps.a+": "+ps.b+(n % 2 == 0 ? "\n": "    ");
+		}
+		
 		try {
 
 		if( state == 0) {
@@ -286,6 +310,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 			System.out.println(" ex "+ex);
 			ex.printStackTrace();
 		}
+		JOptionPane.showMessageDialog(null, s);
 	}
 
 	@Override
@@ -326,12 +351,12 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 				double blue = 0;
 				//for( int k = 0; k < elections.size(); k++) {
 					//Vector<Election> dem = elections.get(k);
-					for( int i = 0; i < demographics.length && i < colors.length; i++) {
+					for( int i = 0; i < demographics.length && i < demo_colors.length; i++) {
 						int pop = (int)demographics[i];
 						tot += pop;
-						red += colors[i].getRed()*pop;
-						green += colors[i].getGreen()*pop;
-						blue += colors[i].getBlue()*pop;
+						red += demo_colors[i].getRed()*pop;
+						green += demo_colors[i].getGreen()*pop;
+						blue += demo_colors[i].getBlue()*pop;
 					}
 				//}
 				red /= tot;
@@ -384,12 +409,12 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 				double blue = 0;
 				//for( int k = 0; k < elections.size(); k++) {
 					//Vector<Election> dem = elections.get(k);
-					for( int i = 0; i < demographics.length && i < colors.length; i++) {
+					for( int i = 0; i < demographics.length && i < demo_colors.length; i++) {
 						int pop = (int)demographics[i];
 						tot += pop;
-						red += colors[i].getRed()*pop;
-						green += colors[i].getGreen()*pop;
-						blue += colors[i].getBlue()*pop;
+						red += demo_colors[i].getRed()*pop;
+						green += demo_colors[i].getGreen()*pop;
+						blue += demo_colors[i].getBlue()*pop;
 					}
 				//}
 
@@ -495,6 +520,8 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	}
 	   public int id;
 		public static int id_enumerator = 0;
+
+
 		public VTD feature = null;
 		public int state = 0;
 		public int temp = -1;
