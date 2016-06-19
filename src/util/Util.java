@@ -402,8 +402,8 @@ New Mexico
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
-			if( i < 24) {
-				//continue;
+			if( i < 16) {
+				continue;
 			}
 			String state = Download.states[i];
 			if( !state.equals("Ohio") && !state.equals("Florida")) {
