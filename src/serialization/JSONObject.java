@@ -272,7 +272,7 @@ public abstract class JSONObject extends HashMap<String,Object> implements iJSON
 	}
 	
 	public String getString(String key) {
-		return (String)get(key);
+		return get(key).toString();
 	}
 	public JSONObject getObject(String key) {
 		return (JSONObject)get(key);

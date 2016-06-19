@@ -47,6 +47,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public static MainFrame mainframe;
 	public DialogManageLocks manageLocks = new DialogManageLocks();
 	public PanelSeats seatsPanel = new PanelSeats();
+	public PanelFeatures featuresPanel = new PanelFeatures();
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
 	public InstructionProcessor ip = new InstructionProcessor();
@@ -4059,6 +4060,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		manageLocks = new DialogManageLocks();
 		seatsPanel = new PanelSeats();
+		featuresPanel = new PanelFeatures();
 		progressBar = new JProgressBar();
 		frameSeatsVotesChart = new FrameSeatsVotesChart();;;
 		chckbxmntmShowPrecinctLabels = new JCheckBoxMenuItem("Show precinct labels");
@@ -5400,6 +5402,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		JSplitPane splitPane = new JSplitPane();
 		JSplitPane splitPane2 = new JSplitPane();
+		splitPane_1 = new JSplitPane();
+
 		getContentPane().add(splitPane, BorderLayout.CENTER);
 		
 		JPanel panel = new JPanel();
@@ -6170,13 +6174,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
-
+		featuresPanel.setPreferredSize(new Dimension(100,100));
+		featuresPanel.setSize(new Dimension(200,100));
+			
 		splitPane.setRightComponent(splitPane2);
+		
 		splitPane2.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane2.setTopComponent(seatsPanel);
-		splitPane2.setBottomComponent(mapPanel);
+		splitPane_1.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane_1.setLeftComponent(mapPanel);
+		splitPane_1.setRightComponent(featuresPanel);
+		splitPane_1.setResizeWeight(1.0);
+	
+		splitPane2.setBottomComponent(splitPane_1);
 		mapPanel.seatsPanel = seatsPanel;
 		seatsPanel.mapPanel= mapPanel;
+		
 		
 		panelStats.featureCollection = featureCollection;
 		frameStats = new JFrame();
@@ -6286,6 +6299,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmExportPieCharts;
 	public JRadioButtonMenuItem rdbtnmntmColorByDescr;
 	public JRadioButtonMenuItem rdbtnmntmColorBySeats;
+	public JSplitPane splitPane_1;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

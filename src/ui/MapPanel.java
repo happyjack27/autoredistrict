@@ -173,8 +173,18 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		int x = arg0.getX();
+		int y = arg0.getY();
+		//System.out.println("mouse pressed "+x+" "+y);
+		VTD f = getFeature(x,y);
+		if( f == null) {
+			//System.out.println("no feature");
+			return;
+		}
+		f.toggleClicked();
+		MainFrame.mainframe.featuresPanel.setFeature(f);
+		invalidate();
+		repaint();
 	}
 
 	@Override
@@ -195,17 +205,6 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 			
 			return;
 		}
-		int x = arg0.getX();
-		int y = arg0.getY();
-		//System.out.println("mouse pressed "+x+" "+y);
-		VTD f = getFeature(x,y);
-		if( f == null) {
-			//System.out.println("no feature");
-			return;
-		}
-		f.toggleClicked();
-		invalidate();
-		repaint();
 		// TODO Auto-generated method stub
 		
 	}

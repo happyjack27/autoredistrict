@@ -266,6 +266,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	}	
 	
 	public void toggleClicked() {
+		/*
 		String s = "";
 		
 		Vector<Pair<String,String>> vps = new Vector<Pair<String,String>>();
@@ -280,11 +281,13 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 			n++;
 			s += ps.a+": "+ps.b+(n % 2 == 0 ? "\n": "    ");
 		}
+		*/
 		
 		try {
 
 		if( state == 0) {
 			state = 2;
+			/*
 			for( VTD b : neighbors) {
 				
 				if( b == null) {
@@ -294,8 +297,10 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 					b.state = 1;
 				}
 			}
+			*/
 		} else if( state == 2) { 
 			state = 0;
+			/*
 			for( VTD b : neighbors) {
 				
 				if( b == null) {
@@ -305,12 +310,13 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 					b.state = 0;
 				}
 			}
+			*/
 		}
 		} catch (Exception ex) {
 			System.out.println(" ex "+ex);
 			ex.printStackTrace();
 		}
-		JOptionPane.showMessageDialog(null, s);
+		//JOptionPane.showMessageDialog(null, s);
 	}
 
 	@Override
