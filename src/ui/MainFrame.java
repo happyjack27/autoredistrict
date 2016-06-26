@@ -3975,7 +3975,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setTitle("Automatic Redistricter");
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
-		this.setSize(new Dimension(1021, 779));
+		this.setSize(new Dimension(1021+100, 779));
 		
 		sliderWastedVotesTotal = new JSlider();
 		lblWastedVotes = new JLabel("Competitive");
@@ -6175,7 +6175,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//Settings.speciation_fraction = 0.5;//1.0;
 		//Settings.disconnected_population_weight = 0.0;
 		featuresPanel.setPreferredSize(new Dimension(100,100));
-		featuresPanel.setSize(new Dimension(200,100));
+		featuresPanel.setSize(new Dimension(100,100));
 			
 		splitPane.setRightComponent(splitPane2);
 		

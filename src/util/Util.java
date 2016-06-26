@@ -402,8 +402,8 @@ New Mexico
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
-			if( i < 16) {
-				continue;
+			if( i < 36) {
+				//continue;
 			}
 			String state = Download.states[i];
 			if( !state.equals("Ohio") && !state.equals("Florida")) {
@@ -1167,29 +1167,37 @@ EXIT
 
 		
 		sb.append("SET DISTRICTS COLUMN CD_SM\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
 		sb.append("EXPORT htmlonly\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT STATS\n");
-		sb.append("EXPORT national\n");
+		//sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 		
 		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
 		sb.append("EXPORT htmlonly\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT STATS\n");
-		sb.append("EXPORT national\n");
+		//sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 
 		
 		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
 		sb.append("EXPORT htmlonly\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT STATS\n");
-		sb.append("EXPORT national\n");
+		//sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 		
 		sb.append("SET DISTRICTS COLUMN CD_2010\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
 		sb.append("EXPORT htmlonly\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT STATS\n");
-		sb.append("EXPORT national\n");
+		//sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
 
 /*
 		sb.append("SET DISTRICTS COLUMN CD_FV\n");
@@ -1201,11 +1209,13 @@ EXIT
 
 		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("SET WEIGHT DESCRIPTIVE 0.40\n");
+
 		sb.append("EXPORT htmlonly\n");
 		sb.append("EXPORT PIE\n");
-		sb.append("EXPORT STATS\n");
-		sb.append("EXPORT national\n");
-		
+		//sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT national\n");
+	
 
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");

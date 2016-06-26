@@ -10,6 +10,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import solutions.Ecology;
+import util.Pair;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -32,10 +33,13 @@ public class PanelFeatures extends JPanel {
 		this.vtd = vtd;
 		Set<Entry<String,Object>> es = vtd.properties.entrySet();
 		String[][] sss = new String[es.size()][];
-		int i = 0;
+		Vector<Pair<String,String>> vp = new Vector<Pair<String,String>>();
 		for( Entry<String,Object> e : es) {
-			sss[i]= new String[]{e.getKey(),e.getValue().toString()};
-			i++;
+			vp.add( new Pair<String,String>(e.getKey(),e.getValue().toString()));
+		}
+		Collections.sort(vp);
+		for( int i = 0; i < vp.size(); i++) {
+			sss[i] = new String[]{vp.get(i).a,vp.get(i).b};
 		}
 		String[] dcolumns = new String[]{"Name","Value"};
 		TableModel tm1 = new DefaultTableModel(sss,dcolumns);

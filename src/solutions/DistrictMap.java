@@ -59,6 +59,38 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	}
     }
     public double get_partisan_gerrymandering() {
+    	double[][] votes = new double[Settings.num_districts][];
+    	double dvotes = 0;
+    	double rvotes = 0;
+    	for( int k = 0; k < Settings.num_districts; k++) {
+    		votes[k] = districts.get(k).getAnOutcome();
+    		dvotes += votes[k][0];
+    		rvotes += votes[k][1];
+    	}
+    	double target = (dvotes+rvotes)/2;
+    	for( int k = 0; k < Settings.num_districts; k++) {
+    		votes[k][0] *= target / dvotes;
+    		votes[k][1] *= target / rvotes;
+    	}
+    	double demsq = 0, repsq = 0, tot = 0;
+    	//margin * excess voters  -or- margin * votes
+    	//divided by total excell voters or divided by votes, or divided by total votes
+    	
+    	for( int k = 0; k < Settings.num_districts; k++) {
+    		double excess = votes[k][0]-votes[k][1];
+    		if( excess < 0) {
+    			repsq += excess*excess;
+    			//repsq += excess*votes[k][1];
+    		} else {
+    			demsq += excess*excess;
+    			//demsq += excess*votes[k][0];
+    		}
+    		tot += Math.abs(tot);
+    	}
+   		return (demsq-repsq)/target;
+    }
+    /*
+    public double get_partisan_gerrymandering() {
 		double[] vote_surpluses = new double[Settings.num_districts];
 		for( int i = 0; i < vote_surpluses.length; i++) {
 			vote_surpluses[i] = getVoteGapPct(i,true);
@@ -87,6 +119,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		return demsq/dem - repsq/rep; //+ = repub gerrymander, - = dem gerrymander, value = difference in avg. vote packing
 	}
+	*/
 
     /*
     public double getDescrVoteImbalance() {

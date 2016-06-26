@@ -1220,16 +1220,25 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		VTD.USE_DISCRETE_COLORS = true;
 		Settings.divide_packing_by_area = false;
 		
+
+		Settings.divide_packing_by_area = true;
+		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_demographics_vtd.png",res,res);
+		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_votes_vtd.png",res,res);
+		Settings.divide_packing_by_area = false;
+		//VTD.outline_districts = false;
+
+		
+		if( false) {
+			return;
+		}
+
 		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
 		VTD.showDistrictLabels = true;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
 		VTD.showDistrictLabels = false;
-
-
-		if( true) {
-			return;
-		}
 
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital.png",res,res);
