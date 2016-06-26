@@ -11,8 +11,9 @@ public abstract class CS_MTV implements iCountingSystem {
 			for( int i = 0; i < dd.length; i++) {
 				tot += dd[i];
 			}
+			tot = ((double)seats)/tot;
 			for( int i = 0; i < dd.length; i++) {
-				dd[i] /= tot;
+				dd[i] *= tot;
 			}
 
 			ballots.add(new AllocationBallot(1,dd));

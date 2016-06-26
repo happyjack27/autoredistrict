@@ -18,10 +18,15 @@ public class counter {
 		new CS_MTV_NVotes(),
 		
 		new CS_STV_Common(),
-		new CS_STV_Correct(),
+		new CS_STV_Correct(),  //since this is NP time, it becomes impractical at somewhere between 15 and 20 candidates.
 	};
 	
 	public static void main(String[] args) {
+		int seats = 3;
+		int num_clones = 3;
+		MultiBallot.num_votes = seats;
+		MultiBallot.num_allocs = (int)(((double)seats)*1.5);
+		MultiBallot.approval_threshold = 1.0;
 		Vector<String[]> v = readDelimited(new File("/Users/jimbrill/Documents/scenario1.txt"), "\t", "\r");
 		for( int i = 0; i < v.size(); i++) {
 			String[] ss = v.get(i);
@@ -30,16 +35,24 @@ public class counter {
 			}
 			System.out.println();
 		}
-		Vector<MultiBallot> all_multi_ballots = new counter().getMultiBallots(v, 1);
+		Vector<MultiBallot> all_multi_ballots = new counter().getMultiBallots(v, num_clones);
 		
 		Vector<MultiBallot> multi_ballots = new Vector<MultiBallot>();
 		multi_ballots.add(all_multi_ballots.get(0));
+		multi_ballots.add(all_multi_ballots.get(1));
+		multi_ballots.add(all_multi_ballots.get(2));
 		
+		System.out.println("---");
 		System.out.print(all_multi_ballots.get(0).toString());
+		System.out.println("---");
+		System.out.print(all_multi_ballots.get(1).toString());
+		System.out.println("---");
+		System.out.print(all_multi_ballots.get(2).toString());
+		System.out.println("---");
 		
 		for(int i = 0; i < systems.length; i++) {
 			System.out.print(systems[i].getName()+": ");
-			int[] winners = systems[i].getWinners( multi_ballots, 1);
+			int[] winners = systems[i].getWinners( multi_ballots, seats);
 			for( int j = 0; j < winners.length; j++) {
 				System.out.print(winners[j]+",");
 			}

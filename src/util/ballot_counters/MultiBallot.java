@@ -5,9 +5,9 @@ import java.util.*;
 import util.Pair;
 
 public class MultiBallot {
-	public static int num_votes = 2;
-	public static int num_allocs = 5;
-	public static double approval_threshold = 0.5;
+	public static int num_votes = 3;
+	public static int num_allocs = 6;
+	public static double approval_threshold = 1.0;
 
 	double[] scores;
 	double[] analog_allocation;
@@ -89,7 +89,7 @@ public class MultiBallot {
 		n_votes = votes;
 		
 		int[] approvals = new int[dd.length];
-		double threshold = (approval_threshold*2.0)/(double)dd.length;
+		double threshold = (approval_threshold)/(double)dd.length;
 		for( int j = 0; j < dd.length; j++) {
 			approvals[j] = dd[j] > threshold ? 1 : 0;
 		}

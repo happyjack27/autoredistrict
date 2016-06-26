@@ -906,7 +906,7 @@ public class STVElection2 {
 		log("     ballots: "+num_votes_cast);
 		log("     quota: "+quota);
 		
-		if( sorted_ignores == null) {
+		if( sorted_ignores == null && !ignore_fewest_votes) {
 			sorted_ignores = getSortedIgnoreCombos(STVBallots, elected, num_candidates);
 		}
 		if( old_way_ignores == null) {
@@ -916,18 +916,20 @@ public class STVElection2 {
 		
 		if( reset_ignores) {
 			si = 0;
-			sorted_ignores = getSortedIgnoreCombos(STVBallots, elected, num_candidates);
+			if( !ignore_fewest_votes) {
+				sorted_ignores = getSortedIgnoreCombos(STVBallots, elected, num_candidates);
+			}
 			old_way_ignores = new Vector<Integer>(); 
 		} else {
 			
 		}
 		boolean first_time = true;
-		for( ; si < sorted_ignores.size(); si++) {
-			int[] a_ignores = sorted_ignores.get(si).b;
+		for( ; si < (ignore_fewest_votes ? num_candidates : sorted_ignores.size()); si++) {
 			
 			Vector<Integer> ignores = new Vector<Integer>();
 			
 			if( !ignore_fewest_votes) {
+				int[] a_ignores = sorted_ignores.get(si).b;
 				for( int ii = 0; ii < a_ignores.length; ii++) {
 					ignores.add(a_ignores[ii]);
 				}
@@ -973,18 +975,22 @@ public class STVElection2 {
 				}
 				s += (char)(ignores.get(i)+'A');
 			}
-			logw("     temporarily ignoring "+s+" (");
-			
-			int[] ii = sorted_ignores.get(si).b;
-			double[] raw_scores = new double[]{
-					countCandidatesForCombination( STVBallots, elected, ii, num_candidates),
-					countBordaValueForCombination( STVBallots, elected, ii, num_candidates),
-					countAffectedBallotsForCombination( STVBallots, elected, ii, num_candidates),
-					countDemotionsForCombination( STVBallots, elected, ii, num_candidates),
-			};
-			logw("demotions: "+raw_scores[3]+" ballots: "+raw_scores[2]+" candidates: "+raw_scores[0]);
-
-			log(")");
+			logw("     temporarily ignoring "+s);
+			if( sorted_ignores != null) {
+				logw(" (");
+				int[] ii = sorted_ignores.get(si).b;
+				double[] raw_scores = new double[]{
+						countCandidatesForCombination( STVBallots, elected, ii, num_candidates),
+						countBordaValueForCombination( STVBallots, elected, ii, num_candidates),
+						countAffectedBallotsForCombination( STVBallots, elected, ii, num_candidates),
+						countDemotionsForCombination( STVBallots, elected, ii, num_candidates),
+				};
+				logw("demotions: "+raw_scores[3]+" ballots: "+raw_scores[2]+" candidates: "+raw_scores[0]);
+	
+				log(")");
+			} else {
+				log("");
+			}
 			
 			
 			double temp_quota = quota;
@@ -1109,6 +1115,8 @@ public class STVElection2 {
 		//return ignored.length;
 	}
 	public static double countBordaValueForCombination(Vector<STVBallot> ballots, int[] elected, int[] ignored, int num_candidates) {
+		return 0;
+		/*
 		//System.out.println("countDemotionsForCombination "+ignored.length);
 		double demotions = 0;
 		for( STVBallot b : ballots) {
@@ -1125,6 +1133,7 @@ public class STVElection2 {
 		}
 		//System.out.println("countDemotionsForCombination demotions: "+demotions);
 		return demotions;
+		*/
 	}
 
 	public static double countAffectedBallotsForCombination(Vector<STVBallot> ballots, int[] elected, int[] ignored, int num_candidates) {
