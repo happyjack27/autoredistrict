@@ -2,9 +2,9 @@ package util.ballot_counters;
 
 import java.util.*;
 
-public class CS_FPTP_Approval implements iCountingSystem {
+public class CS_NTV_Approval implements iCountingSystem {
 	public String getName() {
-		return "FPTP Approval";
+		return "NTV Approval";
 	}
 	public int[] getWinners(Vector<MultiBallot> multi_ballots, int seats) {
 		double[] tots = new double[multi_ballots.get(0).approval.length];

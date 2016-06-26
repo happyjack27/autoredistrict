@@ -2,15 +2,15 @@ package util.ballot_counters;
 
 import java.util.*;
 
-public class CS_FPTP_AnalogAllocation implements iCountingSystem {
+public class CS_NTV_DigitalAllocation implements iCountingSystem {
 	public String getName() {
-		return "FPTP Analog Allocation";
+		return "NTV Digital Allocation";
 	}
 	public int[] getWinners(Vector<MultiBallot> multi_ballots, int seats) {
-		double[] tots = new double[multi_ballots.get(0).analog_allocation.length];
+		double[] tots = new double[multi_ballots.get(0).digital_allocation.length];
 		for( MultiBallot m : multi_ballots) {
 			for(int i = 0; i < tots.length; i++) {
-				tots[i] += m.analog_allocation[i];
+				tots[i] += m.digital_allocation[i];
 			}
 		}
 		

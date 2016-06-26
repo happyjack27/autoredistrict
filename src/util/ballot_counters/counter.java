@@ -7,10 +7,10 @@ import util.Pair;
 
 public class counter {
 	public static iCountingSystem[] systems = new iCountingSystem[]{
-		new CS_FPTP_AnalogAllocation(),
-		new CS_FPTP_DigitalAllocation(),
-		new CS_FPTP_Approval(),
-		new CS_FPTP_NVotes(),
+		new CS_NTV_AnalogAllocation(),
+		new CS_NTV_DigitalAllocation(),
+		new CS_NTV_Approval(),
+		new CS_NTV_NVotes(),
 	};
 	
 	public static void main(String[] args) {
