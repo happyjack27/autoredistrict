@@ -11,6 +11,14 @@ public class counter {
 		new CS_NTV_DigitalAllocation(),
 		new CS_NTV_Approval(),
 		new CS_NTV_NVotes(),
+		new CS_MTV_AnalogAllocation(),
+		
+		new CS_MTV_DigitalAllocation(),
+		new CS_MTV_Approval(),
+		new CS_MTV_NVotes(),
+		
+		new CS_STV_Common(),
+		new CS_STV_Correct(),
 	};
 	
 	public static void main(String[] args) {
