@@ -17,7 +17,7 @@ public abstract class CS_MTV implements iCountingSystem {
 
 			ballots.add(new AllocationBallot(1,dd));
 		}		
-		int[] ii = AllocationElection.getWinners(ballots,seats,dballots.get(0).length);
+		int[] ii = AllocationElection.getWinners(ballots,dballots.get(0).length,seats);
 		
 		Vector<Integer> v = new Vector<Integer>();
 		for( int s = 0; s < seats; s++) {
