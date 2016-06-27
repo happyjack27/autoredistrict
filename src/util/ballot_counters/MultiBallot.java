@@ -8,6 +8,8 @@ public class MultiBallot {
 	public static int num_votes = 3;
 	public static int num_allocs = 6;
 	public static double approval_threshold = 1.0;
+	
+	double weight = 1;
 
 	double[] scores;
 	double[] analog_allocation;
@@ -17,8 +19,9 @@ public class MultiBallot {
 	int[] n_votes;
 	int[] ranked_choice;
 	
-	public MultiBallot(double[] dd) {
+	public MultiBallot(double w, double[] dd) {
 		super();
+		weight = w;
 		scores = dd;
 		createAllBallotTypesFromScores();
 	}

@@ -21,9 +21,11 @@ public class counter {
 		new CS_STV_Correct(),  //since this is NP time, it becomes impractical at somewhere between 15 and 20 candidates.
 	};
 	
+	public static boolean b_first_col_is_weight = false;
+	
 	public static void main(String[] args) {
 		int seats = 3;
-		int num_clones = 3;
+		int num_clones = 2;
 		MultiBallot.num_votes = seats;
 		MultiBallot.num_allocs = (int)(((double)seats)*1.5);
 		MultiBallot.approval_threshold = 1.0;
@@ -80,19 +82,25 @@ public class counter {
 		return vdd;
 	}
 
+
+
 	
 	public Vector<MultiBallot> getMultiBallots(Vector<String[]> vs,int clones_per_party) {
 		Vector<MultiBallot> mbs = new Vector<MultiBallot>();
 		for( int i = 0; i < vs.size(); i++) {
 			String[] ss = vs.get(i);
-			double[] dd = new double[ss.length*clones_per_party];
-			for( int j = 0; j < ss.length; j++) {
+			double w = 1;
+			if( b_first_col_is_weight) {
+				w = Double.parseDouble(ss[0].trim());
+			}
+			double[] dd = new double[(ss.length-(b_first_col_is_weight ? 1 : 0))*clones_per_party];
+			for( int j = (b_first_col_is_weight ? 1 : 0); j < ss.length; j++) {
 				double d = Double.parseDouble(ss[j].trim());
 				for( int k = 0; k < clones_per_party; k++) {
-					dd[j*clones_per_party+k] = d/(double)clones_per_party;
+					dd[(j-(b_first_col_is_weight ? 1 : 0))*clones_per_party+k] = d/(double)clones_per_party;
 				}
 			}
-			mbs.add(new MultiBallot(dd));
+			mbs.add(new MultiBallot(w,dd));
 		}
 		return mbs;
 	}

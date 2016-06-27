@@ -10,7 +10,7 @@ public class CS_NTV_Approval implements iCountingSystem {
 		double[] tots = new double[multi_ballots.get(0).approval.length];
 		for( MultiBallot m : multi_ballots) {
 			for(int i = 0; i < tots.length; i++) {
-				tots[i] += m.approval[i];
+				tots[i] += m.approval[i]*m.weight;
 			}
 		}
 		

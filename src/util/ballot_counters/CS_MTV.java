@@ -3,10 +3,11 @@ package util.ballot_counters;
 import java.util.*;
 
 public abstract class CS_MTV implements iCountingSystem {
-	public int[] getWinnersGeneric(Vector<double[]> dballots, int seats) {
+	public int[] getWinnersGeneric(Vector<Double> weights, Vector<double[]> dballots, int seats) {
 		
 		Vector<AllocationBallot> ballots = new Vector<AllocationBallot>();
-		for( double[] dd : dballots) {
+		for( int j = 0; j < dballots.size(); j++) {
+			double[] dd = dballots.get(j);
 			double tot = 0;
 			for( int i = 0; i < dd.length; i++) {
 				tot += dd[i];
@@ -16,7 +17,7 @@ public abstract class CS_MTV implements iCountingSystem {
 				dd[i] *= tot;
 			}
 
-			ballots.add(new AllocationBallot(1,dd));
+			ballots.add(new AllocationBallot(weights.get(j),dd));
 		}		
 		int[] ii = AllocationElection.getWinners(ballots,dballots.get(0).length,seats);
 		

@@ -10,7 +10,7 @@ public class CS_NTV_DigitalAllocation implements iCountingSystem {
 		double[] tots = new double[multi_ballots.get(0).digital_allocation.length];
 		for( MultiBallot m : multi_ballots) {
 			for(int i = 0; i < tots.length; i++) {
-				tots[i] += m.digital_allocation[i];
+				tots[i] += m.digital_allocation[i]*m.weight;
 			}
 		}
 		

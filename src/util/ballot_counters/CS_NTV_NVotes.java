@@ -10,7 +10,7 @@ public class CS_NTV_NVotes implements iCountingSystem {
 		double[] tots = new double[multi_ballots.get(0).n_votes.length];
 		for( MultiBallot m : multi_ballots) {
 			for(int i = 0; i < tots.length; i++) {
-				tots[i] += m.n_votes[i];
+				tots[i] += m.n_votes[i]*m.weight;
 			}
 		}
 		
