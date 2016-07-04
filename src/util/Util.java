@@ -487,11 +487,13 @@ New Mexico
 				//continue;
 			}
  			sb.append("LOAD "+i+ " 2010 2012\n");
- 			appendExportEmbedded(sb,i);
+ 			appendExportHare(sb,i);
+ 			
+ 			//appendExportEmbedded(sb,i);
  			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
  			//sb.append("SAVE\n");
 			//sb.append("LOAD "+i+ " 2010 2012\n");
-			newscript(sb,i);
+			//newscript(sb,i);
 			//import2010(sb,i);
 			/*
 			sb.append("COPY FEATURE PRES12_DEM PRES12_D50\n");
@@ -1125,6 +1127,43 @@ EXIT
 
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
+	}
+	public static void appendExportHare(StringBuffer sb, int i) {
+		String state = Download.states[i];
+		
+		sb.append("COPY FEATURE CD_FV2 CD_FVH\n");
+		sb.append("SAVE\n");
+		sb.append("LOAD [FIPS] 2010 2012\n");
+		
+		
+		sb.append("SET DISTRICTS COLUMN CD_2010\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+
+		sb.append("EXPORT htmlonly\n");
+		//sb.append("EXPORT PIE\n");
+		
+
+		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("SET WEIGHT DESCRIPTIVE 0.40\n");
+
+		sb.append("EXPORT htmlonly\n");
+		//sb.append("EXPORT PIE\n");
+		
+		sb.append("SET QUOTA HARE\n");
+		sb.append("SET DISTRICTS COLUMN CD_FVH\n");
+		sb.append("SET QUOTA HARE\n");
+		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
+		sb.append("SET QUOTA HARE\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.40\n");
+		sb.append("SET QUOTA HARE\n");
+
+		sb.append("EXPORT htmlonly\n");
+		sb.append("EXPORT PIE\n");
+
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
+
 	}
 	public static void appendExportEmbedded(StringBuffer sb, int i) {
 		String state = Download.states[i];

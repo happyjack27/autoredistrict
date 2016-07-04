@@ -614,7 +614,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
 					new String[]{""+decimal.format(dm.get_partisan_gerrymandering()),"Packing/cracking asymmetry (%)"},
 					new String[]{""+integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},
-					new String[]{""+decimal.format(dm.fairnessScores[8]),"Representation imbalance (global)"},
+					new String[]{""+decimal.format(dm.calcDisproporionality()),"Disproporionality"},
+					//new String[]{""+decimal.format(dm.fairnessScores[8]),"Representation imbalance (global)"},
 					new String[]{""+decimal.format(dm.getRacialVoteDilution()),"Racial vote dilution"},
 					new String[]{"",""},
 					//new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
@@ -1453,6 +1454,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		String raceStr = getAsHtml(ethnicityTable);
 		String sumStr = getAsHtml(summaryTable);
 		String districtsStr = getAsHtml(districtsTable);
+		String seatsStr = getAsHtml(MainFrame.mainframe.frameSeatsVotesChart.table);
 		
 		URL header_path = Applet.class.getResource("/resources/header.php");
 		URL footer_path = Applet.class.getResource("/resources/footer.php");
@@ -1599,6 +1601,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		try {
 			FileOutputStream fos = new FileOutputStream(write_folder+"stats_race.html");
 			fos.write(raceStr.getBytes());
+			fos.close();
+		} catch (Exception ex) { ex.printStackTrace(); }
+		try {
+			FileOutputStream fos = new FileOutputStream(write_folder+"stats_seats.html");
+			fos.write(seatsStr.getBytes());
 			fos.close();
 		} catch (Exception ex) { ex.printStackTrace(); }
 

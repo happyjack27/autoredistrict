@@ -576,6 +576,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			addHistory("EXIT");
 			System.exit(0);
 		} else
+		if( command.equals("SET") && instruction_words.length >= 3 && instruction_words[1].equals("PREFER4S")) {
+			Settings.prefer4s = instruction_words[2].equals("TRUE");
+		} else
 		if( command.equals("SET") && instruction_words.length >= 3 && instruction_words[1].equals("QUOTA")) {
 			boolean hare = instruction_words[2].equals("HARE");
 			mainFrame.comboBoxQuota.setSelectedItem(hare ? "HARE" : "DROOP");

@@ -250,6 +250,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static int quota_method = QUOTA_METHOD_DROOP;
 	public static double descr_rep_weight;
 	public static boolean divide_packing_by_area = true;
+	public static boolean prefer4s = false;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;
@@ -322,6 +323,13 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 					s3 = 0;
 					break;
 				}				
+			}
+			if( prefer4s ) {
+				if( s5 > 0 && s3 > 0) {
+					s5--;
+					s3--;
+					s4+=2;
+				}
 			}
 			int tot = s5+s4+s3;
 			int totseat = s5*5+s4*4+s3*3;

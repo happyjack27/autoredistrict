@@ -1563,7 +1563,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 		seats_votes = swap;
     }
-    
+    public double calcDisproporionality() {
+    	calcSeatsVotesCurve();
+    	double total = 0;    
+    	double weight = 1.0/(double)seats_votes.size();
+	    for( int i = 0; i < seats_votes.size(); i++) {
+	    	double[] dd = seats_votes.get(i);
+	    	total += Math.abs(dd[0]-dd[1]);
+	    }
+	    return total*weight;
+	}
     public double calcSeatsVoteAsymmetry() {
     	calcSeatsVotesCurve();
     	double total = 0;

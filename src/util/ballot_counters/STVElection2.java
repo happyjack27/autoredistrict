@@ -77,19 +77,42 @@ public class STVElection2 {
 				countBordaValueForCombination( ballots, elected, ignored, num_candidates),
 				countAffectedBallotsForCombination( ballots, elected, ignored, num_candidates),
 				countDemotionsForCombination( ballots, elected, ignored, num_candidates),
+				//countDemotionsForCombination( ballots, elected, ignored, num_candidates)+countAffectedBallotsForCombination( ballots, elected, ignored, num_candidates),
 		};
+		double num_ballots = 0;
+		for( int i = 0; i < ballots.size(); i++) {
+			num_ballots += ballots.get(i).weight;
+		}
+		double[] multipliers = new double[]{
+				num_candidates,
+				num_candidates*num_ballots,
+				num_ballots,
+				num_candidates*num_ballots,
+				//num_ballots+num_candidates*num_ballots,
+		};
+		/*
 		double[] multipliers = new double[]{
 				num_candidates,
 				num_candidates*ballots.size(),
 				ballots.size(),
 				num_candidates*ballots.size(),
 		};
-		
+		*/
+		//204.0
+		/*
+		for( int i = 0; i < ignored.length; i++) {
+			System.out.print(ignored[i]+" ");
+		}
+		System.out.println(":" +raw_scores[0]+" "+raw_scores[1]+" "+raw_scores[2]+" "+raw_scores[3]+" ");
+		*/
 		double score = 0;
 		for( int i = 0; i < sort_orders.length; i++) {
 			int s = sort_orders[i];
 			score = score*multipliers[s]+raw_scores[s];
+			//score = (score+raw_scores[s])*multipliers[s];
 		}
+		
+		//return raw_scores[3]*multipliers[3];
 		return score;
 	}
 
@@ -1081,6 +1104,16 @@ public class STVElection2 {
 		}
 		
 		Collections.sort(sorted);
+		/*
+		for( int i = 0; i < sorted.size(); i++) {
+			Pair<Double,int[]> p = sorted.get(i);
+			System.out.print(p.a+": ");
+			for( int j = 0; j < p.b.length; j++) {
+				System.out.print(p.b[j]+" ");
+			}
+			System.out.println();			
+		}
+		*/
 		return sorted;
 	}
 	
