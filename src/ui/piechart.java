@@ -1,13 +1,19 @@
 package ui;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.awt.*;
+
 import javax.swing.*;
+
 import java.io.*;
 import java.awt.image.*;
+
 import javax.imageio.*;
 
 public class piechart extends JPanel {
+	
+	//public static boolean drawLabels = true;
 
 	BufferedImage pie_eth_pop = null;
 	BufferedImage pie_eth_target = null;
@@ -63,15 +69,16 @@ public class piechart extends JPanel {
 		*/		
 	}
 	
-	public static BufferedImage drawPieChart(int size, double[] vals, Color[] cols) {
+	public static BufferedImage drawPieChart(int size, double[] vals, Color[] cols, boolean drawLabels) {
 		BufferedImage image1 = new BufferedImage(size,size, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics1 = image1.createGraphics(); 
 		
         graphics1.setComposite(AlphaComposite.Clear);
         graphics1.fillRect(0, 0, size, size);
         graphics1.setComposite(AlphaComposite.Src);
+        
 		
-		drawPieChart(graphics1,size,vals,cols);
+		drawPieChart(graphics1,size,vals,cols, drawLabels);
 		
 		return image1;
 		/*
@@ -82,10 +89,10 @@ public class piechart extends JPanel {
             ex.printStackTrace();
         }*/
 	}
-	public static void drawPieChart(Graphics g,int size, double[] vals, Color[] cols) {
-		drawPieChart(g,size/2,size/2,size,vals,cols);
+	public static void drawPieChart(Graphics g,int size, double[] vals, Color[] cols, boolean drawLabels) {
+		drawPieChart(g,size/2,size/2,size,vals,cols, drawLabels);
 	}
-	public static void drawPieChart(Graphics g,int x, int y,int size, double[] vals, Color[] cols) {
+	public static void drawPieChart(Graphics g,int x, int y,int size, double[] vals, Color[] cols, boolean drawLabels) {
 		 int width = size-2;
 		 int height = size-2;
 		 int xs = x-size/2+1;
@@ -118,6 +125,36 @@ public class piechart extends JPanel {
 		 g.setColor(Color.black);
 		 g.drawOval(xs,ys,width,height);
 		 
+		 if( drawLabels) {
+			 cumarc = 0;
+			 DecimalFormat df = new DecimalFormat("#0"); 
+			 g.setColor(Color.BLACK);
+			 Font f = new Font("Arial",0,24);
+			 g.setFont(f);
+			 if( vals.length < 20) {
+				 for( int i = 0; i < vals.length; i++) {
+					 double arc = vals[i]*2.0*Math.PI/tot;
+	
+	                  String pct = df.format(100.0*vals[i]/tot)+"%";
+
+	                  double center_angle = cumarc + arc/2.0;
+	                  double tx = ((double)width) * Math.cos(center_angle) / 3.0; 
+	                  double ty = -((double)height) * Math.sin(center_angle) / 3.0;
+
+	                  ty += g.getFontMetrics().getHeight()/3;
+	                  tx -= g.getFontMetrics().stringWidth(pct)/2;
+	                  tx = Math.round(tx+xs+width/2);
+	                  ty = Math.round(ty+ys+height/2);
+
+	                  if( vals[i]/tot > 0.03) {
+	                      g.drawString(pct, (int)tx, (int)ty);
+	                  }
+	                  //g.drawArc(0,0,width,height,(int)cumarc,(int)(arc));
+	                  cumarc += arc;
+	              }
+	          }
+		 }
+		 
 		 
 		 //g.setColor(Color.black);
 		
@@ -127,6 +164,7 @@ public class piechart extends JPanel {
 
 		 g.setColor(Color.white);
 		 g.fillRect(0,0,1000,1000);
+		 /*
 		 drawPieChart(g,100,100,100,new double[]{2,1}, new Color[]{Color.blue,Color.red});
 		 drawPieChart(g,300,100,100,new double[]{6,2,1,0,0,0},new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta});
 		 drawPieChart(g,100,300,100,new double[]{3,3,3,0,0,0},new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta});
@@ -137,6 +175,7 @@ public class piechart extends JPanel {
 				 new Color(0xb0,0,0x40),
 				 new Color(0xff,0,0x00),
 		 });
+		 */
 	  }
 	 
 	 

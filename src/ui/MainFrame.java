@@ -51,6 +51,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JProgressBar progressBar = new JProgressBar();
 	public FrameSeatsVotesChart frameSeatsVotesChart = new FrameSeatsVotesChart();
 	public InstructionProcessor ip = new InstructionProcessor();
+	public FramePieCharts pie = new FramePieCharts();
 	
 	public ButtonGroup seatsModeBG = new ButtonGroup();
 	 
@@ -5367,6 +5368,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnWindows.add(mntmShowScripts);
 		
+		mntmShowPieCharts = new JMenuItem("Show pie charts");
+		mntmShowPieCharts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pie.show();
+			}
+		});
+		mnWindows.add(mntmShowPieCharts);
+		
 		
 		mntmShowData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -6300,6 +6309,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButtonMenuItem rdbtnmntmColorByDescr;
 	public JRadioButtonMenuItem rdbtnmntmColorBySeats;
 	public JSplitPane splitPane_1;
+	public JMenuItem mntmShowPieCharts;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

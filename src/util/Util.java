@@ -10,6 +10,75 @@ import java.util.Map.Entry;
 
 import ui.Download;
 
+/*
+=======
+
+MORE THAN 5 SEATS
+
+LOAD 2010 <ENTER FIPS CODE HERE>
+COPY FEATURE CD_FV2 CD_CB
+SAVE
+LOAD 2010 [FIPS]
+
+SET PREFER4S TRUE
+SET ELECTION COLUMNS PRES12_D50 PRES12_R50
+SET DISTRICTS COLUMN CD_CB
+SET DISTRICTS FAIRVOTE_SEATS [SEATS]
+
+SET WEIGHT PARTISAN 0.0
+SET WEIGHT RACIAL 0.0
+
+SET WEIGHT GEOMETRY_FAIRNESS 0.25
+
+SET EVOLUTION ANNEAL_RATE 0.80
+SET EVOLUTION MUTATE_RATE 1.0
+SET EVOLUTION ELITE_FRAC 0.50
+SET EVOLUTION POPULATION 200
+
+GO
+WHEN MUTATE_RATE 0.5
+
+SET WEIGHT CONTIGUITY 1.0
+SET WEIGHT POPULATION 1.0
+
+SET WEIGHT GEOMETRY_FAIRNESS 0.20
+
+SET EVOLUTION ELITE_MUTATE_FRAC 0.5
+SET EVOLUTION MUTATE_RATE 1.00
+
+WHEN MUTATE_RATE 0.3
+
+STOP
+SAVE
+EXPORT PIE
+EXPORT HTMLONLY
+EXPORT NATIONAL
+EXIT
+EXIT
+
+==========
+
+5 OR LESS SEATS
+
+LOAD 2010 <ENTER FIPS CODE HERE>
+COPY FEATURE CD_FV2 CD_CB
+SAVE
+LOAD 2010 [FIPS]
+
+SET PREFER4S TRUE
+SET ELECTION COLUMNS PRES12_D50 PRES12_R50
+SET DISTRICTS COLUMN CD_CB
+SET DISTRICTS FAIRVOTE_SEATS [SEATS]
+
+EXPORT PIE
+EXPORT HTMLONLY
+EXPORT NATIONAL
+EXIT
+EXIT
+
+
+ */
+
 /*ftp://ftp2.census.gov/geo/tiger/TIGERrd13/SLDL/
  * 
 EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/SLDL/tl_rd13_[FIPS]_sldl.zip" SLDL
@@ -402,9 +471,9 @@ New Mexico
 			if( Download.apportionments[i] > 5) {
 				//continue;
 			}
-			if( i < 36) {
+			if( i < 42) {
 				//continue;
-			}
+			} 
 			String state = Download.states[i];
 			if( !state.equals("Ohio") && !state.equals("Florida")) {
 				//continue;
@@ -1130,7 +1199,7 @@ EXIT
 	}
 	public static void appendExportHare(StringBuffer sb, int i) {
 		String state = Download.states[i];
-		
+		/*
 		sb.append("COPY FEATURE CD_FV2 CD_FVH\n");
 		sb.append("SAVE\n");
 		sb.append("LOAD [FIPS] 2010 2012\n");
@@ -1149,6 +1218,7 @@ EXIT
 
 		sb.append("EXPORT htmlonly\n");
 		//sb.append("EXPORT PIE\n");
+		*/
 		
 		sb.append("SET QUOTA HARE\n");
 		sb.append("SET DISTRICTS COLUMN CD_FVH\n");
@@ -1158,8 +1228,10 @@ EXIT
 		sb.append("SET WEIGHT DESCRIPTIVE 0.40\n");
 		sb.append("SET QUOTA HARE\n");
 
-		sb.append("EXPORT htmlonly\n");
-		sb.append("EXPORT PIE\n");
+		//sb.append("EXPORT htmlonly\n");
+		//sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		//sb.append("EXPORT NATIONAL\n");
 
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");

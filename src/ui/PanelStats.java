@@ -704,7 +704,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				 tossup,
 				 lean,
 				 safe,
-		});
+		}, true);
 		pie_party_comp_digital = piechart.drawPieChart(200,new double[]{
 				tot_seats[0]+tot_seats[4],
 				tot_seats[1]+tot_seats[3],
@@ -713,9 +713,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				 new Color(0xb0,0xb0,0xb0),
 				 new Color(0xff,0x80,0xff),
 				 new Color(0x80,0x00,0x80),
-		});
-		pie_party_votes = piechart.drawPieChart(200,vote_counts,FeatureCollection.standard_district_colors); 
-		pie_party_seats = piechart.drawPieChart(200,elec_counts,FeatureCollection.standard_district_colors); 
+		}, true);
+		pie_party_votes = piechart.drawPieChart(200,vote_counts,FeatureCollection.standard_district_colors, true); 
+		pie_party_seats = piechart.drawPieChart(200,elec_counts,FeatureCollection.standard_district_colors, true); 
 		pie_party_seats_frac = piechart.drawPieChart(200,new double[]{
 				tot_seats[0],
 				tot_seats[1],
@@ -728,10 +728,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				 new Color(0x80,0,0x80),
 				 new Color(0xb0,0,0x40),
 				 new Color(0xff,0,0x00),
-		});
-		pie_eth_pop    = piechart.drawPieChart(200,pop_by_dem,FeatureCollection.demo_district_colors); 
-		pie_eth_target = piechart.drawPieChart(200,targets,FeatureCollection.demo_district_colors); 
-		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.demo_district_colors);
+		}, true);
+		pie_eth_pop    = piechart.drawPieChart(200,pop_by_dem,FeatureCollection.demo_district_colors, true); 
+		pie_eth_target = piechart.drawPieChart(200,targets,FeatureCollection.demo_district_colors, true); 
+		pie_eth_descr  = piechart.drawPieChart(200,winners_by_ethnicity,FeatureCollection.demo_district_colors, true);
 		
 		double[] dr = new double[votes_by_dem.length];
 		double tot = 0;
@@ -753,7 +753,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				dr[i] = 0;
 			}
 		}
-		pie_eth_power  = piechart.drawPieChart(200,dr,FeatureCollection.demo_district_colors); 
+		pie_eth_power  = piechart.drawPieChart(200,dr,FeatureCollection.demo_district_colors, true); 
 
 		boolean t = Settings.divide_packing_by_area;
 		Settings.divide_packing_by_area = false;
@@ -779,8 +779,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			cc_r[i] = dm.getVoteGapByDemoColor(dist,false);
 		}
 		//getVoteGapForDistrict
-		pie_party_packing = piechart.drawPieChart(200,dd,cc);
-		pie_eth_packing = piechart.drawPieChart(200,dd_r,cc_r);
+		pie_party_packing = piechart.drawPieChart(200,dd,cc,false);
+		pie_eth_packing = piechart.drawPieChart(200,dd_r,cc_r,false);
 
 
 		triplet  = new Vector<Triplet<Double,Color,Integer>>();
@@ -801,8 +801,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dd_r[i] = dd[i];
 			cc_r[i] = dm.getVoteGapByDemoColor(dist,true);
 		}	
-		pie_party_packingm = piechart.drawPieChart(200,dd,cc);
-		pie_eth_packingm = piechart.drawPieChart(200,dd_r,cc_r);
+		pie_party_packingm = piechart.drawPieChart(200,dd,cc,false);
+		pie_eth_packingm = piechart.drawPieChart(200,dd_r,cc_r,false);
 		
 		use_vote_gap_for_arc = true;
 
@@ -825,8 +825,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			cc_r[i] = dm.getVoteGapByDemoColor(dist,false);
 		}
 		//getVoteGapForDistrict
-		pie_party_packing_byvoter = piechart.drawPieChart(200,dd,cc);
-		pie_eth_packing_byvoter = piechart.drawPieChart(200,dd_r,cc_r);
+		pie_party_packing_byvoter = piechart.drawPieChart(200,dd,cc,false);
+		pie_eth_packing_byvoter = piechart.drawPieChart(200,dd_r,cc_r,false);
 
 
 		triplet  = new Vector<Triplet<Double,Color,Integer>>();
@@ -847,8 +847,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			dd_r[i] = dd[i];
 			cc_r[i] = dm.getVoteGapByDemoColor(dist,true);
 		}	
-		pie_party_packingm_byvoter = piechart.drawPieChart(200,dd,cc);
-		pie_eth_packingm_byvoter = piechart.drawPieChart(200,dd_r,cc_r);
+		pie_party_packingm_byvoter = piechart.drawPieChart(200,dd,cc,false);
+		pie_eth_packingm_byvoter = piechart.drawPieChart(200,dd_r,cc_r,false);
 		
 		
 		Settings.divide_packing_by_area = t;
