@@ -699,21 +699,21 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			}
 			*/
 		}
-
 		pie_party_comp_digital2 = piechart.drawPieChart(200,dd0,new Color[]{
 				 tossup,
 				 lean,
 				 safe,
 		}, true);
 		pie_party_comp_digital = piechart.drawPieChart(200,new double[]{
-				tot_seats[0]+tot_seats[4],
-				tot_seats[1]+tot_seats[3],
 				tot_seats[2],
+				tot_seats[1]+tot_seats[3],
+				tot_seats[0]+tot_seats[4],
 		},new Color[]{
-				 new Color(0xb0,0xb0,0xb0),
-				 new Color(0xff,0x80,0xff),
-				 new Color(0x80,0x00,0x80),
+				 tossup,
+				 lean,
+				 safe,
 		}, true);
+
 		pie_party_votes = piechart.drawPieChart(200,vote_counts,FeatureCollection.standard_district_colors, true); 
 		pie_party_seats = piechart.drawPieChart(200,elec_counts,FeatureCollection.standard_district_colors, true); 
 		pie_party_seats_frac = piechart.drawPieChart(200,new double[]{
@@ -1194,6 +1194,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	@Override
 	public void eventOccured() {
 		getStats();
+		MainFrame.mainframe.pie.invalidate();
+		MainFrame.mainframe.pie.repaint();
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
 	public void exportMaps(String write_folder, int res,boolean outline) {
@@ -1222,18 +1224,21 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		Settings.divide_packing_by_area = false;
 		
 
+		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
+		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital.png",res,res);
+
+		if( false) {
+			return;
+		}
+
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_demographics_vtd.png",res,res);
 		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_votes_vtd.png",res,res);
 		Settings.divide_packing_by_area = false;
-		//VTD.outline_districts = false;
-
 		
-		if( false) {
-			return;
-		}
+		//VTD.outline_districts = false;
 
 		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
 		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);

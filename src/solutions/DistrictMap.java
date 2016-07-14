@@ -2498,25 +2498,24 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 		return new double[]{safe_d,lean_d,tossup,lean_r,safe_r};
 	}
-		public int getFVColorIndex(int district) {
-			//0 = purple, 1 = light purple, 2 = gray
-			double[][] result = new double[2][];
-			result[0] = districts.get(district).getAnOutcome();
-			result[1] = District.popular_vote_to_elected(result[0], district, 0);
+	public int getFVColorIndex(int district) {
+		//0 = purple, 1 = light purple, 2 = gray
+		double[][] result = new double[2][];
+		result[0] = districts.get(district).getAnOutcome();
+		result[1] = District.popular_vote_to_elected(result[0], district, 0);
 
-			double[] seats = new double[]{};
-			if( Settings.seats_in_district(district) == 1) {
-				double pct_d = result[0][0]/(result[0][0]+result[0][1]);
-				double pct_r = 1-pct_d;
-				double edge = Math.abs(pct_d-pct_r);
-				return edge > 0.08 ? 2 : edge > 0.04 ? 1 : 0;			
-			} else {
-				if( result[0].length > 0) {
-					seats = getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(district));
-				}
-				
+		double[] seats = new double[]{};
+		if( Settings.seats_in_district(district) == 1) {
+			double pct_d = result[0][0]/(result[0][0]+result[0][1]);
+			double pct_r = 1-pct_d;
+			double edge = Math.abs(pct_d-pct_r)/2;
+			return edge > 0.08 ? 2 : edge > 0.04 ? 1 : 0;			
+		} else {
+			if( result[0].length > 0) {
+				seats = getSeats_new(result[0][0]/(result[0][0]+result[0][1]),  Settings.seats_in_district(district));
 			}
-			return seats[2] > 0 ? 0 : seats[1] > 0 || seats[3] > 0 ? 1 : 2;
+			
 		}
-
+		return seats[2] > 0 ? 0 : seats[1] > 0 || seats[3] > 0 ? 1 : 2;
+	}
 }

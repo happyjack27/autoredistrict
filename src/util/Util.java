@@ -1204,21 +1204,49 @@ EXIT
 		sb.append("SAVE\n");
 		sb.append("LOAD [FIPS] 2010 2012\n");
 		
+		afsd
+		*/
+		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
+
+		
+		sb.append("SET DISTRICTS COLUMN CD_SM\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT NATIONAL\n");
+		/*
+		sb.append("SET DISTRICTS COLUMN CD_BD\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT NATIONAL\n");
 		
 		sb.append("SET DISTRICTS COLUMN CD_2010\n");
 		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT NATIONAL\n");
 
-		sb.append("EXPORT htmlonly\n");
+		sb.append("SET DISTRICTS COLUMN CD_2000\n");
+		sb.append("SET WEIGHT DESCRIPTIVE 0.50\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT NATIONAL\n");
+
+		//sb.append("EXPORT htmlonly\n");
 		//sb.append("EXPORT PIE\n");
 		
 
 		sb.append("SET DISTRICTS COLUMN CD_FV2\n");
 		sb.append("SET DISTRICTS FAIRVOTE_SEATS [SEATS]\n");//"+Download.apportionments[i]+"\n"); 
 		sb.append("SET WEIGHT DESCRIPTIVE 0.40\n");
+		sb.append("EXPORT PIE\n");
+		sb.append("EXPORT STATS\n");
+		sb.append("EXPORT NATIONAL\n");
 
-		sb.append("EXPORT htmlonly\n");
+		//sb.append("EXPORT htmlonly\n");
 		//sb.append("EXPORT PIE\n");
-		*/
+		
 		
 		sb.append("SET QUOTA HARE\n");
 		sb.append("SET DISTRICTS COLUMN CD_FVH\n");
@@ -1229,9 +1257,10 @@ EXIT
 		sb.append("SET QUOTA HARE\n");
 
 		//sb.append("EXPORT htmlonly\n");
-		//sb.append("EXPORT PIE\n");
+		sb.append("EXPORT PIE\n");
 		sb.append("EXPORT STATS\n");
-		//sb.append("EXPORT NATIONAL\n");
+		sb.append("EXPORT NATIONAL\n");
+		*/
 
 		sb.append("EXIT\n");
 		sb.append("EXIT\n");
