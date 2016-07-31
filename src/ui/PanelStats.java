@@ -883,11 +883,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			return;
 		}
 		String[] demonames = Applet.mainFrame.project.demographic_columns_as_array();
-		String[] ecolumns = new String[2+demonames.length];
+		Vector<String> c_names = Applet.mainFrame.project.election_columns;
+		String[] ecolumns = new String[2+demonames.length+c_names.size()];
 		ecolumns[0] = "COUNTY";
 		ecolumns[1] = "POPULATION";
 		for( int i = 0; i < demonames.length; i++) {
 			ecolumns[i+2] = demonames[i];
+		}
+		for( int i = 0; i < c_names.size(); i++) {
+			ecolumns[i+2+demonames.length] = c_names.get(i);
 		}
 		Vector<String> countynames = new Vector<String>();
 		Hashtable<String,Vector<VTD>> hash = new Hashtable<String,Vector<VTD>>();
@@ -906,12 +910,16 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		String[][] edata = new String[countynames.size()][];
 		for( int i = 0; i < countynames.size(); i++) {
 			String scounty = countynames.get(i);
-			double[] dd = new double[demonames.length];
 			double pop = 0;
+			double[] dd = new double[demonames.length];
 			for( int j = 0; j < dd.length; j++) {
 				dd[j] = 0;
 			}
-			edata[i] = new String[2+dd.length];
+			double[] cc = new double[c_names.size()];
+			for( int j = 0; j < cc.length; j++) {
+				cc[j] = 0;
+			}
+			edata[i] = new String[2+dd.length+c_names.size()];
 			edata[i][0] = scounty;
 			Vector<VTD> vf = hash.get(scounty);
 			for( int k = 0; k < vf.size(); k++) {
@@ -921,10 +929,17 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					double d = Double.parseDouble(p.get(demonames[j]).toString().replaceAll(",",""));
 					dd[j] += d;
 				}
+				for( int j = 0; j < c_names.size(); j++) {
+					double d = Double.parseDouble(p.get(c_names.get(j)).toString().replaceAll(",",""));
+					cc[j] += d;
+				}
 			}
 			edata[i][1] = ""+pop;
 			for( int j = 0; j < demonames.length; j++) {
 				edata[i][j+2] = ""+dd[j];
+			}
+			for( int j = 0; j < c_names.size(); j++) {
+				edata[i][j+2+demonames.length] = ""+cc[j];
 			}
 		}
 

@@ -3502,9 +3502,119 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			f.resetOutcomes();
 		}
 	}
+
+	public void importPopulation() {
+		ip.addHistory("IMPORT POPULATION");
 	
+		if( Download.census_merge_working) {
+			if( Download.census_merge_old) {
+				Download.nextThread = new ImportCensus2Thread(); 
+			} else {
+				Download.nextThread = new ImportGazzeterThread(); 
+				
+			}
+		}
+		Download.download_vtd = false;
+		Download.download_census = true;
+		new Download().start();
+		
+		//DialogDownload dd = new DialogDownload();
+		//dd.setTitle("Download and aggregate census data from census.gov");
+		//dd.show();
+	}
+	public void appendStuff() {
+		String fn = Download.getBasePath()+File.separator+"missing_data.txt";
+		String s = getFile(new File(fn)).toString();
+		DataAndHeader dh =  readDelimited(s,"\t", true);
+		if( dh.data.length == 0) {
+			dh.header = new String[]{"STATE","GEOID10","DISTRICT","VTDNAME","VTD CODE","LAND","WATER","POPULATION","COUNTY","PRES12_DEM","PRES12_REP"};
+		}
+		Vector<String[]> v = arrayToVector(dh.data);
+		System.out.println("starting with "+v.size()+" elements.");
+		
+		String[] source_cols = new String[]{"","GEOID10","CD_2010","VTDNAME","VTDST10","ALAND10","AWATER10","POPULATION","COUNTY_NAM","PRES12_DEM","PRES12_REP"};
+		for( VTD f : this.featureCollection.features) {
+			String pdem = f.properties.getString("PRES12_DEM").trim();
+			String prep = f.properties.getString("PRES12_REP").trim();
+			pdem = pdem == null ? "0" : pdem.equals("") ? "0" : pdem.equals("null") ? "0" : pdem;
+			prep = prep == null ? "0" : prep.equals("") ? "0" : prep.equals("null") ? "0" : prep;
+			double pd = 0, pr = 0;
+			try {
+				pd = Double.parseDouble(pdem.replaceAll(",", ""));
+				pr = Double.parseDouble(prep.replaceAll(",", ""));
+			} catch(Exception ex) { }
+			
+			if( pd <= 0 && pr <= 0 ) {
+				System.out.println("found a bad precinct");
+				String[] data = new String[source_cols.length];
+				data[0] = Download.states[Download.istate];
+				for( int i = 1; i < source_cols.length; i++) {
+					data[i] = f.properties.getString(source_cols[i]);
+				}
+				v.add(data);
+			}
+		}
+		
+		dh.data = vectorToArray(v);
+		writeDelimited(fn,dh,"\t",true);
+	}
+	public Vector<String[]> arrayToVector(String[][] sss) {
+		Vector<String[]> v = new Vector<String[]>();
+		for( String[] ss : sss) {
+			v.add(ss);
+		}
+		return v;
+	}
+	public String[][] vectorToArray(Vector<String[]> v) {
+		String[][] sss = new String[v.size()][];
+		for( int i = 0; i < sss.length; i++) {
+			sss[i] = v.get(i);
+		}
+		return sss;
+	}
+	public void writeDelimited(String filename, DataAndHeader dh, String delimiter, boolean has_headers) {
+		String[] headers = dh.header;
+		String[][] data = dh.data;
+		System.out.println("creating...");
+		File f = new File(filename);
+		FileOutputStream fos;
+		try {
+			fos = new FileOutputStream(f);
+			StringBuffer sb = new StringBuffer();
+			for(int i = 0; i < headers.length; i++) {
+				sb.append((i>0?delimiter:"")+headers[i]);
+			}
+			sb.append("\n");
+			
+			for(int j = 0; j < data.length; j++) {
+				for(int i = 0; i < headers.length; i++) {
+					sb.append((i>0?delimiter:"")+data[j][i]);
+				}
+				sb.append("\n");
+			}
+			System.out.println("writing...");
+			fos.write(sb.toString().getBytes());
+			
+			fos.flush();
+			System.out.println("closing...");
+			fos.close();		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void printss(String[] ss) {
+		System.out.print("ss("+ss.length+"): ");
+		for( String s : ss) {
+			System.out.print("["+s+"] ");
+		}
+		System.out.println();
+	}
 	public DataAndHeader readDelimited(String s, String delimiter, boolean has_headers) {
 		DataAndHeader dh = new DataAndHeader();
+		if( delimiter.equals(",")) {
+			delimiter = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+		}
 		try {
 			String[] lines = s.split("\n");
 			dh.header = lines[0].split(delimiter);
@@ -3513,14 +3623,31 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					dh.header[i] = "col_"+i;
 				}
 			}
+			for( int i = 0; i < dh.header.length; i++) {
+				dh.header[i] = dh.header[i].trim();
+				if(dh.header[i].length() > 2 && dh.header[i].charAt(0) == '"' && dh.header[i].charAt(dh.header[i].length()-2) == '"' ) {
+					dh.header[i] = dh.header[i].substring(1, dh.header[i].length()-1);
+				}
+			}
+			printss( dh.header);
 			dh.data = new String[lines.length - (has_headers ? 1 : 0)][];
 			for( int i = has_headers ? 1 : 0; i < lines.length; i++) {
-				dh.data[i-(has_headers ? 1 : 0)] = lines[i].split(delimiter);
+				int k = i-(has_headers ? 1 : 0); 
+				dh.data[k] = lines[i].split(delimiter);
+				for( int j = 0; j < dh.data[k].length; j++) {
+					dh.data[k][j] = dh.data[k][j].trim();
+					if(dh.data[k][j].length() > 2 && dh.data[k][j].charAt(0) == '"' && dh.data[k][j].charAt(dh.data[k][j].length()-1) == '"' ) {
+						dh.data[k][j] = dh.data[k][j].substring(1, dh.data[k][j].length()-1);
+					}
+				}
+				printss( dh.data[k]);
 			}
+			System.out.println();
 			return dh;
 		} catch (Exception ex) {
-			
+			ex.printStackTrace();
 		}
+		//System.exit(0);
 		return dh;
 	}
 	public void writeDBF(String filename, String[] headers, String[][] data) {
@@ -4162,6 +4289,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mntmBlocklevelPopulation = new JMenuItem("Block-level population");
 		mntmBlocklevelPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				importPopulation();
+			}
+		});
+		/*
+		mntmBlocklevelPopulation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				ip.addHistory("IMPORT POPULATION");
 
 				if( Download.census_merge_working) {
@@ -4178,6 +4311,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				dd.show();
 			}
 		});
+		*/
 		mnMerge.add(mntmBlocklevelPopulation);
 		
 		mntmBlocklevelEthnicData = new JMenuItem("Block-level ethnic data");

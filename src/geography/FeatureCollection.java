@@ -963,7 +963,18 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		if( VTD.outline_state && !MainFrame.mainframe.evolving) {
 			try {
 				g.setColor(Color.BLACK);
-				Hashtable<String,double[][][]> outlines = getOutlines("STATEFP10");
+				Hashtable<String,double[][][]> outlines = null;
+				if( features.get(0).properties.containsKey("STATEFP10")) {
+					outlines = getOutlines("STATEFP10");
+				} else
+				if( features.get(0).properties.containsKey("STATEFP")) {
+					outlines = getOutlines("STATEFP");
+				} else
+				if( features.get(0).properties.containsKey("STATE")) {
+					outlines = getOutlines("STATE");
+				} else {
+					System.out.print("state outline: no state column found!");
+				}
 				Stroke str = ((Graphics2D)g).getStroke();
 				if( !Settings.national_map) {
 					((Graphics2D)g).setStroke(new BasicStroke(4));
@@ -979,11 +990,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 							g.drawPolygon(polygons[j]);
 						}
 					} catch (Exception ex) {
+						System.out.println("Ex outline state inner "+ex);
 						ex.printStackTrace();
 					}
 				}
 				((Graphics2D)g).setStroke(str);
 			} catch (Exception ex) {
+				System.out.println("Ex outline state "+ex);
 				ex.printStackTrace();
 			}
 		}
@@ -1212,19 +1225,25 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 
 				VTD nearest = getNearestFeature(f);
 
+				if( nearest != null) {
 				//new way, just add the unpaired edge length of the no-neighbors feature.
-				double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
-				for( int i = 0; i < nearest.neighbor_lengths.length; i++) {
-					new_neighbbor_lengths[i] = nearest.neighbor_lengths[i]; 
+					try {
+						double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
+						for( int i = 0; i < nearest.neighbor_lengths.length; i++) {
+							new_neighbbor_lengths[i] = nearest.neighbor_lengths[i]; 
+						}
+						new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.unpaired_edge_length;
+						
+						nearest.neighbors.add(f);
+						nearest.neighbor_lengths = new_neighbbor_lengths;
+						
+						f.neighbors.add(nearest);
+						f.neighbor_lengths = new double[]{f.unpaired_edge_length};
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					f.unpaired_edge_length = 0;
 				}
-				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.unpaired_edge_length;
-				
-				nearest.neighbors.add(f);
-				nearest.neighbor_lengths = new_neighbbor_lengths;
-				
-				f.neighbors.add(nearest);
-				f.neighbor_lengths = new double[]{f.unpaired_edge_length};
-				f.unpaired_edge_length = 0;
 
 				/*
 				 //old way - grab a fraction of the new neighbors edges.

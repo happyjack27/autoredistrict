@@ -465,7 +465,7 @@ New Mexico
 			if( Download.apportionments[i] < 6) {
 				//continue;
 			}
-			if( Download.apportionments[i] < 1) {
+			if( Download.apportionments[i] <= 1) {
 				continue;
 			}
 			if( Download.apportionments[i] > 5) {
@@ -556,7 +556,31 @@ New Mexico
 				//continue;
 			}
  			sb.append("LOAD "+i+ " 2010 2012\n");
- 			appendExportHare(sb,i);
+ 			String s = ""
+ 					/*
+ 					+"IMPORT POPULATION\n"
+ 					+"IMPORT URL ftp://autoredistrict.org/pub/2012%20Pres%20results%20by%202012%20CDs/[FIPS].csv CD_2010A CD_2010A PRES12_DEM PRES12_REP\n"
+ 					+"COPY FEATURE PRES12_DEM PRES12_D50\n"
+ 					+"COPY FEATURE PRES12_REP PRES12_R50\n"
+ 					+"RESCALE ELECTIONS\n"
+ 					+"SAVE\n"
+ 					*/
+
+ 					//+"OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
+ 					+"SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n"
+ 					+"SET DISTRICTS COLUMN CD113FP\n"
+ 					+"SET DISTRICTS COLUMN CD_2010A\n"
+ 					+"SET WEIGHT DESCRIPTIVE 0.50\n"
+ 					//+"EXPORT PIE\n"
+ 					+"EXPORT NATIONAL\n"
+ 					+"EXPORT STATS\n"
+ 					+"CLEAN\n"
+ 					+"EXIT\n"
+ 					+"EXIT\n";
+
+ 					;
+ 			sb.append(s);
+ 			//appendExportHare(sb,i);
  			
  			//appendExportEmbedded(sb,i);
  			//sb.append("COPY FEATURE CD_FV CD_FV2\n");
@@ -859,8 +883,43 @@ EXIT
 
 	}
 
-
+/*
+ * ./sc: line 3: cd: /home/autotrader/autoredistrict_data_cd113/Alaska/2010/CD_2010A/: No such file or directory
+./sc: line 15: cd: /home/autotrader/autoredistrict_data_cd113/Delaware/2010/CD_2010A/: No such file or directory
+./sc: line 51: cd: /home/autotrader/autoredistrict_data_cd113/Montana/2010/CD_2010A/: No such file or directory
+./sc: line 67: cd: /home/autotrader/autoredistrict_data_cd113/North Dakota/2010/CD_2010A/: No such file or directory
+./sc: line 81: cd: /home/autotrader/autoredistrict_data_cd113/South Dakota/2010/CD_2010A/: No such file or directory
+./sc: line 89: cd: /home/autotrader/autoredistrict_data_cd113/Vermont/2010/CD_2010A/: No such file or directory
+./sc: line 99: cd: /home/autotrader/autoredistrict_data_cd113/Wyoming/2010/CD_2010A/: No such file or directory
+*/
 	public static void main(String[] args) {
+		
+		String[] ss = new String[]{
+				"Alaska",
+				"Delaware",
+				"Montana",
+				"North Dakota",
+				"South Dakota",
+				"Vermont",
+				"Wyoming"
+				//nh
+				
+				//ri
+		};
+		
+		for( int i = 0; i < ss.length; i++) {
+			String state = ss[i];
+			String from ="/home/autotrader/autoredistrict_data_cd113/";
+			String to = "/var/www/html/autoredistrict/website/all50/CD_PRES/";
+			String prefix = state+"/2010/";
+			//System.out.println("mkdir \""+to+prefix+"CD_2010A\"");
+			System.out.println("cd \""+to+prefix+"CD_2010/\"");
+			System.out.println("/bin/cp -rf ./* \""+to+prefix+"CD_2010A/\"");
+			//System.out.println("mkdir \""+to+prefix+"CD_2010A\"");
+			//System.out.println("cd \""+from+prefix+"CD_2010A/\"");
+			//System.out.println("/bin/cp -rf ./* \""+to+prefix+"CD_2010A/\"");
+		}
+		System.exit(0);
 		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 1024, 1024, "/");
 		//mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
 
@@ -1206,6 +1265,9 @@ EXIT
 		
 		afsd
 		*/
+		sb.append("FFF\n");
+		sb.append("EXIT\n");
+		sb.append("EXIT\n");
 		sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
 
 		

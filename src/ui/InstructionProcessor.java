@@ -510,6 +510,12 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 			}
 			mainFrame.importURL( url,  fk,  pk, cols);
 		} else
+			if( command.equals("IMPORT") && instruction_words[1].equals("POPULATION")) {
+				boolean d = Download.prompt;
+				Download.prompt = false;
+				mainFrame.importPopulation();
+				Download.prompt = d;
+			} else
 			if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
 				mainFrame.importBlockElection();
 			} else
@@ -519,6 +525,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 					textFieldIP.setText(""+(instruction_pointer+1));
 					return;
 				} else
+		if( command.equals("FFF")) {
+			mainFrame.appendStuff();
+		}
 		if( command.equals("IMPORT") && instruction_words[1].equals("TRANSLATIONS")) {
 			mainFrame.importTranslations();
 		} else
