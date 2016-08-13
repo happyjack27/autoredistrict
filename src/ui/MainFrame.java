@@ -5798,7 +5798,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				progressBar.setIndeterminate(true);
 				progressBar.setStringPainted(true);
 				progressBar.setValue(0);
-				ip.addHistory("GO");
+				ip.addHistory("GO\n");
 			}
 		});
 		goButton.setBounds(109, 29, 83, 29);
@@ -6592,7 +6592,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		stopButton.setEnabled(false);
 		progressBar.setIndeterminate(false);
 		progressBar.setValue(0);
-		ip.addHistory("STOP");
+		ip.addHistory("STOP\n");
 	}
 	public void saveData(File f, int opt, boolean confirm) {
 		if( opt < 0) {
@@ -8307,8 +8307,12 @@ ui.Mainframe:
 				if( i % (100 * 10) == 0) {
 					System.out.println(""+i);
 				}
-				if( hmmap.containsKey(dh.data[i][fk_index])) {
-					VTD f = hmmap.get(dh.data[i][fk_index]);
+				String key = dh.data[i][fk_index];
+				if( !hmmap.containsKey(key)) {
+					key = "0"+key;
+				}
+				if( hmmap.containsKey(key)) {
+					VTD f = hmmap.get(key);
 					if( f == null) {
 						System.out.println("f is null!");
 					}

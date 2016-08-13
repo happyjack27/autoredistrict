@@ -103,7 +103,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double tot = 0;
 		for( VTD feat : features) {
 			try {
-				tot += Double.parseDouble(feat.properties.get(dest).toString());
+				tot += Double.parseDouble(feat.properties.get(dest).toString().replaceAll(",", ""));
 			} catch (Exception ex) { }
 		}
 		return tot;
@@ -127,24 +127,31 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
 					continue;
 				}
+				System.out.println("not found "+filter +" " + filter_key +" dest");
 			}			
 			try {
-				tot += Double.parseDouble(feat.properties.get(dest).toString());
+				tot += Double.parseDouble(feat.properties.get(dest).toString().replaceAll(",", ""));
 			} catch (Exception ex) { }
 		}
+		System.out.println("dscale "+dscale+" tot "+tot);
 		
 		dscale /= tot;
 
+		System.out.println("dscale "+dscale);
 		
 		for( VTD feat : features) {
 			if( filter != null) {
 				if( !feat.properties.get(filter).toString().equals(filter_key) ) {
+					System.out.println("not found "+filter +" " + filter_key +" dest");
 					continue;
 				}
 			}			
 			try {
-				feat.properties.put(dest,""+(dscale* Double.parseDouble(feat.properties.get(dest).toString()) ));
-			} catch (Exception ex) { }
+				feat.properties.put(dest,""+(dscale* Double.parseDouble(feat.properties.get(dest).toString().replaceAll(",", "")) ));
+			} catch (Exception ex) {
+				System.out.println("ex afsf "+ex);
+				ex.printStackTrace();
+			}
 		}
 	}		
 	

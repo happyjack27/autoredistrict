@@ -555,16 +555,52 @@ New Mexico
 			if( i < 6) {
 				//continue;
 			}
+			if( 
+					i != 9 &&
+					i != 42 &&
+					i != 17 &&
+					i != 26
+					) {
+				continue;
+			}
  			sb.append("LOAD "+i+ " 2010 2012\n");
+ 			
+ 			/*
+LOAD 9 2010 2012
+IMPORT URL ftp://autoredistrict.org/pub/2012%20Pres%20results%20by%202012%20CDs/[FIPS].csv CD_2010A CD_2010A PRES12_DEM PRES12_REP
+COPY FEATURE PRES12_DEM PRES12_D50
+COPY FEATURE PRES12_REP PRES12_R50
+RESCALE ELECTIONS
+SAVE
+SET ELECTION COLUMNS PRES12_D50 PRES12_R50
+SET DISTRICTS COLUMN CD113FP
+SET DISTRICTS COLUMN CD_2010A
+SET WEIGHT DESCRIPTIVE 0.50
+EXPORT NATIONAL
+EXPORT STATS
+EXPORT PIE
+CLEAN
+EXIT
+EXIT
+STOP
+SET DISTRICTS SEATS_PER_DISTRICT [SEATS]
+SET DISTRICTS COLUMN CD_FV
+SET DISTRICTS FAIRVOTE_SEATS [SEATS]
+EXPORT STATS
+EXIT
+EXIT
+ 			 */
  			String s = ""
- 					/*
- 					+"IMPORT POPULATION\n"
+ 					
+ 					//+"IMPORT POPULATION\n"
  					+"IMPORT URL ftp://autoredistrict.org/pub/2012%20Pres%20results%20by%202012%20CDs/[FIPS].csv CD_2010A CD_2010A PRES12_DEM PRES12_REP\n"
  					+"COPY FEATURE PRES12_DEM PRES12_D50\n"
  					+"COPY FEATURE PRES12_REP PRES12_R50\n"
  					+"RESCALE ELECTIONS\n"
  					+"SAVE\n"
- 					*/
+ 					
+ 					//+"RESCALE ELECTIONS\n"
+ 					//+"SAVE\n"
 
  					//+"OPEN "CD113/tl_rd13_[FIPS]_cd113.shp"
  					+"SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n"
@@ -574,6 +610,7 @@ New Mexico
  					//+"EXPORT PIE\n"
  					+"EXPORT NATIONAL\n"
  					+"EXPORT STATS\n"
+ 					+"EXPORT PIE\n"
  					+"CLEAN\n"
  					+"EXIT\n"
  					+"EXIT\n";
@@ -893,6 +930,17 @@ EXIT
 ./sc: line 99: cd: /home/autotrader/autoredistrict_data_cd113/Wyoming/2010/CD_2010A/: No such file or directory
 */
 	public static void main(String[] args) {
+		System.out.println(""
+				+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+				+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
+				+"\nSET DISTRICTS COLUMN CD113FP"
+				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
+				+"\nLOAD [FIPS] 2010 2012"
+				+"\nIMPORT BLOCKS \"[START PATH]blocks.txt\" TRUE TRUE CD113FP CD_2010"
+				+"\nSAVE"
+			);
+		System.exit(0);
+
 		
 		String[] ss = new String[]{
 				"Alaska",
@@ -907,19 +955,28 @@ EXIT
 				//ri
 		};
 		
-		for( int i = 0; i < ss.length; i++) {
-			String state = ss[i];
-			String from ="/home/autotrader/autoredistrict_data_cd113/";
+		for( int i = 0; i < states.length; i++) {
+			String state = states[i];
+			//String from ="/home/autotrader/autoredistrict_data_cd113/";
+			String from = "/Users/jimbrill/autoredistrict_data/";
 			String to = "/var/www/html/autoredistrict/website/all50/CD_PRES/";
 			String prefix = state+"/2010/";
 			//System.out.println("mkdir \""+to+prefix+"CD_2010A\"");
-			System.out.println("cd \""+to+prefix+"CD_2010/\"");
-			System.out.println("/bin/cp -rf ./* \""+to+prefix+"CD_2010A/\"");
+			System.out.println("cd \""+from+prefix+"\"");
+			System.out.println("rm -rf ./CD_2010/*");
+			System.out.println("rm -rf ./CD_BD/*");
+			System.out.println("rm -rf ./CD_FV/*");
+			System.out.println("rm -rf ./CD_FV2/*");
+			System.out.println("rm -rf ./CD_FVH/*");
+			System.out.println("rm -rf ./CD_2000/*");
+			System.out.println("rm -rf ./CD_SM/*");
+			System.out.println("rm -rf ./CD_NOW/*");
+			//System.out.println("/bin/cp -rf ./* \""+to+prefix+"CD_2010A/\"");
 			//System.out.println("mkdir \""+to+prefix+"CD_2010A\"");
 			//System.out.println("cd \""+from+prefix+"CD_2010A/\"");
 			//System.out.println("/bin/cp -rf ./* \""+to+prefix+"CD_2010A/\"");
 		}
-		System.exit(0);
+		//System.exit(0);
 		//mergeTransparentImages("/Users/jimbrill/autoredistrict_data/", "CD_BD", "map_districts.png", 1024, 1024, "/");
 		//mergeTransparentImages("http:/autoredistrict.org/autoredistrict_data/", "CD_NOW", "map_vtd_votes.png", 1024, 1024, "/");
 
@@ -1328,6 +1385,14 @@ EXIT
 		sb.append("EXIT\n");
 
 	}
+	/*
+IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/vtd_data.txt GEOID10 GEOID10 CD_SM
+IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/vtd_data.txt GEOID10 GEOID10 CD_FV2
+IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/vtd_data.txt GEOID10 GEOID10 CD_FVH
+SAVE
+LOAD [FIPS]] 2010 2012
+*/
+	
 	public static void appendExportEmbedded(StringBuffer sb, int i) {
 		String state = Download.states[i];
 		/*

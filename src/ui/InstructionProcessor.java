@@ -339,7 +339,14 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		eventOccured();
 	}
-
+	/*
+DELETE feature PRES_D50
+DELETE feature PRES_R50
+COPY FEATURE PRES12_DEM PRES12_D50
+COPY FEATURE PRES12_REP PRES12_R50
+RESCALE ELECTIONS
+SAVE
+*/
 	public static boolean duplicateThread = false;
 	@Override
 	public void eventOccured() {
@@ -434,7 +441,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 
 
 		if( command.equals("OPEN")) {
-			String dest =  Download.getStartPath()+File.separator+instruction_words_original[1];
+			String dest =  /*Download.getStartPath()+File.separator+*/instruction_words_original[1];
 			File f = new File(dest);
 			Applet.mainFrame.open(f);
 			instruction_pointer++;
@@ -642,6 +649,9 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		} else
 		if(command.equals("SAVE")) {
 			mainFrame.saveData(Download.vtd_dbf_file, 2,false);
+		} else
+		if(command.equals("SAVEAS")) {
+			mainFrame.saveData(new File(instruction_words_original[1]), 2,false);
 		} else
 		if(command.equals("EXTRACT")) {
 			//EXTRACT "ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_04_cd113.zip" CD113
