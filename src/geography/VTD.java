@@ -127,6 +127,25 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	
 	public double calcArea() {
 		System.out.print(".");
+    	if( !FeatureCollection.isLatLon) {
+    		double tot_area = 0;
+			for( int i = 0; i < geometry.coordinates.length; i++) {
+				double[][] coords = geometry.coordinates[i];
+				double[] xpoints = new double[coords.length];
+				double[] ypoints = new double[coords.length];
+				int npoints = coords.length;
+				
+				for( int j = 0; j < coords.length; j++) {
+					xpoints[j] = coords[j][0];
+					ypoints[j] = coords[j][1];
+				}
+				tot_area += Math.abs(flatArea(xpoints,ypoints,npoints));
+			}
+			area = tot_area;
+			return area;
+
+    	}
+
 		
 		double tot_area = 0;
 		try {
@@ -686,6 +705,9 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	    public double[] getOutcome() {
 	    	if( outcomes == null) {
 	    		generateOutComes();
+	    	}
+	    	if( outcomes == null) {
+	    		return new double[]{0,0};
 	    	}
 	    	int i = (int)Math.floor(Math.random()*(double)outcomes.length);
 	    	return outcomes[i];

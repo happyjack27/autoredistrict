@@ -61,6 +61,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	public static boolean[] buncontested1 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested2 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested3 = new boolean[Settings.num_districts];
+	public static boolean isLatLon = true;;
 	
 	public void addFeatures(String dest, String[] sources) {
 		String s = "ADD FEATURES";
@@ -329,8 +330,13 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double lat1 = MainFrame.mainframe.maxy;//features.get(0).geometry.coordinates[0][0][1];
 		//System.out.println("lat0"+lat0);
 		//System.out.println("lat1"+lat1);
-		
-		dlonlat = Math.cos((Math.toRadians(lat0)+Math.toRadians(lat1))/2.0);
+		if( Math.abs(lat0) > 180 || Math.abs(lat1) > 180) {
+			dlonlat = 1;
+			isLatLon = false;
+		} else {
+			dlonlat = Math.cos((Math.toRadians(lat0)+Math.toRadians(lat1))/2.0);
+			isLatLon = true;
+		}
 	}
 		
 	public void draw(Graphics g) {
@@ -351,7 +357,11 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		double lat1 = MapPanel.maxy;//features.get(0).geometry.coordinates[0][0][1];
 		
 		//dlonlat = Math.cos((lat0+lat1)/2);
-		dlonlat = Math.cos((Math.toRadians(lat0)+Math.toRadians(lat1))/2.0);
+		if( Math.abs(lat0) > 180 || Math.abs(lat1) > 180) {
+			dlonlat = 1;
+		} else {
+			dlonlat = Math.cos((Math.toRadians(lat0)+Math.toRadians(lat1))/2.0);
+		}
 		//System.out.println("dlonlat: "+dlonlat);
 
 		//dlonlat = 1.0/Math.cos(Math.toRadians((lat0+lat1)/2.0));
@@ -1371,6 +1381,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				f.unpaired_edge_length = 0;
 			}
 		}
+		System.out.println("done islands");
 		
 		
 		//create geographically sorted vector
@@ -1474,6 +1485,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 
 	public void loadDistrictsFromProperties(String column_name) {
+		System.out.println("loadDistrictsFromProperties");
+
 		VTD.compare_centroid = false;
 		Collections.sort(features);
 		
@@ -1493,6 +1506,8 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 			//dm.fillDistrictwards();
 		
 		}
+		System.out.println("loadDistrictsFromProperties done");
+
 		
 	}
 	

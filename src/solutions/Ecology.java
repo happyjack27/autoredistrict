@@ -325,6 +325,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
     	}
     }
     public void resize_population() {
+		System.out.println("resize_population start "+ (population == null ? "null" : population.size()));
+		try {
+
     	if( population == null) {
     		population =  new Vector<DistrictMap>();
     	}
@@ -335,6 +338,13 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
             population.remove(Settings.population);
         }
         last_population = Settings.population;
+		} catch (Exception ex) {
+			System.out.println("resize fail: "+ex);
+			ex.printStackTrace();
+			
+		}
+
+		System.out.println("resize_population done" + population.size());
     }
     public void resize_districts() {
     	if( population == null) {

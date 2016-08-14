@@ -457,6 +457,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
     	public void run() { 
     		try {
+    			System.out.println("export start");
 	    		dlg.setVisible(true);
 	    		dlbl.setText("Loading file...");
 	    		
@@ -465,13 +466,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				//count number of points in each precinct
 	    		double[] points = getCounts(dbfname,bdivide);
  
+    			System.out.println("read start");
 	
-				DBFReader dbfreader;
+				DBFReader dbfreader = null;
 				try {
 					dbfreader = new DBFReader(dbfname);
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					return;
+	    			System.out.println("read exception");
+
+					//return;
 				}
 				DataAndHeader dh = new DataAndHeader();
 				
@@ -1933,6 +1937,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			 */
 			Download.downloadAndExtractCentroids();
 			ExportCustomThread exp = new ExportCustomThread();
+			//Download.nextThread = exp;
 			exp.nextThread = new ThreadFinishThreads();
 			//Download.census_centroid_file  
 			Download.initPaths();
@@ -2323,7 +2328,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 		System.out.println();
-		System.out.println("done.");
+		System.out.println("renumber done.");
 		mapPanel.invalidate();
 		mapPanel.repaint();
 	}
@@ -2924,14 +2929,41 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	    	System.out.println("init ecology ex: "+ex);
 	    	ex.printStackTrace();
 	    }
+	    
+    	System.out.println("resize ex1");
+
+	    try {
+	    	featureCollection.ecology.resize_population();
+			//featureCollection.loadDistrictsFromProperties("");
+	    } catch (Exception ex) {
+	    	System.out.println("resize ex: "+ex);
+	    	ex.printStackTrace();
+	    }
 		System.out.println("filling combo boxes...");
 		fillComboBoxes();
 		mapPanel.invalidate();
 		mapPanel.repaint();
 		
+    	System.out.println("resize ex2");
+	    try {
+	    	featureCollection.ecology.resize_population();
+			//featureCollection.loadDistrictsFromProperties("");
+	    } catch (Exception ex) {
+	    	System.out.println("resize ex2: "+ex);
+	    	ex.printStackTrace();
+	    }
+		
 		
 		setDistrictColumn(project.district_column);
 		//featureCollection.loadDistrictsFromProperties(project.district_column);
+    	System.out.println("resize ex3");
+	    try {
+	    	featureCollection.ecology.resize_population();
+			//featureCollection.loadDistrictsFromProperties("");
+	    } catch (Exception ex) {
+	    	System.out.println("resize ex3: "+ex);
+	    	ex.printStackTrace();
+	    }
 		
 		mapPanel.featureCollection = featureCollection;
 		mapPanel.invalidate();
@@ -2939,6 +2971,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//featureCollection.ecology.mapPanel = mapPanel;
 		//featureCollection.ecology.statsPanel = panelStats;
     	addEcologyListeners();
+    	
+    	System.out.println("resize ex4");
+	    try {
+	    	featureCollection.ecology.resize_population();
+			//featureCollection.loadDistrictsFromProperties("");
+	    } catch (Exception ex) {
+	    	System.out.println("resize ex3: "+ex);
+	    	ex.printStackTrace();
+	    }
 
 		
 		dlg.setVisible(false);
@@ -2946,17 +2987,36 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		geo_loaded = true;
+		System.out.println("resize_population start0 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
+
 		setEnableds();
+		System.out.println("resize_population start1 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
 		project.demographic_columns.clear();
 		setDemographicColumns();
+		/*
+		System.out.println("resize_population start2 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
 		project.election_columns.clear();
 		setElectionColumns();
+		System.out.println("resize_population start3 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
 		project.election_columns_2.clear();
 		setElectionColumns2();
+		System.out.println("resize_population start4 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
 		project.election_columns_3.clear();
 		setElectionColumns3();
+		
+		System.out.println("resize_population start5 "+ (featureCollection.ecology.population == null ? "null" : featureCollection.ecology.population.size()));
 		project.substitute_columns.clear();
 		setSubstituteColumns();
+		*/
+		
+    	System.out.println("resize ex5");
+	    try {
+	    	featureCollection.ecology.resize_population();
+			//featureCollection.loadDistrictsFromProperties("");
+	    } catch (Exception ex) {
+	    	System.out.println("resize ex3: "+ex);
+	    	ex.printStackTrace();
+	    }
 	}
 	
 	public void openShapeFile(File f,boolean synchronous) {
@@ -3379,6 +3439,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		for( int idem = 0; idem < max; idem++) {
 			try {
+				System.out.println(" a "+featureCollection.ecology.population.size());
 				// TODO Auto-generated method stub
 				DistrictMap dm = featureCollection.ecology.population.get(0);
 				

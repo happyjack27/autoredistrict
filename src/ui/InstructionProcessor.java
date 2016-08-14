@@ -441,7 +441,9 @@ SAVE
 
 
 		if( command.equals("OPEN")) {
-			String dest =  /*Download.getStartPath()+File.separator+*/instruction_words_original[1];
+			String dest =  instruction_words_original[1].replaceAll("\\[START PATH\\]",Download.getStartPath());;///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
+			dest =  dest.replaceAll("\\[START_PATH\\]",Download.getStartPath());
+			System.out.println(dest);
 			File f = new File(dest);
 			Applet.mainFrame.open(f);
 			instruction_pointer++;
@@ -499,8 +501,11 @@ SAVE
 			//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
 //	importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"},false);
 			
+			String dest =  instruction_words_original[2].replaceAll("\\[START PATH\\]",Download.getStartPath());;///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
+			dest =  dest.replaceAll("\\[START_PATH\\]",Download.getStartPath());
+
 			Applet.mainFrame.importBlockData(
-				instruction_words_original[2], 
+				dest, 
 				instruction_words[3].equals("TRUE"), instruction_words[4].equals("TRUE"), 
 				new String[]{instruction_words[5]}, new String[]{instruction_words[6]},false
 			);

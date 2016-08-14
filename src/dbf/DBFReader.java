@@ -59,7 +59,7 @@ public class DBFReader {
 
     }
     catch (IOException ioexception) {
-      throw new Exception(ioexception);
+      //throw new Exception(ioexception);
     }
   }
 
