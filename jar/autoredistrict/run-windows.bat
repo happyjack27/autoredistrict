@@ -1,0 +1,1 @@
+java -jar autoredistrict.jar -Xmx4096M -Xms2048M

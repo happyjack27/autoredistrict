@@ -1,0 +1,192 @@
+Changelog:
+
+V. 1.28
+
+* added pie chart generation and export ("EXPORT PIE")
+* on exported html, larger version of maps now open in separate tab
+* importing 2010 districts fixed (data origin was mislabeling the districts)
+* made menu items have radio buttons
+* added mean-centered versions of some maps
+
+V. 1.27
+
+* can now script exporting to block assignment file
+* can now script importing to block assignment file
+* reduced white dots at borders due to geometric rounding
+* can now import block-level cvap (citizen voting age population) demographic data from census.gov
+* fixed bug with import block-level cvap data (was accumulating multiple resolutions on together)
+* can now script downloading and extracting zip files
+* added ability to use quotes in scripts
+* added ability to use tags in script such as [STATE] or [FIPS]
+* added coloring by population density (lower density fades to white)
+* added density-based mas to html export and national map export
+* added county-level stats
+* added descriptive representation optimization criteria - also added to stats and graph.
+
+V. 1.26
+
+* bug fix: fixed map aspect ratio
+* bug fix: added ftp resume manager (so doesn't get stuck on california, texas)
+
+* added a new criteria / slider for descriptive representation (to help compensate for weaknesses in droop quota)
+* added ability to show vote packing on a per-square-mile scale rather than per-district
+
+* added ability to use either droop or hare quota for multi-member districts
+* can now import specific columns from a url (need to document this)
+* added command to rescale column values
+* added 1/4 size thumbnails for html exported images
+* splits can now be highlighted
+* added merge menu
+* html export now lists county splits
+* added ability to outline districts/counties/state
+* changed the folder that html export exports to (now named after the column used)
+* added ability to create / export nation-wide transparent maps
+* added spellcheck in merge routine so you it'll match up even if there are some typos
+* can import block assignment lists
+* can export block assignment lists
+
+V. 1.25
+
+* joined in vtd-level election data
+* grofman-king now shows when its negative
+* added 3 more map coloring modes.
+* changed map output to stats: higher res
+* changed map output to stats: 11 different maps - thumbnails that you click on
+* added fair vote safe/lean/tossup counts
+* bugfix: by district stats headers were shifted
+
+V. 1.24
+
+* added ability to color by county
+* added scripting and automatic writing of a script from your actions
+* added command line arguments so you can run a script - so now the program can be run completely from the command line
+* added fairvote.org pvi
+* made it so multi-member (fairvote version) can do less than 3 seats. (just creaes a single 1 seat or 2 seat district)
+
+V. 1.23
+
+* bugfix: when loading a new district column, will not reset the population of candidate proposals
+* bugfix: latitude-longitude aspect ratio is better now
+* feature: now downloadds  county name and county fips
+* feature: now automatically downloads county-resolution demographics and election counts.
+* feature: now automaticaly sets colmns: county, population, election & demographics
+ 
+
+V. 1.22
+
+* election columns and substitute columns now clear when a new shapefile is loaded.
+* map anti-aliasing automatically turns off when evolution is started
+* map background is now white, and default map color is yellow-brown.
+* the "Evolution" menu has been moved into the main view, as new "constrain" checkboxes by the sliders
+* added the data files to the generated html 
+* fixed white lines in the ranked districts chart.
+* fixed html link to states with names with spaces (changed " " to "%20")
+
+
+V. 1.21
+
+* renamed and re-ordered fairness sliders
+* cleaned obsolete items from the evolution menu
+* added images to html export
+* switched normalization from exponential moving average to rank.
+
+V. 1.20
+
+* added slider for anneal rate, made annealing follow anneal rate exactly
+* fixed bug where stats panel didn't refresh if there was no vote count data (geometry only optimization).
+
+V. 1.19
+
+added ability to aggregate census data from census.gov
+added ability to see more maps at once
+added tooltips for elitism sliders
+added ability to export to html page
+removed export to excel due to 32-bit/64-bit conflict
+improvements to seats/votes curve window:
+- combined ranked districts window into it
+- now shows partisan asymmetry stats
+- visualized asymmetry stats on curve
+- added tooltip to curve to show the different measures
+
+V. 1.18
+
+added "straight vote descr. rep." to ethnicity stats. (this is what'd happen if you swapped out parties and ethnicities, and everyone voted for their ethnicity, and every ethnicity had the same turnout. note, in single winner elections this in theory is not proportional, but sigmoidal like the seats-votes curve.)
+anti-aliased (2xFSAA) the seats-votes curve.
+V. 1.17
+
+added save to .dbf (dbase file). this way you can save the results back to the original shapfile.
+V. 1.16
+
+added color key to election columns and demographics columns
+implemented color by demographic
+adjusted annealing ceiling to 1.2 times floor
+added ability to choose between minimize squared deviation of population or minimize absolute deviation
+added mean absolute population deviation to summary statistics
+V. 1.15
+
+added export stats to excel
+made anneal rate adjust to be proportional to logarithm of number of possible maps (log(number of districts)*number of vtds) this way maps that don't need as many iterations to converge will evolve faster.
+moved auto-anneal checkbox from menu to main ui area
+changed "mutate elite" checkbox to "elites mutated" fraction
+removed changing selection method - not satisfied with it.
+made it so polygons are simplified to 1/100th of a pixel by default.
+V. 1.14
+
+added 5-3 mixed seats per district option for FairVote.org (select "Total seats")
+consolidated winner assignment code into one function. (was duplicated)
+V. 1.13
+
+added minimize splits geometric criteria
+added minimize ethnic vote dilution criteria.
+V. 1.12
+
+added stats by ethnicity
+V. 1.11:
+
+a few minor UI tweaks (labels, etc.)
+changed competitiveness to use margin of victory (by vote count). This way multi-member districts and single-member districts are on the same playing field, so to speak. Also, it makes more sense.
+V. 1.10:
+
+changed "Representation" slider to match seats to votes over the entire seats-votes curve, instead of just a few simulated elections.
+added "Representation (global)" To the graph and the stats - this represents the total area between the seats-votes curve and the diagonal (which represents perfect proportionality).
+made changing the number of seats per district refresh the stats
+V. 1.09:
+
+two (long overdue) multi-member fixes.
+
+fixed a minor bug that caused wasted votes to be counted incorrectly when using multi-member districts (it was counting them as if it was a single member district)
+fixed a minor bug that seats-votes curve to be counted incorrectly when using multi-member districts (it was counting them as if it was a single member district)
+V. 1.08:
+
+added ability to use a third election.
+made it so when you use a "substitute election" for uncontested elections, it saves the substituted data. this way, when you save to disk and later re-load it, it won't be reverted back to the non-substituted data.
+changed default weights on fairness criteria, and moved seats-votes and total wasted votes to the top. these are really the two main criteria for a collection of single-winner elections.
+normalized the seats-votes curve asymmetry score to always be between 0 and 100.
+V. 1.07:
+
+now can use a second election, e.g. congress 2008 & congress 2004, to get a better spread of results
+now can use a fallback election ("substitute election") to fill in gaps where elections were uncontested.
+V. 1.06:
+
+added new fairness criteria: "Seats / votes asymmetry". This is the total darkened area on the Seats / votes curve. (the total absolute deviation from the symmetry line)
+V. 1.05:
+
+the program can now work with uncontested elections (by locking and ignoring them)
+added seats/votes curve (under "View" menu)
+added a bunch of scores to both summary and by-district (PVI, # competitive elections, etc.)
+colored district rows by PVI
+made districts labels look better
+faded the color a bit
+V. 1.04: lots of minor changes, including:
+
+added new scores: PVI scores, Efficiency gap score, # competitive elections
+new map display mode (wasted votes)
+fixed a bug with import & aggregate
+added tournament selection option.
+export to block level now optionally includes header row and centroids.
+
+Added option to change selection mode among:
+
+* fitness proportionate selection aka roulette selection
+* rank proportionate selection
+* truncation selection (original)

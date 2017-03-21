@@ -1,0 +1,30 @@
+			current_instruction = current_instruction.replaceAll("\\[SEATS\\]",""+Download.apportionments[Download.istate]);
+			String fips = (""+Download.istate).length() < 2 ? ("0"+Download.istate) : (""+Download.istate);
+			current_instruction = current_instruction.replaceAll("\\[FIPS\\]",fips);
+			current_instruction = current_instruction.replaceAll("\\[STATE\\]",Download.states[Download.istate]);
+			current_instruction = current_instruction.replaceAll("\\[STATE URL\\]",Download.states[Download.istate].replaceAll(" ", "%20"));
+			current_instruction = current_instruction.replaceAll("\\[STATE UNDERSCORE\\]",Download.states[Download.istate].replaceAll(" ", "_"));
+			current_instruction = current_instruction.replaceAll("\\[ABBR\\]",Download.state_to_abbr.get(Download.states[Download.istate]));
+			current_instruction = current_instruction.replaceAll("\\[START PATH\\]",Download.getStartPath());
+			}
+
+
+run control
+
+GO
+STOP
+WHEN
+
+
+setting variables
+
+SET
+
+
+file i/o
+
+OPEN <filename>
+LOAD
+DOWNLOAD
+EXIT
+
