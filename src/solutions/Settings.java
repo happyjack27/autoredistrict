@@ -203,7 +203,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 
 	public static double mutation_rate = 0.5;
 	public static double mutation_boundary_rate = 0.5;
-	public static int population = 100;
+	public static int population = 200;
 	public static int num_elections_simulated = 1;
 	public static int num_districts = 4;
 	// geometry
@@ -251,6 +251,7 @@ public class Settings extends serialization.ReflectionJSONObject<Settings> {
 	public static double descr_rep_weight;
 	public static boolean divide_packing_by_area = true;
 	public static boolean prefer4s = false;
+	public static boolean recombination_on = true;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

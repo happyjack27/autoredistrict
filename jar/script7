@@ -1,0 +1,13 @@
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete 6
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar download 6
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 6
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete 21
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar download 21
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 21
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete 44
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar download 44
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 44
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar delete 48
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar download 48
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 48
+

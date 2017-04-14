@@ -370,7 +370,7 @@ SAVE
 		}
 		duplicateThread = false;
 		if( instruction_pointer >= instructions.size()) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
+			//System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION DONE");
 			lblFinished.setVisible(true);
 			return;
 		}

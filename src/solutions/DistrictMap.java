@@ -25,6 +25,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
+	boolean EVIL1 = false; //dem
+	boolean EVIL2 = false; //rep
+	boolean EVIL3 = false; //either
+	double NEGATIVE_ONE_IS_EVIL = EVIL3 ? -1 : 1;
 	
 	public double area_multiplier = 1;//Math.pow(100,2)*10;
 	
@@ -756,6 +760,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     public void crossover(int[] genome1, int[] genome2) {
+        if( !Settings.recombination_on) {
+        	genome2 = genome1; //if no recombination, clone.
+        }
+
     	reciprocal_iso_quotient = -1;
         for( int i = 0; i < vtd_districts.length; i++) {
             double r = Math.random();
@@ -1602,7 +1610,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	total += weight*Math.abs(dd[0]-mid_y);
 	    }
 
-    	return total;
+    	return NEGATIVE_ONE_IS_EVIL*total;
     }
 
     //returns total edge length, unfairness, population imbalance
@@ -1964,7 +1972,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time5 = System.currentTimeMillis();
     	
         //System.out.println(""+wasted_votes+", "+wasted_vote_imbalance);
-    	double sva = calcSeatsVoteAsymmetry();
+    	double sva = EVIL1 ? get_partisan_gerrymandering() : EVIL2 ? -get_partisan_gerrymandering() : calcSeatsVoteAsymmetry();
     	/*
     	 * double[] weights = new double[]{
         		Settings.geometry_weight                *1.0, 

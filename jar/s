@@ -1,0 +1,3 @@
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript16
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript35
+

@@ -83,7 +83,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public boolean hushcomboBoxCounty = false;
 
 	double mutation_rate_multiplier = 0.1;
-	public static double boundary_mutation_rate_multiplier = 1.0;//0.2;
+	public static double boundary_mutation_rate_multiplier = 2.0;//0.2;
 	long load_wait = 100;
 	
 	double minx,maxx;
@@ -152,6 +152,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JComboBox comboBoxDistrictColumn = new JComboBox();
     public JTextField textFieldNumDistricts = new JTextField();
     public JTextField textField = new JTextField();
+    private JTextField evolutionPopulationTF;
 	public JTextField textFieldSeatsPerDistrict;
 
 	public JSlider slider_mutation;
@@ -4137,7 +4138,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Settings.diagonalization_weight = sliderRepresentation.getValue()/100.0;
 		Settings.population_balance_weight = sliderPopulationBalance.getValue()/100.0;
 		Settings.geometry_weight = sliderBorderLength.getValue()/100.0;
-		Settings.disconnected_population_weight = sliderDisconnected.getValue()/100.0;
+		Settings.disconnected_population_weight = 2*sliderDisconnected.getValue()/100.0;
 		Settings.split_reduction_weight = sliderSplitReduction.getValue()/100.0;
 		Settings.vote_dilution_weight = sliderVoteDilution.getValue()/100.0;
 		Settings.descr_rep_weight = slider.getValue()/100.0;
@@ -4284,7 +4285,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		comboBoxPopulation = new JComboBox();
 		comboBoxDistrictColumn = new JComboBox();
 	    textFieldNumDistricts = new JTextField();
-	    textField = new JTextField();
+	    evolutionPopulationTF = new JTextField();
 
 
 		separator_1 = new JSeparator();
@@ -4295,6 +4296,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		slider_mutation = new JSlider();
+		slider_mutation.setValue(100);
 		sliderDisconnected = new JSlider();
 		sliderBorderLength = new JSlider();
 		sliderPopulationBalance = new JSlider();
@@ -5713,15 +5715,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JLabel lblPopulation = new JLabel("Population");
 		lblPopulation.setBounds(6, 40, 104, 16);
 		panel_3.add(lblPopulation);
-		textField.setBounds(105, 34, 91, 28);
-		panel_3.add(textField);
-		textField.addFocusListener(new FocusAdapter() {
+		evolutionPopulationTF.setBounds(105, 34, 91, 28);
+		panel_3.add(evolutionPopulationTF);
+		evolutionPopulationTF.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
 				textField.postActionEvent();
 			}
 		});
-		textField.addActionListener(new ActionListener() {
+		evolutionPopulationTF.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 try {
 					 int n = new Integer(textField.getText());
@@ -5736,8 +5738,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		
-		textField.setText(""+Settings.population);
-		textField.setColumns(10);
+		evolutionPopulationTF.setText(""+Settings.population);
+		evolutionPopulationTF.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Evolution");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -5801,6 +5803,16 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		slider_anneal.setBounds(6, 97, 190, 29);
 		panel_3.add(slider_anneal);
+		
+		chckbxRecombination = new JCheckBox("Recombination");
+		chckbxRecombination.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.recombination_on = chckbxRecombination.isSelected();
+			}
+		});
+		chckbxRecombination.setSelected(true);
+		chckbxRecombination.setBounds(6, 228, 128, 23);
+		panel_3.add(chckbxRecombination);
 		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
@@ -6505,6 +6517,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JRadioButtonMenuItem rdbtnmntmColorBySeats;
 	public JSplitPane splitPane_1;
 	public JMenuItem mntmShowPieCharts;
+	public JCheckBox chckbxRecombination;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {
@@ -6581,7 +6594,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	@Override
 	public void valueChanged() {
 		double d = Settings.mutation_boundary_rate;
- 		textField.setText(""+Settings.population);
+ 		evolutionPopulationTF.setText(""+Settings.population);
  		double e = Math.log(Settings.mutation_boundary_rate)*Settings.exp_mutate_factor+100;
  		//double d = Math.exp((slider_mutation.getValue()-100)/Settings.exp_mutate_factor);
 		//System.out.println("new boundary mutation rate: "+Settings.mutation_boundary_rate+" total: "+total+" mutated: "+mutated);

@@ -1,0 +1,8 @@
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript9
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 9
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript17
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 17
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript26
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 26
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar run subscript42
+java -jar -Xmx4096M -Xms1024M autoredistrict.jar clean 42

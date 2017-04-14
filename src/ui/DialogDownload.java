@@ -34,7 +34,7 @@ public class DialogDownload extends JDialog {
 		initComponents();
 		int y = new Date().getYear()+1900-1;
 		int y10 = y - y % 10;
-		int y4 = y - y % 4;
+		int y4 = 2012;//y - y % 4;
 		String[] cyears = new String[]{""+y10,""+(y10-10)};
 		String[] eyears = new String[]{""+y4,""+(y4-4),""+(y4-8),""+(y4-12),""+(y4-16),""+(y4-20)};
 		for( int i = 0; i < cyears.length; i++ ) {
