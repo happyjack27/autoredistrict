@@ -23,6 +23,9 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
+	
+	public static String stats_descriptions_url = "https://docs.google.com/spreadsheets/d/1PlhLg9j9TCu0lkLWQJE7KBPRe618Si62JQo7ubvkKO8/edit?usp=sharing";
+	
 	DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
 	Color[] dmcolors = null;
 	double[] tot_seats = new double[5];
@@ -1077,6 +1080,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		});
 		button_3.setBounds(728, 614, 89, 23);
 		add(button_3);
+		
+		btnExplainStats = new JButton("Explain stats");
+		btnExplainStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Applet.browseTo(stats_descriptions_url);
+			}
+		});
+		btnExplainStats.setBounds(205, 8, 117, 29);
+		add(btnExplainStats);
 	}
 	public FeatureCollection featureCollection;
 	private JTable districtsTable;
@@ -1098,6 +1110,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public JScrollPane scrollPane_4;
 	public JTable countyTable;
 	public JButton button_3;
+	public JButton btnExplainStats;
 	
 	public void saveURL(final String filename, final URL url) {
 	    BufferedInputStream in = null;
@@ -1658,5 +1671,4 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		Settings.setNationalMap(national);
 	}
-
 }

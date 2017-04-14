@@ -1,5 +1,15 @@
 Changelog:
 
+V. 1.29
+* added link in stats panel to descriptions of stats
+* added ability to turn off recombination step (for local search)
+* added % labels to pie charts
+* added pie charts window
+* changed download vtd dialog to default to year 2012
+* corrected by state digital competition pie charts
+* fixed running headless via xvfb
+
+
 V. 1.28
 
 * added pie chart generation and export ("EXPORT PIE")

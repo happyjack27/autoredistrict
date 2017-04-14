@@ -492,7 +492,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
         }
         if( Settings.mutate_disconnected && prob >= 0) { 
-        	mutate_all_disconnected(0.5);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
+        	mutate_all_disconnected(1.0);//prob > 0.1  ? (prob > 0.1 ? 0.1 : prob) : 0.05);
         }
     }
     public void mutate_all_disconnected(double prob) {
