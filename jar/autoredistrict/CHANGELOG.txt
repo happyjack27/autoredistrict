@@ -1,6 +1,7 @@
 Changelog:
 
-V. 1.29
+V. 1.30
+
 * added link in stats panel to descriptions of stats
 * added ability to turn off recombination step (for local search)
 * added % labels to pie charts
@@ -8,6 +9,18 @@ V. 1.29
 * changed download vtd dialog to default to year 2012
 * corrected by state digital competition pie charts
 * fixed running headless via xvfb
+
+V. 1.29
+
+* changed minority caucasian to gray
+* added proportionality score
+* added packing/cracking asymmetry score
+* added export of seats/votes
+* added projected partisan representation map coloring mode
+* added vtd-level packing maps
+* added display of feature detail when clicking on a feature
+* added instruction to change quota method ("set quota hare")
+* added instruction to change to prefering 4-4 seats to 5-3 seats (SET PREFER4S TRUE)
 
 
 V. 1.28
