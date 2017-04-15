@@ -25,6 +25,8 @@ import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Precision;
 
+import new_metrics.*;
+
 /**
  * Implements the Beta distribution.
  *
@@ -32,6 +34,120 @@ import org.apache.commons.math3.util.Precision;
  * @since 2.0 (changed to concrete class in 3.0)
  */
 public class BetaDistribution extends AbstractRealDistribution {
+	
+	public BetaDistribution(double[] xs) {
+		super(new Well19937c());
+		double[] ps = MLE(xs);
+		alpha = ps[0];
+		beta = ps[1];
+		z = Double.NaN;
+	}
+	
+    public double sample_mean(double[] xs) {
+        // compute mean
+        double mean = 0;
+        for (double x : xs) {
+            mean += x;
+        }
+        mean /= (double)xs.length;
+        return mean;
+    }
+    
+    public double sample_variance(double[] xs) {
+        double mean = sample_mean(xs);
+        double var = 0;
+        for (double x : xs) {
+            double s = x - mean;
+            var += s * s;
+        }
+        var /= (double)(xs.length - 1);
+        return var;
+    }
+	
+	
+	 public double[] mom_estimate(double[] xs)
+	    {
+	        double mean = sample_mean(xs);
+	        double var = sample_variance(xs);
+	        
+	        // compute a and B
+	        return new double[]{
+	        		(mean) * (mean * (1 - mean) / var - 1)
+	        		,(1 - mean) * (mean * (1 - mean) / var - 1)
+	        };
+	    }
+
+	    public double[] MLE(double[] xs)
+	    {
+	        return MLE_Newton(xs);
+	    }
+
+	    public double[] MLE_Newton(double[] xs)
+	    {
+	        double[] params = mom_estimate(xs);
+	        //System.out.println("initial: "+params[0]+","+params[1]);
+	        if(true) {
+	        	return params;
+	        }
+	        
+	        double delta = 1;
+	        double delta_mult = 0.66; // slight overlap
+	        double done = 0.0001;
+	        
+	        double best = avg_log_likelihood(xs, params[0], params[1]);
+	        while (delta > done) {
+	            // correct a
+	        	double a_up = params[0] * Math.exp(delta);
+	        	double a_dn = params[0] * Math.exp(-delta);
+	        	double up = avg_log_likelihood(xs, a_up, params[1]);
+	        	double dn = avg_log_likelihood(xs, a_dn, params[1]);
+	            if (up > best) {
+	                params[0] = a_up;
+	                best = up;
+	    	        //System.out.println("improved: "+params[0]+","+params[1]);
+	            }
+	            if (dn > best) {
+	                params[0] = a_dn;
+	                best = dn;
+	    	        //System.out.println("improved: "+params[0]+","+params[1]);
+	            }
+	            // correct b
+	            a_up = params[1] * Math.exp(delta);
+	            a_dn = params[1] * Math.exp(- delta);
+	            up = avg_log_likelihood(xs, params[0], a_up);
+	            dn = avg_log_likelihood(xs, params[0], a_dn);
+	            if (up > best) {
+	                params[1] = a_up;
+	                best = up;
+	    	        //System.out.println("improved: "+params[0]+","+params[1]);
+	            }
+	            if (dn > best) {
+	                params[1] = a_dn;
+	                best = dn;
+	    	        //System.out.println("improved: "+params[0]+","+params[1]);
+	            }
+	            // zoom in
+	            delta *= delta_mult;
+	        }
+	        //System.out.println("final: "+params[0]+","+params[1]);
+
+	        return params;
+	    }
+
+	    public double avg_log_likelihood(double[] xs, double a, double b) {
+
+	    	this.alpha = a;
+	    	this.beta = b;
+	    	
+	        double sum = 0;
+	        for( double x : xs) {
+	            sum += logDensity(x);
+	        }
+	        System.out.println("ll: "+(sum / xs.length));
+	        return -sum / xs.length;
+	    }
+	
+	
     /**
      * Default inverse cumulative probability accuracy.
      * @since 2.1
@@ -40,15 +156,15 @@ public class BetaDistribution extends AbstractRealDistribution {
     /** Serializable version identifier. */
     private static final long serialVersionUID = -1221965979403477668L;
     /** First shape parameter. */
-    private final double alpha;
+    private double alpha;
     /** Second shape parameter. */
-    private final double beta;
+    private double beta;
     /** Normalizing factor used in density computations.
      * updated whenever alpha or beta are changed.
      */
     private double z;
     /** Inverse cumulative probability accuracy. */
-    private final double solverAbsoluteAccuracy;
+    private double solverAbsoluteAccuracy = DEFAULT_INVERSE_ABSOLUTE_ACCURACY;
 
     /**
      * Build a new instance.
