@@ -15,12 +15,16 @@ public class Metrics {
 	
 	double[][] dem_counts = null;
 	double[][] rep_counts = null;
+
+	double[][] centered_dem_counts = null;
+	double[][] centered_rep_counts = null;
 	
 	double[][] dem_pcts = null;
 	double[] election_pcts = null;
 	
 	BetaDistribution election_bd = null;
 	Vector<BetaDistribution> district_bds = null;
+	Vector<BetaDistribution> centerd_district_bds = null;
 	double[] seat_probs = null;
 	double seat_expectation = 0;
 
@@ -34,11 +38,35 @@ public class Metrics {
 	Metrics(double[][] dem, double[][] rep, int num_districts) {
 		compute( dem,  rep,  num_districts);
 	}
-	public void compute(double[][] dem, double[][] rep, int num_districts) {
+	public void centerCounts(double[][] dem_all, double[][] rep_all) {
+		centered_dem_counts = new double[rep_all.length][];
+		centered_rep_counts = new double[rep_all.length][];
+		for(int j = 0; j < dem_all.length; j++) {
+			double[] dem = dem_all[j];
+			double[] rep = rep_all[j];
+
+			centered_dem_counts[j] = new double[dem.length];
+			centered_rep_counts[j] = new double[dem.length];
+			double dem_total = 0;
+			double rep_total = 0;
+			for( int i = 0; i < dem.length; i++) {
+				dem_total += dem[i];
+				rep_total += rep[i];
+			}
+			double target_total = (dem_total+rep_total)/2;
+			for( int i = 0; i < dem.length; i++) {
+				centered_dem_counts[j][i] = dem[i] * target_total/dem_total;
+				centered_rep_counts[j][i] = rep[i] * target_total/rep_total;
+			}
+		}
+	}
+	
+ 	public void compute(double[][] dem, double[][] rep, int num_districts) {
 		dem_counts = dem;
 		rep_counts = rep;
-		
-
+		centerCounts(dem_counts,rep_counts);
+		centerd_district_bds = getDistributions(centered_dem_counts,centered_rep_counts,num_districts);
+		centerd_district_bds.remove(0);
 		
 		Vector<BetaDistribution> bds = getDistributions(dem,rep,num_districts);
 		election_bd = bds.remove(0);
@@ -50,6 +78,9 @@ public class Metrics {
 			seat_expectation += seat_probs[i]*(double)i;
 		}
 		System.out.println("Expectation: "+seat_expectation);
+		
+		
+		//now do asymmetry
 		
 		expected_asymmetry = 0;
 		Vector<Double> asym = new Vector<Double>();
@@ -147,7 +178,7 @@ public class Metrics {
 	
 	public double scoreRandom() {
 		Vector<Double> ds = new Vector<Double>();
-		for( BetaDistribution bd : district_bds) {
+		for( BetaDistribution bd : centerd_district_bds) {
 			ds.add(bd.sample());
 		}
 		Collections.sort(ds);
