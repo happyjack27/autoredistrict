@@ -39,7 +39,7 @@ public class Metrics {
 	public double asymmetry_median;
 	
 	Metrics() { }
-	Metrics(double[][] dem, double[][] rep, int num_districts) {
+	public Metrics(double[][] dem, double[][] rep, int num_districts) {
 		compute( dem,  rep,  num_districts);
 	}
 	public void centerCounts(double[][] dem_all, double[][] rep_all) {

@@ -341,6 +341,25 @@ public class District extends JSONObject {
         	return outcomes;
     	}
     }
+    public double[] getElectionOutcome(int election) {
+        double[] district_vote = new double[Settings.num_candidates]; //inited to 0
+        if( vtds.size() == 0) {
+            for( int i = 0; i < district_vote.length; i++) {//most_value) {
+                district_vote[i] = 0;
+            }
+            return district_vote;
+        }
+        for( int j = 0; j < vtds.size(); j++) {
+        	VTD vtd = vtds.get(j);
+            double[] vtd_vote = vtd.getElectionOutcome(election);
+            if( vtd_vote != null) {
+                for( int i = 0; i < vtd_vote.length; i++) {//most_value) {
+                    district_vote[i] += vtd_vote[i];
+                }
+            }
+        }
+        return district_vote;
+    }
     
     public double[] getAnOutcome() {
         double[] district_vote = new double[Settings.num_candidates]; //inited to 0

@@ -2,6 +2,7 @@ package ui;
 
 import geography.*;
 import geography.Properties;
+import new_metrics.Metrics;
 import solutions.*;
 import ui.MainFrame.OpenShapeFileThread;
 import util.*;
@@ -5544,6 +5545,22 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnWindows.add(mntmShowPieCharts);
 		
+		mntmShowAdvancedStats = new JMenuItem("Show advanced stats (snapshot)");
+		mntmShowAdvancedStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if( MainFrame.mainframe.project.multiElections.size() < 3) {
+					JOptionPane.showMessageDialog(null, "Must have at least three elections selected to compute advanced statistics.");
+					return;
+				}
+				DistrictMap dm = featureCollection.ecology.population.get(0);
+				double[][][] ee = dm.getAllElectionOutcomes();
+				Metrics m = new Metrics(ee[0],ee[1],Settings.num_districts);
+				m.showBetas();
+				m.showSeats();
+			}
+		});
+		mnWindows.add(mntmShowAdvancedStats);
+		
 		
 		mntmShowData.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -6521,6 +6538,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmShowPieCharts;
 	public JCheckBox chckbxRecombination;
 	public JButton btnMultielectionColumns;
+	public JMenuItem mntmShowAdvancedStats;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

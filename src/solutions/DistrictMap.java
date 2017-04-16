@@ -62,6 +62,24 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		d.invalidate();
     	}
     }
+    
+    //[party][election][district]
+    public double[][][] getAllElectionOutcomes() {
+    	int num_elections = MainFrame.mainframe.project.multiElections.size();
+    	double[][] dem_votes = new double[num_elections][];
+    	double[][] rep_votes = new double[num_elections][];
+    	for(int i = 0; i < num_elections; i++) {
+    		dem_votes[i] = new double[Settings.num_districts];
+    		rep_votes[i] = new double[Settings.num_districts];
+        	for(int j = 0; j < Settings.num_districts; j++) {
+        		double[] dd = districts.get(j).getElectionOutcome(i);
+        		dem_votes[i][j] = dd[0];
+        		rep_votes[i][j] = dd[1];
+        	}
+    	}
+    	return new double[][][]{dem_votes,rep_votes};
+    }
+    
     public double get_partisan_gerrymandering() {
     	double[][] votes = new double[Settings.num_districts][];
     	double dvotes = 0;

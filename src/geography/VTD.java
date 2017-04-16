@@ -701,7 +701,18 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 			// TODO Auto-generated method stub
 			
 		}
-		
+		public double[] getElectionOutcome(int election) {
+			Vector<String> cols = MainFrame.mainframe.project.multiElections.get(election);
+			double[] dd = new double[cols.size()];
+			for( int i = 0; i < cols.size(); i++) {
+				try {
+					dd[i] = Double.parseDouble(properties.getString(cols.get(i)));
+				} catch (Exception ex) {
+
+				}
+			}
+			return dd;
+		}
 	    public double[] getOutcome() {
 	    	if( outcomes == null) {
 	    		generateOutComes();
