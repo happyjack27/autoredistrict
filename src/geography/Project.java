@@ -54,6 +54,8 @@ public class Project extends ReflectionJSONObject<Project> {
 	public double representation_weight = 0.5;
 	public boolean equalize_turnout = false;
 	public String muni_column;
+	public Vector<Vector<String>> multiElections = new Vector<Vector<String>>();
+	public Vector<Vector<String>> multiImputators = new Vector<Vector<String>>();
 	
 
 	public void post_deserialize() {

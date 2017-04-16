@@ -167,7 +167,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton stopButton = new JButton();
 	public JMenuItem mntmOpenProjectFile_1;
 	public JPanel panel_4;
-	public JButton btnElectionColumns;
 	public JSeparator separator_1 = new JSeparator();
 	public JSeparator separator_2 = new JSeparator();
 	public JMenuItem mntmImportAggregate = new JMenuItem("Import & aggregate custom");
@@ -3527,34 +3526,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		setEnableds();	
 		
 	}
-	
-	public void selectLayers() {
-		boolean is_evolving = this.evolving;
-		if( is_evolving) { featureCollection.ecology.stopEvolving(); }
-		setDistrictColumn(project.district_column);
-		//featureCollection.loadDistrictsFromProperties(project.district_column);
-		DialogSelectLayers dlg = new DialogSelectLayers();
-		dlg.setData(featureCollection,project.election_columns);
-		dlg.show();
-		if( !dlg.ok) {
-			if( is_evolving) { featureCollection.ecology.startEvolving(); }
-			return;
-		}
-
-		try {
-			project.election_columns = dlg.in;
-			setElectionColumns();
-		} catch (Exception ex) {
-			System.out.println("ex "+ex);
-			ex.printStackTrace();
-		}
-		//mntmShowDemographics.setSelected(true);
-		//Feature.display_mode = 1;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		
-		if( is_evolving) { featureCollection.ecology.startEvolving(); }
-	}
 	public void setMaxElections() {
 		int imax = 1;//chckbxThirdElection.isSelected() ? 3 : chckbxSecondElection.isSelected() ? 2 : 1;
 		for( VTD f : featureCollection.features) {
@@ -5984,15 +5955,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		sliderSeatsVotes.setBounds(10, 180, 180, 29);
 		panel_4.add(sliderSeatsVotes);
 		
-		btnElectionColumns = new JButton("Election columns");
-		btnElectionColumns.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				selectLayers();
-			}
-		});
-		btnElectionColumns.setBounds(6, 268, 184, 23);
-		panel.add(btnElectionColumns);
-		
 		lblGeometricFairness = new JLabel("Geometric <===> Fairness");
 		lblGeometricFairness.setHorizontalAlignment(SwingConstants.CENTER);
 		lblGeometricFairness.setBounds(410, 11, 180, 16);
@@ -6380,6 +6342,46 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblQuotaMethod = new JLabel("Quota");
 		lblQuotaMethod.setBounds(6, 182, 52, 16);
 		panel.add(lblQuotaMethod);
+		
+		btnMultielectionColumns = new JButton("Multi-Election columns");
+		btnMultielectionColumns.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean is_evolving = evolving;
+				if( is_evolving) { featureCollection.ecology.stopEvolving(); }
+				setDistrictColumn(project.district_column);
+				//featureCollection.loadDistrictsFromProperties(project.district_column);
+				DialogManageElections dlg = new DialogManageElections("Multiple election column selection"
+						,featureCollection.getHeaders()
+						,project.multiElections
+						,project.multiImputators
+						);
+				//dlg.setData(featureCollection,project.election_columns);
+				dlg.show();
+				if( !dlg.ok) {
+					if( is_evolving) { featureCollection.ecology.startEvolving(); }
+					return;
+				}
+
+				try {
+					project.multiElections = dlg.elections;
+					project.multiImputators = dlg.imputators;
+					project.election_columns = dlg.elections.get(0);
+					setElectionColumns();
+					//setElectionColumns();
+				} catch (Exception ex) {
+					System.out.println("ex "+ex);
+					ex.printStackTrace();
+				}
+				//mntmShowDemographics.setSelected(true);
+				//Feature.display_mode = 1;
+				mapPanel.invalidate();
+				mapPanel.repaint();
+				
+				if( is_evolving) { featureCollection.ecology.startEvolving(); }
+			}
+		});
+		btnMultielectionColumns.setBounds(4, 303, 184, 23);
+		panel.add(btnMultielectionColumns);
 		rdbtnRouletteSelection.setVisible(false);
 		rdbtnRankSelection.setVisible(false);
 		
@@ -6518,6 +6520,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JSplitPane splitPane_1;
 	public JMenuItem mntmShowPieCharts;
 	public JCheckBox chckbxRecombination;
+	public JButton btnMultielectionColumns;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

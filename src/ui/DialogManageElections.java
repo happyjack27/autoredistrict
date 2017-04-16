@@ -41,7 +41,7 @@ public class DialogManageElections extends JDialog {
 		for( int i = 0; i < 20; i++) {
 			all.add("col"+i);
 		}
-		DialogManageElections dme = new DialogManageElections("title",all,null,null);
+		DialogManageElections dme = new DialogManageElections("title",(String[])(all.toArray()),null,null);
 		dme.show();
 	}
 	
@@ -77,7 +77,7 @@ public class DialogManageElections extends JDialog {
     	}
 	}
 	
-	public DialogManageElections(String title, Vector<String> all, Vector<Vector<String>> elections,Vector<Vector<String>> imputators) {
+	public DialogManageElections(String title, String[] all, Vector<Vector<String>> elections,Vector<Vector<String>> imputators) {
 		setTitle(title);
 		if( elections == null) {
 			elections = new Vector<Vector<String>>();
@@ -85,8 +85,6 @@ public class DialogManageElections extends JDialog {
 		if( imputators == null) {
 			imputators = new Vector<Vector<String>>();
 		}
-		System.out.println("all "+all.size());
-
 		
 		for( String s : all) {
 			available.add(s);
@@ -301,7 +299,7 @@ public class DialogManageElections extends JDialog {
 				
 			}
 		});
-		removeElectionButton.setBounds(369, 1, 34, 29);
+		removeElectionButton.setBounds(359, 1, 48, 29);
 		getContentPane().add(removeElectionButton);
 		
 		addElectionButton = new JButton("+");
@@ -317,13 +315,15 @@ public class DialogManageElections extends JDialog {
 					
 				}
 				listElections.setListData(electionNumbers);
+				/*
 				if( i >= 0) {
 					listElections.setSelectedIndex(i);
-				}
+				}*/
+				listElections.setSelectedIndex(electionNumbers.size()-1);
 				
 			}
 		});
-		addElectionButton.setBounds(434, 1, 34, 29);
+		addElectionButton.setBounds(419, 1, 49, 29);
 		getContentPane().add(addElectionButton);
 	}
 }
