@@ -32,10 +32,14 @@ public class BetaStuff implements VoteCounts {
 				wi_maxdem_dem,wi_maxdem_rep,
 				8
 				);
-		maxrep.showBetas();
-		fair.showBetas();
+		
+		//maxrep.showBetas();
+		//fair.showBetas();
+		//actual.showBetas();
+		//maxdem.showBetas();
+		
 		actual.showBetas();
-		maxdem.showBetas();
+		actual.showSeats();
 	}
 
 

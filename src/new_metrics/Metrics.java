@@ -1,9 +1,12 @@
 package new_metrics;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.util.FastMath;
+
+import util.Pair;
 
 public class Metrics {
 	int trials = 100000;
@@ -26,6 +29,7 @@ public class Metrics {
 	Vector<BetaDistribution> district_bds = null;
 	Vector<BetaDistribution> centerd_district_bds = null;
 	double[] seat_probs = null;
+	double[] inv_seat_probs = null;
 	double seat_expectation = 0;
 
 	public double asymmetry_90_low;
@@ -84,6 +88,9 @@ public class Metrics {
 		
 		expected_asymmetry = 0;
 		Vector<Double> asym = new Vector<Double>();
+		for( int i = -num_districts/2; i <= num_districts/2; i++) {
+			asym.add((double)i/(double)num_districts);
+		}
 		for( int i = 0; i < trials; i++) {
 			double d = scoreRandom();
 			expected_asymmetry += d;
@@ -114,6 +121,7 @@ public class Metrics {
 		System.out.println("asymmetry SD      : "+Math.sqrt(var));
 		System.out.println("asymmetry high  5%: "+asymmetry_90_high);
 		System.out.println();
+		binAndShow(asym);
 	}
 	public void showBetas() {
 		FrameDraw fd = new FrameDraw();
@@ -206,6 +214,29 @@ public class Metrics {
 		}
 		return ((double)num_dem_seats)/(double)sorted_dists.size();
 
+	}
+	public void binAndShow(Vector<Double> samples) {
+		Hashtable<Double,Double> hash = new Hashtable<Double,Double>();
+		double tot = 0;
+		for( double d : samples) {
+			Double bin = hash.get(d);
+			if( bin == null) {
+				bin = new Double(0);
+			}
+			bin++;
+			hash.put(d, bin);
+			tot++;
+		}
+		Vector<Pair<Double,Double>> bins = new Vector<Pair<Double,Double>>();
+		for( Entry<Double,Double> e : hash.entrySet()) {
+			bins.add(new Pair<Double,Double>(e.getKey(),e.getValue()/tot));
+		}
+		Collections.sort(bins);
+		FrameDraw fd = new FrameDraw();
+		fd.bins = bins;
+		fd.show();
+
+		
 	}
 
 

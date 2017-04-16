@@ -7,6 +7,8 @@ import javax.swing.table.*;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 
+import util.Pair;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -33,6 +35,7 @@ public class FrameDraw extends JFrame {
 	BetaDistribution dist = null;
 	Vector<BetaDistribution> dists = null;
 	double[] seats = null;
+	public Vector<Pair<Double, Double>> bins = null;
 	
 	class PiePanel extends JPanel {
 		
@@ -55,7 +58,31 @@ public class FrameDraw extends JFrame {
 			    
 
 			    graphics.setColor(Color.gray);
-			    
+			    if( bins != null) {
+			    	int length = (int)(400/bins.size());
+			    	int x = 50;
+			    	for( int i = 0; i < bins.size(); i++) {
+			    		int height = (int)(bins.get(i).b*500);
+			    		if( bins.get(i).a <= 0) {
+						    graphics.setColor(Color.red);
+						    if( bins.get(i).a == 0) {
+						    	graphics.setColor(Color.gray);
+						    }
+			    			
+			    		} else {
+						    graphics.setColor(Color.blue);
+
+			    		}
+
+			    		
+			    		graphics.fillRect(x, 400-height, length, height);
+			    		String s = ""+bins.get(i).a;
+			    		int textx = x + length/2 - graphics.getFontMetrics().stringWidth(s)/2;
+			    		graphics.drawString(s, textx, 420);
+			    		x += length;
+			    	}
+			    	
+			    }
 			    if( seats != null) {
 			    	int length = (int)(400/seats.length);
 			    	int x = 50;
