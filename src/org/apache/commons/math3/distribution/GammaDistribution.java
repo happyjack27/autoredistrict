@@ -188,7 +188,8 @@ public class GammaDistribution extends AbstractRealDistribution {
         // compute a and B
         return new double[]{
         		mean*mean/var,
-        		mean/var  ///or is this upside down?  scale or rate?
+        		//mean/var  //rate
+        		var/mean //scale
         };
     }
 
