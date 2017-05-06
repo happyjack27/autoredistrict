@@ -5552,11 +5552,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					JOptionPane.showMessageDialog(null, "Must have at least three elections selected to compute advanced statistics.");
 					return;
 				}
+				if( featureCollection.ecology.population == null || featureCollection.ecology.population.size() == 0) {
+					featureCollection.ecology.population =  new Vector<DistrictMap>();
+		    		featureCollection.ecology.population.add(new DistrictMap(featureCollection.ecology.vtds,Settings.num_districts));
+				}
 				DistrictMap dm = featureCollection.ecology.population.get(0);
 				double[][][] ee = dm.getAllElectionOutcomes();
 				Metrics m = new Metrics(ee[0],ee[1],Settings.num_districts);
 				m.showBetas();
+				m.computeSeatProbs(false);
 				m.showSeats();
+				m.computeAsymmetry(false);
+				m.showAsymmetry();
 			}
 		});
 		mnWindows.add(mntmShowAdvancedStats);

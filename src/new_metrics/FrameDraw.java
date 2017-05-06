@@ -59,26 +59,44 @@ public class FrameDraw extends JFrame {
 
 			    graphics.setColor(Color.gray);
 			    if( bins != null) {
+			    	//graphics.setFont(new Font("Arial,"));
+			    	double max_height = 0;
+			    	for( int i = 0; i < bins.size(); i++) {
+			    		if( bins.get(i).b > max_height) {
+			    			max_height = bins.get(i).b;
+			    		}
+			    	}
+			    	int last_label_x = -1000;
 			    	int length = (int)(400/bins.size());
 			    	int x = 50;
 			    	for( int i = 0; i < bins.size(); i++) {
-			    		int height = (int)(bins.get(i).b*500);
-			    		if( bins.get(i).a <= 0) {
-						    graphics.setColor(Color.red);
-						    if( bins.get(i).a == 0) {
-						    	graphics.setColor(Color.gray);
-						    }
+			    		try {
+				    		int height = (int)(bins.get(i).b*400/max_height);
+				    		if( bins.get(i).a <= 0) {
+							    graphics.setColor(Color.red);
+							    if( bins.get(i).a == 0) {
+							    	graphics.setColor(Color.gray);
+							    }
+				    			
+				    		} else {
+							    graphics.setColor(Color.blue);
+	
+				    		}
+	
+				    		
+				    		graphics.fillRect(x, 400-height, length, height);
+				    		String s = ""+bins.get(i).a;
+				    		if( s.length() > 5) {
+				    			s = s.substring(0, 5);
+				    		}
+				    		int textx = x + length/2 - graphics.getFontMetrics().stringWidth(s)/2;
+				    		if( textx - last_label_x > 40) {
+					    		graphics.drawString(s, textx, 420);
+					    		last_label_x = textx;
+				    		}
+			    		} catch (Exception ex) {
 			    			
-			    		} else {
-						    graphics.setColor(Color.blue);
-
 			    		}
-
-			    		
-			    		graphics.fillRect(x, 400-height, length, height);
-			    		String s = ""+bins.get(i).a;
-			    		int textx = x + length/2 - graphics.getFontMetrics().stringWidth(s)/2;
-			    		graphics.drawString(s, textx, 420);
 			    		x += length;
 			    	}
 			    	
@@ -86,6 +104,7 @@ public class FrameDraw extends JFrame {
 			    if( seats != null) {
 			    	int length = (int)(400/seats.length);
 			    	int x = 50;
+			    	int last_label_x = -1000;
 			    	for( int i = 0; i < seats.length; i++) {
 			    		int height = (int)(seats[i]*500);
 			    		if( x < 250) {
@@ -101,7 +120,10 @@ public class FrameDraw extends JFrame {
 			    		graphics.fillRect(x, 400-height, length, height);
 			    		String s = ""+i+" rep";
 			    		int textx = x + length/2 - graphics.getFontMetrics().stringWidth(s)/2;
-			    		graphics.drawString(s, textx, 420);
+			    		if( textx-last_label_x > 40) {
+				    		graphics.drawString(s, textx, 420);
+				    		last_label_x = textx;
+			    		}
 			    		x += length;
 			    	}
 			    }

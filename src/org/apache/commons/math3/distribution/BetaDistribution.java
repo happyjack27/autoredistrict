@@ -65,17 +65,16 @@ public class BetaDistribution extends AbstractRealDistribution {
     }
 	
 	
-	 public double[] mom_estimate(double[] xs)
-	    {
-	        double mean = sample_mean(xs);
-	        double var = sample_variance(xs);
-	        
-	        // compute a and B
-	        return new double[]{
-	        		(mean) * (mean * (1 - mean) / var - 1)
-	        		,(1 - mean) * (mean * (1 - mean) / var - 1)
-	        };
-	    }
+    public double[] mom_estimate(double[] xs) {
+        double mean = sample_mean(xs);
+        double var = sample_variance(xs);
+        
+        // compute a and B
+        return new double[]{
+        		(mean) * (mean * (1 - mean) / var - 1)
+        		,(1 - mean) * (mean * (1 - mean) / var - 1)
+        };
+    }
 
 	    public double[] MLE(double[] xs)
 	    {
@@ -141,7 +140,11 @@ public class BetaDistribution extends AbstractRealDistribution {
 	    	
 	        double sum = 0;
 	        for( double x : xs) {
-	            sum += logDensity(x);
+	        	try {
+	        		sum += logDensity(x);
+	        	} catch (Exception ex) {
+	        		
+	        	}
 	        }
 	        System.out.println("ll: "+(sum / xs.length));
 	        return -sum / xs.length;
@@ -266,8 +269,12 @@ public class BetaDistribution extends AbstractRealDistribution {
 
     /** {@inheritDoc} */
     public double density(double x) {
-        final double logDensity = logDensity(x);
-        return logDensity == Double.NEGATIVE_INFINITY ? 0 : FastMath.exp(logDensity);
+    	try {
+    		final double logDensity = logDensity(x);
+    		return logDensity == Double.NEGATIVE_INFINITY ? 0 : FastMath.exp(logDensity);
+    	} catch (Exception ex) {
+    		return 0;
+    	}
     }
 
     /** {@inheritDoc} **/

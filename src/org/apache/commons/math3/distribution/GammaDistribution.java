@@ -38,14 +38,14 @@ public class GammaDistribution extends AbstractRealDistribution {
     /** Serializable version identifier. */
     private static final long serialVersionUID = 20120524L;
     /** The shape parameter. */
-    private final double shape;
+    private double shape;
     /** The scale parameter. */
-    private final double scale;
+    private double scale;
     /**
      * The constant value of {@code shape + g + 0.5}, where {@code g} is the
      * Lanczos constant {@link Gamma#LANCZOS_G}.
      */
-    private final double shiftedShape;
+    private double shiftedShape;
     /**
      * The constant value of
      * {@code shape / scale * sqrt(e / (2 * pi * (shape + g + 0.5))) / L(shape)},
@@ -54,7 +54,7 @@ public class GammaDistribution extends AbstractRealDistribution {
      * {@link #density(double)}, when no overflow occurs with the natural
      * calculation.
      */
-    private final double densityPrefactor1;
+    private double densityPrefactor1;
     /**
      * The constant value of
      * {@code log(shape / scale * sqrt(e / (2 * pi * (shape + g + 0.5))) / L(shape))},
@@ -63,7 +63,7 @@ public class GammaDistribution extends AbstractRealDistribution {
      * {@link #logDensity(double)}, when no overflow occurs with the natural
      * calculation.
      */
-    private final double logDensityPrefactor1;
+    private double logDensityPrefactor1;
     /**
      * The constant value of
      * {@code shape * sqrt(e / (2 * pi * (shape + g + 0.5))) / L(shape)},
@@ -72,7 +72,7 @@ public class GammaDistribution extends AbstractRealDistribution {
      * {@link #density(double)}, when overflow occurs with the natural
      * calculation.
      */
-    private final double densityPrefactor2;
+    private double densityPrefactor2;
     /**
      * The constant value of
      * {@code log(shape * sqrt(e / (2 * pi * (shape + g + 0.5))) / L(shape))},
@@ -81,21 +81,21 @@ public class GammaDistribution extends AbstractRealDistribution {
      * {@link #logDensity(double)}, when overflow occurs with the natural
      * calculation.
      */
-    private final double logDensityPrefactor2;
+    private double logDensityPrefactor2;
     /**
      * Lower bound on {@code y = x / scale} for the selection of the computation
      * method in {@link #density(double)}. For {@code y <= minY}, the natural
      * calculation overflows.
      */
-    private final double minY;
+    private double minY;
     /**
      * Upper bound on {@code log(y)} ({@code y = x / scale}) for the selection
      * of the computation method in {@link #density(double)}. For
      * {@code log(y) >= maxLogY}, the natural calculation overflows.
      */
-    private final double maxLogY;
+    private double maxLogY;
     /** Inverse cumulative probability accuracy. */
-    private final double solverAbsoluteAccuracy;
+    private double solverAbsoluteAccuracy;
 
     /**
      * Creates a new gamma distribution with specified values of the shape and
@@ -170,6 +170,50 @@ public class GammaDistribution extends AbstractRealDistribution {
      * {@code scale <= 0}.
      * @since 3.1
      */
+	public GammaDistribution(double[] xs) {
+		super(new Well19937c());
+		solverAbsoluteAccuracy = DEFAULT_INVERSE_ABSOLUTE_ACCURACY;
+		double[] ps = mom_estimate(xs);
+		setShapeScale(ps[0], ps[1]);
+	}
+	public void setShapeScale(double a, double b) {
+		shape = a;
+		scale = b;
+		init();
+	}
+    public double[] mom_estimate(double[] xs) {
+        double mean = sample_mean(xs);
+        double var = sample_variance(xs);
+        
+        // compute a and B
+        return new double[]{
+        		mean*mean/var,
+        		mean/var  ///or is this upside down?  scale or rate?
+        };
+    }
+
+	
+    public double sample_mean(double[] xs) {
+        // compute mean
+        double mean = 0;
+        for (double x : xs) {
+            mean += x;
+        }
+        mean /= (double)xs.length;
+        return mean;
+    }
+    
+    public double sample_variance(double[] xs) {
+        double mean = sample_mean(xs);
+        double var = 0;
+        for (double x : xs) {
+            double s = x - mean;
+            var += s * s;
+        }
+        var /= (double)(xs.length - 1);
+        return var;
+    }
+    
     public GammaDistribution(RandomGenerator rng,
                              double shape,
                              double scale,
@@ -187,6 +231,9 @@ public class GammaDistribution extends AbstractRealDistribution {
         this.shape = shape;
         this.scale = scale;
         this.solverAbsoluteAccuracy = inverseCumAccuracy;
+        init();
+    }
+    public void init() {
         this.shiftedShape = shape + Gamma.LANCZOS_G + 0.5;
         final double aux = FastMath.E / (2.0 * FastMath.PI * shiftedShape);
         this.densityPrefactor2 = shape * FastMath.sqrt(aux) / Gamma.lanczos(shape);

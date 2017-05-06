@@ -262,7 +262,7 @@ public class DialogManageElections extends JDialog {
 		});
 		scrollPane_3.setViewportView(listElections);
 		
-		lblImputeWithoptional = new JLabel("Impute with (optional)");
+		lblImputeWithoptional = new JLabel("Impute with (not implemented)");
 		lblImputeWithoptional.setBounds(286, 254, 182, 16);
 		getContentPane().add(lblImputeWithoptional);
 		
