@@ -39,7 +39,14 @@ public class BetaStuff implements VoteCounts {
 		//maxdem.showBetas();
 		
 		actual.showBetas();
+		actual.computeSeatProbs(false);
+		double[][] dd = actual.getAnOutcome();
+		for( int i = 0; i < dd.length; i++) {
+			System.out.println(""+i+": "+dd[i][0]+" "+dd[i][1]);
+		}
 		actual.showSeats();
+		actual.computeAsymmetry(false);
+		actual.showAsymmetry();
 	}
 
 

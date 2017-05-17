@@ -125,8 +125,9 @@ public class Download extends Thread {
 
 	
 	public static void main(String[] args) {
-		System.out.println(census_pop_url(51,2010));
-		System.out.println(census_centroid_url(51,2010));
+		int state = 55;
+		System.out.println(census_pop_url(state,2010));
+		System.out.println(census_centroid_url(state,2010));
 	}
 
 	/*

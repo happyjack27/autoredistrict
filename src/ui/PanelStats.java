@@ -927,7 +927,13 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			Vector<VTD> vf = hash.get(scounty);
 			for( int k = 0; k < vf.size(); k++) {
 				geography.Properties p = vf.get(k).properties;
-				pop += Double.parseDouble(p.get(pop_col).toString().replaceAll(",",""));
+				try { 
+					if( p.get(pop_col) != null) {
+						pop += Double.parseDouble(p.get(pop_col).toString().replaceAll(",",""));
+					}
+				} catch (Exception ex) {
+					
+				}
 				for( int j = 0; j < dd.length; j++) {
 					double d = Double.parseDouble(p.get(demonames[j]).toString().replaceAll(",",""));
 					dd[j] += d;

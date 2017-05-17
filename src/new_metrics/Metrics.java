@@ -454,6 +454,37 @@ public class Metrics {
 		
 		return new double[]{dem_sq/tot,rep_sq/tot,dem_sq/target,rep_sq/target,target};
 	}
+	
+	public void showHistogram() {
+		double res = 100;
+		Vector<Double> vd = new Vector<Double>();
+		for( int i = 0; i < 5*trials/res; i++) {
+			double[][] dd = getAnOutcome();
+			for( int j = 0; j < dd.length; j++) {
+				double d = dd[j][0]/(dd[j][0]+dd[j][1]);
+				d = Math.round(d*res)/res - 0.5;
+				vd.add(d);
+			}
+		}
+		binAndShow(vd);
+	}
+	
+	public void showBetaParameters() {
+		System.out.println("{");
+		System.out.println("\tpopular_vote: { alpha: "+election_betas.getAlpha()+", beta: "+election_betas.getBeta()+" },");
+		System.out.println("\tdistrict_vote: ["); 
+		for( int i = 0; i < district_betas.size(); i++) {
+			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+district_betas.get(i).getAlpha()+", beta: "+district_betas.get(i).getBeta()+" },");
+		}
+		System.out.println("\t],"); 
+		System.out.println("\tcentered_district_vote: ["); 
+		for( int i = 0; i < centered_district_betas.size(); i++) {
+			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+district_betas.get(i).getAlpha()+", beta: "+district_betas.get(i).getBeta()+" },");
+		}
+		System.out.println("\t]"); 
+		System.out.println("}");
+	}
+
 	/*
 	public double[] get_packing(double[][] district_votes) {
 		
