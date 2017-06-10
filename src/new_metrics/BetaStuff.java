@@ -47,6 +47,7 @@ public class BetaStuff implements VoteCounts {
 		actual.showSeats();
 		actual.computeAsymmetry(false);
 		actual.showAsymmetry();
+		actual.showSeatsVotes();
 	}
 
 

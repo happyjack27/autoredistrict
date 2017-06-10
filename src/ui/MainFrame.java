@@ -5566,6 +5566,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				m.showAsymmetry();
 				m.showHistogram();
 				m.showBetaParameters();
+				m.showSeatsVotes();
 			}
 		});
 		mnWindows.add(mntmShowAdvancedStats);

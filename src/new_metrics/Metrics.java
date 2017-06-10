@@ -170,6 +170,12 @@ public class Metrics {
 		FrameDraw fd = new FrameDraw();
 		fd.dist = election_betas;
 		fd.dists = district_betas;
+		System.out.println("beta params:");
+		for( int i = 0; i < centered_district_betas.size(); i++) {
+			BetaDistribution b = centered_district_betas.get(i);
+			System.out.println(""+(i+1)+" alpha: "+b.getAlpha()+", beta: "+b.getBeta());
+			
+		}
 		
 		fd.show();
 		fd.repaint();
@@ -483,6 +489,14 @@ public class Metrics {
 		}
 		System.out.println("\t]"); 
 		System.out.println("}");
+	}
+	public void showSeatsVotes() {
+		FrameDrawSeatsVotes sv = new FrameDrawSeatsVotes();
+		sv.dist = election_betas;
+		sv.dists = district_betas;
+		sv.show();
+		// TODO Auto-generated method stub
+		
 	}
 
 	/*
