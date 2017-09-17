@@ -522,25 +522,37 @@ SAVE
 			}
 			mainFrame.importURL( url,  fk,  pk, cols);
 		} else
-			if( command.equals("IMPORT") && instruction_words[1].equals("POPULATION")) {
-				boolean d = Download.prompt;
-				Download.prompt = false;
-				mainFrame.importPopulation();
-				Download.prompt = d;
-			} else
-			if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
-				mainFrame.importBlockElection();
-			} else
-				if( command.equals("IMPORT") && instruction_words[1].equals("DEMOGRAPHICS")) {
-					mainFrame.importBlockDemographics();
-					instruction_pointer++;
-					textFieldIP.setText(""+(instruction_pointer+1));
-					return;
-				} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("POPULATION")) {
+			boolean d = Download.prompt;
+			Download.prompt = false;
+			mainFrame.importPopulation();
+			Download.prompt = d;
+		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("ELECTIONS")) {
+			mainFrame.importBlockElection();
+		} else
+		if( command.equals("IMPORT") && instruction_words[1].equals("DEMOGRAPHICS")) {
+			mainFrame.importBlockDemographics();
+			instruction_pointer++;
+			textFieldIP.setText(""+(instruction_pointer+1));
+			return;
+		} else
 		if( command.equals("FFF")) {
 			mainFrame.appendStuff();
 		}
 		if( command.equals("IMPORT") && instruction_words[1].equals("TRANSLATIONS")) {
+			mainFrame.importTranslations();
+		} else
+		if( command.equals("EVIL")) { 
+			if( instruction_words[1].equals("GOOD")) {
+				DistrictMap.EVIL_MODE = DistrictMap.EVIL_GOOD;
+			}
+			if( instruction_words[1].equals("DEM")) {
+				DistrictMap.EVIL_MODE = DistrictMap.EVIL_DEM;
+			}
+			if( instruction_words[1].equals("REP")) {
+				DistrictMap.EVIL_MODE = DistrictMap.EVIL_REP;
+			}
 			mainFrame.importTranslations();
 		} else
 		if( command.equals("IMPORT") && (instruction_words[1].equals("CURRENT_DISTRICTS") || instruction_words[1].equals("CY2000_DISTRICTS"))) {

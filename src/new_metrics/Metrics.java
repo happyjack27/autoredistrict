@@ -17,7 +17,7 @@ import util.Pair;
  */
 
 public class Metrics {
-	int trials = 100000;
+	public int trials = 100000;
 	
 	//Expected_asymmetry: -0.4247375
 	//Expected_asymmetry: -0.3091875

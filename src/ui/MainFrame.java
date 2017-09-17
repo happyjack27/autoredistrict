@@ -132,6 +132,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	JMenuItem mntmOpenElectionResults = new JMenuItem("Open Election results");
 	JMenu mnEvolution = new JMenu("Evolution");
 	JMenu mnHelp = new JMenu("Help");
+	private JMenu mnHelp_1;
 	JMenuItem mntmWebsite = new JMenuItem("Website");
 	JMenuItem mntmSourceCode = new JMenuItem("Source code");
 	JMenuItem mntmLicense = new JMenuItem("License");
@@ -4239,7 +4240,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		//mnDemographics = new JMenu("Demographics");
 		chckbxmntmOpenCensusResults = new JMenuItem("Open Census results");
 		mntmOpenElectionResults = new JMenuItem("Open Election results");
-		mnHelp = new JMenu("Help");
+		mnHelp_1 = new JMenu("Help");
 		mntmWebsite = new JMenuItem("Website");
 		mntmSourceCode = new JMenuItem("Source code");
 		mntmLicense = new JMenuItem("License");
@@ -5512,10 +5513,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				JOptionPane.showMessageDialog(null,"Not implemented.");
 			}
 		});
+		
+		mntmExplainStats = new JMenuItem("Explain stats");
+		mntmExplainStats.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Applet.browseTo(PanelStats.stats_descriptions_url);
+			}
+		});
+		mnHelp_1.add(mntmExplainStats);
 		//menuBar.add(S)
-		mnHelp.add(mntmWebsite);
-		mnHelp.add(mntmSourceCode);
-		mnHelp.add(mntmLicense);
+		mnHelp_1.add(mntmWebsite);
+		mnHelp_1.add(mntmSourceCode);
+		mnHelp_1.add(mntmLicense);
 		
 		menuBar.add(mnWindows);
 		mnWindows.add(mntmShowStats);
@@ -5559,6 +5568,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				DistrictMap dm = featureCollection.ecology.population.get(0);
 				double[][][] ee = dm.getAllElectionOutcomes();
 				Metrics m = new Metrics(ee[0],ee[1],Settings.num_districts);
+				m.trials = 10000;
 				m.showBetas();
 				m.computeSeatProbs(false);
 				m.showSeats();
@@ -5601,8 +5611,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		menuBar.add(Box.createHorizontalGlue());
-		mnHelp.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); 
-		menuBar.add(mnHelp);
+		mnHelp_1.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT); 
+		menuBar.add(mnHelp_1);
 		
 		JSplitPane splitPane = new JSplitPane();
 		JSplitPane splitPane2 = new JSplitPane();
@@ -6549,6 +6559,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBox chckbxRecombination;
 	public JButton btnMultielectionColumns;
 	public JMenuItem mntmShowAdvancedStats;
+	public JMenuItem mntmExplainStats;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

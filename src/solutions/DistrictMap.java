@@ -25,10 +25,11 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
-	boolean EVIL1 = false; //dem
-	boolean EVIL2 = false; //rep
-	boolean EVIL3 = false; //either
-	double NEGATIVE_ONE_IS_EVIL = EVIL3 ? -1 : 1;
+	public static int EVIL_GOOD = 0;
+	public static int EVIL_DEM = 1;
+	public static int EVIL_REP = 2;
+	public static int EVIL_EITHER = 3;
+	public static int EVIL_MODE = EVIL_GOOD;
 	
 	public double area_multiplier = 1;//Math.pow(100,2)*10;
 	
@@ -89,6 +90,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		dvotes += votes[k][0];
     		rvotes += votes[k][1];
     	}
+    	
+    	//center
     	double target = (dvotes+rvotes)/2;
     	for( int k = 0; k < Settings.num_districts; k++) {
     		votes[k][0] *= target / dvotes;
@@ -1628,7 +1631,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    	total += weight*Math.abs(dd[0]-mid_y);
 	    }
 
-    	return NEGATIVE_ONE_IS_EVIL*total;
+    	return total;
     }
 
     //returns total edge length, unfairness, population imbalance
@@ -1990,7 +1993,27 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	long time5 = System.currentTimeMillis();
     	
         //System.out.println(""+wasted_votes+", "+wasted_vote_imbalance);
-    	double sva = EVIL1 ? get_partisan_gerrymandering() : EVIL2 ? -get_partisan_gerrymandering() : calcSeatsVoteAsymmetry();
+    	double sva = 
+    			EVIL_MODE == EVIL_GOOD ? calcSeatsVoteAsymmetry() :
+        		EVIL_MODE == EVIL_DEM ? get_partisan_gerrymandering() :
+                EVIL_MODE == EVIL_REP ? -get_partisan_gerrymandering() :
+                EVIL_MODE == EVIL_EITHER ? Math.abs(get_partisan_gerrymandering()) :
+    		0;
+    	/*
+    	 * 
+	boolean EVIL1 = false; //dem
+	boolean EVIL2 = false; //rep
+	boolean EVIL3 = false; //either
+	double NEGATIVE_ONE_IS_EVIL = EVIL3 ? -1 : 1;
+	
+	static int EVIL_GOOD = 0;
+	static int EVIL_DEM = 1;
+	static int EVIL_REP = 2;
+	static int EVIL_EITHER = 3;
+	static int EVIL_MODE = EVIL_GOOD;
+
+    	 */
+    	//double sva = EVIL1 ? get_partisan_gerrymandering() : EVIL2 ? -get_partisan_gerrymandering() : calcSeatsVoteAsymmetry();
     	/*
     	 * double[] weights = new double[]{
         		Settings.geometry_weight                *1.0, 
