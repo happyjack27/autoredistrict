@@ -1,5 +1,11 @@
 Changelog:
 
+V. 1.31
+
+* added ability to select multiple elections
+* added advanced stats (available when multiple elections are selected)
+* statically linked apache.commons.math.
+
 V. 1.30
 
 * added link in stats panel to descriptions of stats
