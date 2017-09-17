@@ -42,7 +42,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	public Vector<District> districts = new Vector<District>();
     
     public int[] vtd_districts = new int[]{};
-    public double[] fairnessScores = new double[12];
+    public double[] fairnessScores = new double[Ecology.NUM_FAIRNESS_SCORES];
     public double fitness_score = 0;
     
     public static double[] metrics = new double[10];
@@ -1532,6 +1532,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
     
     double deviation_from_diagonal = 0;
+    double specificAsymmetry = 0;
     public void calcSeatsVotesCurve() {
     	deviation_from_diagonal = 0;
 		Vector<double[]> swap = new Vector<double[]>();
@@ -1591,6 +1592,44 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			swap.add(new double[]{demseatpct,dempct});
 		}
 		seats_votes = swap;
+
+		
+		//now calculate spec asym
+		//dem
+		double dempct = vote_count_totals[0]/(vote_count_totals[0]+vote_count_totals[1]);
+		double reppct = 1-dempct;
+		//double votes = dempct;
+		double demseats = 0;
+		double repseats = 0;
+		double totseats = 0;
+		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+			//if uncontested, ignore.
+			if( FeatureCollection.buncontested1 != null && FeatureCollection.buncontested1.length > i && FeatureCollection.buncontested1[i] && Settings.ignore_uncontested) {
+				continue;
+			}
+			totseats += Settings.seats_in_district(i);
+			double[] pv = new double[]{vote_count_districts[i][0]*dempct,vote_count_districts[i][1]*reppct};
+			double[] winners = District.popular_vote_to_elected( pv,i,0);
+			demseats += winners[0];
+		}
+		
+		//rep
+		dempct = vote_count_totals[1]/(vote_count_totals[0]+vote_count_totals[1]);
+		reppct = 1-dempct;
+		//double votes = dempct;
+		repseats = 0;
+		totseats = 0;
+		for( int i = 0; i < districts.size() && i < Settings.num_districts; i++) {
+			//if uncontested, ignore.
+			if( FeatureCollection.buncontested1 != null && FeatureCollection.buncontested1.length > i && FeatureCollection.buncontested1[i] && Settings.ignore_uncontested) {
+				continue;
+			}
+			totseats += Settings.seats_in_district(i);
+			double[] pv = new double[]{vote_count_districts[i][0]*dempct,vote_count_districts[i][1]*reppct};
+			double[] winners = District.popular_vote_to_elected( pv,i,0);
+			repseats += winners[1];
+		}
+		specificAsymmetry = (repseats - demseats)/2.0;
     }
     public double calcDisproporionality() {
     	calcSeatsVotesCurve();
@@ -1602,6 +1641,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    }
 	    return total*weight;
 	}
+    public double getSpecificAsymmetry() {
+    	calcSeatsVotesCurve();
+    	return specificAsymmetry;
+    }
     public double calcSeatsVoteAsymmetry() {
     	calcSeatsVotesCurve();
     	double total = 0;
@@ -2042,7 +2085,6 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		if( shutout) {
     			total_vote_gap += 1000000;
     		}*/
-    	//sadfs
     	}
         fairnessScores = new double[]{
         		length+penalty
@@ -2057,14 +2099,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		,Settings.reduce_splits ? countSplits()+penalty : 0
                 ,Settings.vote_dilution_weight == 0 ? 0 : getRacialVoteDilution()+penalty
                 ,Settings.descr_rep_weight == 0 ? 0 : this.getDescrVoteImbalance()+penalty
+                ,Math.abs(specificAsymmetry)
         		}; //exponentiate because each bit represents twice as many people disenfranched
     	long time6 = System.currentTimeMillis();
-    	metrics[0] += time1-time0;
-    	metrics[1] += time2-time1;
+    	metrics[0] += time1-time0; //x
+    	metrics[1] += time2-time1; //x
     	metrics[2] += time3-time2;
-    	metrics[3] += time4-time3;
-    	metrics[4] += time5-time4;
-    	metrics[5] += time6-time5;
+    	metrics[3] += time4-time3; //x
+    	metrics[4] += time5-time4; //x
+    	metrics[5] += time6-time5; //x
 
     	metrics[6] += time20-time2;//time10-time1;
     	metrics[7] += 0;//time11-time10; //

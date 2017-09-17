@@ -36,7 +36,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Contiguity",
     		"Equal population",
     		"Splits",
-    		"",
+    		"Specific Asymmetry",
     };
 
 

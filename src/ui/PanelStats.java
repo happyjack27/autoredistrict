@@ -197,7 +197,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				dm.fairnessScores[7], //seats votes asymmetry
 				
 
-				0,//Settings.getAnnealingFloor( featureCollection.ecology.generation),
+				dm.fairnessScores[12], //spec asymm,
 
 				(
 						//Settings.square_root_compactness 
@@ -247,7 +247,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					(dm.fairnessScores[4]+dm2.fairnessScores[4]+dm3.fairnessScores[4])*0.3333333, //POWER IMBALANCE
 					(dm.fairnessScores[5]+dm2.fairnessScores[5]+dm3.fairnessScores[5])*0.3333333, //WASTED VOTES TOTAL
 					(dm.fairnessScores[6]+dm2.fairnessScores[6]+dm3.fairnessScores[6])*0.3333333, //WASTED VOTES IMBALANCE
-					0,
+					(dm.fairnessScores[12]+dm2.fairnessScores[12]+dm3.fairnessScores[12])*0.3333333, //spec asymm
 					
 
 					0,//Settings.getAnnealingFloor( featureCollection.ecology.generation),
@@ -298,8 +298,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 						), //BORDER LENGTH
 					dm.fairnessScores[3], //DISCONNECTED POP
 					dm.fairnessScores[2], //POP IMBALANCE
-					dm.fairnessScores[9],//dm.fairnessScores[8], //diag error
-					0,
+					dm.fairnessScores[9],//splits
+					dm.fairnessScores[12], //spec asymm
 					
 			});
 			
@@ -613,7 +613,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+decimal.format(dm.getMeanPopDiff()*100.0),"Population mean deviation (%)"},
 					Settings.reduce_splits && dm.countCountySplitsInteger() > 0 ? new String[]{""+integer.format(dm.countCountySplitsInteger()),"County splits"} : new String[]{"",""},	
 					Settings.reduce_splits && dm.countMuniSplitsInteger() > 0 ? new String[]{""+integer.format(dm.countMuniSplitsInteger()),"Muni splits"} : new String[]{"",""},	
-					new String[]{"",""},					
+					new String[]{"",""},
+					new String[]{""+decimal.format(dm.fairnessScores[12]),"Specific Asymmetry"},
 					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
 					new String[]{""+decimal.format(dm.get_partisan_gerrymandering()),"Packing/cracking asymmetry (%)"},
 					new String[]{""+integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},

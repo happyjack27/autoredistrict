@@ -5,6 +5,7 @@ V. 1.31
 * added ability to select multiple elections
 * added advanced stats (available when multiple elections are selected)
 * statically linked apache.commons.math.
+* added specific asymmetry metric
 
 V. 1.30
 
