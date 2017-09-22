@@ -12,6 +12,22 @@ public class ScoreArray implements Comparable<ScoreArray> {
 	public double dominated_by;
 	//public double age = 0;
 	
+	public static String listAllNonDominated( Vector<ScoreArray> scoreArray) {
+		StringBuffer sb = new StringBuffer();
+		for( ScoreArray s : scoreArray) {
+			if( s.dominated_by == 0) {
+				for( int i = 0; i < s.scores.length; i++) {
+					if( i > 0) {
+						sb.append(",");
+					}
+					sb.append(s.scores[i]);
+				}
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
+	}
+	
 	public static void sortByParetoFitness(Vector<ScoreArray> scoreArray, int num_scores) {
 		computeDomination(scoreArray,num_scores);
 		computeCrowding(scoreArray,num_scores);
@@ -68,8 +84,8 @@ public class ScoreArray implements Comparable<ScoreArray> {
 			Collections.sort(scoreArray);
 			double normalizer = 1.0/(scoreArray.get(scoreArray.size()-1).scores[i] - scoreArray.get(0).scores[i]);
 			
-			scoreArray.get(0).crowding = -9999999999.99;
-			scoreArray.get(scoreArray.size()-1).crowding = -9999999999.99;
+			scoreArray.get(0).crowding = -9999999999999.99;
+			scoreArray.get(scoreArray.size()-1).crowding = -99999999999.99;
 
 			for( int j = 1; j < scoreArray.size()-1; j++) {
 				for( ScoreArray s : scoreArray) {
@@ -79,7 +95,6 @@ public class ScoreArray implements Comparable<ScoreArray> {
 			}
 		}
 	}
-
 
 	//O(NN)
 	public static void computeDomination(Vector<ScoreArray> scoreArray, int num_scores) {
@@ -96,5 +111,4 @@ public class ScoreArray implements Comparable<ScoreArray> {
 			}
 		}
 	}
-
 }
