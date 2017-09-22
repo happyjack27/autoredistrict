@@ -153,8 +153,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JComboBox comboBoxPopulation = new JComboBox();
 	public JComboBox comboBoxDistrictColumn = new JComboBox();
     public JTextField textFieldNumDistricts = new JTextField();
-    public JTextField textField = new JTextField();
-    private JTextField evolutionPopulationTF;
+    public JTextField evolutionPopulationTF;
 	public JTextField textFieldSeatsPerDistrict;
 
 	public JSlider slider_mutation;
@@ -4219,7 +4218,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		comboBoxPopulation = new JComboBox();
 		comboBoxDistrictColumn = new JComboBox();
 	    textFieldNumDistricts = new JTextField();
-	    textField = new JTextField();
 
 		manageLocks = new DialogManageLocks();
 		seatsPanel = new PanelSeats();
@@ -5728,13 +5726,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		evolutionPopulationTF.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				textField.postActionEvent();
+				evolutionPopulationTF.postActionEvent();
 			}
 		});
 		evolutionPopulationTF.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				 try {
-					 int n = new Integer(textField.getText());
+					 int n = new Integer(evolutionPopulationTF.getText());
 					 if( n == Settings.population) {
 						 return;
 					 }
@@ -6419,6 +6417,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		btnMultielectionColumns.setBounds(4, 303, 184, 23);
 		panel.add(btnMultielectionColumns);
+		
+		chckbxParetoFront = new JCheckBox("Pareto front");
+		chckbxParetoFront.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.paretoMode = chckbxParetoFront.isSelected();
+			}
+		});
+		chckbxParetoFront.setBounds(32, 599, 128, 23);
+		panel.add(chckbxParetoFront);
 		rdbtnRouletteSelection.setVisible(false);
 		rdbtnRankSelection.setVisible(false);
 		
@@ -6560,6 +6567,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JButton btnMultielectionColumns;
 	public JMenuItem mntmShowAdvancedStats;
 	public JMenuItem mntmExplainStats;
+	public JCheckBox chckbxParetoFront;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

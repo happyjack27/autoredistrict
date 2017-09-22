@@ -796,7 +796,7 @@ SAVE
 			mainFrame.setMuniColumn();
 		} else
 		if( category.equals("EVOLUTION")) {
-			if( parsed && item.equals("POPULATION")) { mainFrame.textField.setText(value); fireAction(mainFrame.textField); }
+			if( parsed && item.equals("POPULATION")) { mainFrame.evolutionPopulationTF.setText(value); fireAction(mainFrame.evolutionPopulationTF); }
 			if( parsed && item.equals("MUTATE_RATE")) { mainFrame.slider_mutation.setValue((int)(d*100)); }
 			if( parsed && item.equals("ANNEAL_RATE")) { mainFrame.slider_anneal.setValue((int)(d*100)); }
 			if( parsed && item.equals("ELITE_FRAC")) { mainFrame.sliderElitism.setValue((int)(d*100)); }

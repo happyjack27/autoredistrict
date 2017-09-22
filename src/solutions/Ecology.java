@@ -1,6 +1,7 @@
 package solutions;
 
 import geography.*;
+import paretoFront.ScoreArray;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -389,7 +390,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         }
 
         
-        if( verbosity > 1)
+        //STEP 1: SCORE
+    	if( verbosity > 1)
         	System.out.print("  calculating fairness");
         if( !Settings.multiThreadScoring) { //single threaded
             for( DistrictMap map : population) {
@@ -415,136 +417,176 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         if( verbosity > 1)
         	System.out.println("");
     	
-        if( verbosity > 1)
-        	System.out.println("  renormalizing fairness...");
-        if( Settings.LINEARIZE_MODE == Settings.RANK) {
-	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
-	        	//pre-randomize so that ties are treated unbiased.
+        //STEP 2: NORMALIZE
+        if( !Settings.paretoMode) {
+	        if( verbosity > 1)
+	        	System.out.println("  renormalizing fairness...");
+	        if( Settings.NORMALIZE_MODE == Settings.RANK) {
+		        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
+		        	//pre-randomize so that ties are treated unbiased.
+		            for( DistrictMap map : population) {
+		                map.fitness_score = Math.random();
+		            }
+		            Collections.sort(population);
+		            
+		            for( DistrictMap map : population) {
+		                map.fitness_score = map.fairnessScores[i];
+		            }
+		            Collections.sort(population);
+		            double mult = 1.0/(double)population.size();
+		            for( int j = 0; j < population.size(); j++) {
+		                DistrictMap map = population.get(j);
+		                //if( map.fairnessScores[i] != 0 || i == 11) {
+		                	map.fairnessScores[i] = ((double)j)*mult;
+		                //}
+		            }
+		        }
+	        } else
+	        if( Settings.NORMALIZE_MODE == Settings.EMA) {
+		        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
+	
+		        	double avg = 0;
+		            for( DistrictMap map : population) {
+		            	avg += map.fairnessScores[i];
+		            }
+		            avg /= (double)population.size();
+	
+		            double var = 0;
+		            for( DistrictMap map : population) {
+		            	var += Math.abs(map.fairnessScores[i]-avg);
+		            }
+		            var /= ((double)population.size()-1.0); //subtract 1 to make it an "unbiased estimator".
+	
+		            if( var == 0) { var = 0.001; }
+		            if( var != var) { var = fairnessScoreEmaVars[i]; }
+		            if( avg != avg) { avg = fairnessScoreEmaMeans[i]; }
+		            if( fairnessScoreEmaVars[i] == 0) {
+		            	fairnessScoreEmaVars[i] = var;
+		            	fairnessScoreEmaMeans[i] = avg;
+		            } else {
+		            	fairnessScoreEmaVars[i] += (var-fairnessScoreEmaVars[i])/100.0;
+		            	fairnessScoreEmaMeans[i] += (avg-fairnessScoreEmaMeans[i])/10.0;
+		            }
+		        }
 	            for( DistrictMap map : population) {
-	                map.fitness_score = Math.random();
-	            }
-	            Collections.sort(population);
-	            
-	            for( DistrictMap map : population) {
-	                map.fitness_score = map.fairnessScores[i];
-	            }
-	            Collections.sort(population);
-	            double mult = 1.0/(double)population.size();
-	            for( int j = 0; j < population.size(); j++) {
-	                DistrictMap map = population.get(j);
-	                //if( map.fairnessScores[i] != 0 || i == 11) {
-	                	map.fairnessScores[i] = ((double)j)*mult;
-	                //}
+	    	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
+	    	        	map.fairnessScores[i] = (map.fairnessScores[i] - fairnessScoreEmaMeans[i])/fairnessScoreEmaVars[i];
+	    	        }
 	            }
 	        }
-        } else
-        if( Settings.LINEARIZE_MODE == Settings.EMA) {
-	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
-
-	        	double avg = 0;
-	            for( DistrictMap map : population) {
-	            	avg += map.fairnessScores[i];
-	            }
-	            avg /= (double)population.size();
-
-	            double var = 0;
-	            for( DistrictMap map : population) {
-	            	var += Math.abs(map.fairnessScores[i]-avg);
-	            }
-	            var /= ((double)population.size()-1.0); //subtract 1 to make it an "unbiased estimator".
-
-	            if( var == 0) { var = 0.001; }
-	            if( var != var) { var = fairnessScoreEmaVars[i]; }
-	            if( avg != avg) { avg = fairnessScoreEmaMeans[i]; }
-	            if( fairnessScoreEmaVars[i] == 0) {
-	            	fairnessScoreEmaVars[i] = var;
-	            	fairnessScoreEmaMeans[i] = avg;
-	            } else {
-	            	fairnessScoreEmaVars[i] += (var-fairnessScoreEmaVars[i])/100.0;
-	            	fairnessScoreEmaMeans[i] += (avg-fairnessScoreEmaMeans[i])/10.0;
+	    }
+        
+        
+        //STEP 3: SUMMARIZE SCORES
+        if( Settings.paretoMode) {
+        	Vector<ScoreArray> scores = new Vector<ScoreArray>();
+        	for( DistrictMap dm : population) {
+        		double[] dd = dm.fairnessScores;
+        		scores.add(new ScoreArray(dm,new double[]{
+        				dd[0], //compact
+        				dd[2], //equal pop
+        				dd[3], //contiguous
+        				dd[5], //competition
+        				dd[7], //fairness
+        				dd[8], //proptionality
+        				dd[9], //splits
+        				dd[11], //descr rep
+        				dd[12], //spec. asym
+        						}));
+        	}
+        	ScoreArray.NUM_SCORES = 8;
+        	ScoreArray.sortByParetoFitness(scores);
+        	for( int i = 0; i < scores.size(); i++) {
+        		((DistrictMap)scores.get(i).scoredObject).fitness_score = i;
+        	}
+        	Collections.sort(population);
+        	//String s = ScoreArray.listScores(scores);
+        	//System.out.println("scores:");
+        	//System.out.println(s);
+        	String s = ScoreArray.listAllNonDominated(scores);
+        	System.out.println("non-dominated:");
+        	System.out.println(s);
+        
+        	
+        } else {
+	        if( verbosity > 1)
+	        	System.out.println("  weighing fairness...");
+	        
+	        double fairness_weight_multiplier = 1;//0.5;
+	        double geometry_weight_multiplier = 1;
+	        
+	
+	        double[] weights = new double[]{
+	        		Settings.geometry_weight                *1.0,  //0
+	        		Settings.disenfranchise_weight          *1.0, 
+	        		Settings.population_balance_weight      *1.0, //2
+	                Settings.disconnected_population_weight *1.0,
+	                Settings.voting_power_balance_weight    *1.0, //4
+	                Settings.competitiveness_weight      *1.0,
+	                Settings.wasted_votes_imbalance_weight  *1.0, //6
+	                Settings.seats_votes_asymmetry_weight   *1.0,
+	                Settings.diagonalization_weight   *1.0, //8
+	                Settings.reduce_splits ? Settings.split_reduction_weight   *1.0 : 0,
+	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.vote_dilution_weight *1.0, //10
+	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.descr_rep_weight *1.0, //10
+	                0.0,
+	        };
+	        double geo_total = weights[0]+weights[2]+weights[3]+weights[9];
+	        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7]+weights[8]+weights[10]+weights[11];
+	        
+	        double geometric_mult = 2.0*(geometry_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/geo_total);
+	        double fairness_mult = fairness_weight_multiplier*(Settings.geo_or_fair_balance_weight)/fair_total;
+	        
+	        weights = new double[]{
+	        		weights[0]*geometric_mult, 
+	        		weights[1]*fairness_mult, 
+	        		weights[2]*geometric_mult,
+	        		weights[3]*geometric_mult,
+	        		weights[4]*fairness_mult,
+	        		weights[5]*fairness_mult,
+	        		weights[6]*fairness_mult,
+	        		weights[7]*fairness_mult,
+	        		weights[8]*fairness_mult,
+	        		weights[9]*geometric_mult,
+	        		weights[10]*fairness_mult,
+	        		weights[11]*fairness_mult,
+	        		weights[12]*fairness_mult,
+	        };
+	
+	        for( int j = 0; j < population.size(); j++) {
+	            DistrictMap map = population.get(j);
+	            map.fitness_score = 0;
+	            for( int i = 0; i < map.fairnessScores.length; i++) {
+	            	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
+	            		map.fairnessScores[i] = 0;
+	            	}
+	            	map.fairnessScores[i] = map.fairnessScores[i]*weights[i]*invert;
+	            	/*
+	                if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.99) {
+	                	map.fairnessScores[i] += map.fairnessScores[i];
+	                	//map.fairnessScores[i] += 10;
+	                }*/
+	                map.fitness_score += map.fairnessScores[i];
 	            }
 	        }
-            for( DistrictMap map : population) {
-    	        for( int i = 0; i < fairnessScoreEmaVars.length; i++) {
-    	        	map.fairnessScores[i] = (map.fairnessScores[i] - fairnessScoreEmaMeans[i])/fairnessScoreEmaVars[i];
-    	        }
-            }
-        }
-        
-        if( verbosity > 1)
-        	System.out.println("  weighing fairness...");
-        
-        double fairness_weight_multiplier = 1;//0.5;
-        double geometry_weight_multiplier = 1;
-
-        double[] weights = new double[]{
-        		Settings.geometry_weight                *1.0,  //0
-        		Settings.disenfranchise_weight          *1.0, 
-        		Settings.population_balance_weight      *1.0, //2
-                Settings.disconnected_population_weight *1.0,
-                Settings.voting_power_balance_weight    *1.0, //4
-                Settings.competitiveness_weight      *1.0,
-                Settings.wasted_votes_imbalance_weight  *1.0, //6
-                Settings.seats_votes_asymmetry_weight   *1.0,
-                Settings.diagonalization_weight   *1.0, //8
-                Settings.reduce_splits ? Settings.split_reduction_weight   *1.0 : 0,
-                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.vote_dilution_weight *1.0, //10
-                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.descr_rep_weight *1.0, //10
-                0.0,
-        };
-        double geo_total = weights[0]+weights[2]+weights[3]+weights[9];
-        double fair_total = weights[1]+weights[4]+weights[5]+weights[6]+weights[7]+weights[8]+weights[10]+weights[11];
-        
-        double geometric_mult = 2.0*(geometry_weight_multiplier*(1.0-Settings.geo_or_fair_balance_weight)/geo_total);
-        double fairness_mult = fairness_weight_multiplier*(Settings.geo_or_fair_balance_weight)/fair_total;
-        
-        weights = new double[]{
-        		weights[0]*geometric_mult, 
-        		weights[1]*fairness_mult, 
-        		weights[2]*geometric_mult,
-        		weights[3]*geometric_mult,
-        		weights[4]*fairness_mult,
-        		weights[5]*fairness_mult,
-        		weights[6]*fairness_mult,
-        		weights[7]*fairness_mult,
-        		weights[8]*fairness_mult,
-        		weights[9]*geometric_mult,
-        		weights[10]*fairness_mult,
-        		weights[11]*fairness_mult,
-        		weights[12]*fairness_mult,
-        };
-
-        for( int j = 0; j < population.size(); j++) {
-            DistrictMap map = population.get(j);
-            map.fitness_score = 0;
-            for( int i = 0; i < map.fairnessScores.length; i++) {
-            	if( map.fairnessScores[i] != map.fairnessScores[i] || weights[i] == 0) {
-            		map.fairnessScores[i] = 0;
-            	}
-            	map.fairnessScores[i] = map.fairnessScores[i]*weights[i]*invert;
-            	/*
-                if( i == 2 && map.getMaxPopDiff()*100.0 >= Settings.max_pop_diff*0.99) {
-                	map.fairnessScores[i] += map.fairnessScores[i];
-                	//map.fairnessScores[i] += 10;
-                }*/
-                map.fitness_score += map.fairnessScores[i];
-            }
-        }
-        MainFrame.mainframe.panelStats.getNormalizedStats();
-
-        if( verbosity > 1)
-        	System.out.println("  sorting population...");
-
-        Collections.sort(population);
-
-        if( verbosity > 0) {
-	        System.out.print("  top score:");
-	        DistrictMap top = population.get(0);
-			for( int i = 0; i < top.fairnessScores.length; i++) {
-				System.out.print(top.fairnessScores[i]+", ");
+	        MainFrame.mainframe.panelStats.getNormalizedStats();
+	
+	        if( verbosity > 1)
+	        	System.out.println("  sorting population...");
+	
+	        Collections.sort(population);
+	
+	        if( verbosity > 0) {
+		        System.out.print("  top score:");
+		        DistrictMap top = population.get(0);
+				for( int i = 0; i < top.fairnessScores.length; i++) {
+					System.out.print(top.fairnessScores[i]+", ");
+				}
+				System.out.println();
 			}
-			System.out.println();
-		}
+        }
+        
+        //INTERMISSION: UPDATE ANNEAL RATE
         if( Settings.auto_anneal) {
 	        int total = 2;
 	        int mutated = 0;
@@ -589,8 +631,9 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
 	        //System.out.println("new rate2:"+Settings.mutation_boundary_rate);
         }
+    
         
-
+        //STEP 4: SELECT AND RECOMBINE
         Vector<DistrictMap> available_mate = new Vector<DistrictMap>();
         for(int i = 0; i < cutoff; i++) {
             available_mate.add(population.get(i));
