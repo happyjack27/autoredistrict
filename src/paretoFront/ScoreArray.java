@@ -5,6 +5,8 @@ import java.util.*;
 //http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=DB2C0FB4F2159957393DAD16E5B755B6?doi=10.1.1.542.385&rep=rep1&type=pdf
 public class ScoreArray<T> implements Comparable<ScoreArray<T>> {
 	public static int NUM_SCORES = 0;
+	public static boolean first_criteria_dominates = true;
+	public static boolean first_criteria_dominates_crowding = true;
 	
 	public static int sortBy = 0;
 	public double[] scores = null;
@@ -76,17 +78,35 @@ public class ScoreArray<T> implements Comparable<ScoreArray<T>> {
 			if( this.dominated_by > o.dominated_by) {
 				return 1;
 			}
+			if( first_criteria_dominates) {
+				if( this.scores[0] < o.scores[0]) {
+					return -1;
+				}
+				if( this.scores[0] > o.scores[0]) {
+					return 1;
+				}
+			}
+
+
 			if( this.dominates > o.dominates) {
 				return -1;
 			}
 			if( this.dominates < o.dominates) {
 				return 1;
 			}
+			if( first_criteria_dominates_crowding) {
+				if( this.scores[0] < o.scores[0]) {
+					return -1;
+				}
+				if( this.scores[0] > o.scores[0]) {
+					return 1;
+				}
+			}
 			if( this.crowding < o.crowding) {
-				return -1;
+				return 1;
 			}
 			if( this.crowding > o.crowding) {
-				return 1;
+				return -1;
 			}
 			return 0;
 		}
@@ -107,8 +127,8 @@ public class ScoreArray<T> implements Comparable<ScoreArray<T>> {
 			if( normalizer == 0) { normalizer = 1; }
 			normalizer = 1.0/normalizer;
 			
-			scores2.get(0).crowding = -9999999999999.99;
-			scores2.get(scores2.size()-1).crowding = -99999999999.99;
+			scores2.get(0).crowding += 9999999999999.99;
+			scores2.get(scores2.size()-1).crowding += 99999999999.99;
 
 			for( int j = 1; j < scores2.size()-1; j++) {
 				for( ScoreArray s : scores2) {

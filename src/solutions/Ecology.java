@@ -482,14 +482,17 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
         	Vector<ScoreArray> scores = new Vector<ScoreArray>();
         	for( DistrictMap dm : population) {
         		double[] dd = dm.fairnessScores;
+        		double popdiff = dm.getMaxPopDiff();
+        		double csplits = dm.getSplitCounties().size();
+
         		scores.add(new ScoreArray(dm,new double[]{
+        				dd[3] + (popdiff > 0.5 ? popdiff*100000.0 : 0.0), //contiguous
         				dd[0], //compact
-        				dd[2], //equal pop
-        				dd[3], //contiguous
+        				popdiff,//dd[2], //equal pop
         				dd[5], //competition
         				dd[7], //fairness
         				dd[8], //proptionality
-        				dd[9], //splits
+        				csplits, //splits
         				dd[11], //descr rep
         				dd[12], //spec. asym
         						}));
