@@ -2595,6 +2595,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		double[][] result = new double[2][];
 		result[0] = districts.get(district).getAnOutcome();
 		result[1] = District.popular_vote_to_elected(result[0], district, 0);
+		if( result[0].length == 0 || result[1].length == 0) {
+			return 0;
+		}
 
 		double[] seats = new double[]{};
 		if( Settings.seats_in_district(district) == 1) {
