@@ -55,6 +55,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public FramePieCharts pie = new FramePieCharts();
 	
 	public ButtonGroup seatsModeBG = new ButtonGroup();
+	public JButton btnInit = new JButton("Init");
+	public JComboBox comboBoxInitMethod = new JComboBox();
+
 	 
 	
 
@@ -5839,11 +5842,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		textFieldNumDistricts.setColumns(10);
-		textFieldNumDistricts.setBounds(132, 69, 52, 28);
+		textFieldNumDistricts.setBounds(136, 175, 52, 28);
 		panel.add(textFieldNumDistricts);
 		
 		JLabel lblNumOfDistricts = new JLabel("Num. of districts");
-		lblNumOfDistricts.setBounds(6, 75, 124, 16);
+		lblNumOfDistricts.setBounds(10, 181, 124, 16);
 		panel.add(lblNumOfDistricts);
 		
 		stopButton.setText("Stop");
@@ -5853,7 +5856,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				stopEvolving();
 			}
 		});
-		stopButton.setBounds(6, 29, 83, 29);
+		stopButton.setBounds(10, 135, 83, 29);
 		panel.add(stopButton);
 		
 		goButton.setText("Go");
@@ -5880,7 +5883,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				ip.addHistory("GO\n");
 			}
 		});
-		goButton.setBounds(109, 29, 83, 29);
+		goButton.setBounds(113, 135, 83, 29);
 		panel.add(goButton);
 		
 		textFieldSeatsPerDistrict = new JTextField();
@@ -5902,7 +5905,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		textFieldSeatsPerDistrict.setText("1");
 		textFieldSeatsPerDistrict.setColumns(10);
-		textFieldSeatsPerDistrict.setBounds(132, 106, 52, 28);
+		textFieldSeatsPerDistrict.setBounds(136, 212, 52, 28);
 		panel.add(textFieldSeatsPerDistrict);
 		
 		lblMembersPerDistrict = new JRadioButton("Seats/district");
@@ -5913,7 +5916,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		lblMembersPerDistrict.setSelected(true);
 		seatsModeBG.add(lblMembersPerDistrict);
-		lblMembersPerDistrict.setBounds(6, 112, 124, 16);
+		lblMembersPerDistrict.setBounds(10, 218, 124, 16);
 		panel.add(lblMembersPerDistrict);
 		
 		comboBoxPopulation.addItemListener(new ItemListener() {
@@ -5922,11 +5925,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				setPopulationColumn((String)comboBoxPopulation.getSelectedItem());
 			}
 		});
-		comboBoxPopulation.setBounds(8, 237, 178, 20);
+		comboBoxPopulation.setBounds(12, 343, 178, 20);
 		panel.add(comboBoxPopulation);
 		
 		JLabel lblPopulationColumn = new JLabel("Population column");
-		lblPopulationColumn.setBounds(8, 217, 182, 16);
+		lblPopulationColumn.setBounds(12, 323, 182, 16);
 		panel.add(lblPopulationColumn);
 		
 		lblDistrictColumn = new JLabel("District column");
@@ -6236,7 +6239,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel.add(btnEthnicityColumns);
 		textFieldTotalSeats.setEnabled(false);
 		textFieldTotalSeats.setText("1");
-		textFieldTotalSeats.setBounds(132, 140, 52, 28);
+		textFieldTotalSeats.setBounds(136, 246, 52, 28);
 		textFieldTotalSeats.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
@@ -6262,7 +6265,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		seatsModeBG.add(lblTotalSeats);
-		lblTotalSeats.setBounds(6, 146, 124, 16);
+		lblTotalSeats.setBounds(10, 252, 124, 16);
 		
 		panel.add(lblTotalSeats);
 		sliderRepresentation.addChangeListener(new ChangeListener() {
@@ -6369,13 +6372,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				}
 			}
 		});
-		comboBoxQuota.setBounds(52, 178, 136, 27);
+		comboBoxQuota.setBounds(56, 284, 136, 27);
 		comboBoxQuota.addItem("DROOP");
 		comboBoxQuota.addItem("HARE");
 		panel.add(comboBoxQuota);
 		
 		lblQuotaMethod = new JLabel("Quota");
-		lblQuotaMethod.setBounds(6, 182, 52, 16);
+		lblQuotaMethod.setBounds(10, 288, 52, 16);
 		panel.add(lblQuotaMethod);
 		
 		btnMultielectionColumns = new JButton("Multi-Election columns");
@@ -6415,7 +6418,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( is_evolving) { featureCollection.ecology.startEvolving(); }
 			}
 		});
-		btnMultielectionColumns.setBounds(4, 303, 184, 23);
+		btnMultielectionColumns.setBounds(8, 409, 184, 23);
 		panel.add(btnMultielectionColumns);
 		
 		chckbxParetoFront = new JCheckBox("Pareto front");
@@ -6426,6 +6429,33 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		chckbxParetoFront.setBounds(32, 599, 128, 23);
 		panel.add(chckbxParetoFront);
+		
+		btnInit.setBounds(138, 42, 52, 23);
+		btnInit.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.add(btnInit);
+		btnInit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String method = (String)comboBoxInitMethod.getSelectedItem();
+				ip.addHistory("INIT "+method);
+				
+				featureCollection.ecology.population = new Vector<DistrictMap>();
+				featureCollection.ecology.swap_population = new Vector<DistrictMap>();
+			}
+		});
+
+
+		
+		comboBoxInitMethod.setBounds(10, 43, 124, 20);
+		panel.add(comboBoxInitMethod);
+		comboBoxInitMethod.addItem("Contiguous");
+		comboBoxInitMethod.addItem("Random");
+		comboBoxInitMethod.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Ecology.initMethod = (String)comboBoxInitMethod.getSelectedItem();
+			}
+		});
+		
 		rdbtnRouletteSelection.setVisible(false);
 		rdbtnRankSelection.setVisible(false);
 		

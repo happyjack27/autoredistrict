@@ -493,18 +493,101 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
          return closest_version;
          */
     }
+    public void initContiguous() {
+    	System.out.println("init contiguous");
+        for( int i = 0; i < vtd_districts.length; i++) {
+        	vtd_districts[i] = -1;
+        }
+        double[] population = new double[Settings.num_districts];
+        Vector<VTD>[] edges = new Vector[Settings.num_districts];
+        //random starting points;
+        for( int i = 0; i < Settings.num_districts; i++) {
+        	int seed = (int)(Math.floor(Math.random()*vtd_districts.length));
+        	while( vtd_districts[seed] >= 0) {
+            	seed = (int)(Math.floor(Math.random()*vtd_districts.length));
+        	}
+        	vtd_districts[seed] = i;
+        	population[i] = vtds.get(seed).population;
+        	edges[i] = new Vector<VTD>();
+        	edges[i].add(vtds.get(seed));
+        }
+        //loop until can't find
+        while(true) {
+        	//find lowest pop
+        	double lowest_pop = -1;
+        	int lowest_pop_i = -1;
+        	for( int i = 0; i < Settings.num_districts; i++) {
+        		//if no edges, skip
+        		if( edges[i].size() == 0) {
+                	int seed = (int)(Math.floor(Math.random()*vtd_districts.length));
+                	int attempts = 0;
+                	while( vtd_districts[seed] >= 0 && attempts < 10) {
+                    	seed = (int)(Math.floor(Math.random()*vtd_districts.length));
+                    	attempts++;
+                	}
+                	if( attempts >= 10) {
+                		continue;
+                	}
+                	edges[i].add(vtds.get(seed));
+                	vtd_districts[seed] = i;
+                	population[i] += vtds.get(seed).population;
+        			//continue;
+        		}
+        		if( population[i] < lowest_pop || lowest_pop_i < 0) {
+        			lowest_pop = population[i];
+        			lowest_pop_i = i;
+        		}
+        	}
+        	if( lowest_pop_i < 0) {
+        		break;
+        	}
+        	int district = lowest_pop_i;
+        	
+        	//now find random unused edge and add it
+        	while( true) {
+        		if( district < 0 || edges[district].size() == 0) {
+        			break;
+        		}
+           		//starting at 0 makes it breadth first
+           		int e = 0;//(int)(Math.floor(Math.random()*edges[district].size()));
+        		VTD edge = edges[district].get(e);
+        		Vector<VTD> options = new Vector<VTD>();
+        		for( VTD v : edge.neighbors) {
+        			if( vtd_districts[v.id] < 0) {
+        				options.add(v);
+        			}
+        		}
+        		if( options.size() == 0) {
+        			edges[district].remove(e);
+        		} else {
+        			int i = (int)(Math.floor(Math.random()*options.size()));
+        			VTD v = options.get(i);
+    				vtd_districts[v.id] = district;
+    				population[district] += v.population;
+    				edges[district].add(v);
+    				break;
+        		}
+        	}
+        }
+        //now randomly assign remaining
+        int matched = 0;
+        int unmatched = 0;
+        for( int i = 0; i < vtd_districts.length; i++) {
+        	if( vtd_districts[i] < 0) {
+        		vtd_districts[i] = (int)(Math.floor(Math.random()*Settings.num_districts));
+        		unmatched++;
+        	} else {
+        		matched++;
+        	}
+        }
+    	System.out.println("init contiguous done "+matched+" "+unmatched);
+
+	}
 
     public void mutate(double prob) {
     	reciprocal_iso_quotient = -1;
         double max = Settings.num_districts;
         for( int i = 0; i < vtd_districts.length; i++) {
-        	/*
-        	if( Settings.mutate_excess_pop) {
-        		if(districts.get(vtd_districts[i]).excess_pop < 0) {
-        			continue;
-        		}
-        	}
-        	*/
             if( Math.random() <= prob) {
                 vtd_districts[i] = (int)(Math.floor(Math.random()*max));
                 while( vtd_districts[i] >= Settings.num_districts) {
@@ -867,6 +950,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
     //constructors
     public DistrictMap(Vector<VTD> wards, int num_districts, int[] genome) {
+    	
         this(wards,num_districts);
         setGenome(genome);
     }
@@ -961,6 +1045,16 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     }
     public DistrictMap(Vector<VTD> wards, int num_districts) {
+    	//postman's sort
+    	VTD[] w = new VTD[wards.size()];
+    	for( int i = 0; i < wards.size(); i++) {
+    		w[wards.get(i).id] = wards.get(i);
+    	}
+    	wards = new Vector<VTD>();
+    	for( int i = 0; i < w.length; i++) {
+    		wards.add(w[i]);
+    	}
+
         this.num_districts = num_districts;
         this.vtds = wards;
         //System.out.println(" districtmap constructor numdists "+num_districts);
@@ -968,11 +1062,17 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
         vtd_districts = new int[wards.size()];
-        mutate(1);
+        if( Ecology.initMethod.equals("Random")) {
+        	mutate(1);
+        } else
+        if( Ecology.initMethod.equals("Contiguous")) {
+        	initContiguous();
+        }
         fillDistrictwards();
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
-    public void resize_districts(int target) {
+
+	public void resize_districts(int target) {
     	//System.out.println("1");
         dist_pops = new double[Settings.num_districts];
         dist_pop_frac = new double[Settings.num_districts];

@@ -1395,7 +1395,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		
 		//initialize locked_wards array.
-		ecology.vtds = features;
+		ecology.vtds = features; //sortedFeatures; //features
 		locked_wards = new boolean[vtds.size()];
 		for( int i = 0; i < locked_wards.length; i++) {
 			locked_wards[i] = false;

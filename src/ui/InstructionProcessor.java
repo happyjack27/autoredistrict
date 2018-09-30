@@ -439,7 +439,17 @@ SAVE
 			}
 		}
 
-
+		if( command.equals("INIT")) {
+			if(instruction_words[1].toUpperCase().equals("CONTIGUOUS")) {
+				mainFrame.comboBoxInitMethod.setSelectedItem("Contiguous");
+			}
+			if(instruction_words[1].toUpperCase().equals("RANDOM")) {
+				mainFrame.comboBoxInitMethod.setSelectedItem("Random");
+			}
+			for(ActionListener a: mainFrame.btnInit.getActionListeners()) {
+			    a.actionPerformed(new ActionEvent(mainFrame.btnInit, 0, ""));
+			}
+		} else
 		if( command.equals("OPEN")) {
 			String dest =  instruction_words_original[1].replaceAll("\\[START PATH\\]",Download.getStartPath());;///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
 			dest =  dest.replaceAll("\\[START_PATH\\]",Download.getStartPath());

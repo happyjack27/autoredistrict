@@ -45,6 +45,8 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 
 	static public boolean evolve_paused = true;
 	public static double invert = 1;
+
+	public static String initMethod = "Contiguous";
 	int last_population = 0;
 	int last_num_districts = 0;
 	
