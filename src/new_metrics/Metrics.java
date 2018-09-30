@@ -396,7 +396,57 @@ public class Metrics {
 		binAndShow(asym_results);
 		
 	}
+	public double[][] showHeatMap() {
+		return showHeatMap(100,100);
+	}
+	public double[][] showHeatMap(int x,int y) {
+		double[][] dd0 = getAnOutcome();
+		if( y > dd0.length) {
+			y = dd0.length;
+		}
+		double[][] hm = new double[x][y];
+		double inc = 1;//(double)(x*y)/(double)(trials*10);
+		double max = 0;
+		for( int i = 0; i < trials; i++) {
+			double[][] dd = getAnOutcome();
+			double pop_d = 0;
+			double pop_r = 0;
+			double seats_d = 0;
+			double seats_r = 0;
+			for( int j = 0; j < dd.length; j++) {
+				pop_d += dd[j][0];
+				pop_r += dd[j][1];
+				if( dd[j][0] > dd[j][1]) {
+					seats_d++;
+				} else {
+					seats_r++;
+				}
+			}
+			double tot_pop = pop_d+pop_r;
+			pop_d /= tot_pop;
+			pop_r /= tot_pop;
+			seats_d /= (double)dd.length;
+			seats_r /= (double)dd.length;
+			int dx = (int)(Math.floor(pop_d*(double)(x)));
+			int dy = (int)(Math.floor(seats_d*(double)(y)));
+			dx = dx < 0 ? 0 : dx >= x ? x-1 : dx;
+			dy = dy < 0 ? 0 : dy >= y ? y-1 : dy;
+			hm[dx][dy] += inc;
+			if( hm[dx][dy] > max) {
+				max = hm[dx][dy];
+			}
+		}
+		for( int i = 0; i < x; i++) {
+			for( int j = 0; j < y; j++) {
+				hm[i][j] /= max;
+			}
+		}
+		FrameHeatMap fd = new FrameHeatMap();
+		fd.hm = hm;
+		fd.show();
 
+		return hm;
+	}
 	public void showPacking() {
 		Vector<Double> packing = new Vector<Double>();
 		for( int i = 0; i < trials; i++) {
