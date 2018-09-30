@@ -401,7 +401,7 @@ public class Metrics {
 	}
 	public double[][] showHeatMap(int x,int y) {
 		double[][] dd0 = getAnOutcome();
-		if( y > dd0.length) {
+		if( y > dd0.length/2) {
 			y = dd0.length;
 		}
 		double[][] hm = new double[x][y];
