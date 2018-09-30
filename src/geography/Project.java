@@ -100,8 +100,8 @@ public class Project extends ReflectionJSONObject<Project> {
 		} else { System.out.println("members_per_district not found"); }
 		
 		if( containsKey("initial_population")) {
-			MainFrame.mainframe.textField.setText(getString("initial_population").trim());
-			MainFrame.mainframe.textField.postActionEvent();
+			MainFrame.mainframe.evolutionPopulationTF.setText(getString("initial_population").trim());
+			MainFrame.mainframe.evolutionPopulationTF.postActionEvent();
 		} else { System.out.println("initial_population not found"); }
 
 		if( containsKey("simulated_elections")) {
