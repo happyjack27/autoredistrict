@@ -397,7 +397,7 @@ public class Metrics {
 		
 	}
 	public double[][] showHeatMap() {
-		return showHeatMap(100,100);
+		return showHeatMap(200,200);
 	}
 	public double[][] showHeatMap(int x,int y) {
 		double[][] dd0 = getAnOutcome();
