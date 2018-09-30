@@ -1,5 +1,7 @@
 V. 1.32
+
 * added initialization drop down, with ability to initialize contiguous (via breadth-first population-balanced flood fill)
+* added seats-votes heatmap to advanced stats
 
 V. 1.31
 
