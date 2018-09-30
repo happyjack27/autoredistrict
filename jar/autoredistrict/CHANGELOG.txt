@@ -1,36 +1,12 @@
-                0                1                  3          4         5
-time metrics: 182 983.0, 617.0, 72 234.0, 625.0, 293 087.0, 205 642.0, 72 314.0, 0.0, 0.0, 0.0, 
-
-Changelog:
+V. 1.32
+* added initialization drop down, with ability to initialize contiguous (via breadth-first population-balanced flood fill)
 
 V. 1.31
 
 * added ability to select multiple elections
 * added advanced stats (available when multiple elections are selected)
 * statically linked apache.commons.math.
-
-V. 1.30
-
-* added link in stats panel to descriptions of stats
-* added ability to turn off recombination step (for local search)
-* added % labels to pie charts
-* added pie charts window
-* changed download vtd dialog to default to year 2012
-* corrected by state digital competition pie charts
-* fixed running headless via xvfb
-
-V. 1.29
-
-* changed minority caucasian to gray
-* added proportionality score
-* added packing/cracking asymmetry score
-* added export of seats/votes
-* added projected partisan representation map coloring mode
-* added vtd-level packing maps
-* added display of feature detail when clicking on a feature
-* added instruction to change quota method ("set quota hare")
-* added instruction to change to prefering 4-4 seats to 5-3 seats (SET PREFER4S TRUE)
-
+* added specific asymmetry metric
 
 V. 1.28
 
