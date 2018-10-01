@@ -3807,6 +3807,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    prefs.setMaxNumberOfPointsPerShape(32650*4);
 		    prefs.setAllowUnlimitedNumberOfPointsPerShape(true);
 		    prefs.setAllowBadContentLength(true);
+		    prefs.setAllowBadRecordNumbers(true);
+		    
 		    //prefs.setMaxNumberOfPointsPerShape(16650);
 		    ShapeFileReader r = new ShapeFileReader(is, prefs);
 		    
