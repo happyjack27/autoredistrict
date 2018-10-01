@@ -401,9 +401,9 @@ public class Metrics {
 	}
 	public double[][] showHeatMap(int x,int y) {
 		double[][] dd0 = getAnOutcome();
-		if( y > dd0.length/2) {
+		//if( y > dd0.length/2) {
 			y = dd0.length;
-		}
+		//}
 		double[][] hm = new double[x][y];
 		double inc = 1;//(double)(x*y)/(double)(trials*10);
 		double max = 0;

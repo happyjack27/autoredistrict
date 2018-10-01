@@ -25,7 +25,7 @@ public class FrameHeatMap extends JFrame {
 
 	private void initComponents() {
 		getContentPane().setLayout(null);
-		setSize(500,500);
+		setSize(700,700);
 		setTitle("Draw");
 		
 		panel = new PiePanel();
@@ -52,10 +52,10 @@ public class FrameHeatMap extends JFrame {
 			    graphics.setColor(Color.white);
 			    graphics.fillRect(0, 0, 1000, 1000);
 
-			    int xs = 10;
-			    int ys = 40;
-			    int w = 400;
-			    int h = 400;
+			    int xs = 5;//10-5;
+			    int ys = 30;//40-5;
+			    int w = 640;
+			    int h = 640;
 
 			    graphics.setColor(Color.gray);
 			    if( hm != null) {
@@ -81,6 +81,14 @@ public class FrameHeatMap extends JFrame {
 			    graphics.setColor(Color.black);
 			    graphics.drawLine(xs+w/2, ys, xs+w/2, ys+h);
 			    graphics.drawLine(xs, ys+h/2, xs+w, ys+h/2);
+			    
+			    for( int i = 0; i < 20; i++) {
+			    	int xm = xs+w*i/20;
+			    	int ym = ys+h*i/20;
+				    graphics.drawLine(xs+w/2-5, ym, xs+w/2+5, ym);
+				    graphics.drawLine(xm, ys+h/2-5, xm, ys+h/2+5);
+			    }
+
 	    	} catch (Exception ex) {
 	    		System.out.println("ex csafs "+ex);
 	    		ex.printStackTrace();
