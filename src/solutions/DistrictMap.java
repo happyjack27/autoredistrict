@@ -500,6 +500,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         }
         double[] population = new double[Settings.num_districts];
         Vector<VTD>[] edges = new Vector[Settings.num_districts];
+        HashSet<VTD>[] hsedges = new HashSet[Settings.num_districts];
         //random starting points;
         for( int i = 0; i < Settings.num_districts; i++) {
         	int seed = (int)(Math.floor(Math.random()*vtd_districts.length));
@@ -510,6 +511,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	population[i] = vtds.get(seed).population;
         	edges[i] = new Vector<VTD>();
         	edges[i].add(vtds.get(seed));
+        	hsedges[i] = new HashSet();
+        	for( VTD v : vtds.get(seed).neighbors ) {
+    			if( vtd_districts[v.id] < 0) {
+    				//hsedges[i].add(v);
+    			}
+        	}
         }
         //loop until can't find
         while(true) {
