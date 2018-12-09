@@ -35,12 +35,34 @@ import new_metrics.*;
  */
 public class BetaDistribution extends AbstractRealDistribution {
 	
+	public static int variance_regularization  = 1;
+	public static boolean sqrt = false;
+	public static double var_mult = 1.0;
+	public boolean force_centered = false;
+	/*
+	 * sqrt:true
+	 0: -533
+	 1: -483
+	 2: -395
+	 sqrt:false
+	 0: -1301 0.25- 950 1 - 1301 4 - 1161
+	 1: -1285 0.5 - 1291 1 - 1285 2 -1206
+	 2: -1206
+	 */
+	
+	public double loglikelihood = 0;
+
 	public BetaDistribution(double[] xs) {
+		this(xs, false);
+	}
+	public BetaDistribution(double[] xs, boolean force_centered) {
 		super(new Well19937c());
+		this.force_centered = force_centered;
 		double[] ps = MLE(xs);
 		alpha = ps[0];
 		beta = ps[1];
 		z = Double.NaN;
+		loglikelihood = avg_log_likelihood(xs,alpha,beta);
 	}
 	
     public double sample_mean(double[] xs) {
@@ -60,19 +82,28 @@ public class BetaDistribution extends AbstractRealDistribution {
             double s = x - mean;
             var += s * s;
         }
-        var /= (double)(xs.length - 1);
+        var /= (double)(xs.length - BetaDistribution.variance_regularization);
+        if (BetaDistribution.sqrt) {
+        	var = Math.sqrt(var);
+        }
+        var *= var_mult;
         return var;
     }
 	
-	
+	// https://scholarsarchive.byu.edu/cgi/viewcontent.cgi?article=2613&context=etd
     public double[] mom_estimate(double[] xs) {
         double mean = sample_mean(xs);
         double var = sample_variance(xs);
+        if( force_centered) {
+        	mean = 0.5;
+        }
+        double one = 1.0;
+        double multiplier =  (mean * (one - mean) / var) - one;
         
         // compute a and B
         return new double[]{
-        		(mean) * (mean * (1 - mean) / var - 1)
-        		,(1 - mean) * (mean * (1 - mean) / var - 1)
+        		(mean) * multiplier
+        		,(1 - mean) * multiplier
         };
     }
 
@@ -89,9 +120,9 @@ public class BetaDistribution extends AbstractRealDistribution {
 	        	return params;
 	        }
 	        
-	        double delta = 1;
+	        double delta = 0.1;
 	        double delta_mult = 0.66; // slight overlap
-	        double done = 0.0001;
+	        double done = 0.00001;
 	        
 	        double best = avg_log_likelihood(xs, params[0], params[1]);
 	        while (delta > done) {
@@ -100,12 +131,12 @@ public class BetaDistribution extends AbstractRealDistribution {
 	        	double a_dn = params[0] * Math.exp(-delta);
 	        	double up = avg_log_likelihood(xs, a_up, params[1]);
 	        	double dn = avg_log_likelihood(xs, a_dn, params[1]);
-	            if (up > best) {
+	            if (up < best) {
 	                params[0] = a_up;
 	                best = up;
 	    	        //System.out.println("improved: "+params[0]+","+params[1]);
 	            }
-	            if (dn > best) {
+	            if (dn < best) {
 	                params[0] = a_dn;
 	                best = dn;
 	    	        //System.out.println("improved: "+params[0]+","+params[1]);
@@ -115,12 +146,12 @@ public class BetaDistribution extends AbstractRealDistribution {
 	            a_dn = params[1] * Math.exp(- delta);
 	            up = avg_log_likelihood(xs, params[0], a_up);
 	            dn = avg_log_likelihood(xs, params[0], a_dn);
-	            if (up > best) {
+	            if (up < best) {
 	                params[1] = a_up;
 	                best = up;
 	    	        //System.out.println("improved: "+params[0]+","+params[1]);
 	            }
-	            if (dn > best) {
+	            if (dn < best) {
 	                params[1] = a_dn;
 	                best = dn;
 	    	        //System.out.println("improved: "+params[0]+","+params[1]);
