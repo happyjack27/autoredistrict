@@ -1485,6 +1485,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	}
 	
 	public void exportToHtml(boolean images, boolean embedded) {
+		try {
 		System.out.println("1");
 		boolean national = Settings.national_map;
 		Settings.setNationalMap(false);
@@ -1522,7 +1523,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		}
 	
 
-		String prepend = Download.states[Download.istate]+"/"+Download.cyear+"/"+Applet.mainFrame.project.district_column+"/";
+		String prepend = Applet.mainFrame.project.district_column+"/";
+		if( Download.istate >= 0) {
+			prepend = Download.states[Download.istate]+"/"+Download.cyear+"/"+Applet.mainFrame.project.district_column+"/";
+		}
 		prepend = prepend.replaceAll(" ", "%20");
 
 		String html = "";
@@ -1677,5 +1681,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		*/
 		
 		Settings.setNationalMap(national);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }
