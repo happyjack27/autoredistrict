@@ -177,7 +177,7 @@ public class BetaDistribution extends AbstractRealDistribution {
 	        		
 	        	}
 	        }
-	        System.out.println("ll: "+(sum / xs.length));
+	        //System.out.println("ll: "+(sum / xs.length));
 	        return -sum / xs.length;
 	    }
 	

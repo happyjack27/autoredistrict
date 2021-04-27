@@ -31,8 +31,8 @@ public class Metrics {
 	public int trials = 10000;
 	public static boolean force_centered_popular_vote = false;
 	
-	public static boolean for_national = true;
-	public static boolean for_national_center = true;
+	public static boolean for_national = false;
+	public static boolean for_national_center = false;
 	public static boolean use_binomials = true;
 	
 	//Expected_asymmetry: -0.4247375
@@ -709,15 +709,15 @@ public class Metrics {
 	
 	public void showBetaParameters() {
 		System.out.println("{");
-		System.out.println("\tpopular_vote: { alpha: "+election_betas.getAlpha()+", beta: "+election_betas.getBeta()+" },");
+		System.out.println("\tpopular_vote: { alpha: "+election_betas.getAlpha()+", beta: "+election_betas.getBeta()+", log-likelihood: "+election_betas.loglikelihood+" },");
 		System.out.println("\tdistrict_vote: ["); 
 		for( int i = 0; i < district_betas.size(); i++) {
-			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+district_betas.get(i).getAlpha()+", beta: "+district_betas.get(i).getBeta()+" },");
+			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+district_betas.get(i).getAlpha()+", beta: "+district_betas.get(i).getBeta()+", log-likelihood: "+district_betas.get(i).loglikelihood+" },");
 		}
 		System.out.println("\t],"); 
 		System.out.println("\tcentered_district_vote: ["); 
 		for( int i = 0; i < centered_district_betas.size(); i++) {
-			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+district_betas.get(i).getAlpha()+", beta: "+district_betas.get(i).getBeta()+" },");
+			System.out.println("\t\t{ district: "+(i+1)+", alpha: "+centered_district_betas.get(i).getAlpha()+", beta: "+centered_district_betas.get(i).getBeta()+", log-likelihood: "+centered_district_betas.get(i).loglikelihood+" },");
 		}
 		System.out.println("\t]"); 
 		System.out.println("}");
