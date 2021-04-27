@@ -28,7 +28,7 @@ rep: 62984828
 
 
 public class Metrics {
-	public int trials = 10000;
+	public int trials = 100000;
 	public static boolean force_centered_popular_vote = false;
 	
 	public static boolean for_national = false;
@@ -278,6 +278,34 @@ public class Metrics {
 		}
 		return ddd;
 	}
+	public double[][] getAnOutcomeBetasOnly() {
+		double[][] ddd = new double[num_districts][];
+		double demt = 0;
+		double rept = 0;
+		for( int i = 0; i < num_districts; i++) {
+			ddd[i] = new double[2];
+			boolean pass = false;
+			double pct = 0;
+			while (!pass) {
+				try {
+					pct = district_betas.get(i).inverseCumulativeProbability(Math.random());
+				} catch (Exception ex) {
+					pass = false;
+				}
+				pass = true;
+			}
+			demt += (ddd[i][0] = pct);
+			rept += (ddd[i][1] = (1-pct));
+		}
+		double pct = election_betas.inverseCumulativeProbability(Math.random());
+		double mult_dem = pct/demt; 
+		double mult_rep = (1-pct)/rept; 
+		for( int i = 0; i < num_districts; i++) {
+			ddd[i][0] *= mult_dem;
+			ddd[i][1] *= mult_rep;
+		}
+		return ddd;
+	}
 	public double[] getSeatProbs(int trials) {
 		double delta = 1.0/(double)trials;
 		double[] seatProbs = new double[district_betas.size()+1];
@@ -430,14 +458,14 @@ public class Metrics {
 		//System.out.println("dem: "+dem+" rep: "+rep+" "+(dem-rep));
 		return (dem-rep);
 	}
-	public void computeDisproportionalityStats() {
+	public void computeDisproportionalityStats(boolean betasOnly) {
 		Vector<Double> results = new Vector<Double>();
 		double expected_mean = 0;
 		double expected_abs = 0;
 		double dem_adv = 0;
 		double rep_adv = 0;
 		for(int i = 0; i < trials; i++) {
-			double d = computeDisproportionality() * (double)num_districts;;
+			double d = computeDisproportionality(betasOnly) * (double)num_districts;;
 			results.add(d);
 			expected_mean += d;
 			expected_abs += Math.abs(d);
@@ -463,8 +491,8 @@ public class Metrics {
 		System.out.println(""+(trials-1)+": "+results.get(trials-1));
 		//binAndShow(results);
 	}
-	public double computeDisproportionality() {
-		double[][] dd = getAnOutcome();
+	public double computeDisproportionality(boolean betasOnly) {
+		double[][] dd = betasOnly ? getAnOutcomeBetasOnly() : getAnOutcome();
 		double demseats = 0;
 		double repseats = 0;
 		double demvotes = 0;
