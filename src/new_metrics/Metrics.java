@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.distribution.GammaDistribution;
+import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.util.FastMath;
 
 import util.Pair;
@@ -32,6 +33,7 @@ public class Metrics {
 	
 	public static boolean for_national = true;
 	public static boolean for_national_center = true;
+	public static boolean use_binomials = true;
 	
 	//Expected_asymmetry: -0.4247375
 	//Expected_asymmetry: -0.3091875
@@ -61,6 +63,7 @@ public class Metrics {
 	Vector<GammaDistribution> district_gammas = null;
 	
 	Vector<Double> asym_results = new Vector<Double>();
+	
 
 
 	
@@ -262,6 +265,17 @@ public class Metrics {
 			ddd[i][0] *= mult_dem;
 			ddd[i][1] *= mult_rep;
 		}
+		if( use_binomials) {
+			for( int i = 0; i < num_districts; i++) {
+				int dturnout = (int)(ddd[i][1]+ddd[i][0]);
+				double dpct = ddd[i][0]/(ddd[i][1]+ddd[i][0]);
+				BinomialDistribution b = new BinomialDistribution(dturnout,dpct); 
+				int dem = b.inverseCumulativeProbability(Math.random());
+				int rep = dturnout - dem;
+				ddd[i][0] = dem;
+				ddd[i][1] = rep;
+			}			
+		}
 		return ddd;
 	}
 	public double[] getSeatProbs(int trials) {
@@ -416,7 +430,55 @@ public class Metrics {
 		//System.out.println("dem: "+dem+" rep: "+rep+" "+(dem-rep));
 		return (dem-rep);
 	}
-	
+	public void computeDisproportionalityStats() {
+		Vector<Double> results = new Vector<Double>();
+		double expected_mean = 0;
+		double expected_abs = 0;
+		double dem_adv = 0;
+		double rep_adv = 0;
+		for(int i = 0; i < trials; i++) {
+			double d = computeDisproportionality() * (double)num_districts;;
+			results.add(d);
+			expected_mean += d;
+			expected_abs += Math.abs(d);
+			dem_adv += (d > 0) ? 1 : 0;
+			rep_adv += (d < 0) ? 1 : 0;
+		}
+		expected_mean /= (double)trials;
+		expected_abs /= (double)trials;
+		dem_adv /= (double)trials;
+		rep_adv /= (double)trials;
+		//expected_mean *= (double)num_districts;
+		//expected_abs *= (double)num_districts;
+		Collections.sort(results);
+		System.out.println("Excepted absolute disproportionality: "+expected_abs+" seats");
+		System.out.println("Excepted signed disproportionality: "+expected_mean+(expected_mean < 0 ? " (rep seat advantage)" : " (dem seat advantage)"));
+		System.out.println("50% chance of being between: "+results.get(trials/4)+" and "+results.get(trials-trials/4)+" seats");
+		System.out.println("90% chance of being between: "+results.get(trials/20)+" and "+results.get(trials-trials/20)+" seats");
+		System.out.println("Chance of dem advantage: "+dem_adv);
+		System.out.println("Chance of rep advantage: "+rep_adv);
+		for(int i = 0; i < trials; i+= trials/10) {
+			System.out.println(""+i+": "+results.get(i));
+		}
+		System.out.println(""+(trials-1)+": "+results.get(trials-1));
+		//binAndShow(results);
+	}
+	public double computeDisproportionality() {
+		double[][] dd = getAnOutcome();
+		double demseats = 0;
+		double repseats = 0;
+		double demvotes = 0;
+		double repvotes = 0;
+		for( int i = 0; i < num_districts; i++) {
+			demvotes += dd[i][0];
+			repvotes += dd[i][1];
+			demseats += dd[i][0] > dd[i][1] ? 1 : 0;
+		}
+		double pctvotes = demvotes / (demvotes+repvotes);
+		double pctseats = demseats / (double)num_districts;
+		return pctseats - pctvotes;
+	}
+
 	public double scoreRandom2() {
 		double[][] dd = getAnOutcome();
 		double demseats = 0;

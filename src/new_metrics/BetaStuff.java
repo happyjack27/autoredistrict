@@ -68,6 +68,34 @@ public class BetaStuff implements VoteCounts {
 				wi_maxdem_dem,wi_maxdem_rep,
 				8
 				);
+		maxdem.computeDisproportionalityStats();
+	}
+	void nothing() {
+		Metrics maxrep = new Metrics(
+				//wi_actual_dem,wi_actual_rep,
+				//wi_fair_dem,wi_fair_rep,
+				wi_maxrep_dem,wi_maxrep_rep,
+				8
+				);
+		Metrics actual = new Metrics(
+				wi_actual_dem,wi_actual_rep,
+				//wi_fair_dem,wi_fair_rep,
+				//wi_maxrep_dem,wi_maxrep_rep,
+				8
+				);
+		Metrics fair = new Metrics(
+				//wi_actual_dem,wi_actual_rep,
+				wi_fair_dem,wi_fair_rep,
+				//wi_maxrep_dem,wi_maxrep_rep,
+				8
+				);
+		Metrics maxdem = new Metrics(
+				//wi_actual_dem,wi_actual_rep,
+				//wi_fair_dem,wi_fair_rep,
+				wi_maxdem_dem,wi_maxdem_rep,
+				8
+				);
+		
 		GatherVoteCounts.getVoteCounts();
 		/*
 		boolean good = true;
