@@ -3,7 +3,7 @@ package util;
 import java.util.*;
 
 // Based on https://en.wikipedia.org/wiki/Steinhaus%E2%80%93Johnson%E2%80%93Trotter_algorithm#Even.27s_speedup
-public class PermIterator
+public class PermutationIterator
     implements Iterator<int[]>
 {
     private int[] next = null;
@@ -12,7 +12,7 @@ public class PermIterator
     private int[] perm;
     private int[] dirs;
 
-    public PermIterator(int size) {
+    public PermutationIterator(int size) {
         n = size;
         if (n <= 0) {
             perm = (dirs = null);
@@ -92,7 +92,7 @@ public class PermIterator
 
     public static void main(String argv[]) {
         String s = argv[0];
-        for(Iterator<int[]> it = new PermIterator(s.length()); it.hasNext(); ) {
+        for(Iterator<int[]> it = new PermutationIterator(s.length()); it.hasNext(); ) {
             print(s, it.next());
         }
     }

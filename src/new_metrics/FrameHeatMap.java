@@ -7,7 +7,7 @@ import javax.swing.table.*;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 
-import util.Pair;
+import util.GenericClasses.Pair;
 
 import java.awt.*;
 import java.awt.event.*;

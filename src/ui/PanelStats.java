@@ -8,7 +8,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import solutions.*;
-import util.Triplet;
+import util.GenericClasses.Triplet;
 
 import java.awt.*;
 import java.awt.datatransfer.*;

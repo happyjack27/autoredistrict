@@ -1,8 +1,6 @@
 package util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.Vector;
 
 
@@ -118,7 +116,7 @@ public class translator {
 		String infile = "C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\vtd_data.txt";
 		String outfile = "C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\vtd_data_out.txt";
 		
-		Vector<String[]> records = readDelimited(new File(infile),delimiter,"\n");
+		Vector<String[]> records = FileUtil.readDelimited(new File(infile),delimiter,"\n");
 		
 		int source_col = 0;
 		int geoid_col = 0;
@@ -176,57 +174,8 @@ public class translator {
 		
 		
 		
-		writeDelimited(new File(outfile),delimiter,"\n",records);
+		FileUtil.writeDelimited(new File(outfile),delimiter,"\n",records);
 		
-	}
-	
-	
-	public static Vector<String[]> readDelimited(File f, String cell, String line) {
-		StringBuffer sb = new StringBuffer(); 
-		Vector<String[]> v = new Vector<String[]>();
-		try {
-			FileInputStream fis = new FileInputStream(f);
-			while( fis.available() > 0) {
-				byte[] bb = new byte[fis.available()];
-				fis.read(bb);
-				sb.append( new String(bb));
-				Thread.sleep(10);
-			}
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		String s = sb.toString();
-		String[] sss = s.split(line);
-		for( int i = 0; i < sss.length; i++) {
-			String[] ss = sss[i].split(cell);
-			v.add(ss);
-		}
-		
-		return v;
-	}
-	
-	public static void writeDelimited(File f, String cell, String line,  Vector<String[]> v) {
-		StringBuffer sb = new StringBuffer(); 
-		for( int i = 0; i < v.size(); i++) {
-			String[] ss = v.get(i);
-			for( int j = 0; j < ss.length; j++) {
-				if( j > 0) {
-					sb.append(cell);
-				}
-				sb.append(ss[j]);
-			}
-			sb.append(line);
-		}
-		
-		try {
-			FileOutputStream fis = new FileOutputStream(f);
-			fis.write(sb.toString().getBytes());
-			fis.flush();
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
 	}
 
 }

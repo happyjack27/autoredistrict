@@ -8,7 +8,7 @@ import org.apache.commons.math3.distribution.GammaDistribution;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.util.FastMath;
 
-import util.Pair;
+import util.GenericClasses.Pair;
 
 
 /*

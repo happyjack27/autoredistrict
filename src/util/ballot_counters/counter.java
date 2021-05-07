@@ -3,7 +3,7 @@ package util.ballot_counters;
 import java.io.*;
 import java.util.*;
 
-import util.Pair;
+import util.GenericClasses.Pair;
 
 public class counter {
 	public static iCountingSystem[] systems = new iCountingSystem[]{

@@ -13,7 +13,7 @@ import javax.swing.text.*;
 import solutions.*;
 import ui.DialogDownload.EventThread;
 import ui.MainFrame.OpenShapeFileThread;
-import util.Util;
+import util.FileUtil;
 
 /*
  * alabama: 252266
@@ -105,7 +105,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				FileInputStream fos = null;
 				try {
 					fos = new FileInputStream(f);
-					String s = Util.readStream(fos);
+					String s = FileUtil.readStream(fos);
 					scriptTA.setText(s);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -857,7 +857,7 @@ SAVE
 
 	public void queueInstructionsFromFile(String string) {
 		try {
-			queueInstructions(Util.readStream(new FileInputStream(string)).toString());
+			queueInstructions(FileUtil.readStream(new FileInputStream(string)).toString());
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

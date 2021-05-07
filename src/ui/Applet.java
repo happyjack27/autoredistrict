@@ -8,7 +8,6 @@ import java.net.URI;
 
 import javax.swing.*;
 
-import util.Gaussian;
 import util.StaticFunctions;
 
 
@@ -126,12 +125,6 @@ public class Applet extends JApplet {
         	System.exit(0);
     	}
     	
-    	StaticFunctions.binomial(1, 1);
-    	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.51));
-    	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.52));
-    	System.out.println(""+Gaussian.binomial_as_normal(1001, 500, 0.55));
-
-
     	mainFrame = new MainFrame();
     	for( int i = 0; i < args.length-1; i++) {
 	    	if( args[i].equals("run")) {

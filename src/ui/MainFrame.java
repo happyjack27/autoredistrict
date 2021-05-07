@@ -6,6 +6,9 @@ import new_metrics.Metrics;
 import solutions.*;
 import ui.MainFrame.OpenShapeFileThread;
 import util.*;
+import util.GenericClasses.BiMap;
+import util.GenericClasses.Quadruplet;
+import util.GenericClasses.Triplet;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -1762,7 +1765,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		    		dlbl.setText("Loading file...");
 
 					String s = getFile(f).toString();
-					dh = readDBF(f.getAbsolutePath());
+					dh = FileUtil.readDBF(f.getAbsolutePath());
 					
 					String dbfname = f.getAbsolutePath();
 					
@@ -3602,7 +3605,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 		
-		dh.data = vectorToArray(v);
+		dh.data = Util.vectorToArray(v);
 		writeDelimited(fn,dh,"\t",true);
 	}
 	public Vector<String[]> arrayToVector(String[][] sss) {
@@ -3611,13 +3614,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			v.add(ss);
 		}
 		return v;
-	}
-	public String[][] vectorToArray(Vector<String[]> v) {
-		String[][] sss = new String[v.size()][];
-		for( int i = 0; i < sss.length; i++) {
-			sss[i] = v.get(i);
-		}
-		return sss;
 	}
 	public void writeDelimited(String filename, DataAndHeader dh, String delimiter, boolean has_headers) {
 		String[] headers = dh.header;
@@ -3696,118 +3692,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		//System.exit(0);
 		return dh;
-	}
-	public void writeDBF(String filename, String[] headers, String[][] data) {
-		int MAX_HEADER_LENGTH = 10;
-        DBField[] fields = new DBField[headers.length];
-        System.out.println("filename: "+filename);
-        
-		for( int i = 0; i < headers.length; i++) {
-			try {
-				Quadruplet<String,Integer,Integer,Byte> q = featureCollection.getHeaderData(headers[i]);
-				System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
-				fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], (char)(int)q.d, q.b,q.c);
-				//fields[i] = new DBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
-			} catch (Exception e) {
-				try {
-					fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], 'C', 32, 0);
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				System.out.println("e "+i+": "+e);
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		DBFWriter dbfwriter;
-		try {
-			dbfwriter = new DBFWriter(filename, fields);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return;
-		}
-		for( int i = 0; i < data.length; i++) {
-			for( int j = 0; j < data[i].length; j++) {
-				if( data[i][j].length() > 64) {
-					data[i][j] = data[i][j].substring(0,64);
-				}
-			}
-			Object[] oo = new Object[data[i].length];
-			for( int j = 0; j < fields.length; j++) {
-				if( fields[j].type == 'N') {
-					if(  data[i][j] == null || data[i][j].equals("<null>")) {
-						oo[j] = new Double(0);
-					} else {
-						try {
-							oo[j] = Double.parseDouble(data[i][j]);
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							oo[j] = data[i][j];
-						}
-					}
-				} else {
-					oo[j] = data[i][j];
-				}
-				
-			}
-			try {
-				//dbfwriter.addRecord(data[i]);
-				dbfwriter.addRecord(oo);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		try {
-			dbfwriter.close();
-			System.out.println("dbfwriter closed");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public DataAndHeader readDBF(String dbfname) {
-		DBFReader dbfreader;
-		try {
-			dbfreader = new DBFReader(dbfname);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return null;
-		}
-		DataAndHeader dh = new DataAndHeader();
-		
-		dh.header = new String[dbfreader.getFieldCount()];
-		for( int i = 0; i < dh.header.length; i++) {
-			try {
-				dh.header[i] = dbfreader.getField(i).name;
-				System.out.println("i: "+dh.header[i]);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		Vector<String[]> vd = new Vector<String[]>();
-
-	    while (dbfreader.hasNextRecord()) {
-	    	try {
-	    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
-	    		String[] ss = new String[oo.length];
-	    		for( int i = 0; i < oo.length; i++) {
-	    			ss[i] = oo[i].toString();
-	    		}
-				vd.add(ss);
-			} catch (Exception e) {
-				// TODO Auto-generated catch ward
-				e.printStackTrace();
-			}
-	    }
-	    dh.data = new String[vd.size()][];
-	    for( int i = 0; i < dh.data.length; i++) {
-	    	dh.data[i] = vd.get(i);
-	    }
-	    return dh;
 	}
 	public void loadShapeFile(File f) {
 
@@ -4616,7 +4500,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				} else
 				if( ext.equals("dbf")) {
 					String s = getFile(f).toString();
-					dh = readDBF(f.getAbsolutePath());
+					dh = FileUtil.readDBF(f.getAbsolutePath());
 				} else {
 					JOptionPane.showMessageDialog(null, "File format not recognized.");
 					return;
@@ -6713,7 +6597,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				String filename = project.save_to;
 				String ext = project.save_to.substring(project.save_to.length()-3).toLowerCase();
 				if( ext.equals("dbf")) {
-					writeDBF(filename,headers,data);					
+					FileUtil.writeDBF(filename,featureCollection.getDBFields(),data);					
 					System.out.println("writedbf done.");
 				} else {
 					String delimiter = ",";
@@ -6808,7 +6692,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				filename += ".dbf";
 			}
 			System.out.println("writedbf start.");
-			writeDBF(filename,headers,data);					
+			FileUtil.writeDBF(filename,featureCollection.getDBFields(),data);					
 			System.out.println("writedbf done.");
 		} else {
 			String delimiter = opt == 1 ? "\t" : ",";
@@ -7335,7 +7219,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			String path = Download.census_tract_path+"demographics"+File.separator;
 
 			Download.download(url,path,fn_zipfile);
-			Download.unzip(path+fn_zipfile, Download.census_tract_path+"demographics"+File.separator);
+			FileUtil.unzip(path+fn_zipfile, Download.census_tract_path+"demographics"+File.separator);
 			
 			String fn_geoheader = stateabbr.toLowerCase()+"geo"+year+".pl";
 			String fn_part1 = stateabbr.toLowerCase()+"00001"+year+".pl";
@@ -7415,9 +7299,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			Vector<String[]> data = new Vector<String[]>();
 			
-			String sgeo_header = Util.readStream(getClass().getResourceAsStream("/resources/geoheader_cols.txt")); 
-			String spart1_header = Util.readStream(getClass().getResourceAsStream("/resources/part1_cols.txt")); 
-			String spart2_header = Util.readStream(getClass().getResourceAsStream("/resources/part2_cols.txt")); 
+			String sgeo_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/geoheader_cols.txt")); 
+			String spart1_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/part1_cols.txt")); 
+			String spart2_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/part2_cols.txt")); 
 			
 			Vector<Triplet<String,String,Integer>> geo_header = new Vector<Triplet<String,String,Integer>>();
 			Vector<Triplet<String,String,Integer>> part1_header = new Vector<Triplet<String,String,Integer>>();
@@ -8432,7 +8316,7 @@ ui.Mainframe:
 		} else
 		if( ext.equals("dbf")) {
 			String s = getFile(fi).toString();
-			dh = readDBF(fi.getAbsolutePath());
+			dh = FileUtil.readDBF(fi.getAbsolutePath());
 		}
 		System.out.println("read "+dh.data.length+" rows");
 		int fk_index = -1;

@@ -18,7 +18,7 @@ package solutions;
 
 import geography.*;
 import ui.MainFrame;
-import util.PermIterator;
+import util.PermutationIterator;
 
 import java.awt.Color;
 import java.util.*;
@@ -443,7 +443,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	}  
 
     	//now iterate through perms
-        for(Iterator<int[]> it = new PermIterator(Settings.num_districts); it.hasNext(); ) {
+        for(Iterator<int[]> it = new PermutationIterator(Settings.num_districts); it.hasNext(); ) {
         	int[] test_subst = it.next();
         	int matches = 0;
             for( int i = 0; i < test_subst.length; i++) {

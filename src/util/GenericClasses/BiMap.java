@@ -1,4 +1,4 @@
-package util;
+package util.GenericClasses;
 
 import java.util.*;
 

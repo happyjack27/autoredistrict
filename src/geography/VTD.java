@@ -13,7 +13,7 @@ import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
 import solutions.*;
 import ui.MainFrame;
-import util.Pair;
+import util.GenericClasses.Pair;
 
 public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 	

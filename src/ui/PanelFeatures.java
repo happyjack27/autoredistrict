@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 
 import solutions.Ecology;
-import util.Pair;
+import util.GenericClasses.Pair;
 
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;

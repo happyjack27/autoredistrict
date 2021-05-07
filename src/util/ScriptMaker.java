@@ -9,7 +9,7 @@ public class ScriptMaker {
 		File f = new File(args[0]);
 		try {
 			FileInputStream fis = new FileInputStream(f);
-			String s = Util.readStream(fis);
+			String s = FileUtil.readStream(fis);
 			make_scripts(s);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

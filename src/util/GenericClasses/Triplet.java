@@ -1,4 +1,4 @@
-package util;
+package util.GenericClasses;
 
 
 public class Triplet<T1 extends Comparable<T1>, T2, T3> implements Comparable<Triplet<T1,T2,T3>>{

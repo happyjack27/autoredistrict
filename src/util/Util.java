@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import ui.Download;
+import util.GenericClasses.Triplet;
 
 /*
 =======
@@ -104,78 +105,7 @@ IMPORT BLOCKS "blocks.txt" TRUE TRUE CD113FP CD_2010
  */
  
 public class Util {
-	/*
-	 * 
-	 * potential redos (descr rep):
-California
-Massacthuses
-Michigan
-New Jersey
-New York
-Ohio
-Pennsylvania
-Virginia
-Wisconsin
-
-	 
-	 */
-	static int apportionment_threshold = 15;
-	static boolean only_redos = false;
-	public static String[] redo_states = new String[]{
-		"Oklahoma",
-		//"Kentucky",
-		//"Rhode Island",
-		//"Pennsylvania",
-		//"Tennessee",
-		//"Alabama",
-		//"New York",
-		//"Oklahoma",
-		//"Virginia",
-		//"Texas",
-		//"New York",
-		//"Washington",
-		//"Wisconsin",
-		//"Michigan",
-		//"Ohio",
-		//"South Carolina",
-		/*
-		"Illinois",
-		"California",
-		"Florida",
-		"Texas",
-		"Massachusetts",
-		"Virginia",
-		"New Jersey",
-		"New York",
-		"Ohio",*/
-	};
 	
-	public static String[] bad_states_round1 = new String[]{
-		"Illinois",
-		"Louisiana",
-		"Maine",
-		"Maryland",
-		"Massachusetts",
-		"Minnesota",//Minnesota
-		"New Jersey",
-		"Ohio",
-		"Oklahoma",
-		"Oregon",
-		"Pennsylvania",
-		"South Dakota",
-		"Texas",
-		"Vermont",
-		"Virginia",
-	};
-	
-	public static String[] bad_states = new String[]{
-		"Massachusetts",
-		"Ohio",
-		"Texas",
-		"Virginia",
-		"Pennsylvania",
-		"Oregon"
-	};
 
 	/*
 	 Minnesota
@@ -225,8 +155,8 @@ New Mexico
 		System.out.println("\t$trans_background = imagecolorallocatealpha($dest_image, 0, 0, 0, 127);");
 		System.out.println("\timagefill($dest_image, 0, 0, $trans_background);");
 		System.out.println("\t");
-		for( int i = 0; i < states.length; i++) {
-			String p = path+states[i].replaceAll(" ","%20")+separator+"2010"+separator+column+separator+"national"+separator+image_name;
+		for( int i = 0; i < StaticVariables.states.length; i++) {
+			String p = path+StaticVariables.states[i].replaceAll(" ","%20")+separator+"2010"+separator+column+separator+"national"+separator+image_name;
 			System.out.println("\t$image_"+i+" = imagecreatefrompng(file_get_contents('"+p+"'));");
 
 			System.out.println("\timagecopy($dest_image, $image_"+i+", 0, 0, 0, 0, WIDTH, HEIGHT);");
@@ -241,10 +171,7 @@ New Mexico
 	
 	//missing: alaska and lousianna!
 	
-	static final String path = "/Users/jimbrill/autoredistrict_data/county_stats";
-	//"C:\\Users\\kbaas.000\\Documents\\autoredistrict_data\\all_state_elections_and_demo_from_google_drive";
-
-    public static int LevenshteinDistance(String a, String b) {
+	public static int LevenshteinDistance(String a, String b) {
         int [] costs = new int [b.length() + 1];
         for (int j = 0; j < costs.length; j++)
             costs[j] = j;
@@ -260,120 +187,14 @@ New Mexico
         return costs[b.length()];
     }
 
-	static final String[] states1 = new String[]{
-		//"Louisiana",
-		"Alaska",
-	};
-	static final String[] states_vtd = new String[]{
-		"Alabama",
-		"Arkansas",
-		"California",
-		"Connecticut",		
-		"Delaware",
-		"Florida",
-		"Georgia",
-		"Hawaii",
-		"Idaho",
-		"Illinois",
-		"Indiana",
-		"Iowa",
-		"Kansas",
-		"Kentucky",
-		//"Louisiana",
-		"Maine",
-		//"Maryland",
-		"Massachusetts",
-		"Michigan",
-		//"Minnesota",
-		"Mississippi",
-		"Missouri",
-		"Montana",
-		"Nebraska",
-		//"Nevada",
-		//"New Hampshire",
-		"New Jersey",
-		"New Mexico",
-		"New York",
-		"North Carolina",
-		"North Dakota",
-		"Ohio",
-		"Oklahoma",
-		//"Oregon",
-		"Pennsylvania",
-		//"Rhode Island",
-		"South Carolina",
-		"South Dakota",
-		"Tennessee",
-		//"Texas",
-		"Utah",
-		"Vermont",
-		"Virginia",
-		"Washington",
-		"West Virginia",
-		"Wisconsin",
-		"Wyoming",
-	};
-	static final String[] states = new String[]{
-		"Alabama",
-		"Alaska",
-		"Arizona",
-		"Arkansas",
-		"California",
-		"Colorado",
-		"Connecticut",
-		"Delaware",
-		"Florida",
-		"Georgia",
-		"Hawaii",
-		"Idaho",
-		"Illinois",
-		"Indiana",
-		"Iowa",
-		"Kansas",
-		"Kentucky",
-		"Louisiana",
-		"Maine",
-		"Maryland",
-		"Massachusetts",
-		"Michigan",
-		"Minnesota",
-		"Mississippi",
-		"Missouri",
-		"Montana",
-		"Nebraska",
-		"Nevada",
-		"New Hampshire",
-		"New Jersey",
-		"New Mexico",
-		"New York",
-		"North Carolina",
-		"North Dakota",
-		"Ohio",
-		"Oklahoma",
-		"Oregon",
-		"Pennsylvania",
-		"Rhode Island",
-		"South Carolina",
-		"South Dakota",
-		"Tennessee",
-		"Texas",
-		"Utah",
-		"Vermont",
-		"Virginia",
-		"Washington",
-		"West Virginia",
-		"Wisconsin",
-		"Wyoming",
-	};
-	
 	public static void writeHTML() {
 		Download.init();
-		for( int i = 0; i < states.length; i++) {
+		for( int i = 0; i < StaticVariables.states.length; i++) {
 			System.out.println("<tr>");
-			System.out.println("<td>"+states[i]+"</td>");
+			System.out.println("<td>"+StaticVariables.states[i]+"</td>");
 			//file:///Users/jimbrill/autoredistrict_data/Alabama/2010/map_districts.png
-			System.out.println("<td><a href='fairvote/"+states[i]+"/2010/stats.html'>stats</a></td>");
-			System.out.println("<td><img src='fairvote/"+states[i]+"/2010/map_districts.png' width=100></td>");
+			System.out.println("<td><a href='fairvote/"+StaticVariables.states[i]+"/2010/stats.html'>stats</a></td>");
+			System.out.println("<td><img src='fairvote/"+StaticVariables.states[i]+"/2010/map_districts.png' width=100></td>");
 			System.out.println("</tr>");
 		}
 	}
@@ -442,14 +263,14 @@ New Mexico
 		Download.init();
 		File f2 = new File(base_dir+"sourcescript");
 		try {
-			script = util.Util.readStream(new FileInputStream(f2));
+			script = util.FileUtil.readStream(new FileInputStream(f2));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		File f3 = new File(base_dir+"sourcescript2");
 		try {
-			script2 = util.Util.readStream(new FileInputStream(f3));
+			script2 = util.FileUtil.readStream(new FileInputStream(f3));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -482,16 +303,16 @@ New Mexico
 			}
 			
 			boolean hit = false;
-			for( int j = 0; j < redo_states.length; j++) {
-				if( redo_states[j].equals(state)) {
+			for( int j = 0; j < StaticVariables.redo_states.length; j++) {
+				if( StaticVariables.redo_states[j].equals(state)) {
 					hit = true;
 					break;
 				}
 			}
-			if( Download.apportionments[i] > apportionment_threshold) {
+			if( Download.apportionments[i] > StaticVariables.apportionment_threshold) {
 				//hit = true;
 			}
-			if( !hit && only_redos) {
+			if( !hit && StaticVariables.only_redos) {
 				continue;
 			}
 
@@ -957,8 +778,8 @@ EXIT
 				//ri
 		};
 		
-		for( int i = 0; i < states.length; i++) {
-			String state = states[i];
+		for( int i = 0; i < StaticVariables.states.length; i++) {
+			String state = StaticVariables.states[i];
 			//String from ="/home/autotrader/autoredistrict_data_cd113/";
 			String from = "/Users/jimbrill/autoredistrict_data/";
 			String to = "/var/www/html/autoredistrict/website/all50/CD_PRES/";
@@ -989,9 +810,9 @@ EXIT
 		//processVTD();
 		System.exit(0);
 		
-		for( int i = 0; i < states.length; i++) {
+		for( int i = 0; i < StaticVariables.states.length; i++) {
 			try {
-				String state = states[i];
+				String state = StaticVariables.states[i];
 				System.out.println("processing: "+state);
 				process(state);
 			} catch (Exception ex) {
@@ -1034,7 +855,7 @@ EXIT
 		}
 		*/
 		
-		File file = new File(path+File.separator+"Merged -- "+state+".txt");
+		File file = new File(StaticVariables.path+File.separator+"Merged -- "+state+".txt");
 		FileOutputStream fos = null;
 		try {
 			fos = new FileOutputStream(file);
@@ -1068,8 +889,8 @@ EXIT
 	}
 	public static Vector<String[]> county_detail(String state) {
 		Vector<String[]> v = new Vector();
-		File folder = new File(path);
-		File file = new File(path+File.separator+"County Detail -- "+state+".txt");
+		File folder = new File(StaticVariables.path);
+		File file = new File(StaticVariables.path+File.separator+"County Detail -- "+state+".txt");
 		int[] useful_columns = new int[]{
 				3,
 				4,
@@ -1099,7 +920,7 @@ EXIT
 		};
 		v.add(renames);
 		try {
-			String filestring = Util.readStream(new FileInputStream(file)).toString();
+			String filestring = FileUtil.readStream(new FileInputStream(file)).toString();
 			String[] lines = filestring.split("\n");
 			System.out.println("found "+lines.length+" lines");
 			
@@ -1154,8 +975,8 @@ EXIT
 	}
 	public static Vector<String[]> county_sum(String state) {
 		Vector<String[]> v = new Vector();
-		File folder = new File(path);
-		File sum_file = new File(path+File.separator+"County Summary -- "+state+".txt");
+		File folder = new File(StaticVariables.path);
+		File sum_file = new File(StaticVariables.path+File.separator+"County Summary -- "+state+".txt");
 		int sum_start=3;
 		int[] useful_columns = new int[]{
 				0,
@@ -1185,7 +1006,7 @@ EXIT
 		};
 		v.add(renames);
 		try {
-			String filestring = Util.readStream(new FileInputStream(sum_file)).toString();
+			String filestring = FileUtil.readStream(new FileInputStream(sum_file)).toString();
 			String[] lines = filestring.split("\n");
 			for(int j = 0; j < renames.length; j++) {
 				//System.out.print("["+j+": "+renames[j]+"]");
@@ -1236,20 +1057,6 @@ EXIT
 	}
 
 
-	public static String readStream(InputStream is) {
-	    StringBuilder sb = new StringBuilder(512);
-	    try {
-	        Reader r = new InputStreamReader(is, "UTF-8");
-	        int c = 0;
-	        while ((c = r.read()) != -1) {
-	            sb.append((char) c);
-	        }
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
-	    return sb.toString();
-	}
-	
 	public static Triplet<String,VTD,Integer> findBestMatch(String source_string, Hashtable<String,VTD> dictionary) {
 		String test_source_string = source_string.toUpperCase().trim();
 
@@ -1598,5 +1405,13 @@ LOAD [FIPS]] 2010 2012
 				+"\nEXIT"
 				+"\nEXIT"
 		);
+	}
+
+	public static String[][] vectorToArray(Vector<String[]> v) {
+		String[][] sss = new String[v.size()][];
+		for( int i = 0; i < sss.length; i++) {
+			sss[i] = v.get(i);
+		}
+		return sss;
 	}
 }

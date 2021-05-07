@@ -9,6 +9,7 @@ import java.util.zip.*;
 import javax.swing.*;
 
 import util.*;
+import util.GenericClasses.BiMap;
 
 //http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
 //http://www.census.gov/geo/maps-data/data/baf_description.html description
@@ -287,15 +288,15 @@ public class Download extends Thread {
 			if( download_vtd || !f.exists()) {
 				System.out.println("Extracting vtd shapefile...");
 				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting vtd shapfile..."); }
-				unzip(census_vtd_path+"vtds.zip", census_vtd_path);
+				FileUtil.unzip(census_vtd_path+"vtds.zip", census_vtd_path);
 			}
 			if( census_merge_working && census_merge_old && download_census) {
 				System.out.println("Extracting census population...");
 				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting census population..."); }
-				unzip(census_pop_path+"block_pops.zip", census_pop_path);
+				FileUtil.unzip(census_pop_path+"block_pops.zip", census_pop_path);
 				System.out.println("Extracting census centroids...");
 				if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting census block centroids..."); }
-				unzip(census_centroid_path+"block_centroids.zip", census_centroid_path);
+				FileUtil.unzip(census_centroid_path+"block_centroids.zip", census_centroid_path);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -646,63 +647,7 @@ public class Download extends Thread {
 		return true;
 	}
 	
-    /**
-     * Size of the buffer to read/write data
-     */
-    private static final int BUFFER_SIZE = 4096;
-    /**
-     * Extracts a zip file specified by the zipFilePath to a directory specified by
-     * destDirectory (will be created if does not exists)
-     * @param zipFilePath
-     * @param destDirectory
-     * @throws IOException
-     */
-    public static void unzip(String zipFilePath, String destDirectory) throws IOException {
-    	try {
-	    	System.out.println("unzipping "+zipFilePath);
-	        File destDir = new File(destDirectory);
-	        if (!destDir.exists()) {
-	            destDir.mkdir();
-	        }
-	        ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath));
-	        ZipEntry entry = zipIn.getNextEntry();
-	        // iterates over entries in the zip file
-	        while (entry != null) {
-	            String filePath = destDirectory + File.separator + entry.getName();
-	            if (!entry.isDirectory()) {
-	                // if the entry is a file, extracts it
-	            	System.out.println("extracting "+filePath+"...");
-	                extractFile(zipIn, filePath);
-	            } else {
-	                // if the entry is a directory, make the directory
-	                File dir = new File(filePath);
-	                dir.mkdir();
-	            }
-	            zipIn.closeEntry();
-	            entry = zipIn.getNextEntry();
-	        }
-	        zipIn.close();
-	    } catch (Exception ex) {
-	    	System.out.println("unzip fail!! "+ex);
-	    	ex.printStackTrace();
-	    }
-    }
-    /**
-     * Extracts a zip entry (file entry)
-     * @param zipIn
-     * @param filePath
-     * @throws IOException
-     */
-    private static void extractFile(ZipInputStream zipIn, String filePath) throws IOException {
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
-        byte[] bytesIn = new byte[BUFFER_SIZE];
-        int read = 0;
-        while ((read = zipIn.read(bytesIn)) != -1) {
-            bos.write(bytesIn, 0, read);
-        }
-        bos.close();
-    }
-	public static void delete() {
+    public static void delete() {
 		Applet.deleteRecursive(new File(getStartPath()));
 	}
 	public static void clean() {
@@ -745,7 +690,7 @@ public class Download extends Thread {
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Downloading "+source_url+"..."); }
 			download(source_url,dest_folder2,"downloaded.zip");
 			if( MainFrame.dlbl != null) { MainFrame.dlbl.setText("Extracting "+source_url+"..."); }
-			unzip(dest_folder2+"downloaded.zip", dest_folder);
+			FileUtil.unzip(dest_folder2+"downloaded.zip", dest_folder);
 			System.out.println("done extracting.");		
 		} catch (Exception ex) {
 			ex.printStackTrace();

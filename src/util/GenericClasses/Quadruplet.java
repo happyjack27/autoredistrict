@@ -1,4 +1,4 @@
-package util;
+package util.GenericClasses;
 
 
 public class Quadruplet<T1, T2, T3, T4> {

@@ -5,7 +5,7 @@ import java.util.*;
 
 import jsonMap.JsonMap;
 import ui.MainFrame;
-import util.Pair;
+import util.GenericClasses.Pair;
 
 public class District extends JsonMap {
     Vector<VTD> vtds = new Vector<VTD>();

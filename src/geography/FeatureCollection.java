@@ -15,6 +15,7 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import dbf.DBFReader;
+import dbf.DBField;
 import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
 import solutions.Election;
@@ -25,7 +26,7 @@ import solutions.Settings;
 import geography.VTD;
 import ui.MainFrame;
 import ui.MapPanel;
-import util.Quadruplet;
+import util.GenericClasses.Quadruplet;
 
 public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
@@ -286,6 +287,31 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 		System.out.println("find uncontested found "+vuncontested1.size()+ " "+vuncontested2.size()+ " "+vuncontested3.size());
 	}
 
+	public DBField[] getDBFields() {
+		String[] headers = getHeaders();
+		int MAX_HEADER_LENGTH = 10;
+	    DBField[] fields = new DBField[headers.length];
+	    
+		for( int i = 0; i < headers.length; i++) {
+			try {
+				Quadruplet<String,Integer,Integer,Byte> q = getHeaderData(headers[i]);
+				System.out.println("header: "+q.a+", "+q.b+", "+q.c+", "+((char)(byte)q.d));
+				fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], (char)(int)q.d, q.b,q.c);
+				//fields[i] = new DBField(headers[i].length() > 10 ? headers[i].substring(0,10) : headers[i], 'C', 32, 0);
+			} catch (Exception e) {
+				try {
+					fields[i] = new DBField(headers[i].length() > MAX_HEADER_LENGTH ? headers[i].substring(0,MAX_HEADER_LENGTH) : headers[i], 'C', 32, 0);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				System.out.println("e "+i+": "+e);
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return fields;
+	}
 	
 	public String[] getHeaders() {
 		String[] headers;

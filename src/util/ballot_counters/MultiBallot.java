@@ -2,7 +2,7 @@ package util.ballot_counters;
 
 import java.util.*;
 
-import util.Pair;
+import util.GenericClasses.Pair;
 
 public class MultiBallot {
 	public static int num_votes = 3;

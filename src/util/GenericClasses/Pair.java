@@ -1,4 +1,4 @@
-package util;
+package util.GenericClasses;
 
 public class Pair<T1 extends Comparable<T1>, T2> implements Comparable<Pair<T1, T2>> {
 	public T1 a;

@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import util.DataAndHeader;
-import dbf.DBFReader;
-import dbf.DBFWriter;
+import util.FileUtil;
 import dbf.DBField;
 
 public class Main {
@@ -35,7 +34,7 @@ public class Main {
 
 	
 	public static void main(String[] ss) {
-		dbfData = readDBF(path+filename);
+		dbfData = FileUtil.readDBF(path+filename);
 		System.out.println("read "+dbfData.data.length+" lines");
 		for( int i = 0; i < dbfData.full_header.length; i++) {
 			fieldIndices.put(dbfData.full_header[i].name, i);
@@ -62,7 +61,7 @@ public class Main {
 			} catch (IOException e) {
 			}
 		}
-		writeDBF(dbfData,path+outname);
+		FileUtil.writeDBF(dbfData,path+outname);
 	}
 	private static void aggregateVotes() {
 		for( String[] ss: dbfData.data) {
@@ -150,105 +149,5 @@ public class Main {
 			}
 			dbfData.data = new_data;
 		}
-	}
-	public static void writeDBF(DataAndHeader dh, String filename) {
-		DBField[] fields = dh.full_header;
-		String[][] data = dh.data;
-		DBFWriter dbfwriter;
-		try {
-			dbfwriter = new DBFWriter(filename, fields);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return;
-		}
-		for( int i = 0; i < data.length; i++) {
-			//System.out.println("writing line "+i+" of "+data.length);
-			for( int j = 0; j < data[i].length; j++) {
-				if( data[i][j].length() > 64) {
-					data[i][j] = data[i][j].substring(0,64);
-				}
-			}
-			Object[] oo = new Object[data[i].length];
-			for( int j = 0; j < fields.length; j++) {
-				if( fields[j].type == 'N') {
-					if(  data[i][j] == null || data[i][j].equals("<null>")) {
-						oo[j] = new Double(0);
-					} else {
-						try {
-							oo[j] = Double.parseDouble(data[i][j]);
-						} catch (Exception ex) {
-							ex.printStackTrace();
-							oo[j] = data[i][j];
-						}
-					}
-				} else {
-					oo[j] = data[i][j];
-				}
-				
-			}
-			try {
-				//dbfwriter.addRecord(data[i]);
-				dbfwriter.addRecord(oo);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		try {
-			dbfwriter.close();
-			System.out.println("dbfwriter closed");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public static DataAndHeader readDBF(String dbfname) {
-		DBFReader dbfreader;
-		try {
-			dbfreader = new DBFReader(dbfname);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			return null;
-		}
-		DataAndHeader dh = new DataAndHeader();
-		
-		dh.header = new String[dbfreader.getFieldCount()];
-		dh.full_header = new DBField[dbfreader.getFieldCount()];
-		for( int i = 0; i < dh.header.length; i++) {
-			try {
-				dh.header[i] = dbfreader.getField(i).name;
-				dh.full_header[i] = dbfreader.getField(i);
-				//System.out.println("i: "+dh.header[i]);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		Vector<String[]> vd = new Vector<String[]>();
-
-	    while (dbfreader.hasNextRecord()) {
-	    	try {
-	    		Object[] oo = dbfreader.nextRecord(Charset.defaultCharset());
-	    		String[] ss = new String[oo.length];
-	    		for( int i = 0; i < oo.length; i++) {
-	    			ss[i] = oo[i].toString();
-	    		}
-				vd.add(ss);
-			} catch (Exception e) {
-				System.out.println(" e on read next "+e);
-				e.printStackTrace();
-			}
-	    }
-	    dh.data = new String[vd.size()][];
-	    for( int i = 0; i < dh.data.length; i++) {
-	    	dh.data[i] = vd.get(i);
-	    }
-	    try {
-			dbfreader.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	    return dh;
 	}
 }
