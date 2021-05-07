@@ -156,7 +156,7 @@ FeatureCollection
 FeatureCollection - Detailed
 ========
 
-FeatureCollection extends ReflectionJSONObject<FeatureCollection>
+FeatureCollection extends ReflectJsonMap<FeatureCollection>
 |-Vector<Features> features 
 |-Vector<VTD> vtds
 |-Ecology ecology
@@ -164,15 +164,15 @@ FeatureCollection extends ReflectionJSONObject<FeatureCollection>
 \-Vector<String> locked_counties
 
 
-Feature extends ReflectionJSONObject<Feature> implements Comparable<Feature>
+Feature extends ReflectJsonMap<Feature> implements Comparable<Feature>
 |-Properties properties
 |-Geometry geometry
 |-VTD vtd
 \-Vector<double[]> points
 
-Properties extends ReflectionJSONObject<Properties> 
+Properties extends ReflectJsonMap<Properties> 
 
-Geometry extends ReflectionJSONObject<Geometry> 
+Geometry extends ReflectJsonMap<Geometry> 
 |-String type;
 |-double[][][] coordinates;
 |-int[] xpolys;
@@ -185,14 +185,14 @@ Geometry extends ReflectionJSONObject<Geometry>
 \-double[] full_centroid;
 
 
-VTD extends ReflectionJSONObject<VTD>
+VTD extends ReflectJsonMap<VTD>
 |-Feature feature 
 |-Vector<Edge> edges 
 |-Vector<VTD> neighbors 
 |-Vector<Vector<Election>>
 \-double[] demographics
 
-Edge extends ReflectionJSONObject<Edge>
+Edge extends ReflectJsonMap<Edge>
 |-VTD ward1 = null;
 |-VTD ward2 = null;
 |-Vertex vertex1;
@@ -205,14 +205,14 @@ Edge extends ReflectionJSONObject<Edge>
 \-double length;
     
 
-Vertex extends ReflectionJSONObject<Vertex>
+Vertex extends ReflectJsonMap<Vertex>
 |-int id;
 |-double x;
 \-double y;
 	
 
 
-Ecology extends ReflectionJSONObject<Ecology> 
+Ecology extends ReflectJsonMap<Ecology> 
 |-Vector<DistrictMap> population
 |-Vector<DistrictMap> swap_population
 |-HashMap<Integer,VTD> wards_by_id;
@@ -242,6 +242,6 @@ DBFReader / DBFWRiter
 
 serialization
 ==========
-ReflectionJSONObject
+ReflectJsonMap
 \-JSONObject
   \-iJSONObject

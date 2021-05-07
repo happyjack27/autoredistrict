@@ -3,10 +3,10 @@ package geography;
 import java.awt.Polygon;
 
 import geography.*;
-import serialization.ReflectionJSONObject;
+import jsonMap.ReflectJsonMap;
 import solutions.*;
 
-public class Edge {// extends ReflectionJSONObject<Edge> {
+public class Edge {// extends ReflectJsonMap<Edge> {
 	public int id = -1;
 	public int ward1_id = -1;
 	public int ward2_id = -1;

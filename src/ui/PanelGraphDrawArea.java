@@ -19,7 +19,7 @@ public class PanelGraphDrawArea extends JPanel {
     		"Population size",
     		"Num. of districts",
     		
-    		"Mutation rate",
+    		"-log(Mutation rate)",
     		
     		//4
     		"Proportionalness (global)",

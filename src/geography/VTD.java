@@ -9,13 +9,13 @@ import java.awt.Polygon;
 import javax.swing.JOptionPane;
 
 import dbf.*;
-import serialization.JSONObject;
-import serialization.ReflectionJSONObject;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import solutions.*;
 import ui.MainFrame;
 import util.Pair;
 
-public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
+public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 	
 	public static Color[] colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 	public static Color[] demo_colors = new Color[]{new Color(192,192,192),Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
@@ -346,7 +346,7 @@ public class VTD extends ReflectionJSONObject<VTD> implements Comparable<VTD> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		if( key.equals("geometry")) {
 			return new Geometry();
 		}

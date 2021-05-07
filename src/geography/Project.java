@@ -6,12 +6,12 @@ import java.util.*;
 
 import javax.swing.JOptionPane;
 
-import serialization.*;
+import jsonMap.*;
 import solutions.Settings;
 import ui.MainFrame;
 
 
-public class Project extends ReflectionJSONObject<Project> {
+public class Project extends ReflectJsonMap<Project> {
 	public String source_file = "";
 	public int number_of_districts = 10;
 	public int members_per_district = 1;
@@ -211,7 +211,7 @@ public class Project extends ReflectionJSONObject<Project> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		if( key.equals("demographics")) {
 			return new DemographicSet();
 		}

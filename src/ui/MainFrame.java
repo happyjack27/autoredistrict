@@ -2673,7 +2673,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean run = false;
 		OpenProjectFileThread(File f, boolean run) { super(f); this.run = run;}
     	public void run() { 
-    	    project.fromJSON(getFile(f).toString());
+    	    project.fromJson(getFile(f).toString());
     	    if( run) {
 				MainFrame.mainframe.featureCollection.ecology.startEvolving();
     	    }
@@ -2713,7 +2713,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 
 			try {
-				fc.fromJSON(sb.toString());
+				fc.fromJson(sb.toString());
 			} catch (Exception ex) {
 				System.out.println("ex "+ex);
 				ex.printStackTrace();
@@ -3437,16 +3437,21 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		boolean[][] buncontested = new boolean[][]{FeatureCollection.buncontested1, FeatureCollection.buncontested2, FeatureCollection.buncontested3};
 		Vector<String>[] dems = (Vector<String>[])new Vector[]{project.election_columns, project.election_columns_2, project.election_columns_3};
 		
+		featureCollection.ecology.reset();
+		featureCollection.ecology.population.add(new DistrictMap(featureCollection.ecology.vtds,Settings.num_districts));
+		
 		for( VTD b : featureCollection.vtds) {
 			b.resetOutcomes();
 			b.has_election_results = true;
 		}
+		
 		for( int idem = 0; idem < max; idem++) {
 			try {
 				System.out.println(" a "+featureCollection.ecology.population.size());
 				// TODO Auto-generated method stub
 				DistrictMap dm = featureCollection.ecology.population.get(0);
 				
+				//count totals in contested districts
 				double[] total_origs = new double[Settings.num_candidates];
 				double[] total_substs = new double[Settings.num_candidates];
 				for( int i = 0; i < Settings.num_candidates; i++) {
@@ -3471,11 +3476,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 						} catch (Exception ex) {
 						}
 					}
-				}	
+				}
+				//compute ratio of totals
 				for( int i = 0; i < Settings.num_candidates; i++) {
 					total_origs[i] /= total_substs[i];
 				}
 				
+				//now replace uncontested with swing adjusted totals
 				for( int id = 0; id < featureCollection.features.size(); id++) {
 					VTD f = featureCollection.features.get(id);
 					if( !buncontested[idem][dm.vtd_districts[id]]) {
@@ -3487,8 +3494,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					for( int i = 0; i < project.substitute_columns.size(); i++) {
 						try {
 							dd[i] = total_origs[i]*Double.parseDouble(f.properties.get(project.substitute_columns.get(i)).toString().replaceAll(",",""));
+							f.properties.put(project.election_columns.get(i),""+((int)dd[i]));
 						} catch (Exception ex) {
-							
+							ex.printStackTrace();
 							dd[i] = 0;
 							f.properties.put(project.substitute_columns.get(i),"0");
 						}
@@ -3525,6 +3533,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		}
 		
 		featureCollection.ecology.reset();
+		featureCollection.ecology.population.add(new DistrictMap(featureCollection.ecology.vtds,Settings.num_districts));
+
 		election_loaded = true;
 		
 		setEnableds();	
@@ -4436,7 +4446,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				if( fd == null) {
 					return;
 				}
-				String s = project.toJSON();
+				String s = project.toString();
 				try {
 					FileOutputStream fos = new FileOutputStream(fd);
 					fos.write(s.getBytes());

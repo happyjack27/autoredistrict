@@ -2,11 +2,11 @@ package geography;
 
 import java.util.Vector;
 
-import serialization.JSONObject;
-import serialization.ReflectionJSONObject;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import solutions.Election;
 
-public class DemographicSet extends ReflectionJSONObject<DemographicSet> {
+public class DemographicSet extends ReflectJsonMap<DemographicSet> {
 	public String name = "";
 	public String year = "";
     public Vector<String> columns = new Vector<String>();
@@ -23,7 +23,7 @@ public class DemographicSet extends ReflectionJSONObject<DemographicSet> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		return super.instantiateObject(key);
 	}
 

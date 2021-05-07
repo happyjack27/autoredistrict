@@ -270,7 +270,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					featureCollection.ecology.population.size(),
 					Settings.num_districts,
 					
-					Settings.mutation_boundary_rate,
+					-Math.log(Settings.mutation_boundary_rate),
 					
 					dm.fairnessScores[8], //diag error
 					dm.fairnessScores[5], //WASTED VOTES TOTAL

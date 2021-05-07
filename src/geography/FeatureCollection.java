@@ -15,8 +15,8 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 
 import dbf.DBFReader;
-import serialization.JSONObject;
-import serialization.ReflectionJSONObject;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import solutions.Election;
 import solutions.District;
 import solutions.DistrictMap;
@@ -27,7 +27,7 @@ import ui.MainFrame;
 import ui.MapPanel;
 import util.Quadruplet;
 
-public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
+public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 	public static Color[] demo_district_colors = new Color[]{new Color(192,192,192),Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};
 
@@ -1180,7 +1180,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		if( key == null) {
 			System.out. println("null key!");
 		}
@@ -1715,7 +1715,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 		
 		//System.out.println("collecting edges ");
 		for( VTD f : features) {
-			String current_district = f.properties.get(key).toString();
+			String current_district = f.properties.get(key) == null ? "" : f.properties.get(key).toString();
 			Vector<Edge> outer_edges = new_polys.get(current_district);
 			if( outer_edges == null) {
 				outer_edges = new Vector<Edge>();
@@ -1725,7 +1725,7 @@ public class FeatureCollection extends ReflectionJSONObject<FeatureCollection> {
 				String s = "hiu24-no match- 554af5";
 				VTD f0 = e.otherFeature(f);
 				if( f0 != null) {
-					s = e.otherFeature(f).feature.properties.get(key).toString();
+					s = e.otherFeature(f).feature.properties.get(key) == null ? "" : e.otherFeature(f).feature.properties.get(key).toString();
 				}
 				if( !s.equals(current_district)) {
 					outer_edges.add(e);

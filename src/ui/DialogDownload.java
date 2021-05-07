@@ -32,19 +32,23 @@ public class DialogDownload extends JDialog {
 	public DialogDownload() {
 		setTitle("Download vtd shapefile & population");
 		initComponents();
-		int y = new Date().getYear()+1900-1;
+		Date d = new Date();
+		long DAY = 24L*60L*60L*1000L;
+		long YEAR = DAY*365L;
+		d.setTime(d.getTime()-YEAR-DAY*30L*7L);
+		int y = d.getYear()+1900-1;
 		int y10 = y - y % 10;
 		int y4 = 2012;//y - y % 4;
-		String[] cyears = new String[]{""+y10,""+(y10-10)};
-		String[] eyears = new String[]{""+y4,""+(y4-4),""+(y4-8),""+(y4-12),""+(y4-16),""+(y4-20)};
+		String[] cyears = new String[]{""+(y10+10),""+y10,""+(y10-10)};
+		String[] eyears = new String[]{""+(y4+8),""+(y4+4),""+y4,""+(y4-4),""+(y4-8),""+(y4-12),""+(y4-16),""+(y4-20)};
 		for( int i = 0; i < cyears.length; i++ ) {
 			comboBoxCensusYear.addItem(cyears[i]);
 		}
 		for( int i = 0; i < eyears.length; i++ ) {
 			comboBoxElectionYear.addItem(eyears[i]);
 		}
-		comboBoxCensusYear.setSelectedIndex(0);
-		comboBoxElectionYear.setSelectedIndex(0);
+		comboBoxCensusYear.setSelectedIndex(1);
+		comboBoxElectionYear.setSelectedIndex(2);
 	}
 	private void initComponents() {
 		setModal(true);

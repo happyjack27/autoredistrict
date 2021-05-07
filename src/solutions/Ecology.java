@@ -10,12 +10,12 @@ import java.util.concurrent.Executors;
 
 import javax.swing.JOptionPane;
 
-import serialization.*;
+import jsonMap.*;
 import ui.MainFrame;
 //import ui.MapPanel;
 //import ui.PanelStats;
 
-public class Ecology extends ReflectionJSONObject<Ecology> {
+public class Ecology extends ReflectJsonMap<Ecology> {
 	
 	public Vector<iDiscreteEventListener> evolveListeners = new Vector<iDiscreteEventListener>();
 	
@@ -288,7 +288,7 @@ public class Ecology extends ReflectionJSONObject<Ecology> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		if( key.equals("vertexes")) {
 			return null;//new Vertex();
 		}

@@ -28,7 +28,7 @@ rep: 62984828
 
 
 public class Metrics {
-	public int trials = 100000;
+	public int trials = 100*1000;
 	public static boolean force_centered_popular_vote = false;
 	
 	public static boolean for_national = false;
@@ -458,7 +458,7 @@ public class Metrics {
 		//System.out.println("dem: "+dem+" rep: "+rep+" "+(dem-rep));
 		return (dem-rep);
 	}
-	public void computeDisproportionalityStats(boolean betasOnly) {
+	public Vector<Double> computeDisproportionalityStats(boolean betasOnly) {
 		Vector<Double> results = new Vector<Double>();
 		double expected_mean = 0;
 		double expected_abs = 0;
@@ -489,6 +489,7 @@ public class Metrics {
 			System.out.println(""+i+": "+results.get(i));
 		}
 		System.out.println(""+(trials-1)+": "+results.get(trials-1));
+		return results;
 		//binAndShow(results);
 	}
 	public double computeDisproportionality(boolean betasOnly) {

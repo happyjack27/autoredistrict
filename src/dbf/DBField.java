@@ -10,6 +10,16 @@ public class DBField {
 	public int decimalCount;
 	
 	public static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	
+	@Override
+	public DBField clone() {
+		try {
+			return new DBField(name, type, length, decimalCount);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public DBField(String s, char c, int i, int j) throws Exception {
 		if (s.length() > 10) {

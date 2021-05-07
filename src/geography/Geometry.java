@@ -1,7 +1,7 @@
 package geography;
 
-import serialization.JSONObject;
-import serialization.ReflectionJSONObject;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import solutions.Settings;
 
 import java.awt.Color;
@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.util.*;
 
-public class Geometry extends ReflectionJSONObject<Geometry> {
+public class Geometry extends ReflectJsonMap<Geometry> {
 	public String type;
 	public double[][][] coordinates;
 	public Polygon[] polygons;
@@ -267,7 +267,7 @@ public class Geometry extends ReflectionJSONObject<Geometry> {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		// TODO Auto-generated method stub
 		return super.instantiateObject(key);
 	}

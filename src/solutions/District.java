@@ -3,11 +3,11 @@ import geography.*;
 
 import java.util.*;
 
-import serialization.JSONObject;
+import jsonMap.JsonMap;
 import ui.MainFrame;
 import util.Pair;
 
-public class District extends JSONObject {
+public class District extends JsonMap {
     Vector<VTD> vtds = new Vector<VTD>();
     
     public static int id = -1;
@@ -513,7 +513,7 @@ public class District extends JSONObject {
 	}
 
 	@Override
-	public JSONObject instantiateObject(String key) {
+	public JsonMap instantiateObject(String key) {
 		// TODO Auto-generated method stub
 		return null;
 	}

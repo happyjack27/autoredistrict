@@ -167,7 +167,11 @@ public class Download extends Thread {
 			System.out.println("state not found!");
 			return false;
 		}
-		int y = new Date().getYear()+1900;
+		Date d = new Date();
+		long DAY = 24L*60L*60L*1000L;
+		long YEAR = DAY*365L;
+		d.setTime(d.getTime()-YEAR-DAY*30L*7L);
+		int y = d.getYear()+1900;
 		int y10 = y - y % 10;
 		int y4 = y - y % 4;
 		String[] cyears = new String[]{""+y10,""+(y10-10)};

@@ -68,8 +68,11 @@ public class BetaStuff implements VoteCounts {
 				wi_maxdem_dem,wi_maxdem_rep,
 				8
 				);
-		maxrep.showBetaParameters();
-		maxrep.computeDisproportionalityStats(false);
+		Metrics todo = actual;
+		todo.showBetaParameters();
+		Vector<Double> res = todo.computeDisproportionalityStats(false);
+		FrameDrawDistribution fdd = new FrameDrawDistribution(res);
+		fdd.show();
 	}
 	void nothing() {
 		Metrics maxrep = new Metrics(

@@ -2,9 +2,9 @@ package geography;
 
 import java.util.Hashtable;
 
-import serialization.ReflectionJSONObject;
+import jsonMap.ReflectJsonMap;
 
-public class Properties extends ReflectionJSONObject<Properties> {
+public class Properties extends ReflectJsonMap<Properties> {
 	public boolean from_shape_file = false;
 	public int esri_rec_num = -1;
 	public double AREA;

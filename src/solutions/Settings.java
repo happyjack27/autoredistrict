@@ -4,14 +4,14 @@ import geography.VTD;
 
 import java.util.Vector;
 
-import serialization.JSONObject;
+import jsonMap.JsonMap;
 import ui.MainFrame;
 
-public class Settings extends serialization.ReflectionJSONObject<Settings> {
+public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 	
 	public static boolean paretoMode = false;
 	public static boolean national_map = false;
-	public static double uncontested_threshold = 0.02;
+	public static double uncontested_threshold = 0.10;
 	public static int num_maps_to_draw = 1;
 	public static boolean use_annealing_floor = true;
 	public static int RANK = 0;

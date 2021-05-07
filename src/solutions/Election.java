@@ -2,9 +2,9 @@ package solutions;
 
 import java.util.Vector;
 
-import serialization.ReflectionJSONObject;
+import jsonMap.ReflectJsonMap;
 
-public class Election  {//extends ReflectionJSONObject<Demographic> {
+public class Election  {//extends ReflectJsonMap<Demographic> {
 	//public int ward_id;
 	public int population;
 	public double turnout_probability;

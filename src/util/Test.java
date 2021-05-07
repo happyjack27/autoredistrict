@@ -1,9 +1,9 @@
 package util;
 
-import serialization.ReflectionJSONObject;
+import jsonMap.ReflectJsonMap;
 import ui.*;
 
-public class Test extends ReflectionJSONObject<Test> {
+public class Test extends ReflectJsonMap<Test> {
 	public int testmember;
     public static void main( String[] args ) {
     	for( int i = 0; i < Download.states.length; i++) {
@@ -21,7 +21,7 @@ public class Test extends ReflectionJSONObject<Test> {
     	}
     	/*
     	Test t = new Test();
-    	//JSONObject._
+    	//JsonMap._
     	t.fromJSON("testmember: 4");
     	System.out.println("value: "+t.testmember);
     	System.out.println("value2: "+t.get("testmember"));

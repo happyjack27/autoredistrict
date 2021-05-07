@@ -1,6 +1,6 @@
 package geography;
 
-import serialization.ReflectionJSONObject;
+import jsonMap.ReflectJsonMap;
 
 public class Vertex {
 	public int id;
