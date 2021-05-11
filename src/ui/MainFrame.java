@@ -3605,7 +3605,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		}
 		
-		dh.data = Util.vectorToArray(v);
+		dh.data = StaticFunctions.vectorToArray(v);
 		writeDelimited(fn,dh,"\t",true);
 	}
 	public Vector<String[]> arrayToVector(String[][] sss) {
