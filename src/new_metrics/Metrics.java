@@ -1,7 +1,18 @@
 package new_metrics;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+
+import jsonMap.JsonMap;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.distribution.GammaDistribution;
@@ -29,6 +40,7 @@ rep: 62984828
 
 public class Metrics {
 	public int trials = 100*1000;
+	public static boolean show = false;
 	public static boolean force_centered_popular_vote = false;
 	
 	public static boolean for_national = false;
@@ -64,8 +76,9 @@ public class Metrics {
 	
 	Vector<Double> asym_results = new Vector<Double>();
 	
-
-
+	public Vector<String[]> point_stats = new Vector<String[]>();
+	
+	double[][][] election_samples = null;
 	
 	double[] seat_probs = null;
 	double[] inv_seat_probs = null;
@@ -77,15 +90,132 @@ public class Metrics {
 
 	public double asymmetry_median;
 	private int[] seat_counts;
+	public String output_folder;
 	
 	Metrics() { }
 	public Metrics(double[][] dem, double[][] rep, int num_districts, int[] seat_counts) {
 		this.seat_counts = seat_counts;
 		compute( dem,  rep,  num_districts);
+		point_stats = new Vector<String[]>();
+		point_stats.add(new String[]{"Measurement","Statistic","Value"});
 	}
 	public Metrics(double[][] dem_elections, double[][] rep_elections, int length) {
 		this(dem_elections,rep_elections,length,null);
 	}
+	public Vector<Vector<String[]>> getElections() {
+		Vector<Vector<String[]>> vvs = new Vector<Vector<String[]>>();
+		for( int i = 0; i < this.dem_counts.length; i++) {
+			Vector<String[]> vs = new Vector<String[]>();
+			vvs.add(vs);
+			double[] dvotes = this.dem_counts[i];
+			double[] rvotes = this.rep_counts[i];
+			String[] ss0 = new String[]{"District","Dem Votes","Rep Votes"};//,"Dem Pct","Rep Pct"};
+			vs.add(ss0);
+			for( int j = 0; j < this.dem_counts[i].length; j++) {
+				double pct = dvotes[j]/(dvotes[j]+rvotes[j]);
+				String[] ss = new String[]{""+(j+1),""+(int)dvotes[j],""+(int)rvotes[j]};//,""+pct,""+(1.0-pct)};
+				vs.add(ss);
+			}
+		}
+		return vvs;
+	}
+	public Vector<String[]> getBetasAsVectorString() {
+		Vector<String[]> vvs = new Vector<String[]>();
+		vvs.add(new String[]{"District","Alpha","Beta","Mean","Variance"});
+		BetaDistribution bd0 = this.election_betas;
+		String[] ss0 = new String[]{
+			"Total"
+			,""+bd0.getAlpha()
+			,""+bd0.getBeta()
+			,""+bd0.getNumericalMean()
+			,""+bd0.getNumericalVariance()
+		};
+		vvs.add(ss0);
+		for( int i = 0; i < this.district_betas.size(); i++) {
+			BetaDistribution bd = this.district_betas.get(i);
+			String[] ss = new String[]{
+				""+(i+1)
+				,""+bd.getAlpha()
+				,""+bd.getBeta()
+				,""+bd.getNumericalMean()
+				,""+bd.getNumericalVariance()
+			};
+			vvs.add(ss);
+		}
+		return vvs;
+	}
+	public Vector<String[]> getGammasAsVectorString() {
+		Vector<String[]> vvs = new Vector<String[]>();
+		vvs.add(new String[]{"District","Shape","Scale","Mean","Variance"});
+		GammaDistribution bd0 = this.election_gammas;
+		String[] ss0 = new String[]{
+				"Total"
+				,""+bd0.getShape()
+				,""+bd0.getScale()
+				,""+bd0.getNumericalMean()
+				,""+bd0.getNumericalVariance()
+			};
+		vvs.add(ss0);
+		for( int i = 0; i < this.district_gammas.size(); i++) {
+			GammaDistribution bd = this.district_gammas.get(i);
+			String[] ss = new String[]{
+				""+(i+1)
+				,""+bd.getShape()
+				,""+bd.getScale()
+				,""+bd.getNumericalMean()
+				,""+bd.getNumericalVariance()
+			};
+			vvs.add(ss);
+		}
+		return vvs;
+	}
+	public JsonMap getProbabilityModelJson() {
+		JsonMap m = new JsonMap();
+		m.put("StatewideBetaDistribution", getBetaAsJson(election_betas));
+		m.put("StatewideGammaDistribution", getGammaAsJson(election_gammas));
+		
+		Vector<JsonMap> db = new Vector<JsonMap>();
+		for( BetaDistribution bd : district_betas) {
+			db.add(getBetaAsJson(bd));
+		}
+		m.put("DistrictBetaDistribution", db);
+		
+		Vector<JsonMap> dg = new Vector<JsonMap>();
+		for( GammaDistribution bd : district_gammas) {
+			dg.add(getGammaAsJson(bd));
+		}
+		m.put("DistrictGammaDistribution", dg);
+		
+		return m;
+	}
+	public JsonMap getBetaAsJson(BetaDistribution bd) {
+		JsonMap dist = new JsonMap();
+		dist.put("Type","Beta");
+		dist.put("Alpha",bd.getAlpha());
+		dist.put("Beta",bd.getBeta());
+		dist.put("Mean",bd.getNumericalMean());
+		dist.put("Variance",bd.getNumericalVariance());
+		return dist;
+	}
+	
+	public JsonMap getGammaAsJson(GammaDistribution bd) {
+		JsonMap dist = new JsonMap();
+		dist.put("Type","Gamma");
+		dist.put("Shape",bd.getShape());
+		dist.put("Scale",bd.getScale());
+		dist.put("Mean",bd.getNumericalMean());
+		dist.put("Variance",bd.getNumericalVariance());
+		return dist;
+	}
+	
+	
+	public void createElectionSamples(int num) {
+		election_samples = new double[num][][];
+		for( int i = 0; i < election_samples.length; i++) {
+			election_samples[i] = getAnOutcome();
+		}
+	}
+
 	public void centerCounts(double[][] dem_all, double[][] rep_all) {
 		centered_dem_counts = new double[rep_all.length][];
 		centered_rep_counts = new double[rep_all.length][];
@@ -141,8 +271,9 @@ public class Metrics {
 		for( int i = -num_districts/2; i <= num_districts/2; i++) {
 			asym_results.add((double)i/(double)num_districts);
 		}
+		trials = election_samples.length;
 		for( int i = 0; i < trials; i++) {
-			double d = use_gammas ? scoreRandom2() : scoreRandom();
+			double d = calculate_asymmetry(this.election_samples[i]);//use_gammas ? scoreRandom2() : scoreRandom();
 			expected_asymmetry += d;
 			asym_results.add(d);
 			//System.out.println("running total "+expected_asymmetry);
@@ -162,6 +293,17 @@ public class Metrics {
 		asymmetry_90_low = asym_results.get(trials/20);
 		asymmetry_median = asym_results.get(trials/2);
 		asymmetry_90_high = asym_results.get(trials-trials/20);
+		double asymmetry_50_low = asym_results.get(trials/4);
+		double asymmetry_50_high = asym_results.get(trials-trials/4);
+		
+		this.point_stats.add(new String[]{"asymmetry","90% upper bound",""+asymmetry_90_high});
+		this.point_stats.add(new String[]{"asymmetry","50% upper bound",""+asymmetry_50_high});
+		this.point_stats.add(new String[]{"asymmetry","median",""+asymmetry_median});
+		this.point_stats.add(new String[]{"asymmetry","mean",""+expected_asymmetry});
+		this.point_stats.add(new String[]{"asymmetry","50% lower bound",""+asymmetry_50_low});
+		this.point_stats.add(new String[]{"asymmetry","90% lower bound",""+asymmetry_90_low});
+		this.point_stats.add(new String[]{"asymmetry","mean absolute deviation",""+mad});
+		this.point_stats.add(new String[]{"asymmetry","standard deviation",""+Math.sqrt(var)});
 		//System.out.println("expected_asymmetry: "+expected_asymmetry);
 		System.out.println();
 		System.out.println("asymmetry   low 5%: "+asymmetry_90_low);
@@ -188,7 +330,7 @@ public class Metrics {
 		for(int i = 0; i < seat_probs.length; i++) {
 			System.out.println(""+i+" seats: "+seat_probs[i]);
 			seat_expectation += seat_probs[i]*(double)i;
-			if( (double)i < threshold) {
+			if( (double)i > threshold) {
 				rep_majority += seat_probs[i];
 			} else {
 				dem_majority += seat_probs[i];
@@ -197,6 +339,11 @@ public class Metrics {
 		System.out.println("Expectation: "+seat_expectation);
 		System.out.println("Dem majority: "+dem_majority);
 		System.out.println("Rep majority: "+rep_majority);
+		this.point_stats.add(new String[]{"seats","expected Democratic seats",""+((double)this.num_districts-seat_expectation)});
+		this.point_stats.add(new String[]{"seats","expected Republican seats",""+seat_expectation});
+		this.point_stats.add(new String[]{"seats","chance of Democratic majority",""+dem_majority});
+		this.point_stats.add(new String[]{"seats","chance of Republican majority",""+rep_majority});
+		
 		//System.exit(0);
 	}
 	public void showBetas() {
@@ -222,18 +369,25 @@ public class Metrics {
 			System.out.println("nan found!");
 			System.exit(0);
 		}
+		
+		saveToFile(fd.panel,this.output_folder+"betas.png",500,500);
 		//System.exit(0);
-		fd.show();
-		fd.repaint();
+		if( show) {
+			fd.show();
+			fd.repaint();
+		}
 	}
 	public void showSeats() {
 		
 		FrameDraw fd2 = new FrameDraw();
 		fd2.seats = seat_probs;
 
-		fd2.show();
-		fd2.repaint();
-		
+		saveToFile(fd2.panel,this.output_folder+"seats.png",500,500);
+
+		if( show) {
+			fd2.show();
+			fd2.repaint();
+		}		
 	}
 	public double[][] getAnOutcome() {
 		double[][] ddd = new double[num_districts][];
@@ -323,13 +477,13 @@ public class Metrics {
 		return seatProbs;
 	}
 	public double[] getSeatProbs2(int trials) {
-		double delta = 1.0/(double)trials;
+		double delta = 1.0/(double)election_samples.length;
 		double[] seatProbs = new double[district_betas.size()+1];
-		for( int i = 0; i < trials; i++) {
+		for( int i = 0; i < election_samples.length; i++) {
+			double[][] result = election_samples[i];
 			int seats = 0;
-			double[][] result = getAnOutcome();
 			for(int j = 0; j < num_districts; j++) {
-				if( result[j][0] < result[j][1]) {
+				if( result[j][0] > result[j][1]) {
 					seats++;
 				}
 			}
@@ -458,19 +612,20 @@ public class Metrics {
 		//System.out.println("dem: "+dem+" rep: "+rep+" "+(dem-rep));
 		return (dem-rep);
 	}
-	public Vector<Double> computeDisproportionalityStats(boolean betasOnly) {
+	public Vector<Double> computeDisproportionalityStats() {
+		int trials = election_samples.length;
 		Vector<Double> results = new Vector<Double>();
 		double expected_mean = 0;
 		double expected_abs = 0;
 		double dem_adv = 0;
 		double rep_adv = 0;
 		for(int i = 0; i < trials; i++) {
-			double d = computeDisproportionality(betasOnly) * (double)num_districts;;
+			double d = computeDisproportionality(this.election_samples[i]) * (double)num_districts;;
 			results.add(d);
 			expected_mean += d;
 			expected_abs += Math.abs(d);
-			dem_adv += (d > 0) ? 1 : 0;
-			rep_adv += (d < 0) ? 1 : 0;
+			dem_adv += (d < 0) ? 1 : 0;
+			rep_adv += (d > 0) ? 1 : 0;
 		}
 		expected_mean /= (double)trials;
 		expected_abs /= (double)trials;
@@ -479,8 +634,15 @@ public class Metrics {
 		//expected_mean *= (double)num_districts;
 		//expected_abs *= (double)num_districts;
 		Collections.sort(results);
+		point_stats.add(new String[]{"disproportionality","90% upper bound",""+results.get(trials-trials/20)});
+		point_stats.add(new String[]{"disproportionality","50% upper bound",""+results.get(trials-trials/4)});
+		point_stats.add(new String[]{"disproportionality","mean",""+expected_mean});
+		point_stats.add(new String[]{"disproportionality","50% lower bound",""+results.get(trials/4)});
+		point_stats.add(new String[]{"disproportionality","90% lower bound",""+results.get(trials-trials/20)});
+		point_stats.add(new String[]{"disproportionality","chance of Democratic advantage",""+dem_adv});
+		point_stats.add(new String[]{"disproportionality","chance of Republican advantage",""+rep_adv});
 		System.out.println("Excepted absolute disproportionality: "+expected_abs+" seats");
-		System.out.println("Excepted signed disproportionality: "+expected_mean+(expected_mean < 0 ? " (rep seat advantage)" : " (dem seat advantage)"));
+		System.out.println("Excepted signed disproportionality: "+expected_mean+(expected_mean < 0 ? " (dem seat advantage)" : " (rep seat advantage)"));
 		System.out.println("50% chance of being between: "+results.get(trials/4)+" and "+results.get(trials-trials/4)+" seats");
 		System.out.println("90% chance of being between: "+results.get(trials/20)+" and "+results.get(trials-trials/20)+" seats");
 		System.out.println("Chance of dem advantage: "+dem_adv);
@@ -492,8 +654,24 @@ public class Metrics {
 		return results;
 		//binAndShow(results);
 	}
-	public double computeDisproportionality(boolean betasOnly) {
-		double[][] dd = betasOnly ? getAnOutcomeBetasOnly() : getAnOutcome();
+	public double computeDisproportionality(double[][] dd) {
+		//double[][] dd = betasOnly ? getAnOutcomeBetasOnly() : getAnOutcome();
+		double demseats = 0;
+		double repseats = 0;
+		double demvotes = 0;
+		double repvotes = 0;
+		for( int i = 0; i < num_districts; i++) {
+			demvotes += dd[i][0];
+			repvotes += dd[i][1];
+			demseats += dd[i][0] > dd[i][1] ? 1 : dd[i][1] == 0 ? 0.5 : 0;
+			repseats += dd[i][0] < dd[i][1] ? 1 : dd[i][1] == 0 ? 0.5 : 0;
+		}
+		double pctvotes = repvotes / (demvotes+repvotes);
+		double pctseats = repseats / (double)num_districts;
+		return pctseats - pctvotes;
+	}
+
+	public double calculate_asymmetry(double[][] dd) {
 		double demseats = 0;
 		double repseats = 0;
 		double demvotes = 0;
@@ -503,9 +681,14 @@ public class Metrics {
 			repvotes += dd[i][1];
 			demseats += dd[i][0] > dd[i][1] ? 1 : 0;
 		}
-		double pctvotes = demvotes / (demvotes+repvotes);
-		double pctseats = demseats / (double)num_districts;
-		return pctseats - pctvotes;
+		double dr = repvotes/demvotes; 
+		double rr = demvotes/repvotes; 
+		for( int i = 0; i < num_districts; i++) {
+			double d = dd[i][0]*dr;
+			double r = dd[i][1]*rr;
+			repseats += r > d ? 1 : 0;
+		}
+		return (repseats-demseats)/(double)num_districts;
 	}
 
 	public double scoreRandom2() {
@@ -545,7 +728,7 @@ public class Metrics {
 		return ((double)num_dem_seats)/(double)sorted_dists.size();
 
 	}
-	public void binAndShow(Vector<Double> samples) {
+	public void binAndShow(Vector<Double> samples, String name) {
 		Hashtable<Double,Double> hash = new Hashtable<Double,Double>();
 		double tot = 0;
 		for( double d : samples) {
@@ -563,14 +746,22 @@ public class Metrics {
 		}
 		Collections.sort(bins);
 		FrameDraw fd = new FrameDraw();
+		if( bins.size() < 20) {
+			fd.interpolate = false;
+		}
+		//fd.interpolate
 		fd.bins = bins;
-		fd.show();
-
 		
+		saveToFile(fd.panel,this.output_folder+name+".png",500,500);
+
+		if( show) {
+			fd.show();
+			fd.repaint();
+		}
 	}
 	public void showAsymmetry() {
 		//now do asymmetry
-		binAndShow(asym_results);
+		binAndShow(asym_results,"partisan_asymmetry");
 		
 	}
 	public double[][] showHeatMap() {
@@ -588,8 +779,8 @@ public class Metrics {
 		double[] seat_probs = new double[y+1];
 		double seats_dem = 0;
 		double seats_rep = 0;
-		for( int i = 0; i < trials; i++) {
-			double[][] dd = getAnOutcome();
+		for( int i = 0; i < election_samples.length; i++) {
+			double[][] dd = election_samples[i];
 			double[] tallied = tallyVotes(dd);
 			double pop_d = tallied[0];
 			double pop_r = tallied[1];
@@ -599,15 +790,15 @@ public class Metrics {
 			pop_d /= tot_pop;
 			pop_r /= tot_pop;
 			//seats_d /= (double)dd.length;
-			seats_r /= (double)dd.length;
-			int dx = (int)(Math.floor(pop_d*(double)(x)));
-			int dy = (int)seats_d;//(int)(Math.floor(seats_d*(double)(y)));
+			//seats_r /= (double)dd.length;
+			int dx = (int)(Math.floor(pop_r*(double)(x)));
+			int dy = (int)seats_r;//(int)(Math.floor(seats_d*(double)(y)));
 			seat_probs[dy] += inc;
 			if( (double)dy > ((double)y/2.0) ) {
-				seats_dem += inc;
+				seats_rep += inc;
 			}
 			if( (double)dy < ((double)y/2.0) ) {
-				seats_rep += inc;
+				seats_dem += inc;
 			}
 			dx = dx < 0 ? 0 : dx >= x ? x-1 : dx;
 			dy = dy < 0 ? 0 : dy >= y ? y-1 : dy;
@@ -628,7 +819,97 @@ public class Metrics {
 		System.out.println("rep majority likelihood: "+seats_rep);
 		FrameHeatMap fd = new FrameHeatMap();
 		fd.hm = hm;
-		fd.show();
+		
+		saveToFile(fd.panel,this.output_folder+"seats-votes.png",640,640);
+		
+		if( show) {
+			fd.show();
+			fd.repaint();
+		}
+
+		return hm;
+	}
+	public void saveToFile(JComponent component, String filename, int w, int h) {
+		File f = new File(filename);
+		BufferedImage image4 = new BufferedImage(w,h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics4 = image4.createGraphics(); 
+        graphics4.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics4.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics4.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics4.setComposite(AlphaComposite.Clear);
+        graphics4.fillRect(0, 0, w, h);
+        graphics4.setComposite(AlphaComposite.Src);
+        component.paint(graphics4);
+
+        try {
+			ImageIO.write(image4,"png", f);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public double[][] showDisproportionHeatMap(int x,int y) {
+		double inc = 1.0/(double)trials;
+		double[][] dd0 = getAnOutcome();
+		//if( y > dd0.length/2) {
+			y = dd0.length;
+		//}
+		double[][] hm = new double[x][y];
+		//double inc = 1;//(double)(x*y)/(double)(trials*10);
+		double max = 0;
+		double[] seat_probs = new double[y+1];
+		double seats_dem = 0;
+		double seats_rep = 0;
+		for( int i = 0; i < election_samples.length; i++) {
+			double[][] dd = election_samples[i];
+			double[] tallied = tallyVotes(dd);
+			double pop_d = tallied[0];
+			double pop_r = tallied[1];
+			double seats_d = tallied[2];
+			double seats_r = tallied[3];
+			double tot_pop = pop_d+pop_r;
+			pop_d /= tot_pop;
+			pop_r /= tot_pop;
+			//seats_d /= (double)dd.length;
+			//seats_r /= (double)dd.length;
+			
+			pop_r = (seats_r /(double)dd.length) - pop_r + 0.5;
+			
+			int dx = (int)(Math.floor(pop_r*(double)(x)));
+			int dy = (int)seats_r;//(int)(Math.floor(seats_d*(double)(y)));
+			seat_probs[dy] += inc;
+			if( (double)dy > ((double)y/2.0) ) {
+				seats_rep += inc;
+			}
+			if( (double)dy < ((double)y/2.0) ) {
+				seats_dem += inc;
+			}
+			dx = dx < 0 ? 0 : dx >= x ? x-1 : dx;
+			dy = dy < 0 ? 0 : dy >= y ? y-1 : dy;
+			hm[dx][dy] += inc;
+			if( hm[dx][dy] > max) {
+				max = hm[dx][dy];
+			}
+		}
+		for( int i = 0; i < x; i++) {
+			for( int j = 0; j < y; j++) {
+				hm[i][j] /= max;
+			}
+		}
+		for( int i = 0; i < seat_probs.length; i++) {
+			System.out.println(""+i+": "+seat_probs[i]);
+		}
+		System.out.println("dem majority likelihood: "+seats_dem);
+		System.out.println("rep majority likelihood: "+seats_rep);
+		FrameHeatMap fd = new FrameHeatMap();
+		fd.hm = hm;
+
+		saveToFile(fd.panel,this.output_folder+"seats-disproportion.png",640,640);
+
+		if( show) {
+			fd.show();
+			fd.repaint();
+		}
 
 		return hm;
 	}
@@ -660,8 +941,8 @@ public class Metrics {
 	}
 	public void showPacking() {
 		Vector<Double> packing = new Vector<Double>();
-		for( int i = 0; i < trials; i++) {
-			double[][] o = getAnOutcome();
+		for( int i = 0; i < election_samples.length; i++) {
+			double[][] o = election_samples[i];
 			double[] r = get_packing(o);
 			packing.add(r[0]-r[1]);
 			if( i % 100 == 0) {
@@ -684,7 +965,7 @@ public class Metrics {
 			packing.set(i,next-inc/2);
 			
 		}
-		binAndShow(packing);
+		binAndShow(packing,"packing");
 		
 	}
 	
@@ -729,11 +1010,11 @@ public class Metrics {
 			double[][] dd = getAnOutcome();
 			for( int j = 0; j < dd.length; j++) {
 				double d = dd[j][0]/(dd[j][0]+dd[j][1]);
-				d = Math.round(d*res)/res - 0.5;
+				d = 0.5 - Math.round(d*res)/res;
 				vd.add(d);
 			}
 		}
-		binAndShow(vd);
+		binAndShow(vd,"histogram");
 	}
 	
 	public void showBetaParameters() {
@@ -755,7 +1036,10 @@ public class Metrics {
 		FrameDrawSeatsVotes sv = new FrameDrawSeatsVotes();
 		sv.dist = election_betas;
 		sv.dists = district_betas;
-		sv.show();
+		if( show) {
+			sv.show();
+			sv.repaint();
+		}
 		// TODO Auto-generated method stub
 		
 	}

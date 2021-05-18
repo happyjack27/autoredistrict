@@ -70,7 +70,7 @@ public class BetaStuff implements VoteCounts {
 				);
 		Metrics todo = actual;
 		todo.showBetaParameters();
-		Vector<Double> res = todo.computeDisproportionalityStats(false);
+		Vector<Double> res = todo.computeDisproportionalityStats();
 		FrameDrawDistribution fdd = new FrameDrawDistribution(res);
 		fdd.show();
 	}
@@ -131,34 +131,34 @@ public class BetaStuff implements VoteCounts {
 		//actual.showBetas();
 		//maxdem.showBetas();
 		try {
-		actual.showBetas();
+			actual.showBetas();
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("1");
 		try {
-		actual.computeSeatProbs(false);
+			actual.computeSeatProbs(false);
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("2");
 		try {
-		double[][] dd = actual.getAnOutcome();
-		for( int i = 0; i < dd.length; i++) {
-			System.out.println(""+i+": "+dd[i][0]+" "+dd[i][1]);
-		}
+			double[][] dd = actual.getAnOutcome();
+			for( int i = 0; i < dd.length; i++) {
+				System.out.println(""+i+": "+dd[i][0]+" "+dd[i][1]);
+			}
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("3");
 		try {
-		actual.showSeats();
+			actual.showSeats();
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("4");
 		try {
-		actual.computeAsymmetry(false);
+			actual.computeAsymmetry(false);
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("5");
 		try {
-		actual.showAsymmetry();
+			actual.showAsymmetry();
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("6");
 		try {
-		actual.showSeatsVotes();
+			actual.showSeatsVotes();
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("7");
 		

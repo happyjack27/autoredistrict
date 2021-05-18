@@ -1,4 +1,4 @@
-package tools.simpleImpute;
+package pmc_tools.simpleImpute;
 
 import java.io.File;
 import java.io.IOException;

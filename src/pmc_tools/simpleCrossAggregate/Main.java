@@ -1,4 +1,4 @@
-package tools.simpleCrossAggregate;
+package pmc_tools.simpleCrossAggregate;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -184,7 +184,7 @@ public class Main {
 			if( d == null) {
 				System.out.println("not found: "+vtdid);
 			}
-			String[] vss = vtds.data[d.vtd_index];
+			String[] vss = vtds.data[d.index_in_file];
 			for(int j = 0; j < ivtd_elec_columns.length; j++) {
 				double value = new Double(vss[ivtd_elec_columns[j]].replaceAll(",",""));
 				bss[iblock_elec_columns[j]] = d.total_population <= 0 ? "0" : df.format(value*block_pop / d.total_population);

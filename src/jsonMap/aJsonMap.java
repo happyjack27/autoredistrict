@@ -460,11 +460,29 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 				}
 				sb.append(_prepend + "]\n");
 			}
+			if(obj instanceof double[]){
+				sb.append("[\n");
+				boolean acomma = false;
+				for(double o : (double[]) obj){
+					writeObject(null, o, sb, _prepend + aJsonMap._json_tab, acomma);
+					acomma = true;
+				}
+				sb.append(_prepend + "]\n");
+			}
+			if( obj instanceof Object[]){
+				sb.append("[\n");
+				boolean acomma = false;
+				for(Object o : (Object[]) obj){
+					writeObject(null, o, sb, _prepend + aJsonMap._json_tab, acomma);
+					acomma = true;
+				}
+				sb.append(_prepend + "]\n");
+			}
 			else if(obj instanceof Long){
 				sb.append(((Long) obj).longValue() + "\n");
 			}
 			else if(obj instanceof Double){
-				sb.append(((Float) obj).doubleValue() + "\n");
+				sb.append(((Double) obj).doubleValue() + "\n");
 			}
 			else if(obj instanceof Integer){
 				sb.append(((Integer) obj).intValue() + "\n");

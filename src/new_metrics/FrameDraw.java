@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 public class FrameDraw extends JFrame {
 
 	PiePanel panel = null;
+	boolean interpolate = true;
 	
 	public FrameDraw() {
 		super();
@@ -69,10 +70,11 @@ public class FrameDraw extends JFrame {
 			    	int last_label_x = -1000;
 			    	int length = (int)(400/bins.size());
 			    	int x = 50;
+			    	int last_height = 0;
 			    	for( int i = 0; i < bins.size(); i++) {
 			    		try {
 				    		int height = (int)(bins.get(i).b*400/max_height);
-				    		if( bins.get(i).a <= 0) {
+				    		if( bins.get(i).a >= 0) {
 							    graphics.setColor(Color.red);
 							    if( bins.get(i).a == 0) {
 							    	graphics.setColor(Color.gray);
@@ -82,9 +84,18 @@ public class FrameDraw extends JFrame {
 							    graphics.setColor(Color.blue);
 	
 				    		}
-	
-				    		
-				    		graphics.fillRect(x, 400-height, length, height);
+				    		if( interpolate) {
+					    		int x0 = x-length/2;
+					    		int x1 = x+length/2+1;
+					    		int h0 = last_height;
+					    		int h1 = height;
+					    		last_height = height;
+					    		Polygon p = new Polygon();
+					    		graphics.fillPolygon(new int[]{x0,x0,x1,x1},new int[]{400,400-h0,400-h1,400},4);
+					    		graphics.drawPolygon(new int[]{x0,x0,x1,x1},new int[]{400,400-h0,400-h1,400},4);
+				    		} else {
+					    		graphics.fillRect(x, 400-height, length, height);
+				    		}
 				    		String s = ""+bins.get(i).a;
 				    		if( s.length() > 5) {
 				    			s = s.substring(0, 5);

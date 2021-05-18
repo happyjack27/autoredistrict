@@ -15,6 +15,9 @@ import java.awt.image.BufferedImage;
 
 public class FrameHeatMap extends JFrame {
 
+	public static boolean draw_axis = true;
+	public static boolean draw_grid = true;
+	public static double zoom = 1.0;
 	public double[][] hm = null;
 	PiePanel panel = null;
 	
@@ -25,7 +28,7 @@ public class FrameHeatMap extends JFrame {
 
 	private void initComponents() {
 		getContentPane().setLayout(null);
-		setSize(700,700);
+		setSize(720,720);
 		setTitle("Draw");
 		
 		panel = new PiePanel();
@@ -65,14 +68,16 @@ public class FrameHeatMap extends JFrame {
 			    		int w2 = w/2;
 			    		int h2 = h/2;
 			    		//zoom 2x
-			    		x0 = w2+2*(x0-w2);
-			    		x1 = w2+2*(x1-w2);
+			    		x0 = (int) (w2+zoom*(x0-w2));
+			    		x1 = (int) (w2+zoom*(x1-w2));
 				    	for( int j = 0; j < hm[i].length; j++) {
-				    		int y0 = j*h/hm[i].length;
-				    		int y1 = (j+1)*h/hm[i].length;
+				    		int div = hm[i].length;
+				    		div += (div+1) % 2; //make sure it's odd
+				    		int y0 = j*h/div;
+				    		int y1 = (j+1)*h/div;
 				    		//zoom 2x
-				    		y0 = h2+2*(y0-h2);
-				    		y1 = h2+2*(y1-h2);
+				    		y0 = (int) (h2+zoom*(y0-h2));
+				    		y1 = (int) (h2+zoom*(y1-h2));
 
 				    		y0 = h-y0+ys;
 				    		y1 = h-y1+ys;
@@ -80,7 +85,7 @@ public class FrameHeatMap extends JFrame {
 				    		int c = 256-(int)(hm[i][j]*256.0);
 				    		c = c < 0 ? 0 : c > 255 ? 255 : c;
 				    		//System.out.println("c:"+c);
-				    		Color clr = j < hm[i].length/2 ? new Color(255,c,c) : new Color(c,c,255);
+				    		Color clr = j > hm[i].length/2 ? new Color(255,c,c) : j == hm[i].length/2 ? new Color(c,c,c) : new Color(c,c,255);
 				    		graphics.setColor(clr);
 				    		//graphics.fillRect(w2+2*(x0-w2), h2+2*(y1-h2), 2*(x1-x0), 2*(y0-y1));
 				    		graphics.fillRect(x0, y1, x1-x0, y0-y1);
@@ -89,23 +94,26 @@ public class FrameHeatMap extends JFrame {
 			    	}
 			    }
 			    
-			    graphics.setColor(Color.lightGray);
-			    for( int i = 0; i < 21; i++) {
-			    	int xm = xs+w*i/20;
-			    	int ym = ys+h*i/20;
-				    graphics.drawLine(xs, ym, xs+w, ym);
-				    graphics.drawLine(xm, ys, xm, ys+h);
+			    if( draw_grid) {
+				    graphics.setColor(Color.lightGray);
+				    for( int i = 0; i < 21; i++) {
+				    	int xm = xs+w*i/20;
+				    	int ym = ys+h*i/20;
+					    graphics.drawLine(xs, ym, xs+w, ym);
+					    graphics.drawLine(xm, ys, xm, ys+h);
+				    }
+				    graphics.setColor(Color.black);
+				    for( int i = 0; i < 21; i++) {
+				    	int xm = xs+w*i/20;
+				    	int ym = ys+h*i/20;
+					    graphics.drawLine(xs+w/2-5, ym, xs+w/2+5, ym);
+					    graphics.drawLine(xm, ys+h/2-5, xm, ys+h/2+5);
+				    }
 			    }
-			    
-			    graphics.setColor(Color.black);
-			    for( int i = 0; i < 21; i++) {
-			    	int xm = xs+w*i/20;
-			    	int ym = ys+h*i/20;
-				    graphics.drawLine(xs+w/2-5, ym, xs+w/2+5, ym);
-				    graphics.drawLine(xm, ys+h/2-5, xm, ys+h/2+5);
+			    if( draw_axis) {
+				    graphics.drawLine(xs+w/2, ys, xs+w/2, ys+h);
+				    graphics.drawLine(xs, ys+h/2, xs+w, ys+h/2);
 			    }
-			    graphics.drawLine(xs+w/2, ys, xs+w/2, ys+h);
-			    graphics.drawLine(xs, ys+h/2, xs+w, ys+h/2);
 
 	    	} catch (Exception ex) {
 	    		System.out.println("ex csafs "+ex);

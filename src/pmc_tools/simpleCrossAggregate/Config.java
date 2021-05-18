@@ -1,4 +1,4 @@
-package tools.simpleCrossAggregate;
+package pmc_tools.simpleCrossAggregate;
 
 public class Config {
 	public static String base_path = "C:\\Users\\kbaas\\Documents\\autoredistrict_data\\mggg autoredistrict\\";

@@ -1,15 +1,15 @@
-package tools.simpleCrossAggregate;
+package pmc_tools.simpleCrossAggregate;
 
 import java.util.Vector;
 
 public class District {
-	double total_population = 0;
-	int vtd_index;
+	public double total_population = 0;
+	public int index_in_file;
 	
 	double[] totals = new double[Config.columns_to_transfer.length];
 	
-	District(int vtd_index) {
-		this.vtd_index = vtd_index;
+	public District(int vtd_index) {
+		this.index_in_file = vtd_index;
 	}
 	public void addToTotals(String[] row, int[] block_indices) {
 		if( totals == null) {

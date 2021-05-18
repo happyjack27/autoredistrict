@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 
 public class FrameDrawDistribution extends JFrame {
 
-	PiePanel panel = null;
+	public PiePanel panel = null;
 	public static int method = 1;
 	
 	public Vector<Double> values = null;
@@ -72,11 +72,12 @@ public class FrameDrawDistribution extends JFrame {
 	    }
 	    private void drawMethod1(Graphics2D graphics) {
 		    int count = values.size();
+		    double area_scale = (double)5000/(double)count;
 		    double min = values.get(0);
 		    double max = values.get(count-1);
 		    double bounds = Math.abs(min) > Math.abs(max) ? Math.abs(min) : Math.abs(max);
-		    double dx = bounds/100;
-		    double last_x = -1;
+		    double dx = bounds/50;
+		    double last_x = 1;
 		    double last_y = 0;
 		    int lasti = 0;
 		    int iyzero = transformy(0);
@@ -85,10 +86,10 @@ public class FrameDrawDistribution extends JFrame {
 		    	while( i < count && values.get(i) < d) {
 		    		i++;
 		    	}
-		    	double new_y = (double)(i-lasti)/(double)10.0;
+		    	double new_y = area_scale*(double)(i-lasti);
 		    	double new_x = d/bounds;
 
-		    	if( new_x > 0) {
+		    	if( new_x < 0) {
 				    graphics.setColor(Color.blue);
 	    		} else {
 				    graphics.setColor(Color.red);
@@ -100,6 +101,7 @@ public class FrameDrawDistribution extends JFrame {
 	    		graphics.drawLine(ix0,iy0,ix1,iy1);
 	    		Polygon poly = new Polygon(new int[]{ix0,ix1,ix1,ix0}, new int[]{iy0,iy1,iyzero,iyzero},4);
 	    		graphics.fillPolygon(poly);
+	    		graphics.drawPolygon(poly);
 		    	
 		    	last_y = new_y;
 		    	last_x = new_x;
@@ -184,10 +186,10 @@ public class FrameDrawDistribution extends JFrame {
 			graphics.fillPolygon(poly);
 	    }
     	int transformx(double x) {
-    		return (int)Math.round(x*400+500);
+    		return (int)Math.round(x*200+250);
     	}
     	int transformy(double y) {
-    		return (int)Math.round(-y+900);
+    		return (int)Math.round(-y+500);
     	}
 }
 

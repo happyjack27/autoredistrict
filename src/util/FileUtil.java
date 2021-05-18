@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -58,6 +59,24 @@ public class FileUtil {
 		return v;
 	}
 
+	public static String readText(File f) {
+		StringBuffer sb = new StringBuffer(); 
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			while( fis.available() > 0) {
+				byte[] bb = new byte[fis.available()];
+				fis.read(bb);
+				sb.append( new String(bb));
+				Thread.sleep(10);
+			}
+			fis.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		String s = sb.toString();
+		return s;
+	}
+
 	public static void writeDelimited(File f, String cell, String line,  Vector<String[]> v) {
 		StringBuffer sb = new StringBuffer(); 
 		for( int i = 0; i < v.size(); i++) {
@@ -74,6 +93,17 @@ public class FileUtil {
 		try {
 			FileOutputStream fis = new FileOutputStream(f);
 			fis.write(sb.toString().getBytes());
+			fis.flush();
+			fis.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void writeText(File f, String text) {
+		try {
+			FileOutputStream fis = new FileOutputStream(f);
+			fis.write(text.getBytes());
 			fis.flush();
 			fis.close();
 		} catch (Exception ex) {
@@ -203,10 +233,12 @@ public class FileUtil {
 		
 		dh.header = new String[dbfreader.getFieldCount()];
 		dh.full_header = new DBField[dbfreader.getFieldCount()];
+		dh.nameToIndex = new HashMap<String,Integer>();
 		for( int i = 0; i < dh.header.length; i++) {
 			try {
 				dh.header[i] = dbfreader.getField(i).name;
 				dh.full_header[i] = dbfreader.getField(i);
+				dh.nameToIndex.put(dh.header[i],i);
 				//System.out.println("i: "+dh.header[i]);
 			} catch (Exception ex) {
 				ex.printStackTrace();

@@ -1,4 +1,4 @@
-package tools.simpleImpute;
+package pmc_tools.simpleImpute;
 
 public class District {
 	String name;
