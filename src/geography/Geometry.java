@@ -5,9 +5,6 @@ import jsonMap.ReflectJsonMap;
 import solutions.Settings;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.util.*;
 

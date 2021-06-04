@@ -7,6 +7,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import org.jfree.svg.SVGGraphics2D;
+
 import solutions.*;
 import util.GenericClasses.Triplet;
 
@@ -85,17 +87,18 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	public void saveAsPng(JComponent component, String path) {
 		saveAsPng( component, path,component.getWidth(), component.getHeight());
   	}
-	public void saveAsPng(JComponent component, String path, int width, int height) {
-		 System.out.println("path: "+path);
-		 saveAsPng2( component,  path,  width,  height);
-		 /*
-		 String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
-		 System.out.println("path2: "+path2);
-		 System.out.println("index: "+path.indexOf(".png"));
-		 saveAsPng2( component,  path2,  width/4,  height/4);
-		 */
+	public void saveAs(JComponent component, String path, int width, int height, String type) {
+		switch(type) {
+		case "png":
+			saveAsPng(component, path+"."+type, width, height);
+			break;
+		case "svg":
+			saveAsSvg(component, path+"."+type, width, height);
+			break;
+		}
 	}
-	public void saveAsPng2(JComponent component, String path, int width, int height) {
+	public void saveAsPng(JComponent component, String path, int width, int height) {
+		System.out.println("path: "+path);
 		System.out.println("saveAsPng2 mode "+VTD.display_mode+" "+Settings.national_map+" "+VTD.outline_vtds);
 		String path2 = path.substring(0,path.indexOf(".png"))+"_small.png";
         Dimension d = component.getSize();
@@ -172,8 +175,66 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         catch(Exception ex) {
             ex.printStackTrace();
         }
-
+        component.setSize(d);
+    	component.doLayout();
+	}
+	
+	public void saveAsSvg(JComponent component, String path) {
+		saveAsSvg( component, path,component.getWidth(), component.getHeight());
+  	}
+	public void saveAsSvg(JComponent component, String path, int width, int height) {
+		System.out.println("path: "+path);
+		System.out.println("saveAsSvg mode "+VTD.display_mode+" "+Settings.national_map+" "+VTD.outline_vtds);
+		String path2 = path.substring(0,path.indexOf(".svg"))+"_small.svg";
+		
+		StringBuilder sb = new StringBuilder();
+		
+        Dimension d = component.getSize();
+        MainFrame.mainframe.mapPanel.invalidate();
+        MainFrame.mainframe.mapPanel.repaint();
+        if( true) {
+        	component.setSize(width,height);
+        	component.doLayout();
+        	
+        } else {
+        	width = d.width;
+        	height = d.height;
+        }
+        MainFrame.mainframe.mapPanel.invalidate();
+        MainFrame.mainframe.mapPanel.repaint();
+        //BufferedImage.TYPE_INT_ARGB
         
+		//BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
+        //Graphics2D graphics1 = image1.createGraphics();
+        SVGGraphics2D graphics1 = new SVGGraphics2D(width,height,sb);
+
+        graphics1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        graphics1.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        graphics1.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        graphics1.setComposite(AlphaComposite.Clear);
+        graphics1.fillRect(0, 0, width, height);
+        graphics1.setComposite(AlphaComposite.Src);
+
+        MainFrame.mainframe.resetZoom();
+        
+        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+        component.paint(graphics1);
+        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+        //component.print(graphics1);
+        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+        //component.print(graphics1);
+        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
+ 
+        
+        //try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+        try {
+            //ImageIO.write(image1,"svg", new File(path2));
+        	util.FileUtil.writeText(new File(path), sb.toString());
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
         component.setSize(d);
     	component.doLayout();
 	}
@@ -1234,6 +1295,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
 	public void exportMaps(String write_folder, int res,boolean outline) {
+		String type = "png";
+		
 		int num_maps_temp = Settings.num_maps_to_draw;
 		int display_mode_temp = VTD.display_mode;
 		Settings.num_maps_to_draw = 1;
@@ -1260,7 +1323,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital",res,res,type);
 
 		if( false) {
 			return;
@@ -1268,32 +1331,32 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_demographics_vtd.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts_demographics_vtd",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_votes_vtd.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts_votes_vtd",res,res,type);
 		Settings.divide_packing_by_area = false;
 		
 		//VTD.outline_districts = false;
 
 		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts",res,res,type);
 		VTD.showDistrictLabels = true;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels",res,res,type);
 		VTD.showDistrictLabels = false;
 
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_digital",res,res,type);
 		
 
 
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_digital.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_digital",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital",res,res,type);
 
 		VTD.USE_GRAY = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital_gray.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_digital_gray",res,res,type);
 		VTD.USE_GRAY = false;
 
 		Settings.divide_packing_by_area = false;
@@ -1302,26 +1365,26 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		VTD.display_mode = VTD.DISPLAY_MODE_NORMAL;		
 		VTD.showDistrictLabels = true;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts_labels",res,res,type);
 		VTD.showDistrictLabels = false;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_districts.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_districts",res,res,type);
 		
 		Settings.divide_packing_by_area = false;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won",res,res,type);
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_SEATS;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_seats_won_area",res,res,type);
 		Settings.divide_packing_by_area = false;
 
 		
 		System.out.println("2");
 		Settings.divide_packing_by_area = false;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep",res,res,type);
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DESCR;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_descr_rep_area",res,res,type);
 		Settings.divide_packing_by_area = false;
 
 		
@@ -1329,45 +1392,45 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		Settings.divide_packing_by_area = false;		
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean",res,res,type);
 
 		Settings.divide_packing_by_area = true;		
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING_MEAN;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_mean_area",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING_MEAN;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_mean_area",res,res,type);
 		Settings.divide_packing_by_area = false;
 
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_POP;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_pop",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_COMPACTNESS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_compactness",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_WASTED_VOTES;		
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_wasted_votes",res,res,type);
 		
 
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing",res,res,type);
 		
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics",res,res,type);
 				
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_PARTISAN_PACKING;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_partisan_packing_area",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_RACIAL_PACKING;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_racial_packing_area",res,res,type);
 
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_VOTE;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_votes_area",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_DIST_DEMO;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_district_demographics_area",res,res,type);
 		System.out.println("3");
 		Settings.divide_packing_by_area = false;
 		
@@ -1375,26 +1438,26 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 		VTD.display_mode = VTD.DISPLAY_MODE_COUNTY_SPLITS;		
 		VTD.outline_counties = true;
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_splits.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_splits",res,res,type);
 		VTD.outline_counties = false;
 		System.out.println("4");
 	
 		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics",res,res,type);
 		System.out.println("5");
 		
 		Settings.divide_packing_by_area = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_VOTES;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_votes_area",res,res,type);
 		VTD.display_mode = VTD.DISPLAY_MODE_DEMOGRAPHICS;			
-		saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics_area.png",res,res);
+		saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_vtd_demographics_area",res,res,type);
 	
 	
 		VTD.outline_counties = true;
 		VTD.display_mode = VTD.DISPLAY_MODE_COUNTIES;			
-		//saveAsPng(MainFrame.mainframe.mapPanel,write_folder+"map_counties.png",res,res);
+		//saveAs(MainFrame.mainframe.mapPanel,write_folder+"map_counties",res,res,type);
 		VTD.outline_counties = false;
 	
 	
