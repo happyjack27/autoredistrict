@@ -7,7 +7,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
 
-import org.jfree.svg.SVGGraphics2D;
+import org.jfree.svg.*;
 
 import solutions.*;
 import util.GenericClasses.Triplet;
@@ -84,9 +84,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
     	return Toolkit.getDefaultToolkit().createImage(ip);
     }
 	
-	public void saveAsPng(JComponent component, String path) {
-		saveAsPng( component, path,component.getWidth(), component.getHeight());
-  	}
 	public void saveAs(JComponent component, String path, int width, int height, String type) {
 		switch(type) {
 		case "png":
@@ -97,6 +94,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			break;
 		}
 	}
+	public void saveAsPng(JComponent component, String path) {
+		saveAsPng( component, path,component.getWidth(), component.getHeight());
+  	}
 	public void saveAsPng(JComponent component, String path, int width, int height) {
 		System.out.println("path: "+path);
 		System.out.println("saveAsPng2 mode "+VTD.display_mode+" "+Settings.national_map+" "+VTD.outline_vtds);
@@ -187,6 +187,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		System.out.println("saveAsSvg mode "+VTD.display_mode+" "+Settings.national_map+" "+VTD.outline_vtds);
 		String path2 = path.substring(0,path.indexOf(".svg"))+"_small.svg";
 		
+		boolean btemp = Settings.b_make_simplified_polys;
+		Settings.b_make_simplified_polys = true;
+		
 		StringBuilder sb = new StringBuilder();
 		
         Dimension d = component.getSize();
@@ -218,18 +221,10 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
         MainFrame.mainframe.resetZoom();
         
-        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-        component.paint(graphics1);
-        //try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-        //component.print(graphics1);
-        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
-        //component.print(graphics1);
-        //try { Thread.sleep(2000); } catch (InterruptedException e) { e.printStackTrace(); }
- 
-        
-        //try { Thread.sleep(100); } catch (InterruptedException e) { e.printStackTrace(); }
+        MainFrame.mainframe.mapPanel.featureCollection.draw(graphics1);
         try {
             //ImageIO.write(image1,"svg", new File(path2));
+        	//SVGUtils.writeToSVG(new File(path), graphics1.getSVGDocument());//sb.toString());
         	util.FileUtil.writeText(new File(path), sb.toString());
         }
         catch(Exception ex) {
@@ -237,6 +232,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         }
         component.setSize(d);
     	component.doLayout();
+    	Settings.b_make_simplified_polys = btemp;
 	}
 
 	public void getNormalizedStats() {
@@ -1295,7 +1291,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
 	public void exportMaps(String write_folder, int res,boolean outline) {
-		String type = "png";
+		String type = "svg";
+		//String type = "png";
 		
 		int num_maps_temp = Settings.num_maps_to_draw;
 		int display_mode_temp = VTD.display_mode;

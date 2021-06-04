@@ -46,6 +46,9 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         this.addMouseMotionListener(this);
     }
 
+    public void paintVector(Graphics2D graphics0) {
+    
+    }
     @Override
     public void paintComponent(Graphics graphics0) {
     	try {
