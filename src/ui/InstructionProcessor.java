@@ -322,22 +322,40 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		JScrollBar vertical = scrollPane.getVerticalScrollBar();
 		vertical.setValue( vertical.getMaximum() );
 	}
+	
 	public void resetInstructions() {
-		String[] new_instructions = scriptTA.getText().toString().split("\n");
-		instructions.clear();
-		for( int i = 0; i < new_instructions.length; i++) {
-			instructions.add(new_instructions[i]);
-		}
-		eventOccured();
+		new ResetInstructions().start();
 	}
 	
 	public void queueInstructions( String s) {
-		scriptTA.setText(scriptTA.getText().toString()+s);
-		String[] new_instructions = s.split("\n");
-		for( int i = 0; i < new_instructions.length; i++) {
-			instructions.add(new_instructions[i]);
+		new QueueInstructions(s).start();
+	}
+	class QueueInstructions extends Thread {
+		String s = "";
+		QueueInstructions(String s) {
+			super();
+			this.s = s;
 		}
-		eventOccured();
+		@Override
+		public synchronized void run() {
+			scriptTA.setText(scriptTA.getText().toString()+s);
+			String[] new_instructions = s.split("\n");
+			for( int i = 0; i < new_instructions.length; i++) {
+				instructions.add(new_instructions[i]);
+			}
+			eventOccured();
+		}
+	}
+	class ResetInstructions extends Thread {
+		@Override
+		public synchronized void run() {
+			String[] new_instructions = scriptTA.getText().toString().split("\n");
+			instructions.clear();
+			for( int i = 0; i < new_instructions.length; i++) {
+				instructions.add(new_instructions[i]);
+			}
+			eventOccured();
+		}
 	}
 	/*
 DELETE feature PRES_D50
@@ -357,11 +375,10 @@ SAVE
 		}
 		duplicateThread = true;
 		if( !mainFrame.evolving) {
-			System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 2000");
+			//System.out.println(" ----------- "+new Date().toLocaleString()+": INSTRUCTION SLEEP 100");
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {
@@ -794,14 +811,30 @@ SAVE
 			d = Double.parseDouble(value);
 			parsed = true;
 		} catch (Exception ex) { }
+		if( category.equals("RECOMBINATION")) {
+			boolean checked = item.equals("ON");
+			mainFrame.chckbxRecombination.setSelected(checked);
+			Settings.recombination_on = mainFrame.chckbxRecombination.isSelected();
+			addHistory("SET RECOMBINATION "+(Settings.recombination_on ? "ON" : "OFF"));
+		} else
 		if( category.equals("POPULATION") && item.equals("COLUMN")) {
+			mainFrame.comboBoxPopulation.setSelectedItem(value);
 			mainFrame.setPopulationColumn(value);
 		} else
+		if( category.equals("POPULATION") && item.equals("REDUCE_MAX")) {
+			mainFrame.rdbtnMinimizeMaxDev.setSelected(true);
+		} else
+		if( category.equals("POPULATION") && item.equals("REDUCE_VARIANCE")) {
+			// rdbtnMinimizeMaxDev
+			mainFrame.rdbtnMinimizeSquaredDev.setSelected(true);
+		} else
 		if( category.equals("COUNTY") && item.equals("COLUMN")) {
+			mainFrame.srcomboBoxCountyColumn.setSelectedItem(value);
 			mainFrame.project.county_column = value;
 			mainFrame.setCountyColumn();
 		} else
 		if( category.equals("MUNI") && item.equals("COLUMN")) {
+			mainFrame.srcomboBoxMuniColumn.setSelectedItem(value);
 			mainFrame.project.muni_column = value;
 			mainFrame.setMuniColumn();
 		} else

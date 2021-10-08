@@ -15,6 +15,7 @@ public class ReflectJsonMap<T> extends JsonMap{
 	}
 	@Override
 	public void post_deserialize(){
+		if( true) return;
 		@SuppressWarnings("unchecked")
 		Field[] fields = ((Class<T>) this.getClass()).getDeclaredFields();
 		for(int i = 0; i < fields.length; i++){
@@ -57,6 +58,7 @@ public class ReflectJsonMap<T> extends JsonMap{
 	}
 	@Override
 	public void pre_serialize(){
+		if( true) return;
 		@SuppressWarnings("unchecked")
 		Field[] fields = ((Class<T>) this.getClass()).getDeclaredFields();
 		for(int i = 0; i < fields.length; i++){

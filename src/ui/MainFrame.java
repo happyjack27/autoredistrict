@@ -3120,10 +3120,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 					} catch (Exception ex) {
 						System.out.println("ex aa "+ex);
 						d = 0;
-						feat.properties.put(district,"0");
+						int new_district = (int)(Math.floor(Math.random()*(double)Settings.num_districts));
+						feat.properties.put(district,new_district);
 						System.out.println("missing district "+district );
 						try {
 							System.out.println((String)feat.properties.get("GEOID10"));
+							System.out.println((String)feat.properties.get("GEOID20"));
 						} catch (Exception ex2) {
 							
 						}
@@ -3218,6 +3220,26 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				f.population = Double.parseDouble(pop);
 			}
 			f.properties.POPULATION = (int) Double.parseDouble(pop.replaceAll(",",""));
+		}
+
+		String[] headers = featureCollection.getHeaders();
+		String aland_col = null;
+		String awater_col = null;
+		for( String s : headers) {
+			if( s.contains("ALAND")) {
+				aland_col = s;
+			}
+			if( s.contains("AWATER")) {
+				awater_col = s;
+			}
+		}
+		if( aland_col != null && aland_col != null) {
+			System.out.println("found land and water columns");
+			for( VTD f : featureCollection.features) {
+				double land = f.properties.getDouble(aland_col);
+				double water = f.properties.getDouble(awater_col);
+				f.properties.IS_LAND  = land/(water+land) > Settings.minLandPct;
+			}
 		}
 	}
 	public void setDemographicColumns() {
@@ -4057,11 +4079,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
 		splitReductionType = new ButtonGroup();
 		chckbxAutoAnneal = new JCheckBox("anneal rate");
+		chckbxAutoAnneal.setEnabled(false);
 		lblElitisesMutated = new JLabel("% elites mutated");
 		sliderElitesMutated = new JSlider();
 		sliderElitesMutated.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
-		rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
-		rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
+		rdbtnMinimizeSquaredDev = new JRadioButton("Minimize squared dev.");
+		rdbtnMinimizeMaxDev = new JRadioButton("Minimize maximum dev.");
 		mntmWizard = new JMenuItem("Download vtd shapefile & population from census.gov...");
 		separator_7 = new JSeparator();
 		mnWindows = new JMenu("Windows");
@@ -4167,6 +4190,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		slider_mutation = new JSlider();
+		slider_mutation.setEnabled(false);
 		slider_mutation.setValue(100);
 		sliderDisconnected = new JSlider();
 		sliderBorderLength = new JSlider();
@@ -4573,6 +4597,18 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		mntmExportBlockFile = new JMenuItem("Export block file");
+		mntmExportWardFile = new JMenuItem("Export ward assn. file");
+		mntmImportWardFile = new JMenuItem("Import ward assn. file");
+		mntmExportWardFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+			}
+		});
+		mntmImportWardFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+			}
+		});
 		mntmExportBlockFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ip.addHistory("EXPORT BLOCKS");
@@ -4612,6 +4648,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		mnFile.add(mntmExportPieCharts);
 		mnFile.add(mntmExportBlockFile);
+		mnFile.add(mntmExportWardFile);
+		mnFile.add(mntmImportWardFile);
 		
 		separator_10 = new JSeparator();
 		mnFile.add(separator_10);
@@ -5565,27 +5603,37 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		});
 		sliderDisconnected.setBounds(6, 57, 190, 29);
 		panel_2.add(sliderDisconnected);
+		rdbtnMinimizeSquaredDev.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.minimize_maximum_deviation = !rdbtnMinimizeSquaredDev.isSelected();
+				if( rdbtnMinimizeSquaredDev.isSelected()) {
+					ip.addHistory("SET POPULATION REDUCE_VARIANCE");
+				} else {
+					ip.addHistory("SET POPULATION REDUCE_MAX");
+				}
+			}
+		});
+		rdbtnMinimizeSquaredDev.setSelected(true);
+		rdbtnMinimizeSquaredDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		rdbtnMinimizeSquaredDev.setBounds(6, 220, 169, 23);
+		
+		panel_2.add(rdbtnMinimizeSquaredDev);
 		rdbtnMinimizeMaxDev.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.minimize_absolute_deviation = !rdbtnMinimizeMaxDev.isSelected();
+				Settings.minimize_maximum_deviation = !rdbtnMinimizeSquaredDev.isSelected();
+				if( rdbtnMinimizeSquaredDev.isSelected()) {
+					ip.addHistory("SET POPULATION REDUCE_VARIANCE");
+				} else {
+					ip.addHistory("SET POPULATION REDUCE_MAX");
+				}
 			}
 		});
-		rdbtnMinimizeMaxDev.setSelected(true);
 		rdbtnMinimizeMaxDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		rdbtnMinimizeMaxDev.setBounds(6, 220, 169, 23);
+		rdbtnMinimizeMaxDev.setBounds(6, 244, 169, 23);
 		
 		panel_2.add(rdbtnMinimizeMaxDev);
-		rdbtnMinimizeMeanDev.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Settings.minimize_absolute_deviation = !rdbtnMinimizeMaxDev.isSelected();
-			}
-		});
-		rdbtnMinimizeMeanDev.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-		rdbtnMinimizeMeanDev.setBounds(6, 244, 169, 23);
-		
-		panel_2.add(rdbtnMinimizeMeanDev);
-		buttonGroupPopMinMethod.add(rdbtnMinimizeMeanDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMaxDev);
+		buttonGroupPopMinMethod.add(rdbtnMinimizeSquaredDev);
 		
 		chckbxNewCheckBox_1 = new JCheckBox("constrain");
 		chckbxNewCheckBox_1.setToolTipText("This adds an extra mutation step to non-contiguous regions at the cost of slower evolution.");
@@ -5653,7 +5701,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblNewLabel.setBounds(6, 6, 159, 16);
 		panel_3.add(lblNewLabel);
 		JLabel lblBorderMutation = new JLabel("% mutation");
-		lblBorderMutation.setBounds(6, 138, 172, 16);
+		lblBorderMutation.setBounds(6, 138, 95, 16);
 		panel_3.add(lblBorderMutation);
 		slider_mutation.setBounds(6, 165, 190, 29);
 		panel_3.add(slider_mutation);
@@ -5694,12 +5742,13 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			}
 		});
-		sliderElitesMutated.setValue(100);
+		sliderElitesMutated.setValue(0);
 		sliderElitesMutated.setBounds(6, 359, 190, 29);
 		
 		panel_3.add(sliderElitesMutated);
 		
 		slider_anneal = new JSlider();
+		slider_anneal.setEnabled(false);
 		slider_anneal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.anneal_rate = Math.exp(3.0*((double)slider_anneal.getValue()-50.0)/50.0);
@@ -5715,11 +5764,24 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxRecombination.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.recombination_on = chckbxRecombination.isSelected();
+				ip.addHistory("SET RECOMBINATION "+(Settings.recombination_on ? "ON" : "OFF"));
 			}
 		});
-		chckbxRecombination.setSelected(true);
 		chckbxRecombination.setBounds(6, 228, 128, 23);
 		panel_3.add(chckbxRecombination);
+		chckboxAdaptiveMutation = new JCheckBox("adaptive");
+		chckboxAdaptiveMutation.setSelected(true);
+		chckboxAdaptiveMutation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Settings.adaptive_mutation = chckboxAdaptiveMutation.isSelected();
+				slider_anneal.setEnabled(!Settings.adaptive_mutation);
+				slider_mutation.setEnabled(!Settings.adaptive_mutation);
+				chckbxAutoAnneal.setEnabled(!Settings.adaptive_mutation);
+			}
+		});
+		chckboxAdaptiveMutation.setBounds(101, 136, 95, 21);
+		
+		panel_3.add(chckboxAdaptiveMutation);
 		textFieldNumDistricts.setText(""+Settings.num_districts);
 		
 		
@@ -6398,7 +6460,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		
 		frameGraph.move(this.getWidth(), this.getX());
 		frameSeatsVotesChart.move(this.getWidth(), this.getX()+frameGraph.getHeight());
-		frameStats.move(this.getWidth()+frameSeatsVotesChart.getWidth(), this.getX()+frameGraph.getHeight());
+		//frameStats.move(this.getWidth()+frameSeatsVotesChart.getWidth(), this.getX()+frameGraph.getHeight());
 		if( !Applet.no_gui) {
 			frameGraph.show();
 			frameSeatsVotesChart.show();
@@ -6443,8 +6505,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JCheckBox chckbxAutoAnneal = new JCheckBox("auto anneal");
 	public JLabel lblElitisesMutated = new JLabel("% elites mutated");
 	public JSlider sliderElitesMutated = new JSlider();
-	public JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize squared dev.");
-	public JRadioButton rdbtnMinimizeMeanDev = new JRadioButton("Minimize absolute dev.");
+	public JRadioButton rdbtnMinimizeSquaredDev = new JRadioButton("Minimize squared dev.");
+	public JRadioButton rdbtnMinimizeMaxDev = new JRadioButton("Minimize absolute dev.");
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
 	public JSlider slider_anneal;
@@ -6466,6 +6528,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmBlocklevelEthnicData;
 	public JMenuItem mntmImportBlockFile;
 	public JMenuItem mntmExportBlockFile;
+	public JMenuItem mntmExportWardFile;
+	public JMenuItem mntmImportWardFile;
 	public JSeparator separator_14;
 	public JSeparator separator_10;
 	public JMenuItem mntmExportNationalMaps;
@@ -6496,6 +6560,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmShowAdvancedStats;
 	public JMenuItem mntmExplainStats;
 	public JCheckBox chckbxParetoFront;
+	public JCheckBox chckboxAdaptiveMutation;
 	public void setSeatsMode() {
 		System.out.println("setSeatsMode called hushed?: "+hush_setSeatsMode);
 		if( hush_setSeatsMode) {

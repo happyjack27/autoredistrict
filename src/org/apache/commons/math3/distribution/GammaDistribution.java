@@ -113,6 +113,8 @@ public class GammaDistribution extends AbstractRealDistribution {
      * @throws NotStrictlyPositiveException if {@code shape <= 0} or
      * {@code scale <= 0}.
      */
+    private double mean = 1;
+    private double variance = 1;
     public GammaDistribution(double shape, double scale) throws NotStrictlyPositiveException {
         this(shape, scale, DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
     }
@@ -176,24 +178,60 @@ public class GammaDistribution extends AbstractRealDistribution {
 		double[] ps = mom_estimate(xs);
 		setShapeScale(ps[0], ps[1]);
 	}
+	public void setShapeScaleFromMeanVariance() {
+		shape = mean*mean/variance;
+		scale = variance/mean;
+		init();
+	}
+
 	public void setShapeScale(double a, double b) {
 		shape = a;
 		scale = b;
 		init();
 	}
     public double[] mom_estimate(double[] xs) {
-        double mean = sample_mean(xs);
-        double var = sample_variance(xs);
+        mean = sample_mean(xs);
+        variance = sample_variance(xs);
+        
         
         // compute a and B
         return new double[]{
-        		mean*mean/var,
+        		mean*mean/variance,
         		//mean/var  //rate
-        		var/mean //scale
+        		variance/mean //scale
         };
     }
 
-	
+	public double update_mean(double new_sample, double count) {
+		mean *= count;
+		mean += new_sample;
+		mean /= (count+1.0);
+		return mean;
+	}
+	public double update_variance(double new_sample, double count) {
+		variance *= (count-1.0);
+        double s = new_sample - mean;
+        variance += s * s;
+        variance /= count;
+		return variance;
+	}
+	public synchronized void update_mean_and_variance(double new_sample, double count) {
+		//count--; // up the mean and variance a bit
+		if( count < 2) {
+			count = 2;
+		}
+		mean *= count;
+		mean += new_sample;
+		mean /= (count+1.0); 
+		//mean /= (count+2.0); //slight downward pressure on mean
+		
+		variance *= (count-1.0);
+        double s = new_sample - mean;
+        variance += s * s;
+        variance /= count;
+        //variance /= (count-1.0); //slight upward pressure on variance
+	}
+
     public double sample_mean(double[] xs) {
         // compute mean
         double mean = 0;

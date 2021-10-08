@@ -12,10 +12,13 @@ import javax.swing.JOptionPane;
 
 import jsonMap.*;
 import ui.MainFrame;
+import util.AdaptiveMutation;
 //import ui.MapPanel;
 //import ui.PanelStats;
 
 public class Ecology extends ReflectJsonMap<Ecology> {
+	
+	public static AdaptiveMutation adaptiveMutation = new AdaptiveMutation(); 
 	
 	public Vector<iDiscreteEventListener> evolveListeners = new Vector<iDiscreteEventListener>();
 	
@@ -320,6 +323,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
         	fairnessScoreEmaMeans[i] = 0;
         	fairnessScoreEmaVars[i] = 0;
         }
+        adaptiveMutation = new AdaptiveMutation();
     }
     public void match_population() {
     	
@@ -590,6 +594,23 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 				System.out.println();
 			}
         }
+        if( Settings.adaptive_mutation) {
+        	for( int i = 0; i < cutoff; i++ ) {
+        		DistrictMap dm = population.get(i);
+        		if( !dm.wasMutationCounted) {
+        			this.adaptiveMutation.addSample(dm.actual_mutate_rate);
+        			dm.wasMutationCounted = true;
+        		}
+        	}
+        	this.adaptiveMutation.recalculate();
+        	Settings.mutation_boundary_rate = Math.exp(-this.adaptiveMutation.gamma.getNumericalMean());
+        	System.out.println("new mutation rate: "+Settings.mutation_boundary_rate
+        			+" var "+Math.exp(-Math.sqrt(this.adaptiveMutation.gamma.getNumericalVariance()))
+        			+" ex "+this.adaptiveMutation.getSample()
+        	);
+        	Settings.setMutationRate(Settings.mutation_boundary_rate);
+        	
+        } else
         
         //INTERMISSION: UPDATE ANNEAL RATE
         if( Settings.auto_anneal) {
@@ -816,7 +837,12 @@ public class Ecology extends ReflectJsonMap<Ecology> {
             if(Settings.mutation_rate > 0)
             	dm.mutate(Settings.mutation_rate);
             if(Settings.mutation_boundary_rate > 0) {
-            	dm.mutate_boundary(Settings.mutation_boundary_rate);
+            	if( Settings.adaptive_mutation) {
+            		dm.mutate_boundary(this.adaptiveMutation.getSample());
+            		dm.wasMutationCounted = false;
+            	} else {
+            		dm.mutate_boundary(Settings.mutation_boundary_rate);
+            	}
             }
         }
         if( Settings.mutate_disconnected) {

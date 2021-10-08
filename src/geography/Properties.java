@@ -9,6 +9,7 @@ public class Properties extends ReflectJsonMap<Properties> {
 	public int esri_rec_num = -1;
 	public double AREA;
 	public int POPULATION;
+	public boolean IS_LAND = true;;
 	public  Hashtable<String,Integer> temp_hash = new Hashtable<String,Integer>();
 	
 	public void post_deserialize() {

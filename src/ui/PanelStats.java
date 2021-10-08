@@ -1291,8 +1291,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		MainFrame.mainframe.progressBar.setString( featureCollection.ecology.generation+" iterations");
 	}
 	public void exportMaps(String write_folder, int res,boolean outline) {
-		String type = "svg";
-		//String type = "png";
+		//String type = "svg";
+		String type = "png";
 		
 		int num_maps_temp = Settings.num_maps_to_draw;
 		int display_mode_temp = VTD.display_mode;

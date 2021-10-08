@@ -847,6 +847,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     }
 
     public void mutate_boundary(double prob) {
+    	this.mutate_rate = prob;
     	reciprocal_iso_quotient = -1;
     	if( Settings.mutate_compactness || Settings.mutate_overpopulated || Settings.mutate_competitive || Settings.mutate_good) {
     		fillDistrictwards();
@@ -868,6 +869,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	boundaries_mutated+=2;
         	boundaries_tested+=4;
         }
+        this.actual_mutate_rate = (double)boundaries_mutated / (double)boundaries_tested;
     }
     
     public void crossover(int[] genome1, int[] genome2) {
@@ -958,7 +960,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     //constructors
     public DistrictMap(Vector<VTD> wards, int num_districts, int[] genome) {
     	
-        this(wards,num_districts);
+        this(wards,num_districts,false);
         setGenome(genome);
     }
     public boolean fillDistrictwards() {
@@ -1052,6 +1054,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     
     }
     public DistrictMap(Vector<VTD> wards, int num_districts) {
+    	this(wards, num_districts, true);
+    }
+    public DistrictMap(Vector<VTD> wards, int num_districts, boolean init) {
     	//postman's sort
     	VTD[] w = new VTD[wards.size()];
     	for( int i = 0; i < wards.size(); i++) {
@@ -1069,13 +1074,15 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         for( int i = 0; i < num_districts; i++)
             districts.add(new District());
         vtd_districts = new int[wards.size()];
-        if( Ecology.initMethod.equals("Random")) {
-        	mutate(1);
-        } else
-        if( Ecology.initMethod.equals("Contiguous")) {
-        	initContiguous();
+        if( init) {
+	        if( Ecology.initMethod.equals("Random")) {
+	        	mutate(1);
+	        } else
+	        if( Ecology.initMethod.equals("Contiguous")) {
+	        	initContiguous();
+	        }
+	        fillDistrictwards();
         }
-        fillDistrictwards();
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
 
@@ -2196,7 +2203,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         fairnessScores = new double[]{
         		length+penalty
         		,disproportional_representation+penalty
-        		,(Settings.minimize_absolute_deviation ? getMeanPopDiff() : getPopVariance())+penalty/*population_imbalance*2.0*/ //getMaxPopDiff()
+        		,(Settings.minimize_max_population_deviation ? getMaxPopDiff() : getPopVariance())+penalty/*population_imbalance*2.0*/ //getMaxPopDiff()
+        		//,(Settings.minimize_absolute_deviation ? getMeanPopDiff() : getPopVariance())+penalty/*population_imbalance*2.0*/ //getMaxPopDiff()
         		,disconnected_pops+penalty
         		,power_fairness+penalty
         		,total_vote_gap//wasted_votes
@@ -2237,7 +2245,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	    }
 	    return disconnected_pops;
     }
-    public double getMaxPopDiff() {
+    public double getMaxPopDiffOld() {
     	double min = -1;
     	double max = -1;
    	  for(int i = 0; i < Settings.num_districts; i++) {
@@ -2281,6 +2289,31 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
     	mad /= seats;
         return mad/tot;
+    }
+    
+    public double getMaxPopDiff() {
+    	double tot = 0;
+    	double seats = 0;
+    	double max = 0;
+    	for(int i = 0; i < Settings.num_districts; i++) {
+    		District district = districts.get(i);
+    		district.id = i;
+			double pop = district.getPopulation();
+			tot += pop;
+			seats +=  Settings.seats_in_district(i);
+		}
+    	tot /= seats;
+    	//System.out.println("tot = "+tot);
+    	for(int i = 0; i < Settings.num_districts; i++) {
+    		District district = districts.get(i);
+    		district.id = i;
+			double pop = district.getPopulation();
+			pop /= Settings.seats_in_district(i);
+			if( Math.abs(pop-tot) > max) {
+				max = Math.abs(pop-tot);
+			}
+		}
+    	return max/tot;
     }
     
     //needs to be variance, not sqrt variance, so that delta is linear
@@ -2486,6 +2519,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 
 	//vote gap_by_district
 	boolean hasStats = false;
+	public double mutate_rate = -1;
+	public boolean wasMutationCounted = false;
+	public double actual_mutate_rate = -1;
 		public double getVoteGapForDistrict(int k, boolean mean_centered) {
 			double multiplier = 1;
 			if( !hasStats) {

@@ -1,0 +1,17 @@
+
+fit a bayesian beta model to mutation, with the mutation rate of winning maps being empirically fitted to that curve.  
+do last 32 wins.  start with a rate of 0.25, 1 sample.  tail off exponentially, with the extra +1 sample being the mean of the last beta curve.
+
+only remember the scores and the assignments of the pareto frontier - say 100 frontiers.  do each one at a time.
+
+0) initialize weighted flood fill
+
+1) only do one candidate map at a time
+2) do binary search on all scores.
+  find score with fewest worse maps
+3) remove all maps that are pareto inferior. (worse on all scores)  - or maps that are only better on one score?
+4) if not at capacity, add 
+	add mutation rate to beta fit
+	
+	
+for current app - add bayesian auto-adjust mutation rate - adjust based on the logarithm of the mutation

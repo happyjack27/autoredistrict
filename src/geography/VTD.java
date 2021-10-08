@@ -53,7 +53,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 
 	public static boolean show_seats = true;
 	
-	public Vector<DBField> dbfFields = new Vector<DBField>();
+	//public Vector<DBField> dbfFields = new Vector<DBField>();
 	
 	public String type;
 	public Properties properties;
@@ -359,6 +359,9 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 	public void draw(Graphics g) {
 		if( geometry.polygons == null) {
 			geometry.makePolys();
+		}
+		if( this.properties != null && !this.properties.IS_LAND) {
+			geometry.fillColor = Color.BLUE.brighter();
 		}
 		if( geometry.fillColor != null || state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);

@@ -481,8 +481,15 @@ public class District extends JsonMap {
             return;
         region.add(ward);
         region_hash.put(ward.id,region);
+        if( !ward.properties.IS_LAND) {
+        	return;
+        }
         for( VTD other_ward : ward.neighbors) {
         	if( ward_districts[other_ward.id] == ward_districts[ward.id]) {
+        		//not connected if neither are land
+        		if( !ward.properties.IS_LAND && !other_ward.properties.IS_LAND) {
+        			continue;
+        		}        		
         		addAllConnected( other_ward, region, region_hash, ward_districts);
         	}
         }

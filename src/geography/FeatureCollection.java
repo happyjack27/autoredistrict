@@ -164,6 +164,9 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	}
 	public void copyFeature(String source, String dest) {
 		MainFrame.mainframe.ip.addHistory("COPY FEATURE "+source+" "+dest);
+		if( source.equals("NEW")) {
+			source = "AR_RESULT";
+		}
 		for( VTD feat : features) {
 			try {
 				feat.properties.put(dest,feat.properties.get(source));
@@ -172,6 +175,8 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				feat.properties.put(dest,"");	
 			}
 		}
+		MainFrame.mainframe.comboBoxDistrictColumn.addItem(dest);
+		MainFrame.mainframe.comboBoxPopulation.addItem(dest);
 	}
 	public void addFeature(String dest) {
 		MainFrame.mainframe.ip.addHistory("CREATE FEATURE "+dest);
@@ -1010,6 +1015,9 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				if( features.get(0).properties.containsKey("STATEFP10")) {
 					outlines = getOutlines("STATEFP10");
 				} else
+				if( features.get(0).properties.containsKey("STATEFP20")) {
+					outlines = getOutlines("STATEFP10");
+				} else
 				if( features.get(0).properties.containsKey("STATEFP")) {
 					outlines = getOutlines("STATEFP");
 				} else
@@ -1018,6 +1026,14 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				} else {
 					System.out.print("state outline: no state column found!");
 				}
+				if( outlines == null) {
+					for( String s : features.get(0).properties.keySet()) {
+						if( s.contains("STATE")) {
+							outlines = getOutlines(s);
+							break;
+						}
+					}
+				}
 				Stroke str = ((Graphics2D)g).getStroke();
 				if( !Settings.national_map) {
 					((Graphics2D)g).setStroke(new BasicStroke(4));
@@ -1025,16 +1041,18 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 					((Graphics2D)g).setStroke(new BasicStroke(3));
 				}
 				//System.out.println("drawing polys...");
-				for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
-					try {
-						double[][][] coords = outline.getValue();
-						Polygon[] polygons = Geometry.makePolys(coords);
-						for( int j = 0; j < polygons.length; j++) {
-							g.drawPolygon(polygons[j]);
+				if( outlines != null) {
+					for( java.util.Map.Entry<String, double[][][]> outline : outlines.entrySet()) {
+						try {
+							double[][][] coords = outline.getValue();
+							Polygon[] polygons = Geometry.makePolys(coords);
+							for( int j = 0; j < polygons.length; j++) {
+								g.drawPolygon(polygons[j]);
+							}
+						} catch (Exception ex) {
+							System.out.println("Ex outline state inner "+ex);
+							ex.printStackTrace();
 						}
-					} catch (Exception ex) {
-						System.out.println("Ex outline state inner "+ex);
-						ex.printStackTrace();
 					}
 				}
 				((Graphics2D)g).setStroke(str);
