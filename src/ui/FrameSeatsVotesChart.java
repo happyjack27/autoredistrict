@@ -93,7 +93,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			    }
 			    
 			    //first do basic background
-			    g.setColor(Color.white);
+			    g.setColor(Color.black);
 			    g.fillRect(0, 0, 200*iFSAA, 200*iFSAA);
 			    g.setColor(new Color(l1,l1,255));
 			    g.fillPolygon(new int[]{scale(0)*iFSAA,scale(200)*iFSAA,0}, new int[]{0,0,200*iFSAA}, 3);

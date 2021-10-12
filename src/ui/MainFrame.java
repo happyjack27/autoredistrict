@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Map.Entry;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.*; 
@@ -181,22 +182,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmOpenWktTabdelimited = new JMenuItem("Open WKT tab-delimited");
 	
 	
-	/**
-	 * Returns the class name of the installed LookAndFeel with a name
-	 * containing the name snippet or null if none found.
-	 * 
-	 * @param nameSnippet a snippet contained in the Laf's name
-	 * @return the class name if installed, or null
-	 */
-	public static String getLookAndFeelClassName(String nameSnippet) {
-	    LookAndFeelInfo[] plafs = UIManager.getInstalledLookAndFeels();
-	    for (LookAndFeelInfo info : plafs) {
-	        if (info.getName().contains(nameSnippet)) {
-	            return info.getClassName();
-	        }
-	    }
-	    return null;
-	}
+
 
 	//=========CLASSES
 	class FileThread extends Thread {
@@ -3947,30 +3933,15 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		mainframe = this;
 		ip.mainFrame = this;
 
-		String className = getLookAndFeelClassName("Nimbus");
 		try {
-			UIManager.setLookAndFeel(className);
+			UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarculaLaf());
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} 
 
 		jbInit();
-		/*
-		chckbxmntmOutlineState.setSelected(true);
-		Feature.outline_state = chckbxmntmOutlineState.isSelected();
-		MapPanel.FSAA = Feature.outline_vtds ? 4 : 1;
-		mapPanel.invalidate();
-		mapPanel.repaint();
-		*/
-		
-		try {
-			UIManager.setLookAndFeel(className);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} 
-		
+
 		sliderRepresentation.setValue(50);
 		sliderSeatsVotes.setValue(50);
 		lblFairnessCriteria.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -3997,7 +3968,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxConstrain_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.mutate_competitive = chckbxConstrain_1.isSelected();
-				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
+				Settings.mutate_good = chckbxConstrainPopulation.isSelected() && chckbxConstrain_1.isSelected();
 				ip.addHistory("SET CONSTRAIN COMPETITION  "+(chckbxConstrain_1.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
@@ -4060,6 +4031,14 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		Dimension d = new Dimension(800,1024);
 		//this.setPreferredSize(d);
 		this.setSize(new Dimension(1021+100, 779));
+
+		try {
+			//this.setIconImage(ImageIO.read( ClassLoader.getSystemResource( "/resources/icons/ar_logo2.png" ) ));
+			this.setIconImage(ImageIO.read( Applet.class.getResource("/resources/icons/ar_logo_cropped.png") ));
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		
 		
 		sliderWastedVotesTotal = new JSlider();
 		lblWastedVotes = new JLabel("Competitive");
@@ -4079,7 +4058,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		rdbtnReduceSplitCounties = new JRadioButton("Reduce split counties");
 		splitReductionType = new ButtonGroup();
 		chckbxAutoAnneal = new JCheckBox("anneal rate");
-		chckbxAutoAnneal.setEnabled(false);
 		lblElitisesMutated = new JLabel("% elites mutated");
 		sliderElitesMutated = new JSlider();
 		sliderElitesMutated.setToolTipText("<html>Elitism involves copying a small proportion of the fittest candidates, unchanged, into the <br/>next generation. This can sometimes have a dramatic impact on performance by ensuring <br/>that the EA does not waste time re-discovering previously discarded partial solutions. <br/>Candidate solutions that are preserved unchanged through elitism remain eligible for <br/>selection as parents when breeding the remainder of the next generation.<br/>\r\nSo basically it takes a small fraction of the best candidates, and copies them over unchanged <br/>to the next generation.  So these are essential your immortals -- every one else only lasts one <br/>generation.<br/><br/>\r\nExperimentally, about 25% elitism seems to work fine.<br/><br/>\r\nThere is also be a slider \"% elites mutated\".  Notice the description above is that the elites <br/>remain unchanged between generations.  With mutate elites selected, the elites will slowly <br/>mutate along with the rest of the population. This helps it search a little faster, but when it <br/>gets down to fine-tuning, where you only want the very best, you want to turn this off, as <br/>otherwise you'd just be hovering around the best.<br/></html>");
@@ -4190,8 +4168,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 		
 		slider_mutation = new JSlider();
-		slider_mutation.setEnabled(false);
-		slider_mutation.setValue(100);
 		sliderDisconnected = new JSlider();
 		sliderBorderLength = new JSlider();
 		sliderPopulationBalance = new JSlider();
@@ -5635,30 +5611,32 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		buttonGroupPopMinMethod.add(rdbtnMinimizeMaxDev);
 		buttonGroupPopMinMethod.add(rdbtnMinimizeSquaredDev);
 		
-		chckbxNewCheckBox_1 = new JCheckBox("constrain");
-		chckbxNewCheckBox_1.setToolTipText("This adds an extra mutation step to non-contiguous regions at the cost of slower evolution.");
-		chckbxNewCheckBox_1.addActionListener(new ActionListener() {
+		chckbxConstrainContiguity = new JCheckBox("constrain");
+		chckbxConstrainContiguity.setToolTipText("This adds an extra mutation step to non-contiguous regions at the cost of slower evolution.");
+		chckbxConstrainContiguity.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Settings.mutate_disconnected = chckbxNewCheckBox_1.isSelected();
-				ip.addHistory("SET CONSTRAIN CONTIGUITY  "+(chckbxNewCheckBox_1.isSelected() ? "TRUE" : "FALSE"));
+				Settings.make_contiguous = chckbxConstrainContiguity.isSelected();
+				//Settings.mutate_disconnected = chckbxNewCheckBox_1.isSelected();
+				ip.addHistory("SET CONSTRAIN CONTIGUITY  "+(chckbxConstrainContiguity.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
-		chckbxNewCheckBox_1.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		chckbxNewCheckBox_1.setBounds(132, 32, 62, 23);
-		panel_2.add(chckbxNewCheckBox_1);
+		chckbxConstrainContiguity.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		chckbxConstrainContiguity.setBounds(132, 32, 62, 23);
+		panel_2.add(chckbxConstrainContiguity);
 		
-		chckbxConstrain = new JCheckBox("constrain");
-		chckbxConstrain.setToolTipText("This rejects mutations that increase population imbalance at the cost of slower evolution.");
-		chckbxConstrain.addActionListener(new ActionListener() {
+		chckbxConstrainPopulation = new JCheckBox("constrain");
+		chckbxConstrainPopulation.setToolTipText("This rejects mutations that increase population imbalance at the cost of slower evolution.");
+		chckbxConstrainPopulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Settings.mutate_excess_pop = chckbxConstrain.isSelected();
-				Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
-				ip.addHistory("SET CONSTRAIN POPULATION  "+(chckbxConstrain.isSelected() ? "TRUE" : "FALSE"));
+				Settings.equalize_after_mutate = chckbxConstrainPopulation.isSelected();
+				//Settings.mutate_excess_pop = chckbxConstrain.isSelected();
+				//Settings.mutate_good = chckbxConstrain.isSelected() && chckbxConstrain_1.isSelected();
+				ip.addHistory("SET CONSTRAIN POPULATION  "+(chckbxConstrainPopulation.isSelected() ? "TRUE" : "FALSE"));
 			}
 		});
-		chckbxConstrain.setFont(new Font("Tahoma", Font.PLAIN, 9));
-		chckbxConstrain.setBounds(132, 154, 62, 23);
-		panel_2.add(chckbxConstrain);
+		chckbxConstrainPopulation.setFont(new Font("Tahoma", Font.PLAIN, 9));
+		chckbxConstrainPopulation.setBounds(132, 154, 62, 23);
+		panel_2.add(chckbxConstrainPopulation);
 		
 		
 		JPanel panel_3 = new JPanel();
@@ -5742,13 +5720,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			}
 		});
-		sliderElitesMutated.setValue(0);
+		sliderElitesMutated.setValue(100);
 		sliderElitesMutated.setBounds(6, 359, 190, 29);
 		
 		panel_3.add(sliderElitesMutated);
 		
 		slider_anneal = new JSlider();
-		slider_anneal.setEnabled(false);
 		slider_anneal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				Settings.anneal_rate = Math.exp(3.0*((double)slider_anneal.getValue()-50.0)/50.0);
@@ -5770,7 +5747,6 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		chckbxRecombination.setBounds(6, 228, 128, 23);
 		panel_3.add(chckbxRecombination);
 		chckboxAdaptiveMutation = new JCheckBox("adaptive");
-		chckboxAdaptiveMutation.setSelected(true);
 		chckboxAdaptiveMutation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Settings.adaptive_mutation = chckboxAdaptiveMutation.isSelected();
@@ -6510,8 +6486,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 	public JMenuItem mntmCopyColumn;
 	public JSeparator separator_9;
 	public JSlider slider_anneal;
-	public JCheckBox chckbxNewCheckBox_1;
-	public JCheckBox chckbxConstrain;
+	public JCheckBox chckbxConstrainContiguity;
+	public JCheckBox chckbxConstrainPopulation;
 	public JCheckBox chckbxConstrain_1;
 	public JMenuItem mntmShowScripts;
 	public JRadioButtonMenuItem mntmColorByCounty;

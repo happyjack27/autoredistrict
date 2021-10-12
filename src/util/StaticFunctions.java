@@ -5,6 +5,13 @@ import java.util.Vector;
 import solutions.Settings;
 
 public class StaticFunctions {
+	
+	public static int getRandomInt(int max) {
+		return (int)Math.floor(Math.random()*(double)max);
+	}
+	public static <T> T selectRandom(Vector<T> vec) {
+		return vec.get((int)Math.floor(Math.random()*(double)vec.size()));
+	}
 
 	public static String[][] vectorToArray(Vector<String[]> v) {
 		String[][] sss = new String[v.size()][];

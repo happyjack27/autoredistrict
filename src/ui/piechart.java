@@ -162,7 +162,7 @@ public class piechart extends JPanel {
 	 public void paintComponent(Graphics g) {
 		 super.paintComponent(g);
 
-		 g.setColor(Color.white);
+		 g.setColor(Color.black);
 		 g.fillRect(0,0,1000,1000);
 		 /*
 		 drawPieChart(g,100,100,100,new double[]{2,1}, new Color[]{Color.blue,Color.red});

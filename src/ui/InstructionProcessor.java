@@ -59,7 +59,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	
 	public void initComponents() {
 		getContentPane().setLayout(null);		
-		this.setSize(new Dimension(600, 500));
+		this.setSize(new Dimension(615, 540));
 		getContentPane().setPreferredSize(new Dimension(500,600));
 		
 		scrollPane = new JScrollPane();
@@ -846,8 +846,8 @@ SAVE
 			if( parsed && item.equals("ELITE_MUTATE_FRAC")) { mainFrame.sliderElitesMutated.setValue((int)(d*100)); }
 		} else
 		if( category.equals("CONSTRAIN")) {
-			if( item.equals("CONTIGUITY")) { mainFrame.chckbxNewCheckBox_1 .setSelected(value.equals("TRUE")); }
-			if( item.equals("POPULATION")) { mainFrame.chckbxConstrain.setSelected(value.equals("TRUE")); }
+			if( item.equals("CONTIGUITY")) { mainFrame.chckbxConstrainContiguity .setSelected(value.equals("TRUE")); }
+			if( item.equals("POPULATION")) { mainFrame.chckbxConstrainPopulation.setSelected(value.equals("TRUE")); }
 			if( item.equals("COMPETITION")) { mainFrame.chckbxConstrain_1.setSelected(value.equals("TRUE")); }
 			
 		} else

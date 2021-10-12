@@ -15,3 +15,53 @@ only remember the scores and the assignments of the pareto frontier - say 100 fr
 	
 	
 for current app - add bayesian auto-adjust mutation rate - adjust based on the logarithm of the mutation
+
+-----------------------
+NEW STUFF STARTS BELOW
+-----------------------
+
+
+adaptive mutation
+------------------
+- have the slider enabled, will set the mean if moved
+- have auto-anneal adjust the mean
+-- try adjusting with simple beta model, not based on logarithm.
+
+------------------
+
+other
+------------
+change balanced flood fill to prefer contiguity over population inequality
+	allow it to steal from neighbors if has no other option, be sure to subtract that from neighbor's population
+
+add ability to set maximum thresholds
+
+add import ward assignment option
+add export ward assignment option
+
+
+rename descriptive representation to majority minority
+
+pareto
+------------------
+add scorers:
+add max rep gerrymander
+add max dem gerrymander
+
+also sorts by rank
+shows map statistics in a table (both value and rank)
+add filter by rank for each criteria (a high and a low) (or by value)
+- show how many maps remain in each filter
+- add ability to crop pareto front
+- add ability to export all that meet filter as ward assignment files
+    - along with summary stats
+
+ability to set permanent limits
+can clean pool by eliminating lowest weighted rank
+majority minority limit is sum (abs (target - received))
+partisan asymmetry is sum of all chosen elections
+
+
+
+add force keep option
+

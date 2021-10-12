@@ -40,7 +40,7 @@ public class PanelRankedDistricts extends JPanel {
 	    		int l3 = 128;
 				Graphics2D g = (Graphics2D)graphics0;
 			    super.paintComponent(g);
-			    g.setColor(Color.white);
+			    g.setColor(Color.black);
 			    g.fillRect(0, 0, 200, 200);
 	
 			    g.setColor(new Color(l2,l2,255));

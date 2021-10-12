@@ -88,7 +88,7 @@ public class PanelGraphDrawArea extends JPanel {
         super.paintComponent(g);
         Dimension d = this.getSize();
       
-        g.setColor(Color.white);
+        g.setColor(Color.black);
         g.fillRect(0, 0, (int)d.getWidth(), (int)d.getHeight());
         g.setColor(Color.black);
         g.drawRect(0, 0, (int)d.getWidth()-1, (int)d.getHeight()-1);

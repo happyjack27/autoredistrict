@@ -6,9 +6,10 @@ import java.util.Vector;
 
 import jsonMap.JsonMap;
 import ui.MainFrame;
+import java.awt.Color;
 
 public class Settings extends jsonMap.ReflectJsonMap<Settings> {
-	
+	public static Color WATER_COLOR = new Color(212,241,249);
 	public static double minLandPct = 0.10;
 	public static boolean paretoMode = false;
 	public static boolean national_map = false;
@@ -204,7 +205,7 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 	// public static double replace_fraction = 0.5;
 
 	public static double mutation_rate = 0.5;
-	public static double mutation_boundary_rate = 0.5;
+	public static double mutation_boundary_rate = Math.exp((50-100)/Settings.exp_mutate_factor);//0.5;
 	public static int population = 200;
 	public static int num_elections_simulated = 1;
 	public static int num_districts = 4;
@@ -242,7 +243,7 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 	public static boolean population_is_per_seat = true;
 	public static boolean b_make_simplified_polys = false;
 	public static boolean minimize_number_of_counties_split = false;
-	public static double elite_mutate_fraction = 0.0;
+	public static double elite_mutate_fraction = 1.0;
 	public static double exp_mutate_factor = 10.0;
 	public static boolean minimize_max_population_deviation = false;
 	public static boolean hush_mutate_rate = false;
@@ -254,8 +255,12 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 	public static boolean divide_packing_by_area = true;
 	public static boolean prefer4s = false;
 	public static boolean recombination_on = false;
-	public static boolean adaptive_mutation = true;
+	public static boolean adaptive_mutation = false;
 	public static boolean minimize_maximum_deviation = false;
+	public static double equalize_after_mutate_max_pct = 0.10;
+	public static int equalize_after_mutate_max_iterations = 10000;
+	public static boolean equalize_after_mutate = false;
+	public static boolean make_contiguous = false;
 	public static void setNo4s(boolean b) {
 		if( no4s == b) {
 			return;

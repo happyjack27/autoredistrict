@@ -664,6 +664,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 			String[] scolumns = new String[]{"Value","Measure"};
 			String[][] sdata = new String[][]{
+					new String[]{""+decimal.format(1.0/featureCollection.ecology.seconds_per_iter),"Iterations per second"},
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
 					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
 					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population max deviation (%)"},

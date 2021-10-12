@@ -2,13 +2,16 @@ package solutions;
 import geography.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import jsonMap.JsonMap;
 import ui.MainFrame;
+import util.HashVector;
 import util.GenericClasses.Pair;
 
 public class District extends JsonMap {
     Vector<VTD> vtds = new Vector<VTD>();
+    HashVector<VTD> border_vtds = new HashVector<VTD>();
     
     public static int id = -1;
     
@@ -17,17 +20,23 @@ public class District extends JsonMap {
     
     public static boolean use_simulated_elections = false;
     
-    private double population = -1;
+    double population = -1;
     
     public double area = -1;
     public double edge_length = -1;
     public double iso_quotient = -1;
     public double paired_edge_length = -1;
     public double unpaired_edge_length = -1;
-    public Vector<Vector<VTD>> regions = null;
+    public Vector<Region> regions = null;
 
 	public int excess_pop = 0;
 	
+	public DistrictMap districtMap = null;
+	
+	public District(DistrictMap districtMap) {
+		this.districtMap = districtMap;
+	}
+
 	public void invalidate() {
 		population = -1;
 		iso_quotient = -1;
@@ -443,14 +452,14 @@ public class District extends JsonMap {
     //getRegionCount() counts the number of contiguous regions by counting the number of vertex cycles.  a proper map will have exactly 1 contiguous region per district.
     //this is a constraint to apply _AFTER_ a long initial optimization.  as a final tuning step.
     int getRegionCount(int[] ward_districts) {
-        return getRegions(ward_districts).size();
+        return getRegions().size();
     }
 
-    Vector<VTD> getTopPopulationRegion(int[] ward_districts) {
-        Vector<Vector<VTD>> regions = getRegions(ward_districts);
-        Vector<VTD> high = null;
+    Region getTopPopulationRegion() {
+        Vector<Region> regions = getRegions();
+        Region high = null;
         double max_pop = 0;
-        for( Vector<VTD> region : regions) {
+        for( Region region : regions) {
             double pop = getRegionPopulation(region);
             if( pop > max_pop || high == null) {
                 max_pop = pop;
@@ -459,42 +468,57 @@ public class District extends JsonMap {
         }
         return high;
     }
-    Vector<Vector<VTD>> getRegions(int[] ward_districts) {
+    Vector<Region> getRegions() {
     	/*
     	if( regions != null) {
     		return regions;
     	}*/
-        Hashtable<Integer,Vector<VTD>> region_hash = new Hashtable<Integer,Vector<VTD>>();
-        regions = new Vector<Vector<VTD>>();
+    	border_vtds = new HashVector<VTD>();
+        Hashtable<Integer,Region> region_hash = new Hashtable<Integer,Region>();
+        regions = new Vector<Region>();
+        int region_num = 0;
         for( VTD ward : vtds) {
             if( region_hash.get(ward.id) != null)
                 continue;
-            Vector<VTD> region = new Vector<VTD>();
+            Region region = new Region(this.districtMap,this,region_num++);
             regions.add(region);
-            addAllConnected(ward,region,region_hash,ward_districts);
+            addAllConnected(ward,region,region_hash);
         }
         return regions;
     }
     //recursively insert connected wards.
-    void addAllConnected( VTD ward, Vector<VTD> region,  Hashtable<Integer,Vector<VTD>> region_hash, int[] ward_districts) {
-        if( region_hash.get(ward.id) != null)
-            return;
-        region.add(ward);
-        region_hash.put(ward.id,region);
-        if( !ward.properties.IS_LAND) {
-        	return;
-        }
-        for( VTD other_ward : ward.neighbors) {
-        	if( ward_districts[other_ward.id] == ward_districts[ward.id]) {
-        		//not connected if neither are land
-        		if( !ward.properties.IS_LAND && !other_ward.properties.IS_LAND) {
-        			continue;
-        		}        		
-        		addAllConnected( other_ward, region, region_hash, ward_districts);
-        	}
-        }
+    void addAllConnected( VTD ward, Region region, Hashtable<Integer,Region> region_hash) {
+    	ConcurrentLinkedQueue<VTD> addQueue = new ConcurrentLinkedQueue<VTD>();
+    	addQueue.add(ward);
+    	while( !addQueue.isEmpty()) {
+    		ward = addQueue.poll();
+	        if( region_hash.get(ward.id) != null)
+	            continue;
+	        region.add(ward);
+	        region_hash.put(ward.id,region);
+	        if( !ward.properties.IS_LAND) {
+	            continue;
+	        }
+	        boolean is_border = false;
+	        for( VTD other_ward : ward.neighbors) {
+	        	if( districtMap.vtd_districts[other_ward.id] == districtMap.vtd_districts[ward.id]) {
+	        		//not connected if neither are land
+	        		if( !ward.properties.IS_LAND && !other_ward.properties.IS_LAND) {
+	        			continue;
+	        		}     
+	        		addQueue.add(other_ward);
+	        		//addAllConnected( other_ward, region, region_hash);
+	        	} else {
+	        		Region.borders_districts.add(districtMap.vtd_districts[other_ward.id]);
+	        		is_border = true;
+	        	}
+	        	if( is_border) {
+	        		border_vtds.add(ward);
+	        	}
+	        }
+    	}
     }
-    double getRegionPopulation(Vector<VTD> region) {
+    double getRegionPopulation(Region region) {
         double population = 0;
         if( region == null) {
         	return 0;

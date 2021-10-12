@@ -12,6 +12,7 @@ public class ParetoFrontier<T extends ParetoPoint<T>> extends ParetoPoint<T> {
 		super(scorers);
 	}
 
+	int max_size = 500;
 	int initial_size = 100;
 	int cur_size = 0;
 	
@@ -63,7 +64,6 @@ public class ParetoFrontier<T extends ParetoPoint<T>> extends ParetoPoint<T> {
 	}
 	
 	public void iterate() {
-		cur_size++;
 		ParetoPoint<T> test = null;
 		if( cur_size <= initial_size) {
 			test = generator.generate();
@@ -93,7 +93,10 @@ public class ParetoFrontier<T extends ParetoPoint<T>> extends ParetoPoint<T> {
 				cur_size--;
 				continue;
 			}
-			add(test);
+			if( cur_size < max_size) {
+				cur_size++;
+				add(test);
+			}
 		}
 	}
 	

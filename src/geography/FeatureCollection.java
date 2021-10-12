@@ -41,7 +41,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	double snap_to_grid_resolution = 10000.0*10.0*10.0;
 	public static double xy = 1;
 	public static double dlonlat = 1;
-	public static Color BACKGROUND_COLOR = Color.WHITE;
+	public static Color BACKGROUND_COLOR = Color.black;
 	public static Color DEFAULT_COLOR = new Color(254,230,121);//bureau of land management //new Color(204,204,16);
 	
 	public static boolean[] locked_wards = null;

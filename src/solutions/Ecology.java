@@ -69,6 +69,8 @@ public class Ecology extends ReflectJsonMap<Ecology> {
     
     public EvolveThread evolveThread; 
     public long generation = 0;
+    public double seconds_per_iter = -1;
+    public long last_iter_time = -1;
     
     public void make_unique() {
     	for(DistrictMap dm : population) {
@@ -124,6 +126,16 @@ public class Ecology extends ReflectJsonMap<Ecology> {
     		}
 
     		while( !evolve_paused) {
+    			long new_time = new Date().getTime();
+    			if( last_iter_time > 0) {
+    				double cur = ((double)(new_time-last_iter_time)/1000.0);
+    				if (seconds_per_iter < 0) {
+    					seconds_per_iter = cur;
+    				} else {
+    					seconds_per_iter = (seconds_per_iter*4.0 + cur)/5.0;
+    				}
+    			}
+				last_iter_time = new_time;
     			MainFrame.mainframe.ip.eventOccured();
     			try {
     				//System.out.println("last_num_districts "+last_num_districts+" Settings.num_districts "+Settings.num_districts);
@@ -201,6 +213,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
     				ex.printStackTrace();
     			}
     		}
+    		last_iter_time = -1;
     	}
     }
     
@@ -230,6 +243,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 	
 	public void stopEvolving() {
 		evolve_paused= true;
+		last_iter_time = -1;
 	}
 
 
@@ -852,9 +866,17 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 	            dm.fillDistrictwards();
 	        }
         } else {
+        	Thread[] threads = new Thread[population.size()];
 	        for(int i =  0; i < population.size(); i++) {
 	            DistrictMap dm = population.get(i);
-	            dm.fillDistrictwards();
+	        	threads[i] = dm.startInitThread();
+	        }
+	        for(int i =  0; i < population.size(); i++) {
+	        	try {
+					threads[i].join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 	        }
         	
         }

@@ -55,7 +55,7 @@ public class FramePieCharts extends JFrame {
 		        
 			    super.paintComponent(graphics);
 			    
-			    graphics.setColor(Color.white);
+			    graphics.setColor(Color.black);
 			    graphics.fillRect(0, 0, 1000, 1000);
 			    
 			    /*

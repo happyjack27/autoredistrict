@@ -361,7 +361,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 			geometry.makePolys();
 		}
 		if( this.properties != null && !this.properties.IS_LAND) {
-			geometry.fillColor = Color.BLUE.brighter();
+			geometry.fillColor = Settings.WATER_COLOR;
 		}
 		if( geometry.fillColor != null || state != 0 || display_mode != DISPLAY_MODE_NORMAL) {
 			g.setColor(geometry.fillColor);

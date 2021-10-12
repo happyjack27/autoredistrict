@@ -4,8 +4,10 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import util.StaticFunctions;
@@ -27,7 +29,14 @@ public class Applet extends JApplet {
 	
     public static void main( String[] _args ) {
     	args = _args;
+		try {
+			UIManager.setLookAndFeel(new com.formdev.flatlaf.FlatDarculaLaf());
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
 		Download.init();
+		
     	if( false) {
     		// failed california connectioin reset
     		//failed kentucky , new hampshire - states with spaces, rhode island, texas

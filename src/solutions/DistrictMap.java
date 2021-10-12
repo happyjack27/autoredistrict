@@ -19,6 +19,7 @@ package solutions;
 import geography.*;
 import ui.MainFrame;
 import util.PermutationIterator;
+import util.StaticFunctions;
 
 import java.awt.Color;
 import java.util.*;
@@ -62,6 +63,26 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	for(District d : districts) {
     		d.invalidate();
     	}
+    }
+    class InitThread extends Thread {
+    	public void run() {
+            fillDistrictwards();
+            if( Settings.make_contiguous) {
+            	for( int i = 0; i < 1; i++) {
+            		makeContiguous();
+            	}
+            }
+            if( Settings.equalize_after_mutate) {
+            	for( int i = 0; i < 1; i++) {
+            		equalizePopulation(Settings.equalize_after_mutate_max_pct, Settings.equalize_after_mutate_max_iterations);
+            	}
+            }
+    	}
+    }
+    public InitThread startInitThread() {
+    	InitThread i = new InitThread();
+    	i.start();
+    	return i;
     }
     
     //[party][election][district]
@@ -494,12 +515,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
          */
     }
     public void initContiguous() {
+        int remaining = vtd_districts.length;
     	System.out.println("init contiguous");
         for( int i = 0; i < vtd_districts.length; i++) {
         	vtd_districts[i] = -1;
         }
         double[] population = new double[Settings.num_districts];
         Vector<VTD>[] edges = new Vector[Settings.num_districts];
+        Vector<VTD>[] retry_edges = new Vector[Settings.num_districts];
         HashSet<VTD>[] hsedges = new HashSet[Settings.num_districts];
         //random starting points;
         for( int i = 0; i < Settings.num_districts; i++) {
@@ -510,8 +533,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	vtd_districts[seed] = i;
         	population[i] = vtds.get(seed).population;
         	edges[i] = new Vector<VTD>();
+        	retry_edges[i] = new Vector<VTD>();
         	edges[i].add(vtds.get(seed));
-        	hsedges[i] = new HashSet();
+        	remaining--;
+        	hsedges[i] = new HashSet<VTD>();
         	for( VTD v : vtds.get(seed).neighbors ) {
     			if( vtd_districts[v.id] < 0) {
     				//hsedges[i].add(v);
@@ -519,26 +544,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
         }
         //loop until can't find
-        while(true) {
+        
+        //boolean retry = false;
+        while(remaining > 0) {
         	//find lowest pop
         	double lowest_pop = -1;
         	int lowest_pop_i = -1;
+        	int district = -1;
+
         	for( int i = 0; i < Settings.num_districts; i++) {
+            	
         		//if no edges, skip
         		if( edges[i].size() == 0) {
-                	int seed = (int)(Math.floor(Math.random()*vtd_districts.length));
-                	int attempts = 0;
-                	while( vtd_districts[seed] >= 0 && attempts < 10) {
-                    	seed = (int)(Math.floor(Math.random()*vtd_districts.length));
-                    	attempts++;
-                	}
-                	if( attempts >= 10) {
-                		continue;
-                	}
-                	edges[i].add(vtds.get(seed));
-                	vtd_districts[seed] = i;
-                	population[i] += vtds.get(seed).population;
-        			//continue;
+        			continue;
         		}
         		if( population[i] < lowest_pop || lowest_pop_i < 0) {
         			lowest_pop = population[i];
@@ -548,16 +566,26 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	if( lowest_pop_i < 0) {
         		break;
         	}
-        	int district = lowest_pop_i;
+        	district = lowest_pop_i;        		
         	
-        	//now find random unused edge and add it
-        	while( true) {
-        		if( district < 0 || edges[district].size() == 0) {
+
+        	for(int t = 0; t < 10; t++) {
+           		//starting at 0 makes it breadth first
+           		//int e = 0;//(int)(Math.floor(Math.random()*edges[district].size()));
+    			if( edges[district].size() == 0) {
+    				break;
+    			}
+
+        		VTD edge = edges[district].get(0);
+        		while( vtd_districts[edge.id] != district && edges[district].size() > 0) {
+        			edges[vtd_districts[edge.id]].add(edge);
+        			edges[district].remove(0);
+        			edge = edges[district].get(0);
+        		}
+        		if( vtd_districts[edge.id] != district) {
         			break;
         		}
-           		//starting at 0 makes it breadth first
-           		int e = 0;//(int)(Math.floor(Math.random()*edges[district].size()));
-        		VTD edge = edges[district].get(e);
+        		
         		Vector<VTD> options = new Vector<VTD>();
         		for( VTD v : edge.neighbors) {
         			if( vtd_districts[v.id] < 0) {
@@ -565,17 +593,19 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         			}
         		}
         		if( options.size() == 0) {
-        			edges[district].remove(e);
+        			edges[district].remove(0);
         		} else {
         			int i = (int)(Math.floor(Math.random()*options.size()));
         			VTD v = options.get(i);
+        			remaining--;
     				vtd_districts[v.id] = district;
     				population[district] += v.population;
     				edges[district].add(v);
     				break;
         		}
-        	}
-        }
+    		}
+    	}
+    
         //now randomly assign remaining
         int matched = 0;
         int unmatched = 0;
@@ -588,7 +618,159 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         	}
         }
     	System.out.println("init contiguous done "+matched+" "+unmatched);
+    	//equalizePopulation(0,100000);
+	}
+	public void equalizePopulation(double max_pct, int max_iterations) {
+    	double amt = 0;
+    	int iterations = 0;
+    	boolean re_add_borders = true;
+    	//System.out.println("equalizePop "+max_pct+" "+max_iterations);
+    	try {
+    		if( false) {
+		    	fillDistrictwards();
+    		}
+    		if( true) {
+		        for( int i = 0; i < districts.size(); i++) {
+		        	District d = districts.get(i);
+		        	//d.resetPopulation();
+		        	d.getPopulation();
+		    		d.getRegions();
+		        }
+    		}
 
+	        double max_pop_vtd = 0;
+	    	double target_population = 0;
+	        for( int i = 0; i < vtds.size(); i++) {
+	        	double pop = vtds.get(i).population;
+	        	target_population += pop;
+	        	if( pop > max_pop_vtd) {
+	        		max_pop_vtd = pop;
+	        	}
+	        }
+	        target_population /= (double)Settings.num_districts;
+	        
+	        for( iterations = 0; iterations < max_iterations; iterations++) {
+	        	int highest_pop_district = -1;
+	        	double highest_pop = -1;
+	        	int lowest_pop_district = -1;
+	        	double lowest_pop = -1;
+	        	for( int i = 0; i < districts.size(); i++) {
+		            if( districts.get(i).border_vtds.size() == 0) {
+		            	//System.out.println("no more borders "+i);
+		            	continue;
+		            }
+	        		
+	        		double pop = districts.get(i).getPopulation();
+	        		if( pop > highest_pop || highest_pop < 0) {
+	        			highest_pop_district = i;
+	        			highest_pop = pop;
+	        		}
+	        		if( pop < lowest_pop || lowest_pop < 0) {
+	        			lowest_pop_district = i;
+	        			lowest_pop = pop;
+	        		}
+	        	}
+	            amt = (double)(highest_pop - lowest_pop)/target_population;        	
+	            if( highest_pop - lowest_pop <= max_pop_vtd*2) {
+	            	//System.out.println("met 1");
+	            	if( iterations == 0) {
+	            		return;
+	            	}
+	            	break;
+	            }
+	            if( highest_pop - lowest_pop <= target_population * max_pct) {
+	            	//System.out.println("met 2");
+	            	if( iterations == 0) {
+	            		return;
+	            	}
+	            	break;
+	            }
+	            if( highest_pop_district < 0 || highest_pop < target_population) {
+	            	//System.out.println("met 3");
+	            	if( iterations == 0) {
+	            		return;
+	            	}
+	            	break;
+	            }
+	            int idistrict = highest_pop_district;
+	            District district = districts.get(idistrict);
+	            
+	
+	            Vector<VTD> options = new Vector<VTD>();
+	            VTD border_vtd = null;
+	            while( options.size() == 0) {
+		            int border = -1;
+		            if( district.border_vtds.size() == 0) {
+		            	//System.out.println("no more borders2 "+idistrict);
+		            	break;
+		            }
+		            border = StaticFunctions.getRandomInt(district.border_vtds.size());
+		            border_vtd = district.border_vtds.get(border);
+		            if(  vtd_districts[border_vtd.id] != idistrict) {
+		            	if( re_add_borders) {
+				            for( VTD n : border_vtd.neighbors) {
+				            	if( vtd_districts[n.id] == idistrict) {
+				            		district.border_vtds.add(n);
+				            	}
+				            }
+		            	}
+		            	district.border_vtds.remove(border);
+		            	continue;
+		            }
+		            for( VTD n : border_vtd.neighbors) {
+		            	if( vtd_districts[n.id] != idistrict) {
+		            		options.add(n);
+		            	}
+		            }
+		            if( options.size() == 0) {
+		            	district.border_vtds.remove(border);
+		            }
+	            }
+	            if( district.border_vtds.size() == 0) {
+	            	continue;
+	            }
+	            
+		    	//System.out.print("2");
+	
+	            VTD selected = StaticFunctions.selectRandom(options);
+	            int iother_dist = vtd_districts[selected.id];
+	            District other_dist = districts.get(iother_dist);
+	            
+	            district.population -= selected.population;
+	            other_dist.population += selected.population;
+	            district.vtds.remove(border_vtd);
+	            other_dist.vtds.add(border_vtd);
+	            
+	            vtd_districts[border_vtd.id] = iother_dist;
+	            
+	            other_dist.border_vtds.add(border_vtd);
+	            
+            	if( re_add_borders) {
+            		for( VTD n : selected.neighbors) {
+            			if(vtd_districts[n.id] != iother_dist) {
+            				districts.get(vtd_districts[n.id]).border_vtds.add(n);
+            			}
+            		}
+            	}
+	        }
+		} catch (Exception ex) {
+			System.err.print(ex);
+			ex.printStackTrace();
+		}
+    	try {
+	        
+	    	fillDistrictwards();
+	        for( int i = 0; i < districts.size(); i++) {
+	        	District d = districts.get(i); 
+	        	d.resetPopulation();
+	        	d.getPopulation();
+	    		d.getRegions();
+	        }
+		} catch (Exception ex) {
+			System.err.print(ex);
+			ex.printStackTrace();
+		}
+    	System.out.println("equalizePop done "+amt+" "+iterations);
 	}
 
     public void mutate(double prob) {
@@ -615,7 +797,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	ward_connected[i] = false;
 	        }
 	        for( int i = 0; i < districts.size(); i++) {
-	        	Vector<VTD> vw = districts.get(i).getTopPopulationRegion(vtd_districts);
+	        	Region vw = districts.get(i).getTopPopulationRegion();
 	        	double pop = districts.get(i).getRegionPopulation(vw);
 	        	if( pop < 20000 || vw == null || vw.size() < 5) {
 	        		for(int j = 0; j < vtd_districts.length; j++) {
@@ -971,7 +1153,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		d.vtds = new Vector<VTD>();
     	}
 		while( Settings.num_districts > districts.size()) {
-			districts.add(new District());
+			districts.add(new District(this));
 		}
 
     	for( int i = 0; i < vtd_districts.length; i++) {
@@ -993,7 +1175,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     			vtd_districts[i] = district;
     		}
     		while( district >= districts.size()) {
-    			districts.add(new District());
+    			districts.add(new District(this));
     		}
     		districts.get(district).vtds.add(vtds.get(i));
     	}
@@ -1051,7 +1233,20 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		}
 
     	return true;
-    
+    }
+    public void makeContiguous() {
+    	for(District d : districts) {
+    		Region top = d.getTopPopulationRegion();
+    		for( Region r : d.regions) {
+    			if( r != top) {
+    				r.giveToBorderingDistrict();
+    			}
+    		}
+    	}
+    	for(District d : districts) {
+    		d.resetPopulation();
+    	}    	
+    	this.fillDistrictwards();
     }
     public DistrictMap(Vector<VTD> wards, int num_districts) {
     	this(wards, num_districts, true);
@@ -1072,7 +1267,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //System.out.println(" districtmap constructor numdists "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++)
-            districts.add(new District());
+            districts.add(new District(this));
         vtd_districts = new int[wards.size()];
         if( init) {
 	        if( Ecology.initMethod.equals("Random")) {
@@ -1082,6 +1277,12 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	initContiguous();
 	        }
 	        fillDistrictwards();
+	        for( int i = 0; i < 2; i++) {
+	        	makeContiguous();
+	        }
+	        for( int i = 0; i < 2; i++) {
+	        	equalizePopulation(0,Settings.equalize_after_mutate_max_iterations*4);
+	        }
         }
         //System.out.println(" districtmap constructor dist size "+districts.size());
     }
@@ -1100,7 +1301,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 			districts.remove(target);
 		}
 		while( districts.size() < target) {
-			District d = new District();
+			District d = new District(this);
 			districts.add(d);
 		}
     	//System.out.println("3");
@@ -1146,7 +1347,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         //System.out.println("setgenome districts "+num_districts);
         districts = new Vector<District>();
         for( int i = 0; i < num_districts; i++) {
-            districts.add(new District());
+            districts.add(new District(this));
         }
         if( vtds == null || vtds.size() < genome.length) {
         	fillDistrictwards();
@@ -2092,7 +2293,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         double power_fairness = 0; //1 = perfect fairness
         if( Settings.voting_power_balance_weight > 0) {
         	while( districts.size() < dist_pops.length) {
-        		districts.add(new District());
+        		districts.add(new District(this));
         	}
             for(int i = 0; i < dist_pops.length; i++) {
                 District district = districts.get(i);
@@ -2240,7 +2441,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	//int count = district.getRegionCount(ward_districts);
 	        	//System.out.println("region count: "+count);
 	        	//disconnected_pops += count;
-	            disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion(vtd_districts));
+	            disconnected_pops += district.getPopulation() - district.getRegionPopulation(district.getTopPopulationRegion());
 	        }
 	    }
 	    return disconnected_pops;
