@@ -191,7 +191,7 @@ public class FileUtil {
 			for( int j = 0; j < fields.length; j++) {
 				if( fields[j].type == 'N') {
 					if(  data[i][j] == null || data[i][j].equals("<null>")) {
-						oo[j] = new Double(0);
+						oo[j] = (double) 0;
 					} else {
 						try {
 							oo[j] = Double.parseDouble(data[i][j]);
@@ -293,7 +293,7 @@ public class FileUtil {
 			for( int j = 0; j < fields.length; j++) {
 				if( fields[j].type == 'N') {
 					if(  data[i][j] == null || data[i][j].equals("<null>")) {
-						oo[j] = new Double(0);
+						oo[j] = (double) 0;
 					} else {
 						try {
 							oo[j] = Double.parseDouble(data[i][j]);

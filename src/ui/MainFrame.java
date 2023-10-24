@@ -2172,7 +2172,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				vf.add(feat);
 				Double i = county_pops.get(county);
 				if( i == null) { 
-					i = new Double(0);
+					i = (double) 0;
 					county_pops.put(county,i);
 				}
 				//if( feat.properties.POPULATION == 0) {
@@ -7417,11 +7417,11 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				vf.add(feat);
 				Double i = county_pops.get(county);
 				if( i == null) { 
-					i = new Double(0);
+					i = (double) 0;
 					county_pops.put(county,i);
 				}
 				//if( feat.properties.POPULATION == 0) {
-					Double d = new Double(0);
+					Double d = (double) 0;
 					try { 
 						d = Double.parseDouble(feat.properties.get(project.population_column).toString());
 					} catch (Exception ex) {

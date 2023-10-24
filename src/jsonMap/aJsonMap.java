@@ -274,7 +274,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 			return 0;
 		}
 		try {
-			return new Double(get(key).toString());
+			return Double.parseDouble(get(key).toString());
 		} catch (Exception ex) {
 			return 0;
 		}

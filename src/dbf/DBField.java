@@ -44,13 +44,13 @@ public class DBField {
 			case 'N':
 			case 'F':
 				if (obj == null) {
-					obj = new Double(0.0D);
+					obj = 0.0D;
 				}
 				if( obj instanceof String) {
-					obj = new Double(Double.parseDouble(obj.toString()));
+					obj = Double.parseDouble(obj.toString());
 				} else if (obj instanceof Number) {
 				} else {
-					obj = new Double(0);
+					obj = (double) 0;
 				}
 				if (obj instanceof Number number) {
 					StringBuffer sb = new StringBuffer(length);
@@ -131,7 +131,7 @@ public class DBField {
 					  return Long.valueOf(s);
 					}
 					else {
-					  return new Double(s);
+					  return Double.parseDouble(s);
 					}
 				} catch (NumberFormatException numberformatexception) {
 					return 0; //throw numberformatexception;
