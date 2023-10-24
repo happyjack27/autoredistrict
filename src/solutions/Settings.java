@@ -282,7 +282,7 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 			int s5 = (seats-sm5) / 5;
 			int s4 = 0;
 			int s3 = 0;
-			if( (no4s && seats != 7) || (seats != 7)) {
+			if(seats != 7) {
 				switch( sm5) {
 				case 0:
 					s5 -= 0;

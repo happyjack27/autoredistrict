@@ -116,7 +116,7 @@ public class DBFWriter {
         else {
           abyte1 = s.getBytes();
         }
-        if (fields[l].length >= 0) System.arraycopy(abyte1, 0, b, k + 0, fields[l].length);
+        if (fields[l].length >= 0) System.arraycopy(abyte1, 0, b, k, fields[l].length);
       k += fields[l].length;
     }
 
