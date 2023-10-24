@@ -19,7 +19,7 @@ Requires Java Development Kit (JDK) version 7 or greater.
 Open a command prompt. Change to the directory that you cloned the repo to. Make a ```bin``` directory here. Run:
 
 ```
-javac -encoding UTF-8 -d bin src/ui/Applet.java
+javac -encoding UTF-8 -d bin -cp 'src:flatlaf-1.6.jar' src/ui/Applet.java
 ```
 
 Now create a jar by changing to the ```bin``` directory and running:
@@ -29,7 +29,7 @@ jar cf autoredistrict.jar .
 
 To start the newly-compiled app from the bin directory, run:
 ```
-java -Xmx4096M -Xms1024M -classpath autoredistrict.jar ui/Applet
+java -Xmx4096M -Xms1024M -classpath 'autoredistrict.jar:../flatlaf-1.6.jar:../src' ui/Applet
 ```
 
 CONTRIBUTION GUIDELINES:
