@@ -29,36 +29,12 @@ public class VerticalLabelUI extends BasicLabelUI {
    Rectangle verticalViewR = new Rectangle();
    Rectangle verticalIconR = new Rectangle();
    Rectangle verticalTextR = new Rectangle();
-   protected static VerticalLabelUI verticalLabelUI =
-         new VerticalLabelUI();
-   private final static VerticalLabelUI SAFE_VERTICAL_LABEL_UI =
-         new VerticalLabelUI();
 
    /**
     * Constructs a <code>VerticalLabelUI</code> with the default anticlockwise
     * rotation
     */
    public VerticalLabelUI() {
-   }
-
-   /**
-    * Constructs a <code>VerticalLabelUI</code> with the desired rotation.
-    * <P>
-    * @param clockwise true to rotate clockwise, false for anticlockwise
-    */
-   public VerticalLabelUI(boolean clockwise) {
-      this.clockwise = clockwise;
-   }
-
-   /**
-    * @see ComponentUI#createUI(javax.swing.JComponent) 
-    */
-   public static ComponentUI createUI(JComponent c) {
-      if (System.getSecurityManager() != null) {
-         return SAFE_VERTICAL_LABEL_UI;
-      } else {
-         return verticalLabelUI;
-      }
    }
 
    /**
