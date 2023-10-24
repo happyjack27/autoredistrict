@@ -1197,7 +1197,7 @@ public class STVElection2 {
 		return false;
 	}
 	
-	public static Vector<int[]> getAllCombinations(int arr[])	{
+	public static Vector<int[]> getAllCombinations(int[] arr)	{
 		Vector<int[]> combs = new Vector<int[]>();
 		for( int i = 0; i < arr.length; i++) {
 			addCombinations(arr,i+1,combs);
@@ -1205,12 +1205,12 @@ public class STVElection2 {
 		//System.out.println("found "+combs.size()+" combinations");
 		return combs;
 	}
-	public static void addCombinations(int arr[],  int r, Vector<int[]> combs)	{
+	public static void addCombinations(int[] arr, int r, Vector<int[]> combs)	{
 	    int[] data = new int[r];
 	    combinationUtil(arr, data, 0, arr.length-1, 0, r, combs);
 		//System.out.println("added combinations of length "+r+" new size "+combs.size());
 	}
-	public static void combinationUtil(int arr[], int data[], int start, int end, int index, int r, Vector<int[]> combs) {
+	public static void combinationUtil(int[] arr, int[] data, int start, int end, int index, int r, Vector<int[]> combs) {
 	    if (index == r) {
 	    	combs.add(data.clone());
 	        return;

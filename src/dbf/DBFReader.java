@@ -6,8 +6,8 @@ import java.nio.charset.Charset;
 public class DBFReader {
 
   DataInputStream stream;
-  DBField fields[];
-  byte nextRecord[];
+  DBField[] fields;
+  byte[] nextRecord;
   int nFieldCount;
 
   public DBFReader(String s) throws Exception {
@@ -63,8 +63,8 @@ public class DBFReader {
     }
   }
 
-  private int readHeader() throws IOException, Exception {
-    byte abyte0[] = new byte[16];
+  private int readHeader() throws Exception {
+    byte[] abyte0 = new byte[16];
     try {
       stream.readFully(abyte0);
     }
@@ -86,8 +86,8 @@ public class DBFReader {
     return i;
   }
 
-  private DBField readFieldHeader() throws IOException, Exception {
-    byte abyte0[] = new byte[16];
+  private DBField readFieldHeader() throws Exception {
+    byte[] abyte0 = new byte[16];
     try {
       stream.readFully(abyte0);
     }
@@ -142,13 +142,11 @@ public class DBFReader {
   public Object[] nextRecord() throws Exception {
     if (!hasNextRecord())
       throw new Exception("No more records available.");
-    Object aobj[] = new Object[nFieldCount];
+    Object[] aobj = new Object[nFieldCount];
     int i = 1;
     for (int j = 0; j < aobj.length; j++) {
       int k = fields[j].length;
-      StringBuffer sb = new StringBuffer(k);
-      sb.append(new String(nextRecord, i, k));
-      aobj[j] = fields[j].parse(sb.toString());
+      aobj[j] = fields[j].parse(new String(nextRecord, i, k));
       i += fields[j].length;
     }
 
@@ -171,13 +169,11 @@ public class DBFReader {
     	System.out.println("read last record");
       throw new Exception("No more records available.");
     }
-    Object aobj[] = new Object[nFieldCount];
+    Object[] aobj = new Object[nFieldCount];
     int i = 1;
     for (int j = 0; j < aobj.length; j++) {
       int k = fields[j].length;
-      StringBuffer sb = new StringBuffer(k);
-      sb.append(new String(nextRecord, i, k, charset));
-      aobj[j] = fields[j].parse(sb.toString());
+      aobj[j] = fields[j].parse(new String(nextRecord, i, k, charset));
       i += fields[j].length;
     }
 

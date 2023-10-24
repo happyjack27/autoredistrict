@@ -190,11 +190,8 @@ public class Download extends Thread {
 		
 		JOptionPane.showMessageDialog(MainFrame.mainframe, "It may take a few minutes to download and extact the data.\n(hit okay)");
 
-		if( !downloadState( istate,cyear,vyear)) {
-			return false;
-		} 
-		return true;
-	}
+        return downloadState(istate, cyear, vyear);
+    }
 	public static void initPaths() {
 		System.out.println("initing paths "+istate+" "+cyear+" "+vyear);
 		String path = getStartPath();
@@ -236,10 +233,10 @@ public class Download extends Thread {
 		download_vtd = true;
 		
 		if( ftest1.exists()) {
-			download_vtd = !prompt ? false : JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
+			download_vtd = prompt && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "VTD shapefiles already exist.  Re-download?");
 		}
 		if( ftest2.exists() && ftest3.exists()) {
-			download_census = !prompt ? false : JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
+			download_census = prompt && JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Census files already exist.  Re-download?");
 		}
 		new Download().start();
 		return true;
@@ -316,8 +313,7 @@ public class Download extends Thread {
 			System.out.println("no next thread, hittng event occured.");
 			MainFrame.mainframe.ip.eventOccured();
 		}
-		return;
-	}
+    }
 	public static String census_districts_url() {
 		String fips = ""+istate;
 		if( fips.length()< 2) {
@@ -369,27 +365,22 @@ public class Download extends Thread {
 				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".zip";
 	}
 	public static String census_tract_filename(int state, int year) {
-		return ""
-			+"census_tracts_list_"+num(state)+".txt";
+		return "census_tracts_list_"+num(state)+".txt";
 	}
 
 	
 	public static String census_centroid_filename(int state, int year) {
-		return ""
-				+"tl_"+year+"_"+num(state)+"_tabblock"+shortyear(year)+".dbf";
+		return "tl_"+year+"_"+num(state)+"_tabblock"+shortyear(year)+".dbf";
 	}
 	public static String census_pop_filename(int state, int year) {
-		return ""
-				+"tabblock"+year+"_"+num(state)+"_pophu.dbf";
+		return "tabblock"+year+"_"+num(state)+"_pophu.dbf";
 
 	}
 	public static String census_vtd_filename(int state, int year, int elec_year) {
-		return ""
-				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".shp";
+		return "tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".shp";
 	}
 	public static String census_vtd_dbf_filename(int state, int year, int elec_year) {
-		return ""
-				+"tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".dbf";
+		return "tl_"+elec_year+"_"+num(state)+"_vtd"+shortyear(year)+".dbf";
 	}
 	public static String shortyear(int year) {
 		String s = ""+year;

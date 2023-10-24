@@ -76,7 +76,7 @@ public class FrameDrawSeatsVotes extends JFrame {
 		    graphics.setColor(Color.black);
 		    graphics.drawRect(x, y, w, h);
 		    double yinc = (double)h / (double)districts.size();
-		    double xinc = (double)w;
+		    double xinc = w;
 		    graphics.setColor(Color.gray);
 			graphics.setStroke(dotted);
 		    graphics.drawLine((int)(x+xinc*popular), y, (int)(x+xinc*popular), y+h);
@@ -106,10 +106,10 @@ public class FrameDrawSeatsVotes extends JFrame {
 		    last_y = y;//-(yinc/2.0);
 		    int[] xs = new int[districts.size()*2+3];
 		    int[] ys = new int[districts.size()*2+3];
-		    xs[districts.size()*2+0] = x;
+		    xs[districts.size() * 2] = x;
 		    xs[districts.size()*2+1] = x;
 		    xs[districts.size()*2+2] = x+w;
-		    ys[districts.size()*2+0] = y+h;
+		    ys[districts.size() * 2] = y+h;
 		    ys[districts.size()*2+1] = y;
 		    ys[districts.size()*2+2] = y;
 		    int i = 0;

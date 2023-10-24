@@ -42,10 +42,9 @@ public class ScriptMaker {
 			}
 			String state = Download.states[i];
 			
-			if( false
-					|| state.equals("Texas")
-					|| state.equals("Florida")
-					|| state.equals("California")) {
+			if(state.equals("Texas")
+                    || state.equals("Florida")
+                    || state.equals("California")) {
 				//continue;
 			}
 			

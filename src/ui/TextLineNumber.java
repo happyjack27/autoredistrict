@@ -32,7 +32,7 @@ public class TextLineNumber extends JPanel
 
 	//  Text component this TextTextLineNumber component is in sync with
 
-	private JTextComponent component;
+	private final JTextComponent component;
 
 	//  Properties that can be changed
 
@@ -283,10 +283,7 @@ public class TextLineNumber extends JPanel
 		int caretPosition = component.getCaretPosition();
 		Element root = component.getDocument().getDefaultRootElement();
 
-		if (root.getElementIndex( rowStartOffset ) == root.getElementIndex(caretPosition))
-			return true;
-		else
-			return false;
+        return root.getElementIndex(rowStartOffset) == root.getElementIndex(caretPosition);
 	}
 
 	/*

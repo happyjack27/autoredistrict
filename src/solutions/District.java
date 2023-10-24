@@ -100,7 +100,7 @@ public class District extends JsonMap {
 		double votes_per_seat = tot_vote / ((double)members_per_district);
 		double total_votes = 0;
 		for( int j = 0; j < district_vote.length; j++) {
-			prop_rep[j] = multiplier*(double)district_vote[j];
+			prop_rep[j] = multiplier* district_vote[j];
 			residual_popular_vote[j] = prop_rep[j] - Math.floor(prop_rep[j]);
 		   	residual_popular_vote2[j] = prop_rep[j] - Math.round(prop_rep[j]);
 		   	prop_rep[j] = Math.round(prop_rep[j]);
@@ -163,7 +163,7 @@ public class District extends JsonMap {
    	   	            
    	            }
    	            
-   	            double[][] prop_rep_results = getPropRepOutcome_deadcode(district_vote,Settings.seats_in_district(this.id));
+   	            double[][] prop_rep_results = getPropRepOutcome_deadcode(district_vote,Settings.seats_in_district(id));
    	            if( prop_rep_results == null) {
    	            	System.out.println("district null prop results");
    	            }
@@ -551,7 +551,7 @@ public class District extends JsonMap {
 
 	public static double[] popular_vote_to_elected(double[] ds, int i, double pop_per_seat_wrong) {
 		return popular_vote_to_elected_for_seats(
-				ds, (int)Settings.seats_in_district(i),pop_per_seat_wrong,
+				ds, Settings.seats_in_district(i),pop_per_seat_wrong,
 				Settings.quota_method == Settings.QUOTA_METHOD_DROOP);
 		/*
 		if( Settings.quota_method == Settings.QUOTA_METHOD_DROOP) {

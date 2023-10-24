@@ -45,7 +45,7 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 
 	// public static boolean border_length_area_weighted = true;
 	public static final boolean make_unique = false; // not the cost of this is
-	public static final double density_multiplier = 2.522667664609363E11/(double)1000000.0;
+	public static final double density_multiplier = 2.522667664609363E11/ 1000000.0;
 														// population times
 														// population times
 														// precinct count.
@@ -134,11 +134,11 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 		
 		//adjust anneal rate to be proportional to the logarithm of the number of total possible maps.
 		double num_features = MainFrame.mainframe.featureCollection.features.size();
-		double combinations = num_features * Math.log((double)Settings.num_districts);
+		double combinations = num_features * Math.log(Settings.num_districts);
 		double g = generation;
 		g *= (30484.02508579287/combinations);
 
-		double e = max_mutation * Math.exp(-0.0006 * (double) g); // reaches
+		double e = max_mutation * Math.exp(-0.0006 * g); // reaches
 																				// -0.0005
 																				// 0.000005
 																				// at
@@ -282,7 +282,7 @@ public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 			int s5 = (seats-sm5) / 5;
 			int s4 = 0;
 			int s3 = 0;
-			if( (no4s && seats != 7) || (true && seats != 7)) {
+			if( (no4s && seats != 7) || (seats != 7)) {
 				switch( sm5) {
 				case 0:
 					s5 -= 0;

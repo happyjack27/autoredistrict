@@ -62,9 +62,9 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	public static boolean[] buncontested1 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested2 = new boolean[Settings.num_districts];
 	public static boolean[] buncontested3 = new boolean[Settings.num_districts];
-	public static boolean isLatLon = true;;
-	
-	public void addFeatures(String dest, String[] sources) {
+	public static boolean isLatLon = true;
+
+    public void addFeatures(String dest, String[] sources) {
 		String s = "ADD FEATURES";
 		for( int i = 0; i < sources.length; i++) {
 			s += sources[i];
@@ -445,7 +445,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				float val = val_start;
 				float sat = sat_start;
 				for( int i = 0; i < c.length; i++) {
-					c[i] = Color.getHSBColor(hue, (float)sat, (float)val);
+					c[i] = Color.getHSBColor(hue, sat, val);
 					int cr = (255-c[i].getRed())*2/3;
 					int cg = (255-c[i].getGreen())*2/3;
 					int cb = (255-c[i].getBlue())*2/3;
@@ -527,7 +527,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				String county = f.properties.get(county_column).toString();
 				Integer s = counties.get(county);
 				if( s == null) {
-					counties.put(county,new Integer(i++));
+					counties.put(county, Integer.valueOf(i++));
 				}
 			}
 
@@ -586,7 +586,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 						
 						double multiplier = 1;
 						if( Settings.divide_packing_by_area) {
-							multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+							multiplier = Settings.density_multiplier* dm.districts.get(i).getPopulation() / dm.districts.get(i).area;
 							if( multiplier > 1) {
 								multiplier = 1;
 							}
@@ -651,7 +651,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 						
 						double multiplier = 1;
 						if( Settings.divide_packing_by_area) {
-							multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+							multiplier = Settings.density_multiplier* dm.districts.get(i).getPopulation() / dm.districts.get(i).area;
 							if( multiplier > 1) {
 								multiplier = 1;
 							}
@@ -812,7 +812,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				for( int i = 0; i < Settings.num_districts; i++) {
 					double multiplier = 1;
 					if( Settings.divide_packing_by_area) {
-						multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+						multiplier = Settings.density_multiplier* dm.districts.get(i).getPopulation() / dm.districts.get(i).area;
 						if( multiplier > 1) {
 							multiplier = 1;
 						}
@@ -874,7 +874,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 					for( int i = 0; i < Settings.num_districts; i++) {
 						double multiplier = 1;
 						if( Settings.divide_packing_by_area) {
-							multiplier = Settings.density_multiplier*(double)dm.districts.get(i).getPopulation()/(double)dm.districts.get(i).area;
+							multiplier = Settings.density_multiplier* dm.districts.get(i).getPopulation() / dm.districts.get(i).area;
 							if( multiplier > 1) {
 								multiplier = 1;
 							}
@@ -1109,7 +1109,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
         			g.setColor(c);
     				int x = (int)((lon-Geometry.shiftx)*Geometry.scalex);
     				int y = (int)((lat-Geometry.shifty)*Geometry.scaley);	        			
-        			g.drawRect((int)x, (int)y, 4, 4);
+        			g.drawRect(x, y, 4, 4);
         			
         		}
         	}
@@ -1290,9 +1290,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				//new way, just add the unpaired edge length of the no-neighbors feature.
 					try {
 						double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
-						for( int i = 0; i < nearest.neighbor_lengths.length; i++) {
-							new_neighbbor_lengths[i] = nearest.neighbor_lengths[i]; 
-						}
+                        System.arraycopy(nearest.neighbor_lengths, 0, new_neighbbor_lengths, 0, nearest.neighbor_lengths.length);
 						new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.unpaired_edge_length;
 						
 						nearest.neighbors.add(f);
@@ -1412,9 +1410,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 				VTD f = closest_inland_Feature.feature;
 				VTD nearest = closest_island_Feature.feature;
 				double[] new_neighbbor_lengths = new double[nearest.neighbor_lengths.length+1];
-				for( int i = 0; i < nearest.neighbor_lengths.length; i++) {
-					new_neighbbor_lengths[i] = nearest.neighbor_lengths[i]; 
-				}
+                System.arraycopy(nearest.neighbor_lengths, 0, new_neighbbor_lengths, 0, nearest.neighbor_lengths.length);
 				new_neighbbor_lengths[new_neighbbor_lengths.length-1] = f.unpaired_edge_length;
 				
 				nearest.neighbors.add(f);
@@ -1477,8 +1473,8 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 			source[0] += dd[0];
 			source[1] += dd[1];
 		}
-		source[0] /= (double)f.geometry.coordinates.length;//f.geometry.polygons.length;
-		source[1] /= (double)f.geometry.coordinates.length;//f.geometry.polygons.length;
+		source[0] /= f.geometry.coordinates.length;//f.geometry.polygons.length;
+		source[1] /= f.geometry.coordinates.length;//f.geometry.polygons.length;
 		return source;
 	}
 	public VTD getNearestFeature(VTD f) {
@@ -1713,7 +1709,7 @@ public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 			} catch (Exception ex) {
 				//System.out.println("couldn't get object as string. trying as number "+o);
 				try {
-					s2 = ""+ (Integer)o;
+					s2 = ""+ o;
 				} catch (Exception ex2) {
 					System.out.println("couldn't get object as number.  using default length of 16");
 					maxlen = 16;

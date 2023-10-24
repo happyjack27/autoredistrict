@@ -264,7 +264,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 			return false;
 		}
 		try {
-			return new Boolean(get(key).toString());
+			return Boolean.valueOf(get(key).toString());
 		} catch (Exception ex) {
 			return false;
 		}
@@ -286,7 +286,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 		try {
 			String tempValue = get(key).toString();//FormatUtil.asString(get(key));
 			tempValue = tempValue.replaceAll(",","");
-			return new Long(tempValue);				
+			return Long.valueOf(tempValue);
 		} catch (Exception ex) {
 			return 0;
 		}
@@ -298,8 +298,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 	// added conversion from base64 encoded string to byte[]
 	public byte[] getBytes(String key){
 		if( get(key) == null) { return null; }
-		if( get(key) instanceof java.io.ByteArrayInputStream) {
-			java.io.ByteArrayInputStream bis = (java.io.ByteArrayInputStream)get(key);
+		if(get(key) instanceof java.io.ByteArrayInputStream bis) {
 			return byteStreamToByteArray(bis);
 		}
 		if( get(key) instanceof byte[]) {
@@ -341,8 +340,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 	// added conversion from byte[] to base64 encoded string
 	public String getString(String key){
 		if( get(key) == null) { return null; }
-		if( get(key) instanceof byte[]) {
-			byte[] bb = (byte[])get(key);
+		if(get(key) instanceof byte[] bb) {
 			return new String(Base64.getEncoder().encode(bb));
 		}
 		return get(key).toString();
@@ -423,7 +421,7 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 	public String toString(){
 		StringBuffer sb = new StringBuffer();
 		serialize(sb, "");
-		return "{\n" + sb.toString() + "}";
+		return "{\n" + sb + "}";
 	}
 
 //	@Deprecated
@@ -492,10 +490,9 @@ public abstract class aJsonMap extends HashMap<String, Object> implements iJsonM
 			}
 			else if(obj instanceof String){
 				String s = escapeControlCharacters((String)obj);
-				sb.append(aJsonMap._json_quote + ((String) s) + aJsonMap._json_quote + "\n");
+				sb.append(aJsonMap._json_quote + s + aJsonMap._json_quote + "\n");
 			}
-			else if(obj instanceof byte[]) {
-				byte[] bb = (byte[])obj;
+			else if(obj instanceof byte[] bb) {
 				String s = new String(Base64.getEncoder().encode(bb));
 				sb.append( aJsonMap._json_quote + escapeControlCharacters(s) + aJsonMap._json_quote + "\n");
 			}

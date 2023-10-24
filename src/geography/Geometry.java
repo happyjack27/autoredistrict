@@ -46,7 +46,7 @@ public class Geometry extends ReflectJsonMap<Geometry> {
 		
 		Polygon[] polygons = new Polygon[coordinates.length];
 		for( int i = 0; i < coordinates.length; i++) {
-			if(Settings.b_make_simplified_polys || true ) {
+			if(true) {
 				int point_count = coordinates[i].length/( min_point_frac );
 				if( point_count < 1) {
 					point_count = 1;
@@ -177,9 +177,7 @@ public class Geometry extends ReflectJsonMap<Geometry> {
 						}
 					}
 					double[][] dd = new double[k2][];
-					for( int k = 0; k < dd.length; k++) {
-						dd[k] = coordinates[i2][k];
-					}
+                    System.arraycopy(coordinates[i2], 0, dd, 0, dd.length);
 					coordinates[i2] = dd;
 					i2++;
 				} catch (Exception ex) { 
@@ -188,9 +186,7 @@ public class Geometry extends ReflectJsonMap<Geometry> {
 				}
 			}
 			double[][][] dd = new double[i2][][];
-			for( int i = 0; i < dd.length; i++) {
-				dd[i] = coordinates[i];
-			}
+            System.arraycopy(coordinates, 0, dd, 0, dd.length);
 			coordinates = dd;
 			this.remove("coordinates");
 			
@@ -234,8 +230,8 @@ public class Geometry extends ReflectJsonMap<Geometry> {
 				    	retx += xs[i];
 				    	rety += ys[i];
 				    }
-				    retx /= (double) xs.length;
-				    rety /= (double) xs.length;
+				    retx /= xs.length;
+				    rety /= xs.length;
 			    }
 
 			    return new double[]{retx,rety};

@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.*;
 
 public class DialogShowProperties extends JDialog {
-	private JTable table;
+	private final JTable table;
 	
 	public void setTableSource(DataAndHeader dh) {
 		

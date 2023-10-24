@@ -138,7 +138,7 @@ public class translator {
 			hss2[i] = hss[i].trim();
 		}
 		
-		hss2[hss.length+0] = "SLDL10_1";
+		hss2[hss.length] = "SLDL10_1";
 		hss2[hss.length+1] = "SLDL10_2";
 		hss2[hss.length+2] = "SLDL10_4";
 		hss2[hss.length+3] = "SLDL10_8";
@@ -159,7 +159,7 @@ public class translator {
 			int n8 = (n4 + n4 % 2)/2;
 			int n16 = (n8 + n8 % 2)/2;
 			
-			ss2[ss.length+0] = ""+n1;
+			ss2[ss.length] = ""+n1;
 			ss2[ss.length+1] = ""+n2;
 			ss2[ss.length+2] = ""+n4;
 			ss2[ss.length+3] = ""+n8;

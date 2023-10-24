@@ -3,7 +3,7 @@ import org.apache.commons.math3.distribution.*;
 
 public class AdaptiveMutation {
 
-	private int max_sample_size = 250;
+	private final int max_sample_size = 250;
 	private int num_samples = 0;
 	
 	public GammaDistribution gamma = new GammaDistribution(1,1);

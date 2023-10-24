@@ -97,7 +97,7 @@ public class PanelGraphDrawArea extends JPanel {
 
         if( v != null && v.size() > 0) {
         	int start = (int)(pctToHide*(double)v.size());
-            double scalex = ((double)d.getWidth())/(double)(v.size()-start);
+            double scalex = d.getWidth() /(double)(v.size()-start);
             if( start >= v.size()) {
             	return;
             }
@@ -123,7 +123,7 @@ public class PanelGraphDrawArea extends JPanel {
             maxys[9] = maxys[3];
             */
         	for( int j = 0; j < maxys.length; j++) {
-        		scaleys[j] = ((double)d.getHeight())/(maxys[j]-minys[j]);
+        		scaleys[j] = d.getHeight() /(maxys[j]-minys[j]);
         	}
             double[] last_vals = v.get(start);
             for( int i = start+1; i < v.size(); i++) {
@@ -136,9 +136,9 @@ public class PanelGraphDrawArea extends JPanel {
             		g.setColor(cc[j]);
             		g.drawLine(
             				(int)(scalex*(double)(i-1-start)),
-            				(int)(d.getHeight()-scaleys[j]*(double)(last_vals[j]-minys[j])),
+            				(int)(d.getHeight()-scaleys[j]* (last_vals[j]-minys[j])),
             				(int)(scalex*(double)(i-start)),
-            				(int)(d.getHeight()-scaleys[j]*(double)(vals[j]-minys[j]))
+            				(int)(d.getHeight()-scaleys[j]* (vals[j]-minys[j]))
             				);
             	}
             	

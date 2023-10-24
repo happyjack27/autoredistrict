@@ -13,7 +13,7 @@ public class CS_MTV_DigitalAllocation extends CS_MTV {
 		for( MultiBallot m : multi_ballots) {
 			double[] dd = new double[m.n_votes.length];
 			for( int i = 0; i < dd.length; i++) {
-				dd[i] = (double)m.digital_allocation[i];
+				dd[i] = m.digital_allocation[i];
 			}
 			dballots.add(dd);
 			weights.add(m.weight);

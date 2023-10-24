@@ -21,8 +21,7 @@ public class Stat implements ChangeListener {
 	
 	public void stateChanged(ChangeEvent changeEvent) {
 		Object source = changeEvent.getSource();
-		if (source instanceof JSlider) {
-			JSlider theJSlider = (JSlider) source;
+		if (source instanceof JSlider theJSlider) {
 			weight = theJSlider.getValue()/100;
 		}
 	}

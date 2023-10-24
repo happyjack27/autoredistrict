@@ -310,7 +310,7 @@ public class HTMLGenerator {
 		}
 		System.out.print(html);
 		for( int i = 0; i < 3; i++) {
-			System.out.println(""+counts[i][0]+" "+counts[i][1]+" "+counts[i][2]+" ");
+			System.out.println(counts[i][0]+" "+counts[i][1]+" "+counts[i][2]+" ");
 		}
 		
 	}

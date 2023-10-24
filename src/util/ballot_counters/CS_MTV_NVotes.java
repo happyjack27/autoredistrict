@@ -13,7 +13,7 @@ public class CS_MTV_NVotes extends CS_MTV {
 		for( MultiBallot m : multi_ballots) {
 			double[] dd = new double[m.n_votes.length];
 			for( int i = 0; i < dd.length; i++) {
-				dd[i] = (double)m.n_votes[i];
+				dd[i] = m.n_votes[i];
 			}
 			dballots.add(dd);
 			weights.add(m.weight);

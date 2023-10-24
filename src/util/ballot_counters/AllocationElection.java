@@ -64,7 +64,7 @@ public class AllocationElection {
 				
 				log(" ignoring: ");
 				for( int j = 0; j < ignores.size(); j++) {
-					log(""+ignores.get(j)+", ");
+					log(ignores.get(j)+", ");
 				}
 				logl();
 				
@@ -82,7 +82,7 @@ public class AllocationElection {
 		}
 		log(" winners:");
 		for( int i = 0; i < winners.length; i++) {
-			log(""+winners[i]+", ");
+			log(winners[i]+", ");
 		}
 		logl();
 		
@@ -93,7 +93,7 @@ public class AllocationElection {
 		double[] ws = getTotals( ballots, ignores, num_candidates);
 		log(" totals: ");
 		for( int j = 0; j < ws.length; j++) {
-			log(""+ws[j]+", ");
+			log(ws[j]+", ");
 		}
 		logl();
 
@@ -102,7 +102,7 @@ public class AllocationElection {
 		for( int j = 0; j < ws.length; j++) {
 			quota += ws[j];
 		}
-		quota /= (double)seats_left;
+		quota /= seats_left;
 		logl(" quota: "+quota);
 		
 		int max_index = 0;

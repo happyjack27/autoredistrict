@@ -162,7 +162,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 			}
 		} else {
 			FeatureCollection.recalcDlonlat();
-			double xscale = FeatureCollection.dlonlat*(double)Geometry.SCALELATLON;
+			double xscale = FeatureCollection.dlonlat* Geometry.SCALELATLON;
 			double yscale = Geometry.SCALELATLON;
 			//System.out.println("dlatlon "+FeatureCollection.dlonlat);
 			//System.out.println("xscale "+xscale);
@@ -392,7 +392,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 				blue /= tot;
 				double multiplier = 1;
 				if( Settings.divide_packing_by_area) {
-					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					multiplier = Settings.density_multiplier* population / area;
 					if( multiplier > 1) {
 						multiplier = 1;
 					}
@@ -448,7 +448,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 
 				double multiplier = 1;
 				if( Settings.divide_packing_by_area) {
-					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					multiplier = Settings.density_multiplier* population / area;
 					if( multiplier > 1) {
 						multiplier = 1;
 					}
@@ -478,7 +478,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 				}
 				double multiplier = 1;
 				if( Settings.divide_packing_by_area) {
-					multiplier = Settings.density_multiplier*(double)population/(double)area;
+					multiplier = Settings.density_multiplier* population / area;
 					if( multiplier > 1) {
 						multiplier = 1;
 					}
@@ -512,7 +512,7 @@ public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 			g.setColor(geometry.outlineColor);
 			for( int i = 0; i < geometry.polygons.length; i++) {
 				//Polygon p = new Polygon(xpolys[i],ypolys[i],xpolys[i].length);
-				if( geometry.isDistrict && false) {
+				if(false) {
 					g.fillPolygon(geometry.polygons[i]);
 				} else {
 					g.drawPolygon(geometry.polygons[i]);

@@ -90,7 +90,7 @@ public class PermutationIterator
     // -----------------------------------------------------------------
     // Testing code:
 
-    public static void main(String argv[]) {
+    public static void main(String[] argv) {
         String s = argv[0];
         for(Iterator<int[]> it = new PermutationIterator(s.length()); it.hasNext(); ) {
             print(s, it.next());

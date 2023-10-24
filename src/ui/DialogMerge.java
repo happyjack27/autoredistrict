@@ -93,8 +93,8 @@ public class DialogMerge extends JDialog {
 					non_matches_file++;
 				}
 			}
-			lblNonmatchesMap.setText(""+non_matches_map+" non-matches");
-			lblNonmatchesFile.setText(""+non_matches_file+" non-matches");
+			lblNonmatchesMap.setText(non_matches_map+" non-matches");
+			lblNonmatchesFile.setText(non_matches_file+" non-matches");
 			System.out.println("recalc: done.");
 			comboBoxMapLayer.repaint();
 			comboBoxFileLinkColumn.repaint();
@@ -195,7 +195,7 @@ public class DialogMerge extends JDialog {
 					}
 				}
 				for( VTD f : fc.features) {
-					if( f.temp_bool == false) {
+					if(!f.temp_bool) {
 						for( int j = 0; j < data_headers.length; j++) {
 							f.properties.put(data_headers[j], "0");
 						}
