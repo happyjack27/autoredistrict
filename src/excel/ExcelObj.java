@@ -1,8 +1,6 @@
 package excel;
 
 import java.util.Vector;
-import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
-import jp.ne.so_net.ga2.no_ji.jcom.ReleaseManager;
 //import com.jacob.activeX.ActiveXComponent;
 //import com.jacob.com.*;
 
@@ -264,13 +262,9 @@ public class ExcelObj extends Dispatch{
 			try{
 				rm = new ReleaseManager();
 				id = new IDispatch(rm, s);
-				if(id == null){
-					System.out.println("jcom ex on ActiveXComponent " + s + ": ID IS NULL!!");
-				}
 				superid = id;
 			}
 			catch(Exception ex){
-				System.out.println("jcom ex on ActiveXComponent " + s + ": " + ex);
 				ex.printStackTrace();
 			}
 		}

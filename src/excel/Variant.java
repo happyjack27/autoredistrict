@@ -1,6 +1,5 @@
 package excel;
 
-import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
 
 public class Variant{
 	public Object o = null;
@@ -36,7 +35,6 @@ public class Variant{
 			return new Dispatch((IDispatch) o);
 		}
 		catch(Exception ex){
-			System.out.println("jcom ex on toDispatch : " + ex);
 			ex.printStackTrace();
 			return new Dispatch();
 		}

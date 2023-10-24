@@ -46,9 +46,6 @@ public class ExportThread extends Thread {
 		this.progressbar = new DialogProgressBar();
 		progressbar.taskLabel.setText("Exporting...");
 		progressbar.show();
-		//loadJarDll("/resources/jcom.dll");
-		loadJarDll("/resources/jcom.dll","jcom.dll");
-		//loadJarDll("/resources/jcom.lib","jcom.so");
 		start();
 	}
 	public void run() {

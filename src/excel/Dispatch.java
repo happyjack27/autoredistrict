@@ -1,7 +1,5 @@
 package excel;
 
-import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
-
 /*
 
  public class Dispatch {
@@ -16,7 +14,6 @@ import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
  try {
  return new Variant(idd.get(s));
  } catch (Exception ex) {
- System.out.println("jcom ex on get "+s+": "+ex);
  ex.printStackTrace();
  return new Variant();
  }
@@ -27,7 +24,6 @@ import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
  try {
  idd.put(s,v.o);
  } catch (Exception ex) {
- System.out.println("jcom ex on put "+s+": "+ex);
  ex.printStackTrace();
  }
  }
@@ -54,7 +50,6 @@ public class Dispatch{
 			return new Variant(idd.get(s));
 		}
 		catch(Exception ex){
-			System.out.println("jcom ex on get " + s + ": " + ex);
 			ex.printStackTrace();
 			return new Variant();
 		}
@@ -68,7 +63,6 @@ public class Dispatch{
 			idd.put(s, v.o);
 		}
 		catch(Exception ex){
-			System.out.println("jcom ex on put " + s + ": " + ex);
 			ex.printStackTrace();
 		}
 	}
@@ -85,7 +79,6 @@ public class Dispatch{
 				return new Variant(idd.get(s, null));
 			}
 			catch(Exception ex){
-				System.out.println("jcom ex on call0 " + s + ": " + ex);
 				ex.printStackTrace();
 				return new Variant();
 			}
@@ -139,7 +132,6 @@ public class Dispatch{
 					dd = (IDispatch) idd.get(s);
 				}
 				catch(Exception ex){
-					System.out.println("jcom ex on call1(2) " + s + ": " + ex);
 					ex.printStackTrace();
 					return new Variant();
 				}
@@ -147,7 +139,6 @@ public class Dispatch{
 					return new Variant(dd.get((String) v.o));// ,new Object[]{(String)v.o}));
 				}
 				catch(Exception ex){
-					System.out.println("jcom ex on call1(3) " + v.o + ": " + ex);
 					ex.printStackTrace();
 					return new Variant();
 				}
@@ -163,7 +154,6 @@ public class Dispatch{
 				return new Variant(d.id.get(s, new Object[]{v1.o, v2.o}));
 			}
 			catch(Exception ex){
-				System.out.println("jcom ex on call2 " + s + ": " + ex);
 				ex.printStackTrace();
 				return new Variant();
 			}
@@ -182,7 +172,6 @@ public class Dispatch{
 				return new Variant(d.id.get(s, oo));
 			}
 			catch(Exception ex){
-				System.out.println("jcom ex on call2 " + s + ": " + ex);
 				ex.printStackTrace();
 				return new Variant();
 			}
