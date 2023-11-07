@@ -1556,9 +1556,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		String districtsStr = getAsHtml(districtsTable);
 		String seatsStr = getAsHtml(MainFrame.mainframe.frameSeatsVotesChart.table);
 		
-		URL header_path = Applet.class.getResource("/resources/header.php");
-		URL footer_path = Applet.class.getResource("/resources/footer.php");
-		URL style_sheet = Applet.class.getResource("/resources/styles2.css");
+		URL header_path = Applet.class.getResource("/header.php");
+		URL footer_path = Applet.class.getResource("/footer.php");
+		URL style_sheet = Applet.class.getResource("/styles2.css");
 		
 		String write_folder = Download.getStartPath()+MainFrame.mainframe.project.district_column+File.separator;
 		String write_folder2 = Download.getStartPath();

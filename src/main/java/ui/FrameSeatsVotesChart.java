@@ -326,7 +326,7 @@ public class FrameSeatsVotesChart extends JFrame {
 		panel = new SeatPanel();
 		panel.setBounds(40, 11, 200, 200);
 		getContentPane().add(panel);
-		panel.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_measures.png") + "\">");
+		panel.setToolTipText("<html><img src=\"" + Applet.class.getResource("/seats_votes_measures.png") + "\">");
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setBounds(40, 329, 200, 200);

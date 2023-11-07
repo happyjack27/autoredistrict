@@ -13,24 +13,18 @@ java -jar autoredistrict.jar -Xmx4096M -Xms1024M
 ```autoredistrict.jar``` is in the ```jar``` folder along with a script file for windows and one for linux/mac.
 The -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
 
-HOW TO BUILD AND RUN:
+## How to Build and Run from Source
 
-Requires Java Development Kit (JDK) version 7 or greater.
-Open a command prompt. Change to the directory that you cloned the repo to. Make a ```bin``` directory here. Run:
+### Requirements
+- Java Development Kit (JDK) version 7 or greater.
+- [Apache Maven](https://maven.apache.org/) ([installation instructions](https://maven.apache.org/install.html))
 
-```
-javac -encoding UTF-8 -d bin -cp 'src:flatlaf-1.6.jar' src/ui/Applet.java
-```
+### Steps
+1. Open a command prompt.
+2. Change to the directory that you cloned the repo to.
+3. Make a ```bin``` directory here.
+4. Execute `mvn clean compile package exec:java`
 
-Now create a jar by changing to the ```bin``` directory and running:
-```
-jar cf autoredistrict.jar .
-```
-
-To start the newly-compiled app from the bin directory, run:
-```
-java -Xmx4096M -Xms1024M -classpath 'autoredistrict.jar:../flatlaf-1.6.jar:../src' ui/Applet
-```
 
 CONTRIBUTION GUIDELINES:
 * I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.

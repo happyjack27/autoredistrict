@@ -3940,6 +3940,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		lblFairnessCriteria.setBounds(10, 10, 179, 16);
 		
 		panel_4.add(lblFairnessCriteria);
+		// TODO: replace this with a path that is not coupled to an individual's machine and OS
 		lblRacialVoteDilution.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		lblRacialVoteDilution.setBounds(10, 220, 172, 16);
 		
@@ -3969,6 +3970,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		panel_4.add(chckbxConstrain_1);
 		
 		lblDescriptiveRepr = new JLabel("Descriptive representation");
+		// TODO: replace this with a path that is not coupled to an individual's machine and OS
 		lblDescriptiveRepr.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		lblDescriptiveRepr.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblDescriptiveRepr.setBounds(10, 265, 172, 16);
@@ -4025,8 +4027,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		this.setSize(new Dimension(1021+100, 779));
 
 		try {
-			//this.setIconImage(ImageIO.read( ClassLoader.getSystemResource( "/resources/icons/ar_logo2.png" ) ));
-			this.setIconImage(ImageIO.read( Applet.class.getResource("/resources/icons/ar_logo_cropped.png") ));
+			//this.setIconImage(ImageIO.read( ClassLoader.getSystemResource( "/icons/ar_logo2.png" ) ));
+			this.setIconImage(ImageIO.read( Applet.class.getResource("/icons/ar_logo_cropped.png") ));
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
@@ -5877,10 +5879,10 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		JLabel lblContiguency = new JLabel("Proportional");
 		lblContiguency.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		lblContiguency.setBounds(10, 100, 104, 16);
-		lblContiguency.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
+		lblContiguency.setToolTipText("<html><img src=\"" + Applet.class.getResource("/representativeness_tooltip.png") + "\">");
 		panel_4.add(lblContiguency);
 		sliderRepresentation.setBounds(10, 120, 180, 29);
-		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/representativeness_tooltip.png") + "\">");
+		sliderRepresentation.setToolTipText("<html><img src=\"" + Applet.class.getResource("/representativeness_tooltip.png") + "\">");
 		panel_4.add(sliderRepresentation);
 		sliderWastedVotesTotal.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -5889,17 +5891,17 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 			}
 		});
 		sliderWastedVotesTotal.setBounds(11, 60, 180, 29);
-		sliderWastedVotesTotal.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
+		sliderWastedVotesTotal.setToolTipText("<html><img src=\"" + Applet.class.getResource("/wasted_votes.png") + "\">");
 		
 		panel_4.add(sliderWastedVotesTotal);
 		lblWastedVotes.setBounds(11, 40, 84, 16);
-		lblWastedVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/wasted_votes.png") + "\">");
+		lblWastedVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/wasted_votes.png") + "\">");
 		
 		panel_4.add(lblWastedVotes);
 		
 		lblSeatsVotes = new JLabel("Anti-partisan gerrymandering");
 		lblSeatsVotes.setFont(new Font("Tahoma", Font.PLAIN, 10));
-		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
+		lblSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/seats_votes_asymmetry_tooltip.png") + "\">");
 		lblSeatsVotes.setBounds(10, 160, 179, 16);
 		panel_4.add(lblSeatsVotes);
 		
@@ -5910,7 +5912,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				ip.addHistory("SET WEIGHT PARTISAN "+Settings.seats_votes_asymmetry_weight);
 			}
 		});
-		sliderSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/resources/seats_votes_asymmetry_tooltip.png") + "\">");
+		sliderSeatsVotes.setToolTipText("<html><img src=\"" + Applet.class.getResource("/seats_votes_asymmetry_tooltip.png") + "\">");
 		sliderSeatsVotes.setBounds(10, 180, 180, 29);
 		panel_4.add(sliderSeatsVotes);
 		
@@ -6004,6 +6006,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 		srlblSplitReduction = new JLabel("Split reduction");
 		srlblSplitReduction.setBounds(10, 136, 172, 16);
 		panel_5.add(srlblSplitReduction);
+		// TODO: replace this with a path that is not coupled to an individual's machine and OS
 		srlblSplitReduction.setToolTipText("<html><img src=\"file:/C:/Users/kbaas.000/git/autoredistrict/bin/resources/voting_power.png\">");
 		
 		sliderSplitReduction = new JSlider();
@@ -7324,9 +7327,9 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 			Vector<String[]> data = new Vector<String[]>();
 			
-			String sgeo_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/geoheader_cols.txt")); 
-			String spart1_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/part1_cols.txt")); 
-			String spart2_header = FileUtil.readStream(getClass().getResourceAsStream("/resources/part2_cols.txt")); 
+			String sgeo_header = FileUtil.readStream(getClass().getResourceAsStream("/geoheader_cols.txt"));
+			String spart1_header = FileUtil.readStream(getClass().getResourceAsStream("/part1_cols.txt"));
+			String spart2_header = FileUtil.readStream(getClass().getResourceAsStream("/part2_cols.txt"));
 			
 			Vector<Triplet<String,String,Integer>> geo_header = new Vector<Triplet<String,String,Integer>>();
 			Vector<Triplet<String,String,Integer>> part1_header = new Vector<Triplet<String,String,Integer>>();
