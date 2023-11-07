@@ -1,17 +1,17 @@
-FULLY AUTOMATED REDISTICTING SOFTWARE
-written in java, open source.
+# FULLY AUTOMATED REDISTRICTING SOFTWARE written in Java, open source.
 
-HOW TO RUN:
+## How to Run
 
-Requires Java Runtime Environment (JRE) version 7 or greater.
+### Requirements
+- Requires Java Runtime Environment (JRE) version 7 or greater.
 
-Open a command prompt. Change to the directory containing the jar:
-```
-java -jar autoredistrict.jar -Xmx4096M -Xms1024M
-```
+### Steps
+1. Open a command prompt.
+2. Change to the directory containing the jar.
+3. Execute `java -jar autoredistrict.jar -Xmx4096M -Xms1024M`
 
-```autoredistrict.jar``` is in the ```jar``` folder along with a script file for windows and one for linux/mac.
-The -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
+```autoredistrict.jar``` is in the ```jar``` folder along with a script file for Windows and one for Linux/macOS.
+The `-Xmx4096M -Xms1024M` arguments tell java to reserve 1GB of memory, and allow additional allocation up to 4GB.
 
 ## How to Build and Run from Source
 
@@ -26,7 +26,7 @@ The -Xmx4096M -Xms1024M arguments tell java to reserve 1GB of memory, and allow 
 4. Execute `mvn clean compile package exec:java`
 
 
-CONTRIBUTION GUIDELINES:
+## Contributing
 * I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.
 it is currently impossible to use the program to gerrymander and it will stay that way.  this means that an otherwise "good" feature might get rejected - so be it.  this is the #1 rule and it trumps all other considerations.
 * I'll only merge it if it's a definite improvement.
@@ -34,7 +34,7 @@ it is currently impossible to use the program to gerrymander and it will stay th
 
 https://travis-ci.org/happyjack27/autoredistrict.svg?branch=master
 
-TODO:
+## TODO:
 * is .dbf save working?  seems to not be - need to save column widths and types!
 * make project files load/save other files relative to woring directory of project file. (and make taht the default in file selection dialog)
 * make able to run gui-less from the command line
@@ -180,8 +180,7 @@ Initial loading
 census and election data
 * population and vote totals for each polgon are attached to the polygon.
 
-Compactness (border length)
-------------------
+## Compactness (border length)
 The total of length of all edges that have a different district on each side is accumulated.
 
 	class DistrictMap {
@@ -202,8 +201,7 @@ The total of length of all edges that have a different district on each side is 
 	}
 
 
-Connectedness
-------------------
+## Connectedness
 Each district is broken up into self-connected regions. The total population for each such region is accumulated from the poplygon populationos.
 The total population in the highest such region is subtracted from the total population in all regions combined, giving the toal population _not_ in the largest region.
 This is the "disconnected population".
@@ -276,8 +274,7 @@ This is the "disconnected population".
 	}
 
          
-Population balance
-------------------
+## Population balance
 The population of each district is accumulated from the polygon populations.
 Then the kullbach-leibler divergence of this from an equal distribution is calculated.  This is the "population imbalance".
 
