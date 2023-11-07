@@ -11,9 +11,20 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>16</maven.compiler.target>
+    <maven.compiler.source>16</maven.compiler.source>
   </properties>
 
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/com.formdev.flatlaf/flatlaf-core -->
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>1.6</version>
+    </dependency>
+
+    <!-- test dependencies -->
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

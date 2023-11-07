@@ -215,7 +215,7 @@ public class STVElection {
 
 class Ballot extends Vector<Choice> {
 	double weight = 1;
-	Choice getFirst() {
+	public Choice getFirst() {
 		for( int i = 0; i < size(); i++) {
 			Choice c = get(i);
 			if( !c.ignored && !c.elected) {
