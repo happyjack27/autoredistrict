@@ -209,7 +209,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
         
 		//BufferedImage image1 = new BufferedImage(width,height, BufferedImage.TYPE_INT_ARGB);
         //Graphics2D graphics1 = image1.createGraphics();
-        SVGGraphics2D graphics1 = new SVGGraphics2D(width,height,sb);
+        SVGGraphics2D graphics1 = new SVGGraphics2D(width,height,null,sb);
 
         graphics1.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         graphics1.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
