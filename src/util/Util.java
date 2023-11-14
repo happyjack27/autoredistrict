@@ -814,7 +814,7 @@ EXIT
 			String[] vs = vsum.get(i);
 			String[] vd = vdetail.get(i);
             System.arraycopy(vs, 0, out, 0, s1);
-            System.arraycopy(vd, 0, out, s1 + 0, s2);
+            System.arraycopy(vd, 0, out, s1, s2);
 			vmerged.add(out);
 		}
 		//System.out.println("showing...");

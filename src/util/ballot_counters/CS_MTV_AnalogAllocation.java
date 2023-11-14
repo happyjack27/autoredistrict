@@ -12,9 +12,7 @@ public class CS_MTV_AnalogAllocation extends CS_MTV {
 		Vector<Double> weights = new Vector<Double>();
 		for( MultiBallot m : multi_ballots) {
 			double[] dd = new double[m.n_votes.length];
-			for( int i = 0; i < dd.length; i++) {
-				dd[i] = m.analog_allocation[i];
-			}
+            System.arraycopy(m.analog_allocation, 0, dd, 0, dd.length);
 			dballots.add(dd);
 			weights.add(m.weight);
 		}
