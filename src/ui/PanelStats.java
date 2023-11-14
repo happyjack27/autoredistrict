@@ -1734,13 +1734,6 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		
 		///=====end insert
 		
-		
-
-		/*
-		excel.ExportThread thread = new excel.ExportThread();
-		thread.export(summaryTable, districtsTable, partiesTable, ethnicityTable, MainFrame.mainframe.frameSeatsVotesChart.table);
-		*/
-		
 		Settings.setNationalMap(national);
 		} catch (Exception ex) {
 			ex.printStackTrace();
