@@ -21,7 +21,7 @@ import util.StaticFunctions;
 
 //failed california, kentucky , new hampshire - states with spaces, rhode island, texas
 
-public class Applet extends JApplet {
+public class Applet extends JFrame {
 	public static MainFrame mainFrame = null;
 	public static boolean no_gui = false;
 	public static String open_project = null;

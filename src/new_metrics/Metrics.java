@@ -734,7 +734,7 @@ public class Metrics {
 		for( double d : samples) {
 			Double bin = hash.get(d);
 			if( bin == null) {
-				bin = new Double(0);
+				bin = (double) 0;
 			}
 			bin++;
 			hash.put(d, bin);
