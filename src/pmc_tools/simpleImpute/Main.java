@@ -30,7 +30,7 @@ public class Main {
 		dbfData = FileUtil.readDBF(Config.path+Config.filename);
 		System.out.println("read "+dbfData.data.length+" lines");
 		for( DBField d : dbfData.full_header) {
-			System.out.println(""+d.name+" "+d.type+" "+d.length+" "+d.decimalCount);
+			System.out.println(d.name+" "+d.type+" "+d.length+" "+d.decimalCount);
 		}
 		//System.exit(0);
 		for( int i = 0; i < dbfData.full_header.length; i++) {
@@ -49,7 +49,7 @@ public class Main {
 		System.out.println("imputeUncontested");
 		imputeUncontested();
 		System.out.println("writeDBF");
-		String outname = ""+Config.filename;
+		String outname = Config.filename;
 		File f = new File(Config.path+outname);
 		if( !f.exists()) {
 			try {
@@ -123,9 +123,7 @@ public class Main {
 		for( int i = 0; i < Config.vote_columns.length; i++) {
 			if( !fieldIndices.containsKey(Config.target_columns[i])) {
 				DBField[] dbf = new DBField[dbfData.full_header.length+1];
-				for(int j = 0; j < dbfData.full_header.length; j++) {
-					dbf[j] = dbfData.full_header[j];
-				}
+                System.arraycopy(dbfData.full_header, 0, dbf, 0, dbfData.full_header.length);
 				dbf[dbf.length-1] = dbf[ivote[i]].clone();
 				dbf[dbf.length-1].name = Config.target_columns[i];
 				fieldIndices.put(Config.target_columns[i], dbf.length-1);
@@ -142,10 +140,8 @@ public class Main {
 			for( int i = 0; i < new_data.length; i++) {
 				String[] ss = dbfData.data[i];
 				new_data[i] = new String[dbfData.data[i].length+fields_to_append];
-				
-				for( int j = 0; j < ss.length; j++) {
-					new_data[i][j] = ss[j];
-				}				
+
+                System.arraycopy(ss, 0, new_data[i], 0, ss.length);
 			}
 			dbfData.data = new_data;
 		}

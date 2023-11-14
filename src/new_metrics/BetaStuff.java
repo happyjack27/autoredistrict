@@ -141,7 +141,7 @@ public class BetaStuff implements VoteCounts {
 		try {
 			double[][] dd = actual.getAnOutcome();
 			for( int i = 0; i < dd.length; i++) {
-				System.out.println(""+i+": "+dd[i][0]+" "+dd[i][1]);
+				System.out.println(i+": "+dd[i][0]+" "+dd[i][1]);
 			}
 		} catch (Exception ex) { ex.printStackTrace(); }
 		System.out.println("3");

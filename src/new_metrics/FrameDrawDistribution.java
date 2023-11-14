@@ -135,7 +135,7 @@ public class FrameDrawDistribution extends JFrame {
 		    		new_x += values.get(i+j);
 		    		new_x += values.get(i-j);
 		    	}
-		    	new_x /= (double)(1+averaging*2);
+		    	new_x /= 1+averaging*2;
 		    	new_x /= bounds;
 	
 		    	double area = 0.5;

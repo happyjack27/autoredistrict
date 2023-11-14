@@ -68,7 +68,7 @@ public class FrameDraw extends JFrame {
 			    		}
 			    	}
 			    	int last_label_x = -1000;
-			    	int length = (int)(400/bins.size());
+			    	int length = 400/bins.size();
 			    	int x = 50;
 			    	int last_height = 0;
 			    	for( int i = 0; i < bins.size(); i++) {
@@ -113,7 +113,7 @@ public class FrameDraw extends JFrame {
 			    	
 			    }
 			    if( seats != null) {
-			    	int length = (int)(400/seats.length);
+			    	int length = 400/seats.length;
 			    	int x = 50;
 			    	int last_label_x = -1000;
 			    	for( int i = 0; i < seats.length; i++) {
@@ -129,7 +129,7 @@ public class FrameDraw extends JFrame {
 
 			    		}
 			    		graphics.fillRect(x, 400-height, length, height);
-			    		String s = ""+i+" rep";
+			    		String s = i+" rep";
 			    		int textx = x + length/2 - graphics.getFontMetrics().stringWidth(s)/2;
 			    		if( textx-last_label_x > 40) {
 				    		graphics.drawString(s, textx, 420);

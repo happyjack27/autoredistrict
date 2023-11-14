@@ -110,8 +110,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 	        
 	        
-	        double scalex = ((double)d.getWidth()*fsaa)/(maxx-minx);
-	        double scaley = ((double)d.getHeight()*fsaa)/(maxy-miny);
+	        double scalex = (d.getWidth() *fsaa)/(maxx-minx);
+	        double scaley = (d.getHeight() *fsaa)/(maxy-miny);
 	        Geometry.shiftx = minx;
 	        Geometry.shifty = miny;
 	        Geometry.scalex = scalex;
@@ -160,7 +160,7 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 		        		(int)d.getWidth(), (int)d.getHeight(), 
 		        		null);
 	
-	        } else if( fsaa == 2 || true) {
+	        } else if(true) {
 		        graphics.drawImage(off_Image,
 		                (i%m)*d.width,
 		                ((i-i%m)/m)*d.height,
@@ -205,9 +205,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
 	public void mousePressed(MouseEvent arg0) {
 		if( zooming) {
 			selection = new Rectangle(arg0.getX(),arg0.getY(),0,0);
-			
-			return;
-		}
+
+        }
 		// TODO Auto-generated method stub
 		
 	}
@@ -296,8 +295,8 @@ public class MapPanel extends JPanel implements MouseListener, MouseMotionListen
         	return;
         }
         Dimension d = this.getSize();
-        double scalex = ((double)d.getWidth())/(maxx-minx);
-        double scaley = ((double)d.getHeight())/(maxy-miny);
+        double scalex = d.getWidth() /(maxx-minx);
+        double scaley = d.getHeight() /(maxy-miny);
 		if( MapPanel.zoomStack.empty()) {
 			//System.out.println(Geometry.scalex +" "+Geometry.scaley );
 			double sign = scaley*scalex > 0 ? 1 : -1;

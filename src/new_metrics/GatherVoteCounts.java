@@ -128,7 +128,7 @@ public class GatherVoteCounts {
 			InputStream inputStream = url.openStream();
 			StringBuilder textBuilder = new StringBuilder();
 			Reader reader = new BufferedReader(
-					new InputStreamReader(inputStream, Charset.forName(StandardCharsets.UTF_8.name())));
+					new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 			int c = 0;
 			while ((c = reader.read()) != -1) {
 				textBuilder.append((char) c);
@@ -145,7 +145,7 @@ public class GatherVoteCounts {
 			InputStream inputStream = new FileInputStream(path);
 			StringBuilder textBuilder = new StringBuilder();
 			Reader reader = new BufferedReader(
-					new InputStreamReader(inputStream, Charset.forName(StandardCharsets.UTF_8.name())));
+					new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 			int c = 0;
 			while ((c = reader.read()) != -1) {
 				textBuilder.append((char) c);

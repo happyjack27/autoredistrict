@@ -134,7 +134,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 				FileOutputStream fos = null;
 				try {
 					fos = new FileOutputStream(f);
-					fos.write(historyTA.getText().toString().getBytes());
+					fos.write(historyTA.getText().getBytes());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -187,8 +187,8 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 					        	
 					        	return;
 					        }*/
-				            start = ((JTextArea) scriptTA).getLineStartOffset(instruction_pointer);
-				            end   = ((JTextArea) scriptTA).getLineEndOffset(instruction_pointer);
+				            start = scriptTA.getLineStartOffset(instruction_pointer);
+				            end   = scriptTA.getLineEndOffset(instruction_pointer);
 				            line = text.substring(start, end);
 				            //System.out.println("My Line: "+ instruction_pointer+" " + line);
 				            //System.out.println("Start Position of Line: " + start);
@@ -270,8 +270,7 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 	public void addHistory( String s) {
 		String prefix = "";
 		if( mainFrame.evolving && !s.equals("GO")) {
-			prefix = ""
-					+"WHEN MUTATE_RATE "+((double)mainFrame.slider_mutation.getValue()/100.0)+"\n";
+			prefix = "WHEN MUTATE_RATE "+((double)mainFrame.slider_mutation.getValue()/100.0)+"\n";
 			indent = true;
 		}
 		
@@ -338,22 +337,18 @@ public class InstructionProcessor extends JDialog implements iDiscreteEventListe
 		}
 		@Override
 		public synchronized void run() {
-			scriptTA.setText(scriptTA.getText().toString()+s);
+			scriptTA.setText(scriptTA.getText() +s);
 			String[] new_instructions = s.split("\n");
-			for( int i = 0; i < new_instructions.length; i++) {
-				instructions.add(new_instructions[i]);
-			}
+            Collections.addAll(instructions, new_instructions);
 			eventOccured();
 		}
 	}
 	class ResetInstructions extends Thread {
 		@Override
 		public synchronized void run() {
-			String[] new_instructions = scriptTA.getText().toString().split("\n");
+			String[] new_instructions = scriptTA.getText().split("\n");
 			instructions.clear();
-			for( int i = 0; i < new_instructions.length; i++) {
-				instructions.add(new_instructions[i]);
-			}
+            Collections.addAll(instructions, new_instructions);
 			eventOccured();
 		}
 	}
@@ -457,10 +452,10 @@ SAVE
 		}
 
 		if( command.equals("INIT")) {
-			if(instruction_words[1].toUpperCase().equals("CONTIGUOUS")) {
+			if(instruction_words[1].equalsIgnoreCase("CONTIGUOUS")) {
 				mainFrame.comboBoxInitMethod.setSelectedItem("Contiguous");
 			}
-			if(instruction_words[1].toUpperCase().equals("RANDOM")) {
+			if(instruction_words[1].equalsIgnoreCase("RANDOM")) {
 				mainFrame.comboBoxInitMethod.setSelectedItem("Random");
 			}
 			for(ActionListener a: mainFrame.btnInit.getActionListeners()) {
@@ -468,7 +463,7 @@ SAVE
 			}
 		} else
 		if( command.equals("OPEN")) {
-			String dest =  instruction_words_original[1].replaceAll("\\[START PATH\\]",Download.getStartPath());;///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
+			String dest =  instruction_words_original[1].replaceAll("\\[START PATH\\]",Download.getStartPath());///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
 			dest =  dest.replaceAll("\\[START_PATH\\]",Download.getStartPath());
 			System.out.println(dest);
 			File f = new File(dest);
@@ -528,7 +523,7 @@ SAVE
 			//IMPORT BLOCKS "FN" FALSE TRUE CD113 CD113
 //	importBlockData(path+File.separator+abbr+"_Congress.csv", true, false, new String[]{"CD_BD"},new String[]{"CD_BD"},false);
 			
-			String dest =  instruction_words_original[2].replaceAll("\\[START PATH\\]",Download.getStartPath());;///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
+			String dest =  instruction_words_original[2].replaceAll("\\[START PATH\\]",Download.getStartPath());///*Download.getStartPath()+File.separator+*/instruction_words_original[1];
 			dest =  dest.replaceAll("\\[START_PATH\\]",Download.getStartPath());
 
 			Applet.mainFrame.importBlockData(
@@ -544,9 +539,7 @@ SAVE
 			String fk = instruction_words[3];
 			String pk = instruction_words[4];
 			String[] cols = new String[instruction_words.length-5];
-			for( int i = 0; i < cols.length; i++) {
-				cols[i] = instruction_words[i+5];
-			}
+            System.arraycopy(instruction_words, 5, cols, 0, cols.length);
 			mainFrame.importURL( url,  fk,  pk, cols);
 		} else
 		if( command.equals("IMPORT") && instruction_words[1].equals("POPULATION")) {
@@ -602,9 +595,7 @@ SAVE
 		} else
 		if( command.equals("ADD") && instruction_words[1].equals("FEATURES")) {
 			String[] ss = new String[instruction_words.length-3];
-			for( int i = 0; i < ss.length; i++) {
-				ss[i] = instruction_words[3+i];
-			}
+            System.arraycopy(instruction_words, 3, ss, 0, ss.length);
 			mainFrame.featureCollection.addFeatures(instruction_words[2], ss);
 		} else
 		if( command.equals("RESCALE") && instruction_words[1].equals("FEATURE")) {
@@ -746,9 +737,7 @@ SAVE
 			} else 
 		if( command.equals("IMPUTE")) {
 			String[] ss = new String[instruction_words.length-1];
-			for( int i = 0; i < ss.length; i++) {
-				ss[i] = instruction_words[i+1];
-			}
+            System.arraycopy(instruction_words, 1, ss, 0, ss.length);
 			mainFrame.impute(ss);
 		} else
 		if(command.equals("WHEN")) {
@@ -773,7 +762,7 @@ SAVE
 			} else 
 			if( instruction_words[1].equals("POPULATION_IMBALANCE")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
-				double current_value = ((double)mainFrame.featureCollection.ecology.population.get(0).getMaxPopDiff());
+				double current_value = mainFrame.featureCollection.ecology.population.get(0).getMaxPopDiff();
 				if( threshold < current_value) {
 					return;
 				}
@@ -781,7 +770,7 @@ SAVE
 			if( instruction_words[1].equals("COMPACTNESS")) {
 				double threshold = Double.parseDouble(instruction_words[2]);
 				DistrictMap dm = mainFrame.featureCollection.ecology.population.get(0);
-				double current_value = ((double)1.0/dm.getReciprocalIsoPerimetricQuotient());
+				double current_value = (1.0 /dm.getReciprocalIsoPerimetricQuotient());
 				if( threshold < current_value) {
 					return;
 				}
@@ -890,7 +879,7 @@ SAVE
 
 	public void queueInstructionsFromFile(String string) {
 		try {
-			queueInstructions(FileUtil.readStream(new FileInputStream(string)).toString());
+			queueInstructions(FileUtil.readStream(new FileInputStream(string)));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

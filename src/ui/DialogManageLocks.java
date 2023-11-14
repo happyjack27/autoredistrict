@@ -63,9 +63,7 @@ public class DialogManageLocks extends JDialog {
 				feat.properties.keySet().toArray(ss);
 				
 				Vector<String> sortable = new Vector<String>();
-				for( int i = 0; i < ss.length; i++) {
-					sortable.add(ss[i]);
-				}
+                Collections.addAll(sortable, ss);
 				Collections.sort(sortable);
 				sortable.toArray(ss);
 				
@@ -82,9 +80,7 @@ public class DialogManageLocks extends JDialog {
 				hash.keySet().toArray(keyoptions);
 				
 				sortable = new Vector<String>();
-				for( int i = 0; i < keyoptions.length; i++) {
-					sortable.add(keyoptions[i]);
-				}
+                Collections.addAll(sortable, keyoptions);
 				Collections.sort(sortable);
 				sortable.toArray(keyoptions);
 

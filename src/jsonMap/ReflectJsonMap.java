@@ -17,7 +17,7 @@ public class ReflectJsonMap<T> extends JsonMap{
 	public void post_deserialize(){
 		if( true) return;
 		@SuppressWarnings("unchecked")
-		Field[] fields = ((Class<T>) this.getClass()).getDeclaredFields();
+		Field[] fields = this.getClass().getDeclaredFields();
 		for(int i = 0; i < fields.length; i++){
 			Field f = fields[i];
 			String name = f.getName();
@@ -60,7 +60,7 @@ public class ReflectJsonMap<T> extends JsonMap{
 	public void pre_serialize(){
 		if( true) return;
 		@SuppressWarnings("unchecked")
-		Field[] fields = ((Class<T>) this.getClass()).getDeclaredFields();
+		Field[] fields = this.getClass().getDeclaredFields();
 		for(int i = 0; i < fields.length; i++){
 			Field f = fields[i];
 			String name = f.getName();
@@ -79,7 +79,7 @@ public class ReflectJsonMap<T> extends JsonMap{
 					put(name, "" + f.getFloat(this));
 				}
 				else if(type.equals(String.class)){
-					put(name, "" + (String) f.get(this));
+					put(name, String.valueOf(f.get(this)));
 				}
 				else if(type.equals(boolean.class)){
 					put(name, "" + f.getBoolean(this));

@@ -24,9 +24,7 @@ public class DialogSelectLayers extends DialogMultiColumnSelect {
 		
 		not_in = new Vector<String>();
 		in = new Vector<String>();
-		for( String s : map_headers) {
-			not_in.add(s);
-		}
+        Collections.addAll(not_in, map_headers);
 		
 		if( current != null) {
 			for( int i = 0; i < current.size(); i++) {

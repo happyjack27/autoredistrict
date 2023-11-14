@@ -211,9 +211,7 @@ public class Main {
 		for( int i = 0; i < Config.columns_to_transfer.length; i++) {
 			if( !block_indices.containsKey(Config.columns_to_transfer[i])) {
 				DBField[] dbf = new DBField[blocks.full_header.length+1];
-				for(int j = 0; j < blocks.full_header.length; j++) {
-					dbf[j] = blocks.full_header[j];
-				}
+                System.arraycopy(blocks.full_header, 0, dbf, 0, blocks.full_header.length);
 				dbf[dbf.length-1] = vtds.full_header[ivtd_elec_columns[i]].clone();//dbf[iblock_elec_columns[i]].clone();
 				block_indices.put(Config.columns_to_transfer[i], dbf.length-1);
 				blocks.full_header = dbf;
@@ -229,10 +227,8 @@ public class Main {
 			for( int i = 0; i < new_data.length; i++) {
 				String[] ss = blocks.data[i];
 				new_data[i] = new String[blocks.data[i].length + fields_to_append];
-				
-				for( int j = 0; j < ss.length; j++) {
-					new_data[i][j] = ss[j];
-				}				
+
+                System.arraycopy(ss, 0, new_data[i], 0, ss.length);
 			}
 			blocks.data = new_data;
 		}
@@ -252,9 +248,7 @@ public class Main {
 		for( int i = 0; i < Config.columns_to_transfer.length; i++) {
 			if( !vtd_indices.containsKey(Config.columns_to_transfer[i])) {
 				DBField[] dbf = new DBField[vtds.full_header.length+1];
-				for(int j = 0; j < vtds.full_header.length; j++) {
-					dbf[j] = vtds.full_header[j];
-				}
+                System.arraycopy(vtds.full_header, 0, dbf, 0, vtds.full_header.length);
 				dbf[dbf.length-1] = blocks.full_header[iblock_elec_columns[i]].clone();//dbf[ivtd_elec_columns[i]].clone();
 				vtd_indices.put(Config.columns_to_transfer[i], dbf.length-1);
 				vtds.full_header = dbf;
@@ -270,10 +264,8 @@ public class Main {
 			for( int i = 0; i < new_data.length; i++) {
 				String[] ss = vtds.data[i];
 				new_data[i] = new String[vtds.data[i].length + fields_to_append];
-				
-				for( int j = 0; j < ss.length; j++) {
-					new_data[i][j] = ss[j];
-				}				
+
+                System.arraycopy(ss, 0, new_data[i], 0, ss.length);
 			}
 			vtds.data = new_data;
 		}

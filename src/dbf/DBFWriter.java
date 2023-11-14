@@ -7,26 +7,26 @@ public class DBFWriter {
 
   BufferedOutputStream stream;
   int recCount;
-  DBField fields[];
+  DBField[] fields;
   String fileName;
   String encoding;
 
-  public DBFWriter(String s, DBField fields[]) throws Exception {
+  public DBFWriter(String s, DBField[] fields) throws Exception {
 	fileName = s;
 	init(new FileOutputStream(s), fields);
   }
  
-  public DBFWriter(OutputStream outputstream, DBField fields[]) throws Exception {
+  public DBFWriter(OutputStream outputstream, DBField[] fields) throws Exception {
     init(outputstream, fields);
   }
 
-  public DBFWriter(String s, DBField fields[], String s1) throws Exception {
+  public DBFWriter(String s, DBField[] fields, String s1) throws Exception {
 	fileName = s;
 	encoding = s1;
 	init(new FileOutputStream(s), fields);
   }
 
-  private void init(OutputStream outputstream, DBField fields[]) throws Exception {
+  private void init(OutputStream outputstream, DBField[] fields) throws Exception {
 	recCount = 0;
 	this.fields = fields;
 	stream = new BufferedOutputStream(outputstream);
@@ -39,7 +39,7 @@ public class DBFWriter {
   }
 
   private void writeHeader() throws Exception {
-    byte b[] = new byte[16];
+    byte[] b = new byte[16];
     b[0] = 3;
     Calendar calendar = Calendar.getInstance();
     b[1] = (byte) (calendar.get(1) - 1900);
@@ -70,7 +70,7 @@ public class DBFWriter {
   }
 
   private void writeFieldHeader(DBField jdbfield) throws Exception {
-    byte b[] = new byte[16];
+    byte[] b = new byte[16];
     String s = jdbfield.name;
     int i = s.length();
     if (i > 10) {
@@ -97,7 +97,7 @@ public class DBFWriter {
   }
 
 
-  public void addRecord(Object aobj[]) throws Exception {
+  public void addRecord(Object[] aobj) throws Exception {
     if (aobj.length != fields.length) {
       throw new Exception("Error adding record: Wrong number of values. Expected " + fields.length + ", got " + aobj.length + ".");
     }
@@ -105,20 +105,18 @@ public class DBFWriter {
     for (int j = 0; j < fields.length; j++) {
       i += fields[j].length;
     }
-    byte b[] = new byte[i];
+    byte[] b = new byte[i];
     int k = 0;
     for (int l = 0; l < fields.length; l++) {
 		String s = fields[l].format(aobj[l]);
-		byte abyte1[];
+		byte[] abyte1;
         if (encoding != null) {
           abyte1 = s.getBytes(encoding);
         }
         else {
           abyte1 = s.getBytes();
         }
-      for (int i1 = 0; i1 < fields[l].length; i1++) {
-        b[k + i1] = abyte1[i1];
-      }
+        if (fields[l].length >= 0) System.arraycopy(abyte1, 0, b, k + 0, fields[l].length);
       k += fields[l].length;
     }
 
@@ -134,7 +132,7 @@ public class DBFWriter {
 	stream.close();
 	RandomAccessFile randomaccessfile = new RandomAccessFile(fileName, "rw");
 	randomaccessfile.seek(4L);
-	byte b[] = new byte[4];
+	byte[] b = new byte[4];
 	b[0] = (byte) (recCount % 256);
 	b[1] = (byte) ( (recCount / 256) % 256);
 	b[2] = (byte) ( (recCount / 0x10000) % 256);

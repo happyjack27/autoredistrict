@@ -278,7 +278,7 @@ public class Metrics {
 			asym_results.add(d);
 			//System.out.println("running total "+expected_asymmetry);
 		}
-		expected_asymmetry /= (double)trials;
+		expected_asymmetry /= trials;
 
 		double mad = 0;
 		double var = 0;
@@ -287,8 +287,8 @@ public class Metrics {
 			mad += Math.abs(d);
 			var += d*d;
 		}
-		mad /= (double)(trials-1);
-		var /= (double)(trials-1);
+		mad /= trials-1;
+		var /= trials-1;
 		Collections.sort(asym_results);
 		asymmetry_90_low = asym_results.get(trials/20);
 		asymmetry_median = asym_results.get(trials/2);
@@ -328,7 +328,7 @@ public class Metrics {
 		double rep_majority = 0;
 		double dem_majority = 0;
 		for(int i = 0; i < seat_probs.length; i++) {
-			System.out.println(""+i+" seats: "+seat_probs[i]);
+			System.out.println(i+" seats: "+seat_probs[i]);
 			seat_expectation += seat_probs[i]*(double)i;
 			if( (double)i > threshold) {
 				rep_majority += seat_probs[i];
@@ -356,7 +356,7 @@ public class Metrics {
 		for( int i = 0; i < centered_district_betas.size(); i++) {
 			BetaDistribution b = centered_district_betas.get(i);
 			//avg_log_likelihood(double[] xs, double a, double b)
-			System.out.println(""+(i+1)+" alpha: "+b.getAlpha()+", beta: "+b.getBeta()+", ll: "+b.loglikelihood);
+			System.out.println((i+1)+" alpha: "+b.getAlpha()+", beta: "+b.getBeta()+", ll: "+b.loglikelihood);
 			if( b.loglikelihood == b.loglikelihood) {
 				total += b.loglikelihood;
 			} else {
@@ -620,17 +620,17 @@ public class Metrics {
 		double dem_adv = 0;
 		double rep_adv = 0;
 		for(int i = 0; i < trials; i++) {
-			double d = computeDisproportionality(this.election_samples[i]) * (double)num_districts;;
-			results.add(d);
+			double d = computeDisproportionality(this.election_samples[i]) * (double)num_districts;
+            results.add(d);
 			expected_mean += d;
 			expected_abs += Math.abs(d);
 			dem_adv += (d < 0) ? 1 : 0;
 			rep_adv += (d > 0) ? 1 : 0;
 		}
-		expected_mean /= (double)trials;
-		expected_abs /= (double)trials;
-		dem_adv /= (double)trials;
-		rep_adv /= (double)trials;
+		expected_mean /= trials;
+		expected_abs /= trials;
+		dem_adv /= trials;
+		rep_adv /= trials;
 		//expected_mean *= (double)num_districts;
 		//expected_abs *= (double)num_districts;
 		Collections.sort(results);
@@ -648,9 +648,9 @@ public class Metrics {
 		System.out.println("Chance of dem advantage: "+dem_adv);
 		System.out.println("Chance of rep advantage: "+rep_adv);
 		for(int i = 0; i < trials; i+= trials/10) {
-			System.out.println(""+i+": "+results.get(i));
+			System.out.println(i+": "+results.get(i));
 		}
-		System.out.println(""+(trials-1)+": "+results.get(trials-1));
+		System.out.println((trials-1)+": "+results.get(trials-1));
 		return results;
 		//binAndShow(results);
 	}
@@ -725,7 +725,7 @@ public class Metrics {
 				num_dem_seats++;
 			}
 		}
-		return ((double)num_dem_seats)/(double)sorted_dists.size();
+		return num_dem_seats /(double)sorted_dists.size();
 
 	}
 	public void binAndShow(Vector<Double> samples, String name) {
@@ -813,7 +813,7 @@ public class Metrics {
 			}
 		}
 		for( int i = 0; i < seat_probs.length; i++) {
-			System.out.println(""+i+": "+seat_probs[i]);
+			System.out.println(i+": "+seat_probs[i]);
 		}
 		System.out.println("dem majority likelihood: "+seats_dem);
 		System.out.println("rep majority likelihood: "+seats_rep);
@@ -897,7 +897,7 @@ public class Metrics {
 			}
 		}
 		for( int i = 0; i < seat_probs.length; i++) {
-			System.out.println(""+i+": "+seat_probs[i]);
+			System.out.println(i+": "+seat_probs[i]);
 		}
 		System.out.println("dem majority likelihood: "+seats_dem);
 		System.out.println("rep majority likelihood: "+seats_rep);

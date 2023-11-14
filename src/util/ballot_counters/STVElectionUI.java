@@ -79,9 +79,9 @@ public class STVElectionUI extends JFrame {
 	}
 	public void updateResults() {
 		boolean teir2 = true;//chckbxNewCheckBox.isSelected();
-		el2.use_droop =  !cbHare.isSelected();
-		el2.reset_ignores =  cbtemp.isSelected();
-		el2.ignore_fewest_votes = !cbfullorder.isSelected();
+		STVElection2.use_droop =  !cbHare.isSelected();
+		STVElection2.reset_ignores =  cbtemp.isSelected();
+		STVElection2.ignore_fewest_votes = !cbfullorder.isSelected();
 		
 		
 		Vector<STVBallot> tballots = new Vector<STVBallot>();
@@ -89,11 +89,11 @@ public class STVElectionUI extends JFrame {
 			tballots.add(new STVBallot(b.weight, b.getChoicesAsArray()));
 		}
 		Vector<Integer> winners =
-				teir2 ? el2.getWinners(tballots, Integer.parseInt(seatTF.getText()), Integer.parseInt(candidatesTF.getText()))
-						: el.getWinners(tballots, Integer.parseInt(seatTF.getText()), Integer.parseInt(candidatesTF.getText()))
+				teir2 ? STVElection2.getWinners(tballots, Integer.parseInt(seatTF.getText()), Integer.parseInt(candidatesTF.getText()))
+						: STVElection.getWinners(tballots, Integer.parseInt(seatTF.getText()), Integer.parseInt(candidatesTF.getText()))
 						;
 		String sw = "";
-		textArea.setText(teir2 ? el2.reasoning : el.reasoning);
+		textArea.setText(teir2 ? STVElection2.reasoning : STVElection.reasoning);
 		for( int i = 0; i < winners.size(); i++) {
 			if( i > 0) {
 				sw +=", ";

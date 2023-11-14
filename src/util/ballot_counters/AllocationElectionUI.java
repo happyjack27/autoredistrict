@@ -74,10 +74,10 @@ public class AllocationElectionUI extends JFrame {
 			tballots.add(new AllocationBallot(b.weight, b.allocs));
 		}
 		int[] winners =
-						el.getWinners(tballots, Integer.parseInt(candidatesTF.getText()),Integer.parseInt(seatTF.getText()))
+						AllocationElection.getWinners(tballots, Integer.parseInt(candidatesTF.getText()),Integer.parseInt(seatTF.getText()))
 						;
 		String sw = "";
-		textArea.setText( el.reasoning);
+		textArea.setText(AllocationElection.reasoning);
 		for( int i = 0; i < winners.length; i++) {
 			if( i > 0) {
 				sw +=", ";

@@ -55,7 +55,7 @@ public class FrameSeatsVotesChart extends JFrame {
 			return (int)((x-100)*multiplier+100);
 		}
 		public int scale_width(double x) {
-			return (int)Math.round(x*(double)multiplier);
+			return (int)Math.round(x* multiplier);
 		}
 	    public void paintComponent(Graphics graphics0) {
 	    	try {

@@ -86,23 +86,23 @@ public class FramePieCharts extends JFrame {
 			    int h = 100;
 			    
 			    
-			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_party_votes,xs*2+w*0,5,100,100,null);
-			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_party_seats,xs*4+w*1,5,100,100,null);
+			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_party_votes,xs*2+ 0,5,100,100,null);
+			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_party_seats,xs*4+ w,5,100,100,null);
 			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_party_packingm_byvoter,xs*6+w*2,5,100,100,null);
 			    
-			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_pop,xs*2+w*0,5+h*1+ys*1,100,100,null);
-			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_descr,xs*4+w*1,5+h*1+ys*1,100,100,null);
-			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_packingm_byvoter,xs*6+w*2,5+h*1+ys*1,100,100,null);
+			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_pop,xs*2+ 0,5+ h + ys,100,100,null);
+			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_descr,xs*4+ w,5+ h + ys,100,100,null);
+			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_packingm_byvoter,xs*6+w*2,5+ h + ys,100,100,null);
 			    
 			    graphics.setColor(Color.black);
 			    
-			    graphics.drawString("Partisan votes", xs*2+w*0+w/2 - graphics.getFontMetrics().stringWidth("Partisan votes")/2, 5+h+20);
-			    graphics.drawString("Partisan seats", xs*4+w*1+w/2 - graphics.getFontMetrics().stringWidth("Partisan seats")/2, 5+h+20);
+			    graphics.drawString("Partisan votes", xs*2+ 0 +w/2 - graphics.getFontMetrics().stringWidth("Partisan votes")/2, 5+h+20);
+			    graphics.drawString("Partisan seats", xs*4+ w +w/2 - graphics.getFontMetrics().stringWidth("Partisan seats")/2, 5+h+20);
 			    graphics.drawString("Packing / cracking", xs*6+w*2+w/2 - graphics.getFontMetrics().stringWidth("Packing / cracking")/2, 5+h+20);
 			    
-			    graphics.drawString("Minority population", xs*2+w*0+w/2 - graphics.getFontMetrics().stringWidth("Minority population")/2, 5+h*2+ys*1+20);
-			    graphics.drawString("Minority seats", xs*4+w*1+w/2 - graphics.getFontMetrics().stringWidth("Minority seats")/2, 5+h*2+ys*1+20);
-			    graphics.drawString("Packing / cracking", xs*6+w*2+w/2 - graphics.getFontMetrics().stringWidth("Packing / cracking")/2, 5+h*2+ys*1+20);
+			    graphics.drawString("Minority population", xs*2+ 0 +w/2 - graphics.getFontMetrics().stringWidth("Minority population")/2, 5+h*2+ ys +20);
+			    graphics.drawString("Minority seats", xs*4+ w +w/2 - graphics.getFontMetrics().stringWidth("Minority seats")/2, 5+h*2+ ys +20);
+			    graphics.drawString("Packing / cracking", xs*6+w*2+w/2 - graphics.getFontMetrics().stringWidth("Packing / cracking")/2, 5+h*2+ ys +20);
 
 			    /*
 			    graphics.drawImage(MainFrame.mainframe.panelStats.pie_eth_descr,0,0,100,100,null);

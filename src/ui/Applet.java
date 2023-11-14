@@ -41,11 +41,10 @@ public class Applet extends JApplet {
     		// failed california connectioin reset
     		//failed kentucky , new hampshire - states with spaces, rhode island, texas
 	    	for( int i = 0; i < Download.states.length; i++) {
-	    		if( false
-	    				|| Download.states[i].equals("Kentucky") //not found - did not participate in census
-	    				|| Download.states[i].equals("Rhode Island") //not found --?
-	    				|| Download.states[i].equals("California") //reset
-	    				||Download.states[i].equals("Texas") //reset
+                //not found - did not participate in census
+                //not found --?
+                //reset
+                if(Download.states[i].equals("Kentucky") || Download.states[i].equals("Rhode Island") || Download.states[i].equals("California") || Download.states[i].equals("Texas") //reset
 	    				) {
 	    			continue;
 	    		}
@@ -119,8 +118,7 @@ public class Applet extends JApplet {
     	String version = System.getProperty("java.version");
     	System.out.println("jre version: "+version);
     	if( versionCompare(version,"1.5") < 0) {
-    		JOptionPane.showMessageDialog(null, ""
-    				+"You are running an out-of-date version of Java."
+    		JOptionPane.showMessageDialog(null, "You are running an out-of-date version of Java."
     				+"\nWith this current installed version of Java, the program will not be able to allocate enough memory."
     				+"\n"
     				+"\nPlease upgrade your java version."

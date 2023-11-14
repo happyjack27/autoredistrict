@@ -51,7 +51,7 @@ public class ReadCsvAndGatherMetrics {
 						continue;
 					}
 					System.out.println(f4.getAbsolutePath());
-					config.assignment_file_path = f4.getAbsolutePath(); 
+					Config.assignment_file_path = f4.getAbsolutePath();
 					process();
 				}				
 			}
@@ -70,25 +70,25 @@ public class ReadCsvAndGatherMetrics {
 		//wi_maxrep_dem,wi_maxrep_rep,
 		String type = "AutoRedistrict_Fair";
 		Metrics m = new Metrics(BetaStuff.wi_fair_dem,BetaStuff.wi_fair_rep,8);
-		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";;
-		this.displayInfoForMetric(m);
+		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";
+        this.displayInfoForMetric(m);
 		
 		
 		type = "AutoRedistrict_Actual";
 		m = new Metrics(BetaStuff.wi_actual_dem,BetaStuff.wi_actual_rep,8);
-		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";;
-		this.displayInfoForMetric(m);
+		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";
+        this.displayInfoForMetric(m);
 		//System.exit(0);
 		
 		type = "AutoRedistrict_MaxRepGerrymander";
 		m = new Metrics(BetaStuff.wi_maxrep_dem,BetaStuff.wi_maxrep_rep,8);
-		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";;
-		this.displayInfoForMetric(m);		
+		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";
+        this.displayInfoForMetric(m);
 		
 		type = "AutoRedistrict_MaxDemGerrymander";
 		m = new Metrics(BetaStuff.wi_maxdem_dem,BetaStuff.wi_maxdem_rep,8);
-		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";;
-		this.displayInfoForMetric(m);		
+		Config.assignment_file_path = Config.base_path+"assignment_files\\2011 wards\\us_congress\\"+type+".csv";
+        this.displayInfoForMetric(m);
 		
 	}
 	public void process() {
@@ -103,17 +103,17 @@ public class ReadCsvAndGatherMetrics {
 	public Metrics getMetrics() {
 		
 		//read files
-		vtds = util.FileUtil.readDBF(config.vtd_file_path);
-		assignments = util.FileUtil.readDelimited(new File(config.assignment_file_path), ",","\n");
+		vtds = util.FileUtil.readDBF(Config.vtd_file_path);
+		assignments = util.FileUtil.readDelimited(new File(Config.assignment_file_path), ",","\n");
 		assignment_headers = assignments.get(0);
 		assignments.remove(0);
 		for( int i = 0; i < assignment_headers.length; i++) {
 			assignment_headers[i] = assignment_headers[i].replaceAll("\"","").trim();
 			System.out.println(":"+assignment_headers[i]);
-			if( assignment_headers[i].equals(config.assignment_file_assignment_column)) {
+			if( assignment_headers[i].equals(Config.assignment_file_assignment_column)) {
 				iassignment_file_assignment_column = i;				
 			}
-			if( assignment_headers[i].equals(config.assignment_file_geoid_column)) {
+			if( assignment_headers[i].equals(Config.assignment_file_geoid_column)) {
 				iassignment_file_geoid_column = i;
 			}
 		}
@@ -122,7 +122,7 @@ public class ReadCsvAndGatherMetrics {
 		vtd_districts = new HashMap<String,District>();
 		for( int i = 0; i < vtds.data.length; i++) {
 			String[] ss  = vtds.data[i];
-			vtd_districts.put(ss[vtds.nameToIndex.get(config.vtd_file_geoid_column)],new District(i));
+			vtd_districts.put(ss[vtds.nameToIndex.get(Config.vtd_file_geoid_column)],new District(i));
 		}
 		
 		//create election districts
@@ -137,11 +137,11 @@ public class ReadCsvAndGatherMetrics {
 		}
 		
 		//accumulate election vote totals
-		double[][][] elec_counts = new double[2][config.vtd_file_election_columns[0].length][num_election_districts];
+		double[][][] elec_counts = new double[2][Config.vtd_file_election_columns[0].length][num_election_districts];
 		for( int i = 0; i < 2; i++) {
-			for( int j = 0; j < config.vtd_file_election_columns[0].length; j++) {
+			for(int j = 0; j < Config.vtd_file_election_columns[0].length; j++) {
 				double[] vote_counts = elec_counts[i][j];
-				int vtd_elec_col = vtds.nameToIndex.get(config.vtd_file_election_columns[i][j]);
+				int vtd_elec_col = vtds.nameToIndex.get(Config.vtd_file_election_columns[i][j]);
 				for( int k = 0; k < assignments.size(); k++) {
 					String[] ss = assignments.get(k);
 					int vtd_index = vtd_districts.get(ss[iassignment_file_geoid_column]).index_in_file;
@@ -157,7 +157,7 @@ public class ReadCsvAndGatherMetrics {
 	}
 	
 	public void displayInfoForMetric(Metrics actual) {
-		String file = config.assignment_file_path;
+		String file = Config.assignment_file_path;
 		file = file.substring(0,file.indexOf("."));
 		File f = new File(file);
 		try { f.mkdir(); } catch (Exception ex) { }

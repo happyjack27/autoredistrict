@@ -1,7 +1,7 @@
 package jsonMap;
 
 public interface iJsonMap{
-	public JsonMap instantiateObject(String key);
-	public void post_deserialize();
-	public void pre_serialize();
+	JsonMap instantiateObject(String key);
+	void post_deserialize();
+	void pre_serialize();
 }

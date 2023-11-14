@@ -397,10 +397,8 @@ EXPORT STATS
 EXIT
 EXIT
  			 */
- 			String s = ""
- 					
- 					//+"IMPORT POPULATION\n"
- 					+"IMPORT URL ftp://autoredistrict.org/pub/2012%20Pres%20results%20by%202012%20CDs/[FIPS].csv CD_2010A CD_2010A PRES12_DEM PRES12_REP\n"
+ 			//+"IMPORT POPULATION\n"
+ 			String s = "IMPORT URL ftp://autoredistrict.org/pub/2012%20Pres%20results%20by%202012%20CDs/[FIPS].csv CD_2010A CD_2010A PRES12_DEM PRES12_REP\n"
  					+"COPY FEATURE PRES12_DEM PRES12_D50\n"
  					+"COPY FEATURE PRES12_REP PRES12_R50\n"
  					+"RESCALE ELECTIONS\n"
@@ -422,8 +420,7 @@ EXIT
  					+"EXIT\n"
  					+"EXIT\n";
 
- 					;
- 			sb.append(s);
+            sb.append(s);
  			//appendExportHare(sb,i);
  			
  			//appendExportEmbedded(sb,i);
@@ -505,7 +502,7 @@ EXIT
 			sb.append("STOP\n");
 
 			if( Download.states[i].equals("Texas") || Download.states[i].equals("New York")  || Download.states[i].equals("Virginia") || Download.states[i].equals("New Jersey")) {
-			if( false && Download.apportionments[i] > 5) {
+			if(false) {
 				sb.append("SET WEIGHT DESCRIPTIVE 0.45\n");
 				sb.append("SET EVOLUTION POPULATION 200\n");
 				sb.append("SET ELECTION COLUMNS PRES12_D50 PRES12_R50\n");
@@ -576,7 +573,7 @@ EXIT
 				*/
 			
 
-			if( hit || true) {
+			if(true) {
 				if( Download.apportionments[i] <= 5) {
 					sb.append("SET DISTRICTS SEATS_PER_DISTRICT [SEATS]\n");//"+Download.apportionments[i]+"\n"); 			
 				} else {
@@ -656,7 +653,7 @@ EXIT
 			sb.append("\tEXIT\n");
 			*/
 
-			System.out.println(sb.toString());
+			System.out.println(sb);
 
 			
 			File f = new File(base_dir+"subscript"+i);
@@ -690,13 +687,11 @@ EXIT
 	}
 	public static void import2010(StringBuffer sb, int i) {
 		if( Download.apportionments[i] == 1) {
-			sb.append(""
-					+"\nCOPY FEATURE CD_BD CD_2010"
+			sb.append("\nCOPY FEATURE CD_BD CD_2010"
 					+"\nSAVE"
 					);			
 		} else {
-			sb.append(""
-					+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+			sb.append("\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
 					+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
 					+"\nSET DISTRICTS COLUMN CD113FP"
 					+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
@@ -715,8 +710,7 @@ EXIT
 					*/
 					);
 		}
-		sb.append(""
-				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+		sb.append("\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
 				+"\nSET DISTRICTS COLUMN CD_2010"
 				//+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
 				+"\nEXPORT"
@@ -737,8 +731,7 @@ EXIT
 ./sc: line 99: cd: /home/autotrader/autoredistrict_data_cd113/Wyoming/2010/CD_2010A/: No such file or directory
 */
 	public static void main(String[] args) {
-		System.out.println(""
-				+"\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
+		System.out.println("\nEXTRACT \"ftp://ftp2.census.gov/geo/tiger/TIGERrd13/CD113/tl_rd13_[FIPS]_cd113.zip\" CD113"
 				+"\nOPEN \"CD113/tl_rd13_[FIPS]_cd113.shp\""
 				+"\nSET DISTRICTS COLUMN CD113FP"
 				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
@@ -820,12 +813,8 @@ EXIT
 			String[] out = new String[s1+s2];
 			String[] vs = vsum.get(i);
 			String[] vd = vdetail.get(i);
-			for( int j = 0; j < s1; j++ ) {
-				out[j] = vs[j];
-			}
-			for( int j = 0; j < s2; j++ ) {
-				out[s1+j] = vd[j];
-			}
+            System.arraycopy(vs, 0, out, 0, s1);
+            System.arraycopy(vd, 0, out, s1 + 0, s2);
 			vmerged.add(out);
 		}
 		//System.out.println("showing...");
@@ -904,7 +893,7 @@ EXIT
 		};
 		v.add(renames);
 		try {
-			String filestring = FileUtil.readStream(new FileInputStream(file)).toString();
+			String filestring = FileUtil.readStream(new FileInputStream(file));
 			String[] lines = filestring.split("\n");
 			System.out.println("found "+lines.length+" lines");
 			
@@ -990,7 +979,7 @@ EXIT
 		};
 		v.add(renames);
 		try {
-			String filestring = FileUtil.readStream(new FileInputStream(sum_file)).toString();
+			String filestring = FileUtil.readStream(new FileInputStream(sum_file));
 			String[] lines = filestring.split("\n");
 			for(int j = 0; j < renames.length; j++) {
 				//System.out.print("["+j+": "+renames[j]+"]");
@@ -1311,10 +1300,9 @@ LOAD [FIPS]] 2010 2012
 		String state = Download.states[i];
 		sb.append("IMPORT URL http://autoredistrict.org/all50/version3/CD_PRES/[STATE]/2010/CD_FV/vtd_data.txt GEOID10 GEOID10 CD_FV2\n".replaceAll("\\[STATE\\]",state.replaceAll(" ","%20")));
 
-		sb.append(""
-				//+"\nCOPY FEATURE CD_FV CD_FV2"
-				//+"\nCOPY FEATURE CD_BD CD_SM"
-				+"\nSAVE"				
+		//+"\nCOPY FEATURE CD_FV CD_FV2"
+		//+"\nCOPY FEATURE CD_BD CD_SM"
+		sb.append("\nSAVE"
 				//+"\nEXIT"
 				
 				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
@@ -1323,8 +1311,7 @@ LOAD [FIPS]] 2010 2012
 			);
 		
 			if( Download.apportionments[i] > 5) {
-					sb.append(""
-				+"\nEXIT"
+					sb.append("\nEXIT"
 				+"\nEXIT"
 					
 					+"\nSET WEIGHT DESCRIPTIVE 1.0"
@@ -1341,8 +1328,7 @@ LOAD [FIPS]] 2010 2012
 					);
 				}
 	
-	sb.append(""
-				+"\nSTOP"
+	sb.append("\nSTOP"
 				+"\nSAVE"
 				+"\nEXPORT"
 				+"\nEXPORT NATIONAL"
@@ -1350,13 +1336,11 @@ LOAD [FIPS]] 2010 2012
 				+"\nEXIT"
 			);
 				
-			sb.append(""
-				+"\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
+			sb.append("\nSET ELECTION COLUMNS PRES12_D50 PRES12_R50"
 				+"\nSET DISTRICTS COLUMN CD_SM"
 				);
 				if( Download.apportionments[i] > 1) {
-					sb.append(""
-					+"\nSET WEIGHT DESCRIPTIVE 0.5"
+					sb.append("\nSET WEIGHT DESCRIPTIVE 0.5"
 					+"\nSET WEIGHT PROPORTIONAL 0.0"
 					+"\nSET WEIGHT PARTISAN 0.5"
 					+"\nSET EVOLUTION MUTATE_RATE 1.0"
@@ -1373,8 +1357,7 @@ LOAD [FIPS]] 2010 2012
 					+"\nSAVE"
 					);
 				}
-				sb.append(""
-				+"\nEXPORT"
+				sb.append("\nEXPORT"
 				+"\nEXPORT NATIONAL"
 				);
 				/*
@@ -1385,8 +1368,7 @@ LOAD [FIPS]] 2010 2012
 				+"\nEXPORT BLOCKS \"CD113/blocks.txt\""
 				);
 				*/
-		sb.append(""
-				+"\nEXIT"
+		sb.append("\nEXIT"
 				+"\nEXIT"
 		);
 	}

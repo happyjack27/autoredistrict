@@ -13,7 +13,7 @@ public class CS_MTV_Approval extends CS_MTV {
 		for( MultiBallot m : multi_ballots) {
 			double[] dd = new double[m.n_votes.length];
 			for( int i = 0; i < dd.length; i++) {
-				dd[i] = (double)m.approval[i];
+				dd[i] = m.approval[i];
 			}
 			dballots.add(dd);
 			weights.add(m.weight);

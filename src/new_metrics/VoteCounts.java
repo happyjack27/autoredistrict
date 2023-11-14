@@ -1,12 +1,12 @@
 package new_metrics;
 
 public interface VoteCounts {
-	public static double[][] template = 
+	double[][] template =
 			new double[][]{
 				new double[]{
 				},
 	};
-	public static double[][] wi_maxdem_dem = 
+	double[][] wi_maxdem_dem =
 			new double[][]{
 				new double[]{
 						199691,
@@ -43,7 +43,7 @@ public interface VoteCounts {
 						130377,
 				}
 	};
-	public static double[][] wi_maxdem_rep = 
+	double[][] wi_maxdem_rep =
 			new double[][]{
 				new double[]{
 						128024,
@@ -80,7 +80,7 @@ public interface VoteCounts {
 						225410,
 					}
 	};
-	public static double[][] wi_maxrep_dem = 
+	double[][] wi_maxrep_dem =
 			new double[][]{
 				new double[]{
 						159130,
@@ -115,7 +115,7 @@ public interface VoteCounts {
 						131649,
 				}
 	};
-	public static double[][] wi_maxrep_rep = 
+	double[][] wi_maxrep_rep =
 			new double[][]{
 				new double[]{
 						194642,
@@ -153,7 +153,7 @@ public interface VoteCounts {
 					}
 	};
 
-	public static double[][] wi_fair_dem = 
+	double[][] wi_fair_dem =
 			new double[][]{
 				new double[]{
 						145853,
@@ -190,7 +190,7 @@ public interface VoteCounts {
 						133757,
 				},
 			};
-	public static double[][] wi_fair_rep = 
+	double[][] wi_fair_rep =
 			new double[][]{
 				new double[]{
 						215868,
@@ -228,7 +228,7 @@ public interface VoteCounts {
 				}
 			};
 			
-	public static double[][] wi_actual_dem = 
+	double[][] wi_actual_dem =
 			new double[][]{
 				new double[]{
 						158414,
@@ -261,7 +261,7 @@ public interface VoteCounts {
 						135683,
 				},
 			};
-		public static double[][] wi_actual_rep = 
+		double[][] wi_actual_rep =
 			new double[][]{
 				new double[]{
 						200423,

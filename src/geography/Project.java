@@ -63,7 +63,7 @@ public class Project extends ReflectJsonMap<Project> {
 
 
 		if( containsKey("equalize_turnout")) {
-			Settings.adjust_vote_to_population = getString("equalize_turnout").trim().toLowerCase().equals("true");
+			Settings.adjust_vote_to_population = getString("equalize_turnout").trim().equalsIgnoreCase("true");
 		} else { System.out.println("equalize_turnout not found"); }
 	    
 		System.out.println("found keys:");
@@ -179,7 +179,7 @@ public class Project extends ReflectJsonMap<Project> {
 	}
 	
 	boolean isEsriSapefile() {
-		return source_file != null && source_file.substring(source_file.length()-4).trim().toLowerCase().equals(".shp");
+		return source_file != null && source_file.substring(source_file.length()-4).trim().equalsIgnoreCase(".shp");
 	}
 
 	@Override

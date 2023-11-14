@@ -31,7 +31,7 @@ public class StatePlaneCoordinates {
     private static final double ESQ = (F + F - F * F);
     private static final double E   = StrictMath.sqrt(ESQ);
 
-    private static Map<Integer, double[]> ZONES = new WeakHashMap<Integer, double[]>();
+    private static final Map<Integer, double[]> ZONES = new WeakHashMap<Integer, double[]>();
 
     static {
         // ****     403      California III (LAMBERT CONIC PROJECTION)
@@ -217,7 +217,7 @@ public class StatePlaneCoordinates {
 
         // somewhere in california
         System.out.println("California");
-        double d1[] = toLatLng(feet2Meters * 6351504, feet2Meters * 2153727, 403);
+        double[] d1 = toLatLng(feet2Meters * 6351504, feet2Meters * 2153727, 403);
         System.out.println("lat should be 37.9075149470656, and is " + d1[1]);
         System.out.println("lon should be -121.2284594353128, and is " + d1[0]);
 
@@ -228,7 +228,7 @@ public class StatePlaneCoordinates {
         // lat 25.6159392
         // lon -080.5839482
         System.out.println("Grossman Hammock");
-        double d2[] = toLatLng(feet2Meters * 793261, feet2Meters * 466320.406, 901);
+        double[] d2 = toLatLng(feet2Meters * 793261, feet2Meters * 466320.406, 901);
         System.out.println("lat should be 25.6159392, and is " + d2[1]);
         System.out.println("lon should be -080.5839482, and is " + d2[0]);
 
@@ -238,7 +238,7 @@ public class StatePlaneCoordinates {
         // lat 29.611670
         // lon -82.298584
         System.out.println("Gainesville");
-        double d3[] = toLatLng(feet2Meters * 2668020.416, feet2Meters * 229201.881, 903);
+        double[] d3 = toLatLng(feet2Meters * 2668020.416, feet2Meters * 229201.881, 903);
         System.out.println("lat should be 29.611670, and is " + d3[1]);
         System.out.println("lon should be -82.298584, and is " + d3[0]);
     }

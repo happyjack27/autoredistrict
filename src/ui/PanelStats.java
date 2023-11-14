@@ -67,9 +67,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
     	ImageFilter filter = new RGBImageFilter() {
 
     		// the color we are looking for... Alpha bits are set to opaque
-    		public int markerRGB = color.getRGB() | 0xFF000000;
+    		public final int markerRGB = color.getRGB() | 0xFF000000;
 
-    		public final int filterRGB(int x, int y, int rgb) {
+    		public int filterRGB(int x, int y, int rgb) {
     			if ((rgb | 0xFF000000) == markerRGB) {
     				// Mark the alpha bits as zero - transparent
     				return 0x00FFFFFF & rgb;
@@ -424,14 +424,14 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				try {
 					elec_counts[i] = 0;
 					vote_counts[i] = 0;
-					dcolumns[i+16] = ""+cands.get(i)+" vote %";
-					dcolumns[i+16+Settings.num_candidates] = ""+cands.get(i)+" votes";
+					dcolumns[i+16] = cands.get(i)+" vote %";
+					dcolumns[i+16+Settings.num_candidates] = cands.get(i)+" votes";
 				} catch (Exception ex) { }
 			}
 			for( int i = 0; i < dem_col_names.length; i++) {
 				try {
-				dcolumns[i+16+Settings.num_candidates*2] = ""+dem_col_names[i]+" %";
-				dcolumns[i+16+Settings.num_candidates*2+dem_col_names.length] = ""+dem_col_names[i]+" pop";
+				dcolumns[i+16+Settings.num_candidates*2] = dem_col_names[i]+" %";
+				dcolumns[i+16+Settings.num_candidates*2+dem_col_names.length] = dem_col_names[i]+" pop";
 			} catch (Exception ex) { }
 			}
 			
@@ -497,7 +497,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		   	    	}
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					winner += ""+((int)result[1][j])+",";
+					winner += ((int)result[1][j])+",";
 					elec_counts[j] += result[1][j];
 					vote_counts[j] += result[0][j];
 					total += result[0][j];
@@ -520,7 +520,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					wasted_0 += result[0][0] - (result[0][0] >= needed ? needed : 0);
 					wasted_1 += result[0][1] - (result[0][1] >= needed ? needed : 0);
 					pvi = 100.0*(result[0][0] >= needed ? result[0][0] - needed : result[0][1] - needed)/total_votes;
-					double fv_pvi = (double)(result[0][0]-result[0][1])/(double)total_votes; 
+					double fv_pvi = (result[0][0]-result[0][1]) / total_votes;
 					fv_pvi = (fv_pvi+Settings.fv_pvi_adjust)/2.0;
 					fv_pviw = fv_pvi > 0 ? "D+"+integer.format((int)Math.round(100*fv_pvi)) : "R+"+integer.format((int)Math.round(-100*fv_pvi))  ;
 					if( !is_uncontested) {
@@ -550,8 +550,8 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				//String winner = ""+iwinner;
 				ddata[i][0] = ""+(i+1);
 				ddata[i][1] = integer.format(d.getPopulation());
-				ddata[i][2] = ""+winner;
-				ddata[i][3] = ""+pviw;
+				ddata[i][2] = winner;
+				ddata[i][3] = pviw;
 				//ddata[i][4] = ""+fv_pviw;
 				
 				ddata[i][4] = ""+dm.vote_gap_by_district[i];
@@ -566,7 +566,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 				ddata[i][9] = ""+seats[3];
 				ddata[i][10] = ""+seats[4];
 				
-				ddata[i][11] = ""+integer.format(d.getPopulation()/Settings.seats_in_district(i));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
+				ddata[i][11] = integer.format(d.getPopulation() / Settings.seats_in_district(i));//  decimal.format(self_entropy*conversion_to_bits)+" bits";
 				ddata[i][12] = ""+d.iso_quotient;
 				ddata[i][13] = ""+d.area;
 				ddata[i][14] = ""+d.paired_edge_length;
@@ -578,15 +578,15 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					ddata[i][j+16] = ""+(result[0][j]/total);
 				}
 				for( int j = 0; j < result[0].length; j++) {
-					ddata[i][j+16+Settings.num_candidates] = ""+integer.format(result[0][j]);
+					ddata[i][j+16+Settings.num_candidates] = integer.format(result[0][j]);
 				}	
 				for( int j = 0; j < dem_col_names.length; j++) {
-					ddata[i][j+16+Settings.num_candidates*2] = ""+decimal.format(demo_pct[i][j]);
+					ddata[i][j+16+Settings.num_candidates*2] = decimal.format(demo_pct[i][j]);
 					votes_by_dem[j] += total_votes*demo_pct[i][j];
 					vote_margins_by_dem[j] += dm.vote_gap_by_district[i]*demo_pct[i][j];
 				}	
 				for( int j = 0; j < dem_col_names.length; j++) {
-					ddata[i][j+16+Settings.num_candidates*2+dem_col_names.length] = ""+integer.format(demo[i][j]);
+					ddata[i][j+16+Settings.num_candidates*2+dem_col_names.length] = integer.format(demo[i][j]);
 				}	
 				} catch (Exception ex) {
 					System.out.println("ex stats 1 "+ex);
@@ -664,30 +664,30 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 
 			String[] scolumns = new String[]{"Value","Measure"};
 			String[][] sdata = new String[][]{
-					new String[]{""+decimal.format(1.0/featureCollection.ecology.seconds_per_iter),"Iterations per second"},
+					new String[]{decimal.format(1.0 / featureCollection.ecology.seconds_per_iter),"Iterations per second"},
 					new String[]{""+(1.0/dm.fairnessScores[0]),"Compactness (isoperimetric quotient)"},
-					new String[]{""+integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
-					new String[]{""+decimal.format(dm.getMaxPopDiff()*100.0),"Population max deviation (%)"},
-					new String[]{""+decimal.format(dm.getMeanPopDiff()*100.0),"Population mean deviation (%)"},
-					Settings.reduce_splits && dm.countCountySplitsInteger() > 0 ? new String[]{""+integer.format(dm.countCountySplitsInteger()),"County splits"} : new String[]{"",""},	
-					Settings.reduce_splits && dm.countMuniSplitsInteger() > 0 ? new String[]{""+integer.format(dm.countMuniSplitsInteger()),"Muni splits"} : new String[]{"",""},	
+					new String[]{integer.format(dm.fairnessScores[3]),"Disconnected population (count)"},
+					new String[]{decimal.format(dm.getMaxPopDiff() * 100.0),"Population max deviation (%)"},
+					new String[]{decimal.format(dm.getMeanPopDiff() * 100.0),"Population mean deviation (%)"},
+					Settings.reduce_splits && dm.countCountySplitsInteger() > 0 ? new String[]{integer.format(dm.countCountySplitsInteger()),"County splits"} : new String[]{"",""},
+					Settings.reduce_splits && dm.countMuniSplitsInteger() > 0 ? new String[]{integer.format(dm.countMuniSplitsInteger()),"Muni splits"} : new String[]{"",""},
 					new String[]{"",""},
-					new String[]{""+decimal.format(dm.fairnessScores[12]),"Specific Asymmetry"},
-					new String[]{""+decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
-					new String[]{""+decimal.format(dm.get_partisan_gerrymandering()),"Packing/cracking asymmetry (%)"},
-					new String[]{""+integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},
-					new String[]{""+decimal.format(dm.calcDisproporionality()),"Disproporionality"},
+					new String[]{decimal.format(dm.fairnessScores[12]),"Specific Asymmetry"},
+					new String[]{decimal.format(dm.fairnessScores[7]),"Seats / vote asymmetry"},
+					new String[]{decimal.format(dm.get_partisan_gerrymandering()),"Packing/cracking asymmetry (%)"},
+					new String[]{integer.format(dm.total_vote_gap),"Competitiveness (victory margin)"},
+					new String[]{decimal.format(dm.calcDisproporionality()),"Disproporionality"},
 					//new String[]{""+decimal.format(dm.fairnessScores[8]),"Representation imbalance (global)"},
-					new String[]{""+decimal.format(dm.getRacialVoteDilution()),"Racial vote dilution"},
+					new String[]{decimal.format(dm.getRacialVoteDilution()),"Racial vote dilution"},
 					new String[]{"",""},
 					//new String[]{""+integer.format(wasted_votes),"Wasted votes (count)"},
 					//new String[]{""+decimal.format(dm.fairnessScores[1]*conversion_to_bits),"Representation imbalance (local)"},
-					new String[]{""+decimal.format(egap),"Efficiency gap (pct)"},
-					new String[]{""+decimal.format(0.01*egap*(double)Settings.num_districts),"Adj. efficiency gap (seats)"},
+					new String[]{decimal.format(egap),"Efficiency gap (pct)"},
+					new String[]{decimal.format(0.01 * egap * (double) Settings.num_districts),"Adj. efficiency gap (seats)"},
 					//new String[]{""+decimal.format(total_pvi / counted_districts),"Avg. PVI"},
 					//new String[]{""+integer.format(num_competitive),"Competitive elections (< 5 PVI)"},
 					//new String[]{""+decimal.format(dm.fairnessScores[4]*conversion_to_bits),"Voting power imbalance (relative entropy)"},
-					new String[]{""+integer.format(dm.getDescrVoteImbalance()),"Undescribed voters"},
+					new String[]{integer.format(dm.getDescrVoteImbalance()),"Undescribed voters"},
 					//Descriptive representation
 					new String[]{"",""},
 					new String[]{""+tot_seats[0],"FV Safe D"},
@@ -696,9 +696,9 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 					new String[]{""+tot_seats[3],"FV Lean R"},
 					new String[]{""+tot_seats[4],"FV Safe R"},
 					new String[]{"",""},
-					new String[]{""+decimal.format(100.0*Settings.mutation_boundary_rate),"Mutation rate (%)"},		
-					new String[]{""+decimal.format(100.0*Settings.elite_fraction),"Elitism (%)"},		
-					new String[]{""+integer.format(featureCollection.ecology.generation),"Generation (count)"},
+					new String[]{decimal.format(100.0 * Settings.mutation_boundary_rate),"Mutation rate (%)"},
+					new String[]{decimal.format(100.0 * Settings.elite_fraction),"Elitism (%)"},
+					new String[]{integer.format(featureCollection.ecology.generation),"Generation (count)"},
 			};
 			TableModel tm = new DefaultTableModel(sdata,scolumns);
 			summaryTable.setModel(tm);
@@ -712,11 +712,11 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 			for( int i = 0; i < Settings.num_candidates; i++) {
 				try {
 				cdata[i] = new String[]{
-						""+cands.get(i),
-						""+integer.format(elec_counts[i]),
-						""+integer.format(vote_counts[i]),//*total_population/tot_votes),
+                        cands.get(i),
+                        integer.format(elec_counts[i]),
+                        integer.format(vote_counts[i]),//*total_population/tot_votes),
 						""+(dm.wasted_votes_by_party[i]),
-						""+(elec_counts[i]/((double)tot_seats)),
+						""+(elec_counts[i]/ tot_seats),
 						""+(vote_counts[i]/tot_votes)
 				};
 				} catch (Exception ex) { }
@@ -949,9 +949,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 		String[] ecolumns = new String[2+demonames.length+c_names.size()];
 		ecolumns[0] = "COUNTY";
 		ecolumns[1] = "POPULATION";
-		for( int i = 0; i < demonames.length; i++) {
-			ecolumns[i+2] = demonames[i];
-		}
+        System.arraycopy(demonames, 0, ecolumns, 2, demonames.length);
 		for( int i = 0; i < c_names.size(); i++) {
 			ecolumns[i+2+demonames.length] = c_names.get(i);
 		}
@@ -1184,7 +1182,7 @@ public class PanelStats extends JPanel implements iDiscreteEventListener {
 	        in = new BufferedInputStream(url.openStream());
 	        fout = new FileOutputStream(filename);
 
-	        final byte data[] = new byte[1024];
+	        final byte[] data = new byte[1024];
 	        int count;
 	        while ((count = in.read(data, 0, 1024)) != -1) {
 	            fout.write(data, 0, count);

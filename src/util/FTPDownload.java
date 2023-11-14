@@ -152,7 +152,7 @@ public class FTPDownload {
 		    outFile = new RandomAccessFile(dest_file, "rw");
 		    if (downloaded > 0)  
 		        outFile.seek(downloaded);
-		    byte data[] = new byte[(int) (1024*scale)];
+		    byte[] data = new byte[(int) (1024*scale)];
 		
 		    // Download file.
 		    for (int count=0, i=0; (count=input.read(data, 0, (int)(1024*scale))) != -1; i++) {

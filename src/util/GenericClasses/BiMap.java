@@ -5,8 +5,8 @@ import java.util.*;
 public class BiMap<K extends Object, V extends Object> {
 	
 
-	  private Map<K,V> forward = new Hashtable<K, V>();
-	  private Map<V,K> backward = new Hashtable<V, K>();
+	  private final Map<K,V> forward = new Hashtable<K, V>();
+	  private final Map<V,K> backward = new Hashtable<V, K>();
 
 	  public synchronized void put(K key, V value) {
 	    forward.put(key, value);

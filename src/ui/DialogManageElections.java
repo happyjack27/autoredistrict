@@ -85,10 +85,8 @@ public class DialogManageElections extends JDialog {
 		if( imputators == null) {
 			imputators = new Vector<Vector<String>>();
 		}
-		
-		for( String s : all) {
-			available.add(s);
-		}
+
+        Collections.addAll(available, all);
 		for( Vector<String> election : elections) {
 			for( String s : election) {
 				available.remove(s);
@@ -173,7 +171,7 @@ public class DialogManageElections extends JDialog {
 		JButton button = new JButton(">");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] selected = (Object[]) listAvailableColumns.getSelectedValues();
+				Object[] selected = listAvailableColumns.getSelectedValues();
 				for( Object s : selected) {
 					elections.get(currentElection).add((String)s);
 					available.remove((String)s);
@@ -188,7 +186,7 @@ public class DialogManageElections extends JDialog {
 		JButton button_1 = new JButton("<");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] selected = (Object[]) listVoteColumns.getSelectedValues();
+				Object[] selected = listVoteColumns.getSelectedValues();
 				for( Object s : selected) {
 					available.add((String)s);
 					elections.get(currentElection).remove((String)s);
@@ -214,7 +212,7 @@ public class DialogManageElections extends JDialog {
 		button_2 = new JButton("<");
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] selected = (Object[]) listImputatorColumns.getSelectedValues();
+				Object[] selected = listImputatorColumns.getSelectedValues();
 				for( Object s : selected) {
 					available.add((String)s);
 					imputators.get(currentElection).remove((String)s);
@@ -229,7 +227,7 @@ public class DialogManageElections extends JDialog {
 		button_3 = new JButton(">");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Object[] selected = (Object[]) listAvailableColumns.getSelectedValues();
+				Object[] selected = listAvailableColumns.getSelectedValues();
 				for( Object s : selected) {
 					imputators.get(currentElection).add((String)s);
 					available.remove((String)s);

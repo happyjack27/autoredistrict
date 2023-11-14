@@ -83,8 +83,8 @@ public class DialogExport extends JDialog {
 					non_matches_file++;
 				}
 			}
-			lblNonmatchesMap.setText(""+non_matches_map+" non-matches");
-			lblNonmatchesFile.setText(""+non_matches_file+" non-matches");
+			lblNonmatchesMap.setText(non_matches_map+" non-matches");
+			lblNonmatchesFile.setText(non_matches_file+" non-matches");
 			System.out.println("recalc: done.");
 			comboBoxMapLayer.repaint();
 			comboBoxFileLinkColumn.repaint();

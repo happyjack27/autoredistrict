@@ -52,8 +52,7 @@ public class DBField {
 				} else {
 					obj = new Double(0);
 				}
-				if (obj instanceof Number) {
-					Number number = (Number) obj;
+				if (obj instanceof Number number) {
 					StringBuffer sb = new StringBuffer(length);
 					for (int i = 0; i < length; i++) {
 						sb.append("#");
@@ -81,8 +80,7 @@ public class DBField {
 				if (obj == null || obj.equals("<null>") || obj.equals("null")) {
 					obj = "";
 				}
-				if (obj instanceof String) {
-					String s = (String) obj;
+				if (obj instanceof String s) {
 					if (s.length() > length) {
 					  throw new Exception("'" + obj + "' is longer than " + length + " characters. "+name);
 					}
@@ -97,10 +95,9 @@ public class DBField {
 				}
 		case 'L':
 				if (obj == null) {
-					obj = new Boolean(false);
+					obj = Boolean.FALSE;
 				}
-				if (obj instanceof Boolean) {
-					Boolean boolean1 = (Boolean) obj;
+				if (obj instanceof Boolean boolean1) {
 					return boolean1.booleanValue() ? "Y" : "N";
 				}
 				else {
@@ -110,8 +107,7 @@ public class DBField {
 				if (obj == null) {
 					obj = new Date();
 				}
-				if (obj instanceof Date) {
-					Date date = (Date) obj;
+				if (obj instanceof Date date) {
 					return sdf.format(date);
 				}
 				else {
@@ -132,7 +128,7 @@ public class DBField {
 				}
 				try {
 					if (decimalCount == 0) {
-					  return new Long(s);
+					  return Long.valueOf(s);
 					}
 					else {
 					  return new Double(s);
@@ -144,7 +140,7 @@ public class DBField {
 				return s;
 			case 'L':
 				s = s.toUpperCase();
-				return new Boolean(s.equals("Y") || s.equals("T"));
+				return Boolean.valueOf(s.equals("Y") || s.equals("T"));
 			case 'D':
 				try {
 					if (s.length() == 0) {

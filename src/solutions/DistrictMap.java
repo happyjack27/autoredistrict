@@ -473,9 +473,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             }
             if( matches > best_subst_matches) {
             	best_subst_matches = matches;
-                for( int i = 0; i < test_subst.length; i++) {
-                	best_subst[i] = test_subst[i];
-                }
+                System.arraycopy(test_subst, 0, best_subst, 0, test_subst.length);
             }
         }
         
@@ -647,7 +645,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        		max_pop_vtd = pop;
 	        	}
 	        }
-	        target_population /= (double)Settings.num_districts;
+	        target_population /= Settings.num_districts;
 	        
 	        for( iterations = 0; iterations < max_iterations; iterations++) {
 	        	int highest_pop_district = -1;
@@ -670,7 +668,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        			lowest_pop = pop;
 	        		}
 	        	}
-	            amt = (double)(highest_pop - lowest_pop)/target_population;        	
+	            amt = (highest_pop - lowest_pop) /target_population;
 	            if( highest_pop - lowest_pop <= max_pop_vtd*2) {
 	            	//System.out.println("met 1");
 	            	if( iterations == 0) {
@@ -810,7 +808,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	        	}
 	        }
 	        for( int i = 0; i < vtd_districts.length; i++) {
-	        	if( ward_connected[i] == false) {
+	        	if(!ward_connected[i]) {
 	        		disconnected++;
 	        	} else {
 	        		connected++;
@@ -823,7 +821,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		mutating_disconnected = true;
     		reciprocal_iso_quotient = -1;
 	        for( int i = 0; i < vtd_districts.length; i++) {
-	        	if( ward_connected[i] == false) {
+	        	if(!ward_connected[i]) {
 	        		mutate_ward_boundary(i,prob,false);
 	        	} else {
 	        	}
@@ -852,7 +850,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
         		break;
         	}
         }
-        if( border == false) {
+        if(!border) {
         	return;
         }
         if( count)
@@ -1001,14 +999,14 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 	   						dfrom.paired_edge_length += from_paired_delta;
 	   						dfrom.unpaired_edge_length += from_unpaired_delta;
 	   						dfrom.area += from_area_delta;
-	   						dfrom.edge_length = this.edge_length(dfrom.paired_edge_length, dfrom.unpaired_edge_length);
-	   						dfrom.iso_quotient = this.iso_quotient(dfrom.area, dfrom.paired_edge_length, dfrom.unpaired_edge_length);
+	   						dfrom.edge_length = edge_length(dfrom.paired_edge_length, dfrom.unpaired_edge_length);
+	   						dfrom.iso_quotient = iso_quotient(dfrom.area, dfrom.paired_edge_length, dfrom.unpaired_edge_length);
 
 	   						dto.paired_edge_length += to_paired_delta;
 	   						dto.unpaired_edge_length += to_unpaired_delta;
 	   						dto.area += to_area_delta;
-	   						dto.edge_length = this.edge_length(dto.paired_edge_length, dto.unpaired_edge_length);
-	   						dto.iso_quotient = this.iso_quotient(dto.area, dto.paired_edge_length, dto.unpaired_edge_length);
+	   						dto.edge_length = edge_length(dto.paired_edge_length, dto.unpaired_edge_length);
+	   						dto.iso_quotient = iso_quotient(dto.area, dto.paired_edge_length, dto.unpaired_edge_length);
 
 	   					}
     					districts.get(vtd_districts[i]).vtds.remove(ward);
@@ -1111,8 +1109,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public static void getPermutations(int[] a, int k, Vector<int[]> results) {
         if(k==a.length) {
             int[] result = new int[a.length];
-            for( int i = 0; i < a.length; i++)
-                result[i] = a[i];
+            System.arraycopy(a, 0, result, 0, a.length);
             results.add(result);
             return;
         }
@@ -1227,9 +1224,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 		if( districts.size() > 0) {
     		districts.get(0).resetPopulation();
     		int pop = (int)districts.get(0).getPopulation();
-    		if( pop <= 10) { //need to shift all down, combining this with district 1. ??
-    			return false;
-    		}    			
+            //need to shift all down, combining this with district 1. ??
+            return pop > 10;
 		}
 
     	return true;
@@ -1258,11 +1254,9 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		w[wards.get(i).id] = wards.get(i);
     	}
     	wards = new Vector<VTD>();
-    	for( int i = 0; i < w.length; i++) {
-    		wards.add(w[i]);
-    	}
+        Collections.addAll(wards, w);
 
-        this.num_districts = num_districts;
+        DistrictMap.num_districts = num_districts;
         this.vtds = wards;
         //System.out.println(" districtmap constructor numdists "+num_districts);
         districts = new Vector<District>();
@@ -1627,7 +1621,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					}
 					
 				}
-				if( true || Settings.minimize_number_of_counties_split) {
+				if(true) {
 					if( nonzeros > 1) {
 						splits++;//splits += least;
 					}
@@ -1673,7 +1667,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 					}
 					
 				}
-				if( true || Settings.minimize_number_of_counties_split) {
+				if(true) {
 					if( nonzeros > 1) {
 						splits++;//splits += least/2.0; //count muni splits at half the value of a county split.	
 					}
@@ -1903,7 +1897,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				demseats += winners[0];
 			}
 			double demseatpct = demseats/totseats;
-			deviation_from_diagonal += Math.abs(demseatpct-dempct)/(double)totseats;
+			deviation_from_diagonal += Math.abs(demseatpct-dempct)/ totseats;
 			swap.add(new double[]{demseatpct,dempct});
 		}
 		seats_votes = swap;
@@ -2000,7 +1994,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     		try {
 	    		for( int i = 0; i < districts.size(); i++) {
 	    			if( districts.get(i) != null) {
-		    			districts.get(i).id = i;
+		    			District.id = i;
 		    		}
 	    		}
     		} catch (Exception ex) {
@@ -2254,8 +2248,8 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
             
     	    double total_by_party = 0;
     	    for( int i = 0; i < wasted_votes_by_party.length; i++) {
-    	    	wasted_votes_by_party[i] /= Settings.num_elections_simulated;;
-    	    	total_by_party += wasted_votes_by_party[i];
+    	    	wasted_votes_by_party[i] /= Settings.num_elections_simulated;
+                total_by_party += wasted_votes_by_party[i];
     	    }
      	    for( int i = 0; i < wasted_votes_by_district.length; i++) {
     	    	wasted_votes_by_district[i] /= Settings.num_elections_simulated;
@@ -2451,7 +2445,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double max = -1;
    	  for(int i = 0; i < Settings.num_districts; i++) {
   		  District district = districts.get(i);
-		  district.id = i;
+		  District.id = i;
         	double pop = district.getPopulation();
         	if( Settings.population_is_per_seat) {
         		pop /= Settings.seats_in_district(i);
@@ -2474,7 +2468,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double seats = 0;
     	for(int i = 0; i < Settings.num_districts; i++) {
     		District district = districts.get(i);
-    		district.id = i;
+    		District.id = i;
 			double pop = district.getPopulation();
 			tot += pop;
 			seats +=  Settings.seats_in_district(i);
@@ -2483,7 +2477,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//System.out.println("tot = "+tot);
     	for(int i = 0; i < Settings.num_districts; i++) {
     		District district = districts.get(i);
-    		district.id = i;
+    		District.id = i;
 			double pop = district.getPopulation();
 			pop /= Settings.seats_in_district(i);
 			mad += Math.abs(pop-tot)*Settings.seats_in_district(i);
@@ -2498,7 +2492,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	double max = 0;
     	for(int i = 0; i < Settings.num_districts; i++) {
     		District district = districts.get(i);
-    		district.id = i;
+    		District.id = i;
 			double pop = district.getPopulation();
 			tot += pop;
 			seats +=  Settings.seats_in_district(i);
@@ -2507,7 +2501,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     	//System.out.println("tot = "+tot);
     	for(int i = 0; i < Settings.num_districts; i++) {
     		District district = districts.get(i);
-    		district.id = i;
+    		District.id = i;
 			double pop = district.getPopulation();
 			pop /= Settings.seats_in_district(i);
 			if( Math.abs(pop-tot) > max) {
@@ -2521,10 +2515,10 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
     public double getPopVariance() {
     	double tot = 0;
     	double tot2 = 0;
-    	double N = (double) districts.size();
+    	double N = districts.size();
  	  for(int i = 0; i < Settings.num_districts; i++) {
   		  District district = districts.get(i);
-		  district.id = i;
+		  District.id = i;
   		  double pop = district.getPopulation();
         	if( Settings.population_is_per_seat) {
         		pop /= Settings.seats_in_district(i);
@@ -2729,7 +2723,7 @@ public class DistrictMap implements iEvolvable, Comparable<DistrictMap> {
 				this.calcDemographicStatistics();
 			}
 			if( Settings.divide_packing_by_area) {
-				multiplier = Settings.density_multiplier*(double)districts.get(k).getPopulation()/(double)districts.get(k).area;
+				multiplier = Settings.density_multiplier* districts.get(k).getPopulation() / districts.get(k).area;
 				//System.out.println("dividing by area "+districts.get(k).area);
 			}
 		

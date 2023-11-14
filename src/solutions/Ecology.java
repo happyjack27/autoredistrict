@@ -435,7 +435,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
         }
         
         if( verbosity > 1)
-        	System.out.println("");
+        	System.out.println();
     	
         //STEP 2: NORMALIZE
         if( !Settings.paretoMode) {
@@ -469,7 +469,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 		            for( DistrictMap map : population) {
 		            	avg += map.fairnessScores[i];
 		            }
-		            avg /= (double)population.size();
+		            avg /= population.size();
 	
 		            double var = 0;
 		            for( DistrictMap map : population) {
@@ -540,18 +540,18 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 	        
 	
 	        double[] weights = new double[]{
-	        		Settings.geometry_weight                *1.0,  //0
-	        		Settings.disenfranchise_weight          *1.0, 
-	        		Settings.population_balance_weight      *1.0, //2
-	                Settings.disconnected_population_weight *1.0,
-	                Settings.voting_power_balance_weight    *1.0, //4
-	                Settings.competitiveness_weight      *1.0,
-	                Settings.wasted_votes_imbalance_weight  *1.0, //6
-	                Settings.seats_votes_asymmetry_weight   *1.0,
-	                Settings.diagonalization_weight   *1.0, //8
-	                Settings.reduce_splits ? Settings.split_reduction_weight   *1.0 : 0,
-	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.vote_dilution_weight *1.0, //10
-	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.descr_rep_weight *1.0, //10
+                    Settings.geometry_weight,  //0
+                    Settings.disenfranchise_weight,
+                    Settings.population_balance_weight, //2
+                    Settings.disconnected_population_weight,
+                    Settings.voting_power_balance_weight, //4
+                    Settings.competitiveness_weight,
+                    Settings.wasted_votes_imbalance_weight, //6
+                    Settings.seats_votes_asymmetry_weight,
+                    Settings.diagonalization_weight, //8
+	                Settings.reduce_splits ? Settings.split_reduction_weight : 0,
+	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.vote_dilution_weight, //10
+	                MainFrame.mainframe.project.demographic_columns.size() == 0 ? 0 : Settings.descr_rep_weight, //10
 	                0.0,
 	        };
 	        double geo_total = weights[0]+weights[2]+weights[3]+weights[9];
@@ -612,15 +612,15 @@ public class Ecology extends ReflectJsonMap<Ecology> {
         	for( int i = 0; i < cutoff; i++ ) {
         		DistrictMap dm = population.get(i);
         		if( !dm.wasMutationCounted) {
-        			this.adaptiveMutation.addSample(dm.actual_mutate_rate);
+        			adaptiveMutation.addSample(dm.actual_mutate_rate);
         			dm.wasMutationCounted = true;
         		}
         	}
-        	this.adaptiveMutation.recalculate();
-        	Settings.mutation_boundary_rate = Math.exp(-this.adaptiveMutation.gamma.getNumericalMean());
+        	adaptiveMutation.recalculate();
+        	Settings.mutation_boundary_rate = Math.exp(-adaptiveMutation.gamma.getNumericalMean());
         	System.out.println("new mutation rate: "+Settings.mutation_boundary_rate
-        			+" var "+Math.exp(-Math.sqrt(this.adaptiveMutation.gamma.getNumericalVariance()))
-        			+" ex "+this.adaptiveMutation.getSample()
+        			+" var "+Math.exp(-Math.sqrt(adaptiveMutation.gamma.getNumericalVariance()))
+        			+" ex "+ adaptiveMutation.getSample()
         	);
         	Settings.setMutationRate(Settings.mutation_boundary_rate);
         	
@@ -639,7 +639,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 	        }
 	        //minimum 3 mutations avg
 	        if( mutated < Settings.population || mutated != mutated) {
-	        	mutated = (int) (Settings.population);
+	        	mutated = Settings.population;
 	        }
 	        
         	double new_rate = ((double)mutated/(double)total)*0.999; //always at least go down a little (0.1%)
@@ -852,7 +852,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
             	dm.mutate(Settings.mutation_rate);
             if(Settings.mutation_boundary_rate > 0) {
             	if( Settings.adaptive_mutation) {
-            		dm.mutate_boundary(this.adaptiveMutation.getSample());
+            		dm.mutate_boundary(adaptiveMutation.getSample());
             		dm.wasMutationCounted = false;
             	} else {
             		dm.mutate_boundary(Settings.mutation_boundary_rate);
@@ -893,7 +893,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
     	public void run() {
     		try {
 	    		if( Settings.SELECTION_MODE == Settings.TOURNAMENT_SELECTION) {
-		            for(int i = 0+id; i < population.size(); i+=num_threads) {
+		            for(int i = id; i < population.size(); i+=num_threads) {
 		            	double d1 = Math.random();
 		            	DistrictMap map1 = population.get(0);
 		            	for( int j = 0; j <  population.size(); j++) {
@@ -918,7 +918,7 @@ public class Ecology extends ReflectJsonMap<Ecology> {
 		            }
 	    		} else 
 	    		if( Settings.SELECTION_MODE != Settings.TRUNCATION_SELECTION) {
-		            for(int i = 0+id; i < population.size(); i+=num_threads) {
+		            for(int i = id; i < population.size(); i+=num_threads) {
 		            	double d1 = Math.random();
 		            	DistrictMap map1 = null;
 		            	for( int j = population.size()-1; j >=0; j--) {

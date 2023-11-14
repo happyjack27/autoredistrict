@@ -25,7 +25,7 @@ public class ScoreArray<T> implements Comparable<ScoreArray<T>> {
 		StringBuffer sb = new StringBuffer();
 		for( int i = 0; i < scores2.size(); i++) {
 			ScoreArray s = scores2.get(i);
-			sb.append(""+i+": "+s.dominated_by+"   "+s.dominates+"   "+s.crowding);
+			sb.append(i+": "+s.dominated_by+"   "+s.dominates+"   "+s.crowding);
 			
 			sb.append("\n");
 		}
@@ -39,7 +39,7 @@ public class ScoreArray<T> implements Comparable<ScoreArray<T>> {
 		for( int i = 0; i < scores2.size(); i++) {
 			ScoreArray s = scores2.get(i);
 			if( s.dominated_by <= 0) {
-				sb.append(""+i+": "+s.dominated_by+", "+s.dominates+", "+s.crowding);
+				sb.append(i+": "+s.dominated_by+", "+s.dominates+", "+s.crowding);
 				for( int j = 0; j < s.scores.length; j++) {
 					sb.append(", ");
 					sb.append(s.scores[j]);
