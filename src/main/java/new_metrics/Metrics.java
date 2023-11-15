@@ -67,12 +67,12 @@ public class Metrics {
 	double[][] dem_pcts = null;
 	double[] election_pcts = null;
 	
-	BetaDistribution election_betas = null;
-	Vector<BetaDistribution> district_betas = null;
-	Vector<BetaDistribution> centered_district_betas = null;
+	CustomBetaDistribution election_betas = null;
+	Vector<CustomBetaDistribution> district_betas = null;
+	Vector<CustomBetaDistribution> centered_district_betas = null;
 
-	GammaDistribution election_gammas = null;
-	Vector<GammaDistribution> district_gammas = null;
+	CustomGammaDistribution election_gammas = null;
+	Vector<CustomGammaDistribution> district_gammas = null;
 	
 	Vector<Double> asym_results = new Vector<Double>();
 	
@@ -122,7 +122,7 @@ public class Metrics {
 	public Vector<String[]> getBetasAsVectorString() {
 		Vector<String[]> vvs = new Vector<String[]>();
 		vvs.add(new String[]{"District","Alpha","Beta","Mean","Variance"});
-		BetaDistribution bd0 = this.election_betas;
+		CustomBetaDistribution bd0 = this.election_betas;
 		String[] ss0 = new String[]{
 			"Total"
 			,""+bd0.getAlpha()
@@ -132,7 +132,7 @@ public class Metrics {
 		};
 		vvs.add(ss0);
 		for( int i = 0; i < this.district_betas.size(); i++) {
-			BetaDistribution bd = this.district_betas.get(i);
+			CustomBetaDistribution bd = this.district_betas.get(i);
 			String[] ss = new String[]{
 				""+(i+1)
 				,""+bd.getAlpha()
@@ -147,7 +147,7 @@ public class Metrics {
 	public Vector<String[]> getGammasAsVectorString() {
 		Vector<String[]> vvs = new Vector<String[]>();
 		vvs.add(new String[]{"District","Shape","Scale","Mean","Variance"});
-		GammaDistribution bd0 = this.election_gammas;
+		CustomGammaDistribution bd0 = this.election_gammas;
 		String[] ss0 = new String[]{
 				"Total"
 				,""+bd0.getShape()
@@ -157,7 +157,7 @@ public class Metrics {
 			};
 		vvs.add(ss0);
 		for( int i = 0; i < this.district_gammas.size(); i++) {
-			GammaDistribution bd = this.district_gammas.get(i);
+			CustomGammaDistribution bd = this.district_gammas.get(i);
 			String[] ss = new String[]{
 				""+(i+1)
 				,""+bd.getShape()
@@ -175,20 +175,20 @@ public class Metrics {
 		m.put("StatewideGammaDistribution", getGammaAsJson(election_gammas));
 		
 		Vector<JsonMap> db = new Vector<JsonMap>();
-		for( BetaDistribution bd : district_betas) {
+		for(CustomBetaDistribution bd : district_betas) {
 			db.add(getBetaAsJson(bd));
 		}
 		m.put("DistrictBetaDistribution", db);
 		
 		Vector<JsonMap> dg = new Vector<JsonMap>();
-		for( GammaDistribution bd : district_gammas) {
+		for(CustomGammaDistribution bd : district_gammas) {
 			dg.add(getGammaAsJson(bd));
 		}
 		m.put("DistrictGammaDistribution", dg);
 		
 		return m;
 	}
-	public JsonMap getBetaAsJson(BetaDistribution bd) {
+	public JsonMap getBetaAsJson(CustomBetaDistribution bd) {
 		JsonMap dist = new JsonMap();
 		dist.put("Type","Beta");
 		dist.put("Alpha",bd.getAlpha());
@@ -198,7 +198,7 @@ public class Metrics {
 		return dist;
 	}
 	
-	public JsonMap getGammaAsJson(GammaDistribution bd) {
+	public JsonMap getGammaAsJson(CustomGammaDistribution bd) {
 		JsonMap dist = new JsonMap();
 		dist.put("Type","Gamma");
 		dist.put("Shape",bd.getShape());
@@ -240,14 +240,14 @@ public class Metrics {
 	}
 	
 	public void estimateDistributions() {
-		Vector<BetaDistribution> bds = getBetaDistributions(dem_counts,rep_counts,num_districts);
+		Vector<CustomBetaDistribution> bds = getBetaDistributions(dem_counts,rep_counts,num_districts);
 		election_betas = bds.remove(0);
 		district_betas = bds;
 
 		centered_district_betas = getBetaDistributions(centered_dem_counts,centered_rep_counts,num_districts);
 		centered_district_betas.remove(0);
 		
-		Vector<GammaDistribution> gds = getGammaDistributions(dem_counts,rep_counts,num_districts);
+		Vector<CustomGammaDistribution> gds = getGammaDistributions(dem_counts,rep_counts,num_districts);
 		election_gammas = gds.remove(0);
 		district_gammas = gds;
 		
@@ -354,7 +354,7 @@ public class Metrics {
 		double total = 0;
 		boolean nanfound = false;
 		for( int i = 0; i < centered_district_betas.size(); i++) {
-			BetaDistribution b = centered_district_betas.get(i);
+			CustomBetaDistribution b = centered_district_betas.get(i);
 			//avg_log_likelihood(double[] xs, double a, double b)
 			System.out.println((i+1)+" alpha: "+b.getAlpha()+", beta: "+b.getBeta()+", ll: "+b.loglikelihood);
 			if( b.loglikelihood == b.loglikelihood) {
@@ -465,7 +465,7 @@ public class Metrics {
 		double[] seatProbs = new double[district_betas.size()+1];
 		for( int i = 0; i < trials; i++) {
 			int seats = 0;
-			for(BetaDistribution bd : district_betas) {
+			for(CustomBetaDistribution bd : district_betas) {
 				double r = FastMath.random();
 				if( r <= bd.cumulativeProbability(0.5)) {
 					seats++;
@@ -492,8 +492,8 @@ public class Metrics {
 		
 		return seatProbs;
 	}
-	public Vector<GammaDistribution> getGammaDistributions(double[][] elections_district_dem_counts,double[][] elections_district_rep_counts, int num_districts) {
-		Vector<GammaDistribution> bds = new Vector<GammaDistribution>();
+	public Vector<CustomGammaDistribution> getGammaDistributions(double[][] elections_district_dem_counts,double[][] elections_district_rep_counts, int num_districts) {
+		Vector<CustomGammaDistribution> bds = new Vector<>();
 		double[] dem_pop = new double[elections_district_rep_counts.length];
 		double[] rep_pop = new double[elections_district_rep_counts.length];
 		district_totals = new double[elections_district_rep_counts.length][num_districts];
@@ -532,15 +532,15 @@ public class Metrics {
 				centered_district_totals[i][j] = district_totals[i][j]*eavg/election_totals[i];
 				dd[i] = centered_district_totals[i][j];
 			}
-			bds.add(new GammaDistribution(dd));
+			bds.add(new CustomGammaDistribution(dd));
 		}
 		
-		bds.insertElementAt(new GammaDistribution(election_totals),0);
+		bds.insertElementAt(new CustomGammaDistribution(election_totals),0);
 		return bds;
 	}
 	
-	public Vector<BetaDistribution> getBetaDistributions(double[][] elections_district_dem_counts,double[][] elections_district_rep_counts, int num_districts) {
-		Vector<BetaDistribution> bds = new Vector<BetaDistribution>();
+	public Vector<CustomBetaDistribution> getBetaDistributions(double[][] elections_district_dem_counts,double[][] elections_district_rep_counts, int num_districts) {
+		Vector<CustomBetaDistribution> bds = new Vector<>();
 		double[] dem_pop = new double[elections_district_rep_counts.length];
 		double[] rep_pop = new double[elections_district_rep_counts.length];
 		double[][] dem_pcts = new double[elections_district_rep_counts.length][num_districts];
@@ -554,7 +554,7 @@ public class Metrics {
 				dem_pop[i] += d;
 				rep_pop[i] += r;
 			}
-			bds.add(new BetaDistribution(dd));
+			bds.add(new CustomBetaDistribution(dd));
 		}
 		double[] election_pcts = new double[elections_district_rep_counts.length+(for_national ? 3 : 0)];
 		for(int i = 0; i < elections_district_rep_counts.length; i++) {
@@ -594,13 +594,13 @@ public class Metrics {
 				rep: 62984828
 				*/
 
-		bds.insertElementAt(new BetaDistribution(election_pcts,force_centered_popular_vote),0);
+		bds.insertElementAt(new CustomBetaDistribution(election_pcts,force_centered_popular_vote),0);
 		return bds;
 	}
 	
 	public double scoreRandom() {
 		Vector<Double> ds = new Vector<Double>();
-		for( BetaDistribution bd : centered_district_betas) {
+		for(CustomBetaDistribution bd : centered_district_betas) {
 			ds.add(bd.sample());
 		}
 		Collections.sort(ds);

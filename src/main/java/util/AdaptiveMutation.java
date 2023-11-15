@@ -1,4 +1,5 @@
 package util;
+import new_metrics.CustomGammaDistribution;
 import org.apache.commons.math3.distribution.*;
 
 public class AdaptiveMutation {
@@ -6,7 +7,7 @@ public class AdaptiveMutation {
 	private final int max_sample_size = 250;
 	private int num_samples = 0;
 	
-	public GammaDistribution gamma = new GammaDistribution(1,1);
+	public CustomGammaDistribution gamma = new CustomGammaDistribution(1,1);
 	
 	public AdaptiveMutation() {
 		double[] starting_values = new double[] {

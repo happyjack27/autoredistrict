@@ -33,8 +33,8 @@ public class FrameDraw extends JFrame {
 		getContentPane().add(panel);
 	}
 	
-	BetaDistribution dist = null;
-	Vector<BetaDistribution> dists = null;
+	CustomBetaDistribution dist = null;
+	Vector<CustomBetaDistribution> dists = null;
 	double[] seats = null;
 	public Vector<Pair<Double, Double>> bins = null;
 	
@@ -141,7 +141,7 @@ public class FrameDraw extends JFrame {
  			    
 			    if( dists != null) {
 				    double inc = 0.001;
-			    	for( BetaDistribution dist : dists) {
+			    	for(CustomBetaDistribution dist : dists) {
 				    	double x = 0;
 				    	double last_x = 0;
 				    	double last_y = 0;

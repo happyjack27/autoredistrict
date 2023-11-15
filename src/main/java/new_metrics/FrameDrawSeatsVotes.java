@@ -34,8 +34,8 @@ public class FrameDrawSeatsVotes extends JFrame {
 		getContentPane().add(panel);
 	}
 	
-	BetaDistribution dist = null;
-	Vector<BetaDistribution> dists = null;
+	CustomBetaDistribution dist = null;
+	Vector<CustomBetaDistribution> dists = null;
 	double[] seats = null;
 	public Vector<Pair<Double, Double>> bins = null;
 	
@@ -158,7 +158,7 @@ public class FrameDrawSeatsVotes extends JFrame {
 			    for( int i = 0; i < num; i++) {
 				    for( int j = 0; j < num; j++) {
 				    	Vector<Double> pcts = new Vector<Double>();
-				    	for( BetaDistribution bd : dists) {
+				    	for(CustomBetaDistribution bd : dists) {
 				    		pcts.add(bd.sample());
 				    	}
 
