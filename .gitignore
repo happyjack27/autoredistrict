@@ -25,7 +25,6 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/maven
-=======
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij
@@ -36,6 +35,11 @@ buildNumber.properties
 
 # User-specific stuff
 .idea/**/workspace.xml
+.idea/**/compiler.xml
+.idea/**/encodings.xml
+.idea/**/jarRepositories.xml
+.idea/**/misc.xml
+.idea/**/vcs.xml
 
 # File-based project format
 *.iws
