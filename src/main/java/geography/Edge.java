@@ -1,10 +1,6 @@
 package geography;
 
-import java.awt.Polygon;
-
-import geography.*;
-import jsonMap.ReflectJsonMap;
-import solutions.*;
+import solutions.Settings;
 
 public class Edge {// extends ReflectJsonMap<Edge> {
 	public int id = -1;

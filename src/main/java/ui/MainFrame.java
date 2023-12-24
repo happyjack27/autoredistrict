@@ -1,39 +1,38 @@
 package ui;
 
-import geography.*;
+import dbf.DBFReader;
 import geography.Properties;
+import geography.*;
 import new_metrics.Metrics;
+import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
+import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
+import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonZShape;
 import solutions.*;
-import ui.MainFrame.OpenShapeFileThread;
-import util.*;
+import util.DataAndHeader;
+import util.FileUtil;
 import util.GenericClasses.BiMap;
 import util.GenericClasses.Quadruplet;
 import util.GenericClasses.Triplet;
+import util.StaticFunctions;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Map.Entry;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.event.*; 
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.border.*;
-
-import org.nocrala.tools.gis.data.esri.shapefile.*;
-import org.nocrala.tools.gis.data.esri.shapefile.header.*;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
-
-import dbf.*;
 /*
 import com.hexiong.jdbf.DBFReader;
 import com.hexiong.jdbf.DBFWriter;

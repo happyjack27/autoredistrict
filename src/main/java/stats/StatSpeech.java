@@ -1,9 +1,9 @@
 package stats;
 
-import solutions.*;
-import geography.*;
+import geography.FeatureCollection;
+import solutions.DistrictMap;
 
-import java.util.*;
+import java.util.Vector;
 
 public class StatSpeech extends Stat {
 	

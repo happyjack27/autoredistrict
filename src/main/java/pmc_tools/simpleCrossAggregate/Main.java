@@ -1,13 +1,11 @@
 package pmc_tools.simpleCrossAggregate;
 
-import java.io.File;
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.Vector;
-
+import dbf.DBField;
 import util.DataAndHeader;
 import util.FileUtil;
-import dbf.DBField;
+
+import java.text.DecimalFormat;
+import java.util.HashMap;
 
 public class Main {
 	public static DataAndHeader blocks;

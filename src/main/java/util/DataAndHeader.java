@@ -1,8 +1,8 @@
 package util;
 
-import java.util.HashMap;
-
 import dbf.DBField;
+
+import java.util.HashMap;
 
 public class DataAndHeader {
 	public DBField[] full_header;

@@ -1,11 +1,11 @@
 package pareto.prototypes;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import util.AdaptiveMutation;
+
+import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import util.AdaptiveMutation;
 
 public class ParetoFrontier<T extends ParetoPoint<T>> extends ParetoPoint<T> {
 	public ParetoFrontier(HashMap<String,Scorer<T>> scorers) {

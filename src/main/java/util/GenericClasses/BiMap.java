@@ -1,6 +1,7 @@
 package util.GenericClasses;
 
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class BiMap<K extends Object, V extends Object> {
 	

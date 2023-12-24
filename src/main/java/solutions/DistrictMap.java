@@ -16,12 +16,14 @@
 
 package solutions;
 
-import geography.*;
+import geography.Edge;
+import geography.FeatureCollection;
+import geography.VTD;
 import ui.MainFrame;
 import util.PermutationIterator;
 import util.StaticFunctions;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.*;
 import java.util.Map.Entry;
 

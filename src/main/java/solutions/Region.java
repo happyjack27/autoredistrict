@@ -1,11 +1,9 @@
 package solutions;
 
-import java.util.HashSet;
-import java.util.Vector;
-
 import geography.VTD;
 import util.HashVector;
-import util.StaticFunctions;
+
+import java.util.Vector;
 
 public class Region extends Vector<VTD> {
 	

@@ -1,13 +1,10 @@
 package util.ballot_counters;
 
-import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
+import java.awt.*;
 import java.awt.event.*;
-
-import java.util.*;
+import java.util.Vector;
 
 public class STVElectionUI extends JFrame {
 	public final JButton btnNewButton = new JButton("New button");

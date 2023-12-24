@@ -1,14 +1,17 @@
 package ui;
-import geography.*;
 
-import javax.swing.*;
-
+import geography.FeatureCollection;
+import geography.VTD;
 import solutions.DistrictMap;
 import solutions.Settings;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Vector;
 
 public class DialogManageLocks extends JDialog {
 	public Vector<String> locks = new Vector<String>();

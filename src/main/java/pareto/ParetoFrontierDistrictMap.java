@@ -1,10 +1,10 @@
 package pareto;
 
-import java.util.HashMap;
-
 import geography.FeatureCollection;
 import pareto.prototypes.ParetoFrontier;
 import pareto.prototypes.Scorer;
+
+import java.util.HashMap;
 
 public class ParetoFrontierDistrictMap {
 	

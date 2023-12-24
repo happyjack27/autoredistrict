@@ -3,10 +3,10 @@ package ui;
  * @(#)VerticalLabelUI.java	1.0 02/18/09
  */
 
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.plaf.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.plaf.ComponentUI;
+import javax.swing.plaf.basic.BasicLabelUI;
+import java.awt.*;
 
 /**
  * A UI delegate for JLabel that rotates the label 90

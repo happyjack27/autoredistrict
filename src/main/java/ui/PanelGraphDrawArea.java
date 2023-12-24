@@ -1,12 +1,8 @@
 package ui;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-
-import javax.swing.*;
-
 import solutions.Ecology;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.Vector;
 

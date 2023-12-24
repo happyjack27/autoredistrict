@@ -1,15 +1,9 @@
 package ui;
 
-import java.text.DecimalFormat;
-import java.util.*;
-import java.awt.*;
-
 import javax.swing.*;
-
-import java.io.*;
-import java.awt.image.*;
-
-import javax.imageio.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 public class piechart extends JPanel {
 	

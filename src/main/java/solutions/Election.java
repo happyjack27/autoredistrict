@@ -1,9 +1,5 @@
 package solutions;
 
-import java.util.Vector;
-
-import jsonMap.ReflectJsonMap;
-
 public class Election  {//extends ReflectJsonMap<Demographic> {
 	//public int ward_id;
 	public int population;

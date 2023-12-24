@@ -1,15 +1,12 @@
 package ui;
 
-import java.awt.Dimension;
-import java.awt.event.*;
-import java.util.*;
+import ui.MainFrame.OpenShapeFileThread;
 
 import javax.swing.*;
-
-import ui.MainFrame.ImportCensus2Thread;
-import ui.MainFrame.ImportCountyLevel;
-import ui.MainFrame.ImportTranslations;
-import ui.MainFrame.OpenShapeFileThread;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Date;
 
 public class DialogDownload extends JDialog {
 	JList<String> list = new JList<String>();

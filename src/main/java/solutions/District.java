@@ -1,13 +1,17 @@
 package solutions;
-import geography.*;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import geography.FeatureCollection;
+import geography.VTD;
 import jsonMap.JsonMap;
 import ui.MainFrame;
-import util.HashVector;
 import util.GenericClasses.Pair;
+import util.HashVector;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class District extends JsonMap {
     Vector<VTD> vtds = new Vector<VTD>();

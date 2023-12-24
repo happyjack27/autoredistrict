@@ -1,41 +1,13 @@
 package util;
 
+import java.io.BufferedInputStream;
+import java.io.RandomAccessFile;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.DecimalFormat;
-
-/*
- * 
-ownloading census block centroids...
-Thu Mar 31 16:56:29 CDT 2016: url: ftp://ftp2.census.gov/geo/pvs/tiger2010st/25_Massachusetts/25/tl_2010_25_tabblock10.zip
-Thu Mar 31 16:56:29 CDT 2016: dest_file: /Users/jimbrill/autoredistrict_data/Massachusetts/2010/block_centroids/block_centroids.zip
-Thu Mar 31 16:56:29 CDT 2016: start: 0
-Thu Mar 31 16:56:29 CDT 2016: 1
-Thu Mar 31 16:56:29 CDT 2016: 2 0
-Thu Mar 31 16:56:29 CDT 2016: 3a0
-failed retrying
-java.net.SocketException: Connection reset
-	at java.net.SocketInputStream.read(SocketInputStream.java:209)
-	at java.net.SocketInputStream.read(SocketInputStream.java:141)
-	at java.io.BufferedInputStream.fill(BufferedInputStream.java:246)
-	at java.io.BufferedInputStream.read(BufferedInputStream.java:265)
-	at sun.net.ftp.impl.FtpClient.readServerResponse(FtpClient.java:420)
-	at sun.net.ftp.impl.FtpClient.readReply(FtpClient.java:497)
-	at sun.net.ftp.impl.FtpClient.connect(FtpClient.java:1013)
-	at sun.net.ftp.impl.FtpClient.connect(FtpClient.java:998)
-	at sun.net.www.protocol.ftp.FtpURLConnection.connect(FtpURLConnection.java:294)
-	at util.FTPDownload.resume(FTPDownload.java:59)
-	at util.FTPDownload.download(FTPDownload.java:23)
-	at ui.Download.download(Download.java:531)
-	at ui.Download.run(Download.java:268)
-arg: clean
-arg: 25
-deleting /Users/jimbrill/autoredistrict_data/Massachusetts/2010/block_centroids
-
-<BR/>
- */
-import java.util.*;
-import java.io.*;
-import java.nio.*;
-import java.net.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class FTPDownload {
 	private static final int TIMEOUT_VALUE = 10000; //10 seconds

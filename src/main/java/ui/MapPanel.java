@@ -1,18 +1,18 @@
 package ui;
 
-import geography.VTD;
 import geography.FeatureCollection;
 import geography.Geometry;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.util.*;
-
-import javax.swing.*;
-
+import geography.VTD;
 import solutions.Settings;
 import solutions.iDiscreteEventListener;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.util.Stack;
 
 public class MapPanel extends JPanel implements MouseListener, MouseMotionListener, iDiscreteEventListener {
 	public static double minx,maxx,miny,maxy;

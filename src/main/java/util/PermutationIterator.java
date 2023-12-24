@@ -1,6 +1,6 @@
 package util;
 
-import java.util.*;
+import java.util.Iterator;
 
 // Based on https://en.wikipedia.org/wiki/Steinhaus%E2%80%93Johnson%E2%80%93Trotter_algorithm#Even.27s_speedup
 public class PermutationIterator

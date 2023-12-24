@@ -1,8 +1,11 @@
 package util;
 
-import java.io.*;
-
 import ui.Download;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 public class ScriptMaker {
 	public static void main(String[] args) {

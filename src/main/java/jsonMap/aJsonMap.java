@@ -1,12 +1,8 @@
 package jsonMap;
+
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 //this class is for parsing a json string into an object, and formatting an object into a json string.
 //objects that you want to be able to save and load from/to a file should extend this object and implement the methods in iJSONObject.

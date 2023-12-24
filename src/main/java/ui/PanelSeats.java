@@ -1,15 +1,12 @@
 package ui;
 
 import geography.FeatureCollection;
+import solutions.District;
+import solutions.DistrictMap;
+import solutions.Settings;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.JPanel;
-
-import solutions.*;
+import javax.swing.*;
+import java.awt.*;
 
 public class PanelSeats extends JPanel {
 	public MapPanel mapPanel;

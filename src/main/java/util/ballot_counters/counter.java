@@ -1,9 +1,8 @@
 package util.ballot_counters;
 
-import java.io.*;
-import java.util.*;
-
-import util.GenericClasses.Pair;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Vector;
 
 public class counter {
 	public static iCountingSystem[] systems = new iCountingSystem[]{

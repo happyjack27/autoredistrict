@@ -1,6 +1,7 @@
 package util.ballot_counters;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Vector;
 
 public abstract class CS_MTV implements iCountingSystem {
 	public int[] getWinnersGeneric(Vector<Double> weights, Vector<double[]> dballots, int seats) {

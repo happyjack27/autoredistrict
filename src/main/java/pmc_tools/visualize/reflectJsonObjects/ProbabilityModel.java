@@ -1,11 +1,10 @@
 package pmc_tools.visualize.reflectJsonObjects;
 
-import java.util.Vector;
-
+import jsonMap.JsonMap;
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.apache.commons.math3.distribution.GammaDistribution;
 
-import jsonMap.*;
+import java.util.Vector;
 
 public class ProbabilityModel extends JsonMap {
 	

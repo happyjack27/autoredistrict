@@ -1,27 +1,16 @@
 package ui;
 
-import geography.FeatureCollection;
-
-import java.util.Vector;
+import solutions.DistrictMap;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
-import solutions.District;
-import solutions.DistrictMap;
-import solutions.Settings;
-
-import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.Vector;
 
 public class FrameSeatsVotesChart extends JFrame {
 	public double wang = 0;

@@ -1,6 +1,6 @@
 package util.ballot_counters;
 
-import java.util.*;
+import java.util.Vector;
 
 public class STVElection {
 	public static String reasoning = "";

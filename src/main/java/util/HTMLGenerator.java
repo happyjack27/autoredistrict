@@ -1,9 +1,10 @@
 package util;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Vector;
 
 public class HTMLGenerator {
 	public static String DEM = "<b><font color=#4040C0>Democratic gerrymander</font></b>";

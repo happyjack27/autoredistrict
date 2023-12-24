@@ -1,6 +1,7 @@
 package util.ballot_counters;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Vector;
 
 public class CS_NTV_AnalogAllocation implements iCountingSystem {
 	public String getName() {

@@ -1,15 +1,14 @@
 package util;
+
 import geography.VTD;
+import ui.Download;
+import util.GenericClasses.Triplet;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
+import java.util.Hashtable;
 import java.util.Map.Entry;
-
-import ui.Download;
-import util.GenericClasses.Triplet;
+import java.util.Vector;
 
 /*
 =======

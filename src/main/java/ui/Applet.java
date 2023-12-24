@@ -1,16 +1,9 @@
 package ui;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-
-import javax.imageio.ImageIO;
 import javax.swing.*;
-
-import util.StaticFunctions;
+import java.awt.*;
+import java.io.File;
+import java.net.URI;
 
 
 // failed california connection reset again

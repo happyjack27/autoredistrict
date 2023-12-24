@@ -1,11 +1,9 @@
 package ui;
-import geography.*;
 
-import javax.swing.*;
+import geography.FeatureCollection;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Vector;
 
 public class DialogSelectLayers extends DialogMultiColumnSelect {	
 	FeatureCollection fc;

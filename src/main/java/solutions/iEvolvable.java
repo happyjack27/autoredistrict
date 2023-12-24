@@ -1,5 +1,4 @@
 package solutions;
-import java.util.*;
 
 public interface iEvolvable {
 	

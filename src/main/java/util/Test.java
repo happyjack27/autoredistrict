@@ -1,7 +1,7 @@
 package util;
 
 import jsonMap.ReflectJsonMap;
-import ui.*;
+import ui.Download;
 
 public class Test extends ReflectJsonMap<Test> {
 	public int testmember;
