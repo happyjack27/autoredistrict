@@ -1,15 +1,7 @@
 package ui;
 
-import java.util.*;
-
 import javax.swing.*;
-import javax.swing.table.*;
-
-import ui.FrameSeatsVotesChart.SeatPanel;
-
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
 
 public class FramePieCharts extends JFrame {
 

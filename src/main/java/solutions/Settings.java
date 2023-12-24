@@ -1,12 +1,10 @@
 package solutions;
 
 import geography.VTD;
-
-import java.util.Vector;
-
-import jsonMap.JsonMap;
 import ui.MainFrame;
-import java.awt.Color;
+
+import java.awt.*;
+import java.util.Vector;
 
 public class Settings extends jsonMap.ReflectJsonMap<Settings> {
 	public static Color WATER_COLOR = new Color(212,241,249);

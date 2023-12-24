@@ -1,18 +1,21 @@
 package solutions;
 
-import geography.*;
+import geography.Edge;
+import geography.VTD;
+import geography.Vertex;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import paretoFront.ScoreArray;
+import ui.MainFrame;
+import util.AdaptiveMutation;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.swing.JOptionPane;
-
-import jsonMap.*;
-import ui.MainFrame;
-import util.AdaptiveMutation;
 //import ui.MapPanel;
 //import ui.PanelStats;
 

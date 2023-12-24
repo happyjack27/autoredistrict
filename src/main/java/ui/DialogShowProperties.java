@@ -1,13 +1,10 @@
 package ui;
-import geography.*;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 import util.DataAndHeader;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.*;
 
 public class DialogShowProperties extends JDialog {
 	private final JTable table;

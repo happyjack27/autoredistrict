@@ -1,12 +1,12 @@
 package org.nocrala.tools.gis.data.esri.shapefile.shape;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
 import org.nocrala.tools.gis.data.esri.shapefile.exception.DataStreamEOFException;
 import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileException;
 import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class ShapeHeader {
 

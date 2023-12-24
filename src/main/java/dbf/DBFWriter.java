@@ -1,6 +1,9 @@
 package dbf;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.Calendar;
 
 public class DBFWriter {

@@ -1,15 +1,17 @@
 package ui;
 
-import java.io.*;
-import java.net.*;
-import java.nio.channels.*;
-import java.util.*;
-import java.util.zip.*;
+import util.FTPDownload;
+import util.FileUtil;
+import util.GenericClasses.BiMap;
 
 import javax.swing.*;
-
-import util.*;
-import util.GenericClasses.BiMap;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Date;
 
 //http://www2.census.gov/geo/docs/maps-data/data/baf/BlockAssign_ST06_CA.zip block assignment file
 //http://www.census.gov/geo/maps-data/data/baf_description.html description

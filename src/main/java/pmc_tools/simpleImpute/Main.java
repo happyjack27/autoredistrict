@@ -1,14 +1,12 @@
 package pmc_tools.simpleImpute;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Vector;
-
+import dbf.DBField;
 import util.DataAndHeader;
 import util.FileUtil;
-import dbf.DBField;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 
 public class Main {
 

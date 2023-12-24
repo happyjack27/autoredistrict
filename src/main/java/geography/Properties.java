@@ -1,8 +1,8 @@
 package geography;
 
-import java.util.Hashtable;
-
 import jsonMap.ReflectJsonMap;
+
+import java.util.Hashtable;
 
 public class Properties extends ReflectJsonMap<Properties> {
 	public boolean from_shape_file = false;

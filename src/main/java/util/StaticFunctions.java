@@ -2,8 +2,6 @@ package util;
 
 import java.util.Vector;
 
-import solutions.Settings;
-
 public class StaticFunctions {
 	
 	public static int getRandomInt(int max) {

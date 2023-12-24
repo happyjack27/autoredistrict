@@ -1,21 +1,13 @@
 package ui;
 
-import java.util.Collections;
-import java.util.Vector;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
-import solutions.District;
-import solutions.DistrictMap;
-import solutions.Settings;
-
-import java.awt.event.ActionListener;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Vector;
 
 public class PanelRankedDistricts extends JPanel {
 	public JPanel panel;

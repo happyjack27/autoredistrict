@@ -3,7 +3,6 @@ package pareto.scorers;
 import pareto.SimpleDistrictMap;
 import pareto.prototypes.ParetoPoint;
 import pareto.prototypes.Scorer;
-import solutions.Settings;
 
 public class ScorerDescriptiveRepresentation implements Scorer<SimpleDistrictMap> {
 

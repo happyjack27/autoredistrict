@@ -1,7 +1,8 @@
 package pareto.prototypes;
 
 import java.util.HashMap;
-import java.util.concurrent.locks.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class ParetoPoint<T extends ParetoPoint<T>> {
 	HashMap<String,Double> scores = new HashMap<String,Double>();

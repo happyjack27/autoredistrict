@@ -1,28 +1,25 @@
 package ui;
 
-import geography.VTD;
 import geography.FeatureCollection;
+import geography.VTD;
+import org.jfree.svg.SVGGraphics2D;
+import solutions.*;
+import util.GenericClasses.Triplet;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.*;
-
-import org.jfree.svg.*;
-
-import solutions.*;
-import util.GenericClasses.Triplet;
-
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.text.*;
-import java.util.*;
-import java.util.Map.Entry;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class PanelStats extends JPanel implements iDiscreteEventListener {
 	

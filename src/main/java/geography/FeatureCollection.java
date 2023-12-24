@@ -1,32 +1,17 @@
 package geography;
 
-import javax.swing.*;
-
-import java.awt.*;
-import java.awt.geom.RoundRectangle2D;
-import java.text.*;
-import java.util.*;
-import java.io.*;
-import java.nio.charset.Charset;
-
-import org.nocrala.tools.gis.data.esri.shapefile.*;
-import org.nocrala.tools.gis.data.esri.shapefile.header.*;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
-
-import dbf.DBFReader;
 import dbf.DBField;
 import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
-import solutions.Election;
-import solutions.District;
-import solutions.DistrictMap;
-import solutions.Ecology;
-import solutions.Settings;
-import geography.VTD;
+import solutions.*;
 import ui.MainFrame;
 import ui.MapPanel;
 import util.GenericClasses.Quadruplet;
+
+import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
+import java.text.DecimalFormat;
+import java.util.*;
 
 public class FeatureCollection extends ReflectJsonMap<FeatureCollection> {
 	public static Color[] standard_district_colors = new Color[]{Color.blue,Color.red,Color.green,Color.cyan,Color.yellow,Color.magenta,Color.orange,Color.gray,Color.pink,Color.white,Color.black};

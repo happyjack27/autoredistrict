@@ -1,9 +1,6 @@
 package new_metrics;
-import java.util.Vector;
 
-import org.apache.commons.math3.*;
-import org.apache.commons.math3.distribution.*;
-import org.apache.commons.math3.util.FastMath;
+import java.util.Vector;
 
 public class BetaStuff implements VoteCounts {
 	/*

@@ -1,6 +1,7 @@
 package paretoFront;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Vector;
 
 //http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=DB2C0FB4F2159957393DAD16E5B755B6?doi=10.1.1.542.385&rep=rep1&type=pdf
 public class ScoreArray<T> implements Comparable<ScoreArray<T>> {

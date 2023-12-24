@@ -1,7 +1,5 @@
 package geography;
 
-import jsonMap.ReflectJsonMap;
-
 public class Vertex {
 	public int id;
 	public double x;

@@ -1,19 +1,14 @@
 package geography;
 
-import java.util.*;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Polygon;
-
-import javax.swing.JOptionPane;
-
-import dbf.*;
 import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
-import solutions.*;
+import solutions.District;
+import solutions.Election;
+import solutions.Settings;
 import ui.MainFrame;
-import util.GenericClasses.Pair;
+
+import java.awt.*;
+import java.util.Vector;
 
 public class VTD extends ReflectJsonMap<VTD> implements Comparable<VTD> {
 	

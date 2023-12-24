@@ -1,8 +1,9 @@
 package util.ballot_counters;
 
-import java.util.*;
-
 import util.GenericClasses.Pair;
+
+import java.util.Collections;
+import java.util.Vector;
 
 public class MultiBallot {
 	public static int num_votes = 3;

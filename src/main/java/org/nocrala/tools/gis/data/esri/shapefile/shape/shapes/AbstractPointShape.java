@@ -1,13 +1,13 @@
 package org.nocrala.tools.gis.data.esri.shapefile.shape.shapes;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeType;
 import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class AbstractPointShape extends AbstractShape {
 

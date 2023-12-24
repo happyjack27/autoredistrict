@@ -1,10 +1,11 @@
 package pmc_tools.extract;
 
+import util.DataAndHeader;
+import util.FileUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
-
-import util.*;
 
 public class Main {
 	public static String base_path = "C:\\Users\\kbaas\\Documents\\autoredistrict_data\\mggg autoredistrict\\";

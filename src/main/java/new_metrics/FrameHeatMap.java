@@ -1,17 +1,11 @@
 package new_metrics;
 
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.table.*;
-
 import org.apache.commons.math3.distribution.BetaDistribution;
-
 import util.GenericClasses.Pair;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.util.Vector;
 
 public class FrameHeatMap extends JFrame {
 

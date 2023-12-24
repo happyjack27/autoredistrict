@@ -1,11 +1,11 @@
 package org.nocrala.tools.gis.data.esri.shapefile.util;
 
+import org.nocrala.tools.gis.data.esri.shapefile.exception.DataStreamEOFException;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-
-import org.nocrala.tools.gis.data.esri.shapefile.exception.DataStreamEOFException;
 
 public class ISUtil {
 

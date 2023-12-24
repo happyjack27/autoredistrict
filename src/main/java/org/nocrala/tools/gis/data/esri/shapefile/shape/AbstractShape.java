@@ -1,8 +1,8 @@
 package org.nocrala.tools.gis.data.esri.shapefile.shape;
 
-import java.io.InputStream;
-
 import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
+
+import java.io.InputStream;
 
 public abstract class AbstractShape {
 

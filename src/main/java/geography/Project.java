@@ -1,14 +1,14 @@
 package geography;
 
-import java.awt.Color;
-import java.io.File;
-import java.util.*;
-
-import javax.swing.JOptionPane;
-
-import jsonMap.*;
+import jsonMap.JsonMap;
+import jsonMap.ReflectJsonMap;
 import solutions.Settings;
 import ui.MainFrame;
+
+import javax.swing.*;
+import java.io.File;
+import java.util.Set;
+import java.util.Vector;
 
 
 public class Project extends ReflectJsonMap<Project> {

@@ -1,13 +1,15 @@
 package ui;
-import geography.*;
+
+import geography.VTD;
 
 import javax.swing.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.Vector;
 
 public class DialogManageElections extends JDialog {
 	JList<String> listAvailableColumns = new JList<String>();

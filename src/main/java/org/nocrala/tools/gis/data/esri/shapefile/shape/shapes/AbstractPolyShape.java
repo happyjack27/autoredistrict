@@ -1,17 +1,13 @@
 package org.nocrala.tools.gis.data.esri.shapefile.shape.shapes;
 
+import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
+import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileException;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.*;
+import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-
-import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
-import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileException;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.Const;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeHeader;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeType;
-import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
 
 public abstract class AbstractPolyShape extends AbstractShape {
 

@@ -4,9 +4,8 @@ import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
 import solutions.Settings;
 
-import java.awt.Color;
-import java.awt.Polygon;
-import java.util.*;
+import java.awt.*;
+import java.util.Vector;
 
 public class Geometry extends ReflectJsonMap<Geometry> {
 	public String type;

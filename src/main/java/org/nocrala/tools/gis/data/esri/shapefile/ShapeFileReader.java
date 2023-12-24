@@ -1,31 +1,18 @@
 package org.nocrala.tools.gis.data.esri.shapefile;
 
-import java.io.BufferedInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.nocrala.tools.gis.data.esri.shapefile.exception.DataStreamEOFException;
 import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileException;
 import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeType;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.MultiPatchShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.MultiPointMShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.MultiPointPlainShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.MultiPointZShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.NullShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PointMShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PointShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PointZShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonMShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonZShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineMShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineShape;
-import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolylineZShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
+
+import java.io.BufferedInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Reads an ESRI Shape File from an InputStream and provides its contents as

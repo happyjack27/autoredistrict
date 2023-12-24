@@ -1,7 +1,5 @@
 package pmc_tools.simpleCrossAggregate;
 
-import java.util.Vector;
-
 public class District {
 	public double total_population = 0;
 	public int index_in_file;

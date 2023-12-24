@@ -1,19 +1,27 @@
 package ui;
 
-import java.util.*;
-import java.util.regex.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import solutions.DistrictMap;
+import solutions.Settings;
+import solutions.iDiscreteEventListener;
+import ui.MainFrame.OpenShapeFileThread;
+import util.FileUtil;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.*;
-
-import solutions.*;
-import ui.DialogDownload.EventThread;
-import ui.MainFrame.OpenShapeFileThread;
-import util.FileUtil;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * alabama: 252266

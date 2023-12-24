@@ -1,16 +1,15 @@
 package pmc_tools.visualize;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Vector;
-
-import jsonMap.JsonMap;
 import new_metrics.BetaStuff;
 import new_metrics.FrameDrawDistribution;
 import new_metrics.Metrics;
+import pmc_tools.simpleCrossAggregate.District;
 import util.DataAndHeader;
 import util.FileUtil;
-import pmc_tools.simpleCrossAggregate.District;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Vector;
 
 public class ReadCsvAndGatherMetrics {
 	

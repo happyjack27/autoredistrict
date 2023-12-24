@@ -1,25 +1,20 @@
 package new_metrics;
 
-import java.awt.AlphaComposite;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import jsonMap.JsonMap;
+import org.apache.commons.math3.distribution.BinomialDistribution;
+import org.apache.commons.math3.util.FastMath;
+import util.GenericClasses.Pair;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Map.Entry;
-
-import javax.imageio.ImageIO;
-import javax.swing.JComponent;
-
-import jsonMap.JsonMap;
-
-import org.apache.commons.math3.distribution.BetaDistribution;
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.apache.commons.math3.util.FastMath;
-
-import util.GenericClasses.Pair;
+import java.util.Vector;
 
 
 /*

@@ -1,10 +1,9 @@
 package geography;
 
-import java.util.Vector;
-
 import jsonMap.JsonMap;
 import jsonMap.ReflectJsonMap;
-import solutions.Election;
+
+import java.util.Vector;
 
 public class DemographicSet extends ReflectJsonMap<DemographicSet> {
 	public String name = "";

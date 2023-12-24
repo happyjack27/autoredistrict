@@ -1,14 +1,12 @@
 package pareto;
 
-import java.util.HashMap;
-import java.util.Vector;
-
 import geography.FeatureCollection;
-import geography.VTD;
 import pareto.prototypes.ParetoPoint;
 import pareto.prototypes.Scorer;
 import solutions.DistrictMap;
 import solutions.Settings;
+
+import java.util.HashMap;
 
 public class SimpleDistrictMap extends ParetoPoint<SimpleDistrictMap> {
 	public SimpleDistrictMap(HashMap<String, Scorer<SimpleDistrictMap>> scorers) {
