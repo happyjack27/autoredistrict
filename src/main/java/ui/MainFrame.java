@@ -3704,8 +3704,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.print(cols[i]+"  ");
 			}
 			System.out.print("\n");
-		    
-		    System.out.println("The shape type of this files is " + r.getHeaderShapeType());
+		    System.out.println("The shape type of this file is " + r.getHeaderShapeType());
 
 			int total = r.processShapeFile(cols, dbfreader, featureCollection);
 			for( int i=0; i<cols.length; i++) {
@@ -3713,15 +3712,12 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 				System.out.print(cols[i]+"  ");
 			}
 			System.out.print("\n");
-
-
 		    System.out.println("Total shapes read: " + total);
 
 		    is.close();		
 		} catch (Exception ex) {
 			System.out.println("exception in processing shapefile: "+ex);
 			ex.printStackTrace();
-			
 		}
 	}
 
