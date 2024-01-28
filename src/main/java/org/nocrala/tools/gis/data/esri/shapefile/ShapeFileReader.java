@@ -1,9 +1,15 @@
 package org.nocrala.tools.gis.data.esri.shapefile;
 
+import dbf.DBFReader;
+import geography.FeatureCollection;
+import geography.Geometry;
+import geography.Properties;
+import geography.VTD;
 import org.nocrala.tools.gis.data.esri.shapefile.exception.DataStreamEOFException;
 import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileException;
 import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
+import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeType;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
@@ -13,13 +19,14 @@ import java.io.BufferedInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Reads an ESRI Shape File from an InputStream and provides its contents as
  * simple Java objects.
  * 
  */
-public class ShapeFileReader {
+public class ShapeFileReader implements shapefile.ShapeFileReader {
 
   private BufferedInputStream is;
   private ValidationPreferences rules;
@@ -99,6 +106,95 @@ public class ShapeFileReader {
   }
 
   // Methods
+
+  public int processShapeFile(String[] cols, DBFReader dbfreader, FeatureCollection featureCollection) throws InvalidShapeFileException, IOException {
+    int total = 0;
+    AbstractShape s;
+    while ((s = this.next()) != null) {
+      Object[] aobj = new Object[cols.length];
+      try {
+        aobj = dbfreader.nextRecord(Charset.defaultCharset());
+      } catch (Exception ex) {
+        System.out.println("aobj ex "+ex);
+        ex.printStackTrace();
+        for( int i = 0; i < aobj.length; i++) {
+          aobj[i] = "";
+        }
+
+      }
+      switch (s.getShapeType()) {
+        case POLYGON_Z:
+        {
+          int rec_num = s.getHeader().getRecordNumber();
+          //System.out.println("record number: "+rec_num);
+          PolygonZShape aPolygon = (PolygonZShape) s;
+
+          VTD feature = new VTD();
+          featureCollection.features.add(feature);
+          feature.properties = new Properties();
+          feature.geometry = new Geometry();
+          feature.properties.esri_rec_num = rec_num;
+          feature.properties.from_shape_file = true;
+          for(int i = 0; i < cols.length; i++) {
+            feature.properties.put(cols[i],aobj[i].toString());
+            //System.out.print(aobj[i].toString()+" ");
+          }
+          //System.out.println();
+          feature.properties.post_deserialize();
+          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+
+          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+            PointData[] points = aPolygon.getPointsOfPart(i);
+            feature.geometry.coordinates[i] = new double[points.length][2];
+            for( int j = 0; j < points.length; j++) {
+              feature.geometry.coordinates[i][j][0] = points[j].getX();
+              feature.geometry.coordinates[i][j][1] = points[j].getY();
+            }
+          }
+          feature.geometry.post_deserialize();
+          feature.post_deserialize();
+        }
+        break;
+        case POLYGON:
+        {
+          int rec_num = s.getHeader().getRecordNumber();
+          //System.out.println("record number: "+rec_num);
+          PolygonShape aPolygon = (PolygonShape) s;
+
+          VTD feature = new VTD();
+          featureCollection.features.add(feature);
+          feature.properties = new Properties();
+          feature.geometry = new Geometry();
+          feature.properties.esri_rec_num = rec_num;
+          feature.properties.from_shape_file = true;
+          for(int i = 0; i < cols.length; i++) {
+            feature.properties.put(cols[i],aobj[i].toString());
+            //System.out.print(aobj[i].toString()+" ");
+          }
+          //System.out.println();
+          feature.properties.post_deserialize();
+          feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
+
+          for (int i = 0; i < aPolygon.getNumberOfParts(); i++) {
+            PointData[] points = aPolygon.getPointsOfPart(i);
+            feature.geometry.coordinates[i] = new double[points.length][2];
+            for( int j = 0; j < points.length; j++) {
+              feature.geometry.coordinates[i][j][0] = points[j].getX();
+              feature.geometry.coordinates[i][j][1] = points[j].getY();
+            }
+          }
+          feature.geometry.post_deserialize();
+          feature.post_deserialize();
+        }
+        break;
+        default:
+          System.out.println("Read other type of shape.");
+      }
+      total++;
+    }
+    return total;
+  }
+
 
   /**
    * Reads one shape from the InputStream.
@@ -229,13 +325,8 @@ public class ShapeFileReader {
 
   // Getters
 
-  /**
-   * Returns the shape's header.
-   * 
-   * @return shape's header.
-   */
-  public ShapeFileHeader getHeader() {
-    return header;
+  public String getHeaderShapeType() {
+    return header.getShapeType().toString();
   }
 
 }
