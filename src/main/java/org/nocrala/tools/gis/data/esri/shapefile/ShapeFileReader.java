@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 /**
  * Reads an ESRI Shape File from an InputStream and provides its contents as
@@ -35,32 +36,6 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
   private boolean eofReached;
 
   // Constructors
-
-  /**
-   * <p>
-   * Reads a Shape File from an InputStream using the default validation
-   * preferences. The default validation preferences conforms strictly to the
-   * ESRI ShapeFile specification.
-   * </p>
-   * 
-   * <p>
-   * The constructor will automatically read the header of the file. Thereafter,
-   * use the method next() to read all shapes.
-   * </p>
-   * 
-   * @param is
-   *          the InputStream to be read.
-   * @throws InvalidShapeFileException
-   *           if the data is malformed, according to the ESRI ShapeFile
-   *           specification.
-   * @throws IOException
-   *           if it's not possible to read from the InputStream.
-   */
-  public ShapeFileReader(final InputStream is)
-      throws InvalidShapeFileException, IOException {
-    ValidationPreferences rules = new ValidationPreferences();
-    initialize(is, rules);
-  }
 
   /**
    * <p>
@@ -117,16 +92,13 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
       } catch (Exception ex) {
         System.out.println("aobj ex "+ex);
         ex.printStackTrace();
-        for( int i = 0; i < aobj.length; i++) {
-          aobj[i] = "";
-        }
+        Arrays.fill(aobj, "");
 
       }
       switch (s.getShapeType()) {
         case POLYGON_Z:
         {
           int rec_num = s.getHeader().getRecordNumber();
-          //System.out.println("record number: "+rec_num);
           PolygonZShape aPolygon = (PolygonZShape) s;
 
           VTD feature = new VTD();
@@ -137,9 +109,7 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
           feature.properties.from_shape_file = true;
           for(int i = 0; i < cols.length; i++) {
             feature.properties.put(cols[i],aobj[i].toString());
-            //System.out.print(aobj[i].toString()+" ");
           }
-          //System.out.println();
           feature.properties.post_deserialize();
           feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
 
@@ -158,7 +128,6 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
         case POLYGON:
         {
           int rec_num = s.getHeader().getRecordNumber();
-          //System.out.println("record number: "+rec_num);
           PolygonShape aPolygon = (PolygonShape) s;
 
           VTD feature = new VTD();
@@ -169,9 +138,7 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
           feature.properties.from_shape_file = true;
           for(int i = 0; i < cols.length; i++) {
             feature.properties.put(cols[i],aobj[i].toString());
-            //System.out.print(aobj[i].toString()+" ");
           }
-          //System.out.println();
           feature.properties.post_deserialize();
           feature.geometry.coordinates = new double[aPolygon.getNumberOfParts()][][];
 
