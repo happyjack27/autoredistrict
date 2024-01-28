@@ -5,12 +5,12 @@ import geography.Properties;
 import geography.*;
 import new_metrics.Metrics;
 import org.nocrala.tools.gis.data.esri.shapefile.ShapeFileReader;
-import org.nocrala.tools.gis.data.esri.shapefile.ValidationPreferences;
 import org.nocrala.tools.gis.data.esri.shapefile.header.ShapeFileHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.AbstractShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.PointData;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonShape;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.PolygonZShape;
+import shapefile.NocralaShapeFileReaderFactory;
 import solutions.*;
 import util.DataAndHeader;
 import util.FileUtil;
@@ -3697,15 +3697,8 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    try {
 			FileInputStream is = new FileInputStream(f);
-			ValidationPreferences prefs = new ValidationPreferences();
-		    prefs.setMaxNumberOfPointsPerShape(32650*4);
-		    prefs.setAllowUnlimitedNumberOfPointsPerShape(true);
-		    prefs.setAllowBadContentLength(true);
-		    prefs.setAllowBadRecordNumbers(true);
-		    
-		    //prefs.setMaxNumberOfPointsPerShape(16650);
-		    ShapeFileReader r = new ShapeFileReader(is, prefs);
-		    
+			ShapeFileReader r = NocralaShapeFileReaderFactory.createShapeFileReader(is);
+
 			String dbfname = f.getAbsolutePath();//.getName();
 			dbfname = dbfname.substring(0,dbfname.length()-4)+".dbf";
 			
