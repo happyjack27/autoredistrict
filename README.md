@@ -25,6 +25,11 @@ The `-Xmx4096M -Xms1024M` arguments tell java to reserve 1GB of memory, and allo
 3. Make a ```bin``` directory here.
 4. Execute `mvn clean compile package exec:java`
 
+## Running Tests
+### From a terminal
+Simply execute `mvn test`.
+### From an IDE
+You may need to add `--add-opens java.base/java.util=ALL-UNNAMED` as program arguments or VM arguments in your run configuration, in order to avoid getting `java.lang.reflect.InaccessibleObjectException`s in the console output.
 
 ## Contributing
 * I won't merge anything that can be abused - that makes it so the program can be used to gerrymander.
