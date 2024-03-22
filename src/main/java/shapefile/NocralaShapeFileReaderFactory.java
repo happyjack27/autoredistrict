@@ -7,10 +7,10 @@ import org.nocrala.tools.gis.data.esri.shapefile.exception.InvalidShapeFileExcep
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class NocralaShapeFileReaderFactory {
-    public static NocralaShapeFileReader createShapeFileReader(FileInputStream is) throws InvalidShapeFileException, IOException {
+public class NocralaShapeFileReaderFactory implements ShapeFileReaderFactory {
+    public NocralaShapeFileReader createShapeFileReader(FileInputStream is) throws InvalidShapeFileException, IOException {
         ValidationPreferences prefs = new ValidationPreferences();
-        prefs.setMaxNumberOfPointsPerShape(32650*4);
+        prefs.setMaxNumberOfPointsPerShape(32650 * 4);
         prefs.setAllowUnlimitedNumberOfPointsPerShape(true);
         prefs.setAllowBadContentLength(true);
         prefs.setAllowBadRecordNumbers(true);

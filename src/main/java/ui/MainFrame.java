@@ -6,6 +6,7 @@ import geography.*;
 import new_metrics.Metrics;
 import shapefile.NocralaShapeFileReaderFactory;
 import shapefile.ShapeFileReader;
+import shapefile.ShapeFileReaderFactory;
 import solutions.*;
 import util.DataAndHeader;
 import util.FileUtil;
@@ -3692,7 +3693,7 @@ public class MainFrame extends JFrame implements iChangeListener, iDiscreteEvent
 
 	    try {
 			FileInputStream is = new FileInputStream(f);
-			ShapeFileReader r = NocralaShapeFileReaderFactory.createShapeFileReader(is);
+			ShapeFileReader r = new NocralaShapeFileReaderFactory().createShapeFileReader(is);
 
 			String dbfname = f.getAbsolutePath();//.getName();
 			dbfname = dbfname.substring(0,dbfname.length()-4)+".dbf";
