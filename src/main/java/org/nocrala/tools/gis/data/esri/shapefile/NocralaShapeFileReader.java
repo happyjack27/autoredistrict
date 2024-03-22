@@ -14,6 +14,7 @@ import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeHeader;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.ShapeType;
 import org.nocrala.tools.gis.data.esri.shapefile.shape.shapes.*;
 import org.nocrala.tools.gis.data.esri.shapefile.util.ISUtil;
+import shapefile.ShapeFileReader;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -27,7 +28,7 @@ import java.util.Arrays;
  * simple Java objects.
  * 
  */
-public class ShapeFileReader implements shapefile.ShapeFileReader {
+public class NocralaShapeFileReader implements ShapeFileReader {
 
   private BufferedInputStream is;
   private ValidationPreferences rules;
@@ -58,8 +59,8 @@ public class ShapeFileReader implements shapefile.ShapeFileReader {
    * @throws IOException
    *           if it's not possible to read from the InputStream.
    */
-  public ShapeFileReader(final InputStream is,
-      final ValidationPreferences preferences)
+  public NocralaShapeFileReader(final InputStream is,
+                                final ValidationPreferences preferences)
       throws InvalidShapeFileException, IOException {
     initialize(is, preferences);
   }
